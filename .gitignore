@@ -67,3 +67,4 @@ node_modules/
 
 /env.json
 functions/_keys/*
+.DS_Store
