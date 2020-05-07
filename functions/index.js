@@ -13,9 +13,9 @@ admin.initializeApp({
   databaseURL: "https://common-daostack.firebaseio.com",
 });
 const graphHttpLink =
-  'https://api.thegraph.com/subgraphs/name/daostack/v7_2_exp_rinkeby';
+  'https://api.thegraph.com/subgraphs/name/daostack/v7_5_exp_rinkeby';
 const graphwsLink =
-  'wss://api.thegraph.com/subgraphs/name/daostack/v7_2_exp_rinkeby';
+  'wss://api.thegraph.com/subgraphs/name/daostack/v7_5_exp_rinkeby';
 
 const env = require('./_keys/env');
 const privateKey = env.wallet_info.private_key;
@@ -39,8 +39,35 @@ const arc = new Arc({
   }
 });
 
+
+const test = {
+  memberCount: 453, // number of members
+  name: 'my wonderful DAO',
+  fundingGoal:  2300000000000000000, // the funding goal (in WEI)
+  fundingGoalDeadline: '',// ? Date representation in firebase?
+  minFeeToJoin: 1000000000000000000,//
+  currentBalance: 2300000000000000000, // the current balance of the DAO's avatar (in WEI),
+  totalRaised: 9900000000000000000,
+  byline: "We aim to ....",
+  agenda: {
+    about: "...",
+    links: [
+      {
+        title: 'Link to somehwere',
+        url: 'http://www.daostack.io'
+      }
+    ],
+    courseOfAction: "We aim to please",
+    rules: [
+      { title: "The first rule",
+        description: "Love your neighbour as you love yourself"
+      }
+    ]
+  }
+}
+
 async function pingDaos() {
-  //loop that runs a function every 10 seconds for 5 intervals
+  //loop that runs a function every 15 seconds for 3 intervals
   for(var i = 0; i < 4; i++) {
     (function(index) {
       setTimeout(function() {
@@ -50,15 +77,40 @@ async function pingDaos() {
             .daos({orderBy: 'name', orderDirection: 'asc'}, {fetchAllData: true})
             .subscribe(res => {
               res.map(dao => {
-                const {name, id, memberCount, tokenName} = dao.coreState;
-                db.collection('daos').doc(id).set({name, id, memberCount, tokenName}).then(() => {
+                const {id, address ,
+                  memberCount ,
+                  name ,
+                  numberOfBoostedProposals ,
+                  numberOfPreBoostedProposals ,
+                  numberOfQueuedProposals ,
+                  register,
+                  reputation,
+                  reputationTotalSupply,
+                  token,
+                  tokenName,
+                  tokenSymbol,
+                  tokenTotalSupply} = dao.coreState;
+
+                db.collection('daos').doc(id).set({id, address ,
+                  memberCount ,
+                  name ,
+                  numberOfBoostedProposals ,
+                  numberOfPreBoostedProposals ,
+                  numberOfQueuedProposals ,
+                  register,
+                  tokenName,
+                  tokenSymbol,
+                  tokenTotalSupply,
+                  reputationId: reputation.id,
+                  tokenId: token.id,
+                  reputationTotalSupply: parseInt(reputationTotalSupply)
+                }).then(() => {
+                  console.log(`[ PING DAOS ] Updated DAOs`);
                 }, (error) => {
-                  console.error('Failed to updated DAOs: ');
-                  console.error(error);
+                  console.error('Failed to updated DAOs: ', error);
                 });
               })
             });
-          console.log(`[ PING DAOS ] Updated DAOs`);
         } catch(e) {
           console.log('Error querying DAOs: ', e)
         }
@@ -84,7 +136,8 @@ app.use(cors({ origin: true }));
 const messaging = admin.messaging();
 
 app.get('/', async (req, res) => {
-  const message = "G'day mate";
+  const message = "G'day matey";
+  pingDaos();
   res.send({message})
 });
 
@@ -120,21 +173,11 @@ app.get('/send-test-eth/:address', async (req, res) => {
   }
 });
 
-app.post('/notification', async (req, res) => {
+app.get('/notification', async (req, res) => {
   try {
-    console.log('REQUEST DATA: ', req.body);
-    const {registrationToken, title, body, data} = req.body;
-    const payload = {
-      token: registrationToken,
-      notification: {
-        title,
-        body
-      },
-      data
-    };
-
+    pingDaos();
     const message = await messaging.send(payload);
-    res.send({message});
+    res.send({message: 'hello'});
 
   } catch(e) {
     console.log('notification error: ', e);
