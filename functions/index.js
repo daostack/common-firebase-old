@@ -66,7 +66,7 @@ const test = {
   }
 }
 
-async function pingDaos() {
+async function updateDaos() {
   //loop that runs a function every 15 seconds for 3 intervals
   for(var i = 0; i < 4; i++) {
     (function(index) {
@@ -76,7 +76,7 @@ async function pingDaos() {
           arc
             .daos({orderBy: 'name', orderDirection: 'asc'}, {fetchAllData: true})
             .subscribe(res => {
-              res.map(dao => {
+              res.map((dao, i) => {
                 const {id, address ,
                   memberCount ,
                   name ,
@@ -105,7 +105,7 @@ async function pingDaos() {
                   tokenId: token.id,
                   reputationTotalSupply: parseInt(reputationTotalSupply)
                 }).then(() => {
-                  console.log(`[ PING DAOS ] Updated DAOs`);
+                  console.log(`[ Updated DAO ] `);
                 }, (error) => {
                   console.error('Failed to updated DAOs: ', error);
                 });
@@ -130,14 +130,12 @@ app.use(express.json());       // to support JSON-encoded bodies
 app.use(express.urlencoded({ extended: true })); // to support URL-encoded bodies
 app.use(cors({ origin: true }));
 
-// Add middleware to authenticate requests
-// app.use(myMiddleware);
 
 const messaging = admin.messaging();
 
 app.get('/', async (req, res) => {
-  const message = "G'day matey";
-  pingDaos();
+  const message = "G'day mate";
+  updateDaos();
   res.send({message})
 });
 
@@ -175,7 +173,6 @@ app.get('/send-test-eth/:address', async (req, res) => {
 
 app.get('/notification', async (req, res) => {
   try {
-    pingDaos();
     const message = await messaging.send(payload);
     res.send({message: 'hello'});
 
@@ -264,6 +261,6 @@ exports.sendFollowerNotification = functions.firestore.document('/notification/f
   })
 
 exports.scheduledFunction = functions.pubsub.schedule('* * * * *').onRun((context) => {
-  pingDaos();
+  updateDaos();
   return null;
 });
