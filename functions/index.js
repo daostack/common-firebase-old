@@ -1,9 +1,8 @@
 const functions = require('firebase-functions');
 const ethers = require('ethers');
 // const Notification = require('./Notification')
-
 const admin = require('firebase-admin');
-
+const { Arc } = require('@daostack/arc.js');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -23,20 +22,19 @@ const provider = ethers.getDefaultProvider('rinkeby');
 let wallet = new ethers.Wallet(privateKey, provider);
 let amount = ethers.utils.parseEther('0.1');
 
-const Arc = require('@daostack/client').Arc;
 // const Arc = require('../dist/lib/index.js').Arc
 
 // create an Arc instance
 const arc = new Arc({
   graphqlHttpProvider: graphHttpLink,
   graphqlWsProvider: graphwsLink,
-  web3Provider: `wss://rinkeby.infura.io/ws/v3/${'4406c3acf862426c83991f1752c46dd8'}`,
-  ipfsProvider: {
-    "host": "subgraph.daostack.io",
-    "port": "443",
-    "protocol": "https",
-    "api-path": "/ipfs/api/v0/"
-  }
+  // web3Provider: `wss://rinkeby.infura.io/ws/v3/${'4406c3acf862426c83991f1752c46dd8'}`,
+  // ipfsProvider: {
+  //   "host": "subgraph.daostack.io",
+  //   "port": "443",
+  //   "protocol": "https",
+  //   "api-path": "/ipfs/api/v0/"
+  // }
 });
 
 
@@ -68,56 +66,64 @@ const test = {
 
 async function updateDaos() {
   //loop that runs a function every 15 seconds for 3 intervals
-  for(var i = 0; i < 4; i++) {
-    (function(index) {
-      setTimeout(function() {
-        try {
-          const db = admin.firestore();
-          arc
-            .daos({orderBy: 'name', orderDirection: 'asc'}, {fetchAllData: true})
-            .subscribe(res => {
-              res.map((dao, i) => {
-                const {id, address ,
-                  memberCount ,
-                  name ,
-                  numberOfBoostedProposals ,
-                  numberOfPreBoostedProposals ,
-                  numberOfQueuedProposals ,
-                  register,
-                  reputation,
-                  reputationTotalSupply,
-                  token,
-                  tokenName,
-                  tokenSymbol,
-                  tokenTotalSupply} = dao.coreState;
+    try {
+      const db = admin.firestore();
+      arc
+        .daos({}, {subscribe: true, fetchAllData: true})
+        .subscribe(res => {
+          res.map(async (dao, i) => {
+            // const state = await dao.fetchState()
+            // console.log(state)
+            console.log(dao.coreState)
+            const joinAndQuitPlugins = await dao.plugins({ where: {name: 'JoinAndQuit'}}).first()
+            if (joinAndQuitPlugins.length == 0) {
+              // this is not a correctly configured Common DAO
+            } else {
+              console.log(joinAndQuitPlugins)
+              const joinAndQuitPlugin = joinAndQuitPlugins[0]
+              const { 
+                fundingGoal,
+                minFeeToJoin,
+                memberReputation
+              } = joinAndQuitPlugin.coreState.pluginParams
 
-                db.collection('daos').doc(id).set({id, address ,
+              const {id, address ,
+                memberCount ,
+                name ,
+                numberOfBoostedProposals ,
+                numberOfPreBoostedProposals ,
+                numberOfQueuedProposals ,
+                register,
+                reputation,
+                reputationTotalSupply,
+              } = dao.coreState;
+
+              try {
+                await db.collection('daos').doc(id).set({
+                  id, 
+                  address ,
                   memberCount ,
                   name ,
                   numberOfBoostedProposals ,
                   numberOfPreBoostedProposals ,
                   numberOfQueuedProposals ,
                   register,
-                  tokenName,
-                  tokenSymbol,
-                  tokenTotalSupply,
                   reputationId: reputation.id,
-                  tokenId: token.id,
-                  reputationTotalSupply: parseInt(reputationTotalSupply)
-                }).then(() => {
-                  console.log(`[ Updated DAO ] `);
-                }, (error) => {
-                  console.error('Failed to updated DAOs: ', error);
-                });
-              })
-            });
-        } catch(e) {
-          console.log('Error querying DAOs: ', e)
-        }
-      }, index*15000);
-    })(i);
+                  reputationTotalSupply: parseInt(reputationTotalSupply),
+                  fundingGoal: fundingGoal.toString(),
+                })
+                console.log(`[ Updated DAO ${name}@${address}] `);
+              } catch(error) {
+                console.error('Failed to updated DAOs: ', error);
+              };
+            }
+          })
+        });
+    } catch(e) {
+      console.log('Error querying DAOs: ', e)
+      throw(e)
+    }
   }
-}
 
 const app = express();
 
@@ -182,8 +188,6 @@ app.get('/notification', async (req, res) => {
 });
 
 // Expose Express API as a single Cloud Function:
-// exports.widgets = functions.https.onRequest(app);
-
 exports.api = functions.https.onRequest(app);
 
 
@@ -260,7 +264,13 @@ exports.sendFollowerNotification = functions.firestore.document('/notification/f
     return Notification.send(title, body,)
   })
 
-exports.scheduledFunction = functions.pubsub.schedule('* * * * *').onRun((context) => {
+// 
+// '* * * * *'
+// minute hour dayofmonth month dayofweek
+
+// "every five minutes"
+// '*/5 * * * *
+exports.scheduledFunction = functions.pubsub.schedule('*/5 * * * *').onRun((context) => {
   updateDaos();
   return null;
 });
