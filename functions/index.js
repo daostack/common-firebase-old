@@ -30,13 +30,6 @@ const Arc = require('@daostack/client').Arc;
 const arc = new Arc({
   graphqlHttpProvider: graphHttpLink,
   graphqlWsProvider: graphwsLink,
-  web3Provider: `wss://rinkeby.infura.io/ws/v3/${'4406c3acf862426c83991f1752c46dd8'}`,
-  ipfsProvider: {
-    "host": "subgraph.daostack.io",
-    "port": "443",
-    "protocol": "https",
-    "api-path": "/ipfs/api/v0/"
-  }
 });
 
 
@@ -64,11 +57,11 @@ const test = {
       }
     ]
   }
-}
+};
 
 async function updateDaos() {
   //loop that runs a function every 15 seconds for 3 intervals
-  for(var i = 0; i < 4; i++) {
+  for(var i = 0; i < 2; i++) {
     (function(index) {
       setTimeout(function() {
         try {
@@ -90,31 +83,32 @@ async function updateDaos() {
                   tokenName,
                   tokenSymbol,
                   tokenTotalSupply} = dao.coreState;
-
-                db.collection('daos').doc(id).set({id, address ,
-                  memberCount ,
-                  name ,
-                  numberOfBoostedProposals ,
-                  numberOfPreBoostedProposals ,
-                  numberOfQueuedProposals ,
-                  register,
-                  tokenName,
-                  tokenSymbol,
-                  tokenTotalSupply,
-                  reputationId: reputation.id,
-                  tokenId: token.id,
-                  reputationTotalSupply: parseInt(reputationTotalSupply)
-                }).then(() => {
-                  console.log(`[ Updated DAO ] `);
-                }, (error) => {
-                  console.error('Failed to updated DAOs: ', error);
-                });
+                if (!name.includes('Test DAO') && !name.includes('Car DAO')) {
+                  db.collection('daos').doc(id).set({id, address ,
+                    memberCount ,
+                    name ,
+                    numberOfBoostedProposals ,
+                    numberOfPreBoostedProposals ,
+                    numberOfQueuedProposals ,
+                    register,
+                    tokenName,
+                    tokenSymbol,
+                    tokenTotalSupply,
+                    reputationId: reputation.id,
+                    tokenId: token.id,
+                    reputationTotalSupply: parseInt(reputationTotalSupply)
+                  }).then(() => {
+                    console.log(`[ Updated DAO ] `);
+                  }, (error) => {
+                    console.error('Failed to updated DAOs: ', error);
+                  });
+                }
               })
             });
         } catch(e) {
           console.log('Error querying DAOs: ', e)
         }
-      }, index*15000);
+      }, index*30000);
     })(i);
   }
 }
