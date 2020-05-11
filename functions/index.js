@@ -40,6 +40,18 @@ app.get('/', async (req, res) => {
   res.send({message})
 });
 
+app.get('/update-daos', async (req, res) => {
+  try {
+    await updateDaos();
+    const code = 200;
+    res.status(code).send('Updated DAOs successfulyy');
+  } catch(e) {
+    const code = 500;
+    res.status(code).send(new Error('Unable to update DAOs'));
+  }
+
+});
+
 app.get('/send-test-eth/:address', async (req, res) => {
   try {
     const address = req.param("address");
@@ -62,7 +74,7 @@ app.get('/send-test-eth/:address', async (req, res) => {
       let transaction = await wallet.sendTransaction(tx);
       console.log(transaction);
       const code = 200;
-      res.status(code).send(new Error(`Successful transaction: ${transaction.hash}`));
+      res.status(code).send(`Successful transaction: ${transaction.hash}`);
 
     }
 
@@ -165,7 +177,7 @@ exports.sendFollowerNotification = functions.firestore.document('/notification/f
 
 // "every five minutes"
 // '*/5 * * * *
-exports.scheduledFunction = functions.pubsub.schedule('*/5 * * * *').onRun((context) => {
-  updateDaos();
-  return null;
-});
+// exports.scheduledFunction = functions.pubsub.schedule('*/5 * * * *').onRun((context) => {
+//   updateDaos();
+//   return null;
+// });

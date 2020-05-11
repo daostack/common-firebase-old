@@ -33,7 +33,9 @@ function updateDaos() {
             reputation,
             reputationTotalSupply,
           } = dao.coreState;
-            const joinAndQuitPlugins = await dao.plugins({ where: {name: 'JoinAndQuit'}}).first()
+          if (!dao.coreState.name.includes('Test DAO') && !dao.coreState.name.includes('Car DAO')) {
+
+            const joinAndQuitPlugins = await dao.plugins({where: {name: 'JoinAndQuit'}}).first()
             if (joinAndQuitPlugins.length == 0) {
               // this is not a correctly configured Common DAO
 
@@ -50,7 +52,7 @@ function updateDaos() {
                   reputationId: reputation.id,
                   reputationTotalSupply: parseInt(reputationTotalSupply),
                 })
-              } catch(e) {
+              } catch (e) {
                 console.error('Failed to updated DAOs: ', error);
               }
             } else {
@@ -61,18 +63,15 @@ function updateDaos() {
                 minFeeToJoin,
                 memberReputation
               } = joinAndQuitPlugin.coreState.pluginParams;
-
-
-
               try {
                 await db.collection('daos').doc(id).set({
                   id,
-                  address ,
-                  memberCount ,
-                  name ,
-                  numberOfBoostedProposals ,
-                  numberOfPreBoostedProposals ,
-                  numberOfQueuedProposals ,
+                  address,
+                  memberCount,
+                  name,
+                  numberOfBoostedProposals,
+                  numberOfPreBoostedProposals,
+                  numberOfQueuedProposals,
                   register,
                   reputationId: reputation.id,
                   reputationTotalSupply: parseInt(reputationTotalSupply),
@@ -81,12 +80,14 @@ function updateDaos() {
                   memberReputation: memberReputation.toString()
                 })
                 console.log(`[ Updated DAO ${name}@${address}] `);
-              } catch(error) {
+              } catch (error) {
                 console.error('Failed to updated DAOs: ', error);
-              };
-            // }
-x
+              }
+              ;
+
+            }
           }
+
           if (dao.coreState.name.includes('Test DAO') || dao.coreState.name.includes('Car DAO')) {
             console.log('DELETING: ', id)
             await db.collection('daos').doc(id).delete();
