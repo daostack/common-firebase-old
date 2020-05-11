@@ -68,3 +68,5 @@ node_modules/
 /env.json
 
 .idea
+functions/_keys/*
+.DS_Store
