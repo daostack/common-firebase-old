@@ -42,12 +42,14 @@ app.get('/', async (req, res) => {
 
 app.get('/update-daos', async (req, res) => {
   try {
-    await updateDaos();
+    const result = await updateDaos();
+    console.log(result)
     const code = 200;
-    res.status(code).send('Updated DAOs successfulyy');
+    res.status(code).send(`Updated DAOs successfully: ${result}`);
   } catch(e) {
     const code = 500;
-    res.status(code).send(new Error('Unable to update DAOs'));
+    console.log(e)
+    res.status(code).send(new Error(`Unable to update DAOs: ${e}`));
   }
 
 });

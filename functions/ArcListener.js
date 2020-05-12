@@ -12,94 +12,136 @@ const arc = new Arc({
 });
 
 
-
-function updateDaos() {
-  //loop that runs a function every 15 seconds for 3 intervals
-  try {
-    const db = admin.firestore();
-    arc
-      .daos({}, {subscribe: true, fetchAllData: true})
-      .subscribe(res => {
-        res.map(async (dao, i) => {
-          // const state = await dao.fetchState()
-          // console.log(state)
-          const {id, address ,
-            memberCount ,
-            name ,
-            numberOfBoostedProposals ,
-            numberOfPreBoostedProposals ,
-            numberOfQueuedProposals ,
-            register,
-            reputation,
-            reputationTotalSupply,
-          } = dao.coreState;
-          if (!dao.coreState.name.includes('Test DAO') && !dao.coreState.name.includes('Car DAO')) {
-
-            const joinAndQuitPlugins = await dao.plugins({where: {name: 'JoinAndQuit'}}).first()
-            if (joinAndQuitPlugins.length == 0) {
-              // this is not a correctly configured Common DAO
-
-              try {
-                await db.collection('daos').doc(id).set({
-                  id,
-                  address,
-                  memberCount,
-                  name,
-                  numberOfBoostedProposals,
-                  numberOfPreBoostedProposals,
-                  numberOfQueuedProposals,
-                  register,
-                  reputationId: reputation.id,
-                  reputationTotalSupply: parseInt(reputationTotalSupply),
-                })
-              } catch (e) {
-                console.error('Failed to updated DAOs: ', error);
-              }
-            } else {
-              console.log('JaQ PLUGINS: ', joinAndQuitPlugins);
-              const joinAndQuitPlugin = joinAndQuitPlugins[0]
-              const {
-                fundingGoal,
-                minFeeToJoin,
-                memberReputation
-              } = joinAndQuitPlugin.coreState.pluginParams;
-              try {
-                await db.collection('daos').doc(id).set({
-                  id,
-                  address,
-                  memberCount,
-                  name,
-                  numberOfBoostedProposals,
-                  numberOfPreBoostedProposals,
-                  numberOfQueuedProposals,
-                  register,
-                  reputationId: reputation.id,
-                  reputationTotalSupply: parseInt(reputationTotalSupply),
-                  fundingGoal: fundingGoal.toString(),
-                  minFeeToJoin: minFeeToJoin.toString(),
-                  memberReputation: memberReputation.toString()
-                })
-                console.log(`[ Updated DAO ${name}@${address}] `);
-              } catch (error) {
-                console.error('Failed to updated DAOs: ', error);
-              }
-              ;
-
-            }
-          }
-
-          if (dao.coreState.name.includes('Test DAO') || dao.coreState.name.includes('Car DAO')) {
-            console.log('DELETING: ', id)
-            await db.collection('daos').doc(id).delete();
-          }
-
-        })
-      });
-  } catch(e) {
-    console.log('Error querying DAOs: ', e)
-    throw(e)
+// get all DAOs data from graphql and read it into the subgraph
+async function updateDaos() {
+  const response = []
+  const db = admin.firestore();
+  const daos = await arc.daos({first: 4}).first()
+  console.log(`found ${daos.length} DAOs`)
+  for (const dao of daos) {
+    const joinAndQuitPlugins = await dao.plugins({where: {name: 'JoinAndQuit'}}).first()
+    if (joinAndQuitPlugins.length === 0) {
+      // not a properly configured common DAO, skipping
+      const msg = `skipping ${dao.id} as it is not properly configured`
+      console.log(msg)
+      response.push(msg)
+    } else {
+      console.log(`updating ${dao.id}`)
+      const joinAndQuitPlugin = joinAndQuitPlugins[0]
+      const {
+        fundingGoal,
+        minFeeToJoin,
+        memberReputation
+      } = joinAndQuitPlugin.coreState.pluginParams;
+      try {
+      const daoState = dao.coreState
+      const doc = {
+        id: dao.id,
+        address: daoState.address,
+        memberCount: daoState.memberCount,
+        name: daoState.name,
+        numberOfBoostedProposals: daoState.numberOfBoostedProposals,
+        numberOfPreBoostedProposals: daoState.numberOfPreBoostedProposals,
+        numberOfQueuedProposals: daoState.numberOfQueuedProposals,
+        register: daoState.register,
+        // reputationId: reputation.id,
+        reputationTotalSupply: parseInt(daoState.reputationTotalSupply),
+        fundingGoal: fundingGoal.toString(),
+        minFeeToJoin: minFeeToJoin.toString(),
+        memberReputation: memberReputation.toString()
+      }
+      await db.collection('daos').doc(dao.id).set(doc)
+      const msg =`Updated dao ${dao.id}`
+      response.push(msg)
+      console.log(msg)
+    } catch(err) {
+      console.log(err)
+      throw err
+    }
+    }
   }
+  return response.join('\n')
 }
+
+
+// function updateDaosSubscription() {
+//   //loop that runs a function every 15 seconds for 3 intervals
+//   const response = ['xxx']
+//   try {
+//     const db = admin.firestore();
+//     arc
+//       .daos({}, {subscribe: true, fetchAllData: true})
+//       .subscribe(res => {
+//         res.map(async (dao, i) => {
+//           // const state = await dao.fetchState()
+//           // console.log(state)
+//           const {id, address ,
+//             memberCount,
+//             name,
+//             numberOfBoostedProposals ,
+//             numberOfPreBoostedProposals ,
+//             numberOfQueuedProposals ,
+//             register,
+//             reputation,
+//             reputationTotalSupply,
+//           } = dao.coreState;
+//           // if (!dao.coreState.name.includes('Test DAO') && !dao.coreState.name.includes('Car DAO')) {
+//           if (true) {
+//             const joinAndQuitPlugins = await dao.plugins({where: {name: 'JoinAndQuit'}}).first()
+//             if (joinAndQuitPlugins.length == 0) {
+//               // we'll delete this DAO, as it does not have the correct plugins
+//               try {
+//                 console.log('DELETING: ', id)
+//                 response.append(`Deleted dao ${id}`)
+//                 await db.collection('daos').doc(id).delete();
+//               } catch (e) {
+//                 console.error('Failed to updated DAOs: ', error);
+//               }
+//             } else {
+//               console.log('JaQ PLUGINS: ', joinAndQuitPlugins);
+//               const joinAndQuitPlugin = joinAndQuitPlugins[0]
+//               const {
+//                 fundingGoal,
+//                 minFeeToJoin,
+//                 memberReputation
+//               } = joinAndQuitPlugin.coreState.pluginParams;
+//               try {
+//                 await db.collection('daos').doc(id).set({
+//                   id,
+//                   address,
+//                   memberCount,
+//                   name,
+//                   numberOfBoostedProposals,
+//                   numberOfPreBoostedProposals,
+//                   numberOfQueuedProposals,
+//                   register,
+//                   reputationId: reputation.id,
+//                   reputationTotalSupply: parseInt(reputationTotalSupply),
+//                   fundingGoal: fundingGoal.toString(),
+//                   minFeeToJoin: minFeeToJoin.toString(),
+//                   memberReputation: memberReputation.toString()
+//                 })
+//                 console.log(`[ Updated DAO ${name}@${address}] `);
+//                 response.append(`updated DAO ${name}@${id}`)
+//               } catch (error) {
+//                 console.error(msg)
+//                 const msg = `Failed to updated DAOs: ${error}`;
+//                 throw Error(msg)
+//               }
+//             }
+//           }
+//           // if (dao.coreState.name.includes('Test DAO') || dao.coreState.name.includes('Car DAO')) {
+//           //   console.log('DELETING: ', id)
+//           //   await db.collection('daos').doc(id).delete();
+//           // }
+//         })
+//       });
+//   } catch(e) {
+//     console.log('Error querying DAOs: ', e)
+//     throw(e)
+//   }
+//   return '\n'.join(response)
+// }
 
 module.exports = {
   updateDaos
