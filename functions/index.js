@@ -1,15 +1,17 @@
 const functions = require('firebase-functions');
-const ethers = require('ethers');
-const Notification = require('./Notification')
 const admin = require('firebase-admin');
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const updateDaos = require('./ArcListener').updateDaos;
+
 admin.initializeApp({
   credential: admin.credential.cert(require('./_keys/adminsdk-keys.json')),
   databaseURL: "https://common-daostack.firebaseio.com",
 });
+
+const ethers = require('ethers');
+const Notification = require('./Notification')
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const updateDaos = require('./ArcListener').updateDaos;
 
 const env = require('./_keys/env');
 const privateKey = env.wallet_info.private_key;
@@ -155,7 +157,7 @@ exports.userInfoTrigger = functions.firestore.document('/users/{userId}')
   })
 
 exports.sendFollowerNotification = functions.firestore.document('/notification/follow/{userId}/{targetUid}')
-  .onWrite(async (change, context) => {
+  .onCreate(async (snapshot, context) => {
     const userId = context.params.userId;
     const targetUid = context.params.targetUid;
     // response.send(`Change: ${change.after.val()} - ID: ${commonId}`)
@@ -170,7 +172,7 @@ exports.sendFollowerNotification = functions.firestore.document('/notification/f
     let title = 'You have a new follower!';
     let body = `${follower.displayName} is now following you.`
 
-    return Notification.send(title, body,)
+    return Notification.send(tokens, title, body)
   })
 
 //
