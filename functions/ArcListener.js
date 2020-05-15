@@ -37,7 +37,7 @@ async function findUserByEthereumAddress(db, ethereumAddress) {
     const snapshot = await query.get()
     if (snapshot.size === 0) {
       // we hae an ethereum address but no registered user: this is unexpected but not impossibl
-      error(`No member found with ethereumAddress === ${s.proposedMember} `)
+      error(`No member found with ethereumAddress === ${ethereumAddress} `)
       return null
     } else {
       const member = snapshot.docs[0]
@@ -45,7 +45,7 @@ async function findUserByEthereumAddress(db, ethereumAddress) {
     }
 }
 async function updateProposals(first=null) {
-  const response = []
+  // const response = []
   const db = admin.firestore();
   const proposals = await arc.proposals({first}).first()
   console.log(`found ${proposals.length} proposals`)
@@ -62,7 +62,7 @@ async function updateProposals(first=null) {
     let proposedMemberId
     if (!s.proposedMember) {
       proposedMemberId = null
-    } else if (s.proposer == s.proposedMember) {
+    } else if (s.proposer === s.proposedMember) {
       proposedMemberId = proposerId
     } else {
       proposedMemberId = await findUserByEthereumAddress(db, s.proposedMember)

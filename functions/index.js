@@ -107,7 +107,7 @@ app.get('/send-test-eth/:address', async (req, res) => {
 
 app.get('/notification', async (req, res) => {
   try {
-    const message = await messaging.send(payload);
+    // const message = await messaging.send(payload);
     res.send({message: 'hello'});
 
   } catch(e) {
