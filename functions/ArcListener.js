@@ -67,6 +67,7 @@ async function updateProposals(first=null) {
     } else {
       proposedMemberId = await findUserByEthereumAddress(db, s.proposedMember)
     }
+      
 
 
     const doc = {

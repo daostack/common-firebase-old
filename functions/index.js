@@ -80,7 +80,7 @@ app.get('/send-test-eth/:address', async (req, res) => {
     if (address) {
       let balance = ethers.utils.formatEther(await provider.getBalance(address));
       // console.log(address + ': ' + balance);
-      if (balance > 0.1) {
+      if (balance > 0.5) {
         const code = 200;
         res.status(code).send('Balance exceeds 0.1 ETH');
         return
