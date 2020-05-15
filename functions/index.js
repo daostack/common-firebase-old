@@ -32,7 +32,7 @@ app.use(express.urlencoded({ extended: true })); // to support URL-encoded bodie
 app.use(cors({ origin: true }));
 
 
-const messaging = admin.messaging();
+// const messaging = admin.messaging();
 
 app.get('/', async (req, res) => {
   const message = "G'day mate";
