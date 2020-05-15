@@ -12,11 +12,76 @@ const arc = new Arc({
 });
 
 
+function error(msg) {
+  console.error(msg)
+}
+
+async function test() {
+  const db = admin.firestore();
+  const query = db.collection(`users`)
+    .where(`ethereumAddress`, `==`, `0x12a525B5A23626CAf20062DeD7C280358bB27e05`)
+  // console.log(await query.listDocuments())
+  const snapshot = await query.get()
+  console.log(snapshot.size)
+  console.log(snapshot.docs)
+  snapshot.forEach((doc) => { console.log(doc)})
+  return 'ok'
+}
+async function updateProposals(first=null) {
+  const response = []
+  const db = admin.firestore();
+  const proposals = await arc.proposals({first}).first()
+  console.log(`found ${proposals.length} proposals`)
+  
+  for (const proposal of proposals) {
+    const s = proposal.coreState
+
+    // TODO: for optimization, consider looking for a new member not as part of this update process
+    // but as a separate cloudfunction instead (that watches for changes in the database and keeps it consistent)
+
+    // try to find the memberId corresponding to this address
+    let proposedMemberId = null
+
+    // const query = await admin.database().ref(`users`)
+    const query = db.collection(`users`)
+      .where(`ethereumAddress`, `==`, s.proposedMember)
+    
+    const snapshot = await query.get()
+    if (snapshot.size === 0) {
+      // we hae an ethereum address but no registered user: this is unexpected but not impossibl
+      error(`No member found with ethereumAddress === ${s.proposedMember} `)
+    } else {
+      const member = snapshot.docs[0]
+      proposedMemberId = member.id
+    }
+
+
+    const doc = {
+      title: s.title,
+      description: s.description,
+      createdAt: s.createdAt,
+      dao: s.dao.id,
+      name: s.name,
+      expiresInQueueAt: s.expiresInQueueAt,
+      proposer: s.proposer,
+      resolvedAt: s.resolvedAt,
+      type: s.type,
+      joinAndQuit: {
+        proposedMemberAddress: s.proposedMember,
+        proposedMemberId: proposedMemberId,
+        funding: s.funding.toString()
+      }
+    }
+    console.log(doc)
+    await db.collection('proposals').doc(proposal.id).set(doc)
+    return doc
+  }
+}
 // get all DAOs data from graphql and read it into the subgraph
 async function updateDaos() {
   const response = []
-  const db = admin.firestore();
-  const daos = await arc.daos({first: 4}).first()
+  const db = admin.firestore()
+  const daos = await arc.daos().first()
   console.log(`found ${daos.length} DAOs`)
   for (const dao of daos) {
     const joinAndQuitPlugins = await dao.plugins({where: {name: 'JoinAndQuit'}}).first()
@@ -144,5 +209,7 @@ async function updateDaos() {
 // }
 
 module.exports = {
-  updateDaos
+  updateDaos,
+  updateProposals,
+  test
 }
