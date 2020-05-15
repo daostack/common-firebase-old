@@ -27,6 +27,23 @@ async function test() {
   snapshot.forEach((doc) => { console.log(doc)})
   return 'ok'
 }
+
+
+async function findUserByEthereumAddress(db, ethereumAddress) {
+    // const query = await admin.database().ref(`users`)
+    const query = db.collection(`users`)
+      .where(`ethereumAddress`, `==`, ethereumAddress)
+    
+    const snapshot = await query.get()
+    if (snapshot.size === 0) {
+      // we hae an ethereum address but no registered user: this is unexpected but not impossibl
+      error(`No member found with ethereumAddress === ${s.proposedMember} `)
+      return null
+    } else {
+      const member = snapshot.docs[0]
+      return member.id
+    }
+}
 async function updateProposals(first=null) {
   const response = []
   const db = admin.firestore();
@@ -35,24 +52,20 @@ async function updateProposals(first=null) {
   
   for (const proposal of proposals) {
     const s = proposal.coreState
+    console.log(s)
 
     // TODO: for optimization, consider looking for a new member not as part of this update process
     // but as a separate cloudfunction instead (that watches for changes in the database and keeps it consistent)
 
     // try to find the memberId corresponding to this address
-    let proposedMemberId = null
-
-    // const query = await admin.database().ref(`users`)
-    const query = db.collection(`users`)
-      .where(`ethereumAddress`, `==`, s.proposedMember)
-    
-    const snapshot = await query.get()
-    if (snapshot.size === 0) {
-      // we hae an ethereum address but no registered user: this is unexpected but not impossibl
-      error(`No member found with ethereumAddress === ${s.proposedMember} `)
+    const proposerId = await findUserByEthereumAddress(db, s.proposer)
+    let proposedMemberId
+    if (!s.proposedMember) {
+      proposedMemberId = null
+    } else if (s.proposer == s.proposedMember) {
+      proposedMemberId = proposerId
     } else {
-      const member = snapshot.docs[0]
-      proposedMemberId = member.id
+      proposedMemberId = await findUserByEthereumAddress(db, s.proposedMember)
     }
 
 
@@ -64,15 +77,20 @@ async function updateProposals(first=null) {
       name: s.name,
       expiresInQueueAt: s.expiresInQueueAt,
       proposer: s.proposer,
+      proposerId,
       resolvedAt: s.resolvedAt,
+      stage: s.stage,
       type: s.type,
       joinAndQuit: {
         proposedMemberAddress: s.proposedMember,
         proposedMemberId: proposedMemberId,
         funding: s.funding.toString()
-      }
+      },
+      votes: s.votes,
+      // TODO: votesFor and votesAgainst are in terms of reputation - we need to divide by 1000
+      votesFor: s.votesFor.toString(),
+      votesAgainst: s.votesAgainst.toString()
     }
-    console.log(doc)
     await db.collection('proposals').doc(proposal.id).set(doc)
     return doc
   }

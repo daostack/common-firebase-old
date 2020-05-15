@@ -33,3 +33,6 @@ Then run the scheduledFunction() which in our case is our pubsub function
 ```
 firebase > scheduledFunction()
 ```
+
+## API endpoints
+
