@@ -5,7 +5,7 @@ const admin = require('firebase-admin');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const updateDaos = require('./ArcListener').updateDaos;
+const {updateDaos, updateProposals, test} = require('./ArcListener')
 admin.initializeApp({
   credential: admin.credential.cert(require('./_keys/adminsdk-keys.json')),
   databaseURL: "https://common-daostack.firebaseio.com",
@@ -36,10 +36,14 @@ const messaging = admin.messaging();
 
 app.get('/', async (req, res) => {
   const message = "G'day mate";
-  updateDaos();
   res.send({message})
 });
 
+
+app.get('/test', async (req, res) => {
+  const message = await test()
+  res.send(message)
+})
 app.get('/update-daos', async (req, res) => {
   try {
     const result = await updateDaos();
@@ -50,6 +54,21 @@ app.get('/update-daos', async (req, res) => {
     const code = 500;
     console.log(e)
     res.status(code).send(new Error(`Unable to update DAOs: ${e}`));
+  }
+
+});
+
+
+app.get('/update-proposals', async (req, res) => {
+  try {
+    const result = await updateProposals();
+    console.log(result)
+    const code = 200;
+    res.status(code).send(`Updated Propsals successfully: ${result}`);
+  } catch(e) {
+    const code = 500;
+    console.log(e)
+    res.status(code).send(new Error(`Unable to update Proposals: ${e}`));
   }
 
 });
