@@ -10,7 +10,7 @@ const arc = new Arc({
   graphqlHttpProvider: graphHttpLink,
   graphqlWsProvider: graphwsLink,
 });
-const db = admin.firestore();
+
 
 function error(msg) {
   console.error(msg)
@@ -49,7 +49,7 @@ async function findUserByEthereumAddress(db, ethereumAddress) {
 async function updateDaos() {
   const response = []
   const db = admin.firestore()
-  const daos = await arc.daos().first()
+  const daos = await arc.daos({limit: 1000}).first()
   console.log(`found ${daos.length} DAOs`)
 
   for (const dao of daos) {
