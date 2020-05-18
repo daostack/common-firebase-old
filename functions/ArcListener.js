@@ -10,7 +10,7 @@ const arc = new Arc({
   graphqlHttpProvider: graphHttpLink,
   graphqlWsProvider: graphwsLink,
 });
-
+const db = admin.firestore();
 
 function error(msg) {
   console.error(msg)
@@ -102,12 +102,13 @@ async function updateDaos() {
   const db = admin.firestore()
   const daos = await arc.daos().first()
   console.log(`found ${daos.length} DAOs`)
+
   for (const dao of daos) {
-    const joinAndQuitPlugins = await dao.plugins({where: {name: 'JoinAndQuit'}}).first()
+    const joinAndQuitPlugins = await dao.plugins({where: {name: 'JoinAndQuit'}}).first();
     if (joinAndQuitPlugins.length === 0) {
       // not a properly configured common DAO, skipping
-      const msg = `skipping ${dao.id} as it is not properly configured`
-      console.log(msg)
+      const msg = `Skipping ${dao.id} as it is not properly configured`;
+      console.log(msg);
       response.push(msg)
     } else {
       console.log(`updating ${dao.id}`)
@@ -147,6 +148,57 @@ async function updateDaos() {
   return response.join('\n')
 }
 
+async function updatePlugins() {
+
+}
+
+async function updateProposals() {
+  arc.proposals({}, {subscribe: true, fetchAllData: true})
+    .subscribe(async proposals => {
+      proposals.map(async proposal => {
+        const {coreState} = proposal;
+        const proposalObject = {
+
+          boostedAt: coreState.boostedAt,
+          createdAt: coreState.createdAt,
+          dao: coreState.dao.id,
+          description: coreState.description,
+          expiresInQueueAt: coreState.expiresInQueueAt,
+          executionState: coreState.executionState,
+          executed: coreState.executed,
+          funding: coreState.funding.toString(),
+          executedAt: coreState.executedAt,
+          joinAndQuit: {
+            funding: coreState.funding.toString(),
+            proposedMemberId: coreState.proposer,
+            proposedMemberAddress: coreState.proposer,
+          },
+          preBoostedAt: coreState.preBoostedAt,
+          id: coreState.id,
+          name: coreState.name,
+          proposer: coreState.proposer,
+          proposerId: coreState.proposer,
+          resolvedAt: coreState.resolvedAt,
+          stage: coreState.stage,
+          title: coreState.title,
+          type: coreState.type,
+          votes: {
+            list: coreState.votes,
+            votesAgainst: parseInt(coreState.votesAgainst),
+            votesFor: parseInt(coreState.votesFor),
+          },
+          links: [{
+            title: "website",
+            url: coreState.url,
+          }],
+          images: [],
+          winningOutcome: coreState.winningOutcome,
+        }
+        await db.collection('proposals').doc(coreState.id).set(proposalObject)
+      });
+
+    })
+}
 
 // function updateDaosSubscription() {
 //   //loop that runs a function every 15 seconds for 3 intervals

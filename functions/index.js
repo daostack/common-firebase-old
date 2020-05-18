@@ -58,7 +58,6 @@ app.get('/update-daos', async (req, res) => {
 
 });
 
-
 app.get('/update-proposals', async (req, res) => {
   try {
     const result = await updateProposals();
