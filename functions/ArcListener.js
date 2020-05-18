@@ -10,7 +10,6 @@ const arc = new Arc({
   graphqlHttpProvider: graphHttpLink,
   graphqlWsProvider: graphwsLink,
 });
-const db = admin.firestore();
 
 function error(msg) {
   console.error(msg)
