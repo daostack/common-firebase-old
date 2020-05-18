@@ -12,6 +12,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const updateDaos = require('./ArcListener').updateDaos;
+const updateProposals = require('./ArcListener').updateProposals;
 
 const env = require('./_keys/env');
 const privateKey = env.wallet_info.private_key;
@@ -45,6 +46,20 @@ app.get('/', async (req, res) => {
 app.get('/update-daos', async (req, res) => {
   try {
     const result = await updateDaos();
+    console.log(result)
+    const code = 200;
+    res.status(code).send(`Updated DAOs successfully: ${result}`);
+  } catch(e) {
+    const code = 500;
+    console.log(e)
+    res.status(code).send(new Error(`Unable to update DAOs: ${e}`));
+  }
+
+});
+
+app.get('/update-proposals', async (req, res) => {
+  try {
+    const result = await updateProposals();
     console.log(result)
     const code = 200;
     res.status(code).send(`Updated DAOs successfully: ${result}`);
