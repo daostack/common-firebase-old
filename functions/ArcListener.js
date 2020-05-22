@@ -66,30 +66,47 @@ async function updateDaos() {
         memberReputation
       } = joinAndQuitPlugin.coreState.pluginParams;
       try {
-      const daoState = dao.coreState
-      const doc = {
-        id: dao.id,
-        address: daoState.address,
-        memberCount: daoState.memberCount,
-        name: daoState.name,
-        numberOfBoostedProposals: daoState.numberOfBoostedProposals,
-        numberOfPreBoostedProposals: daoState.numberOfPreBoostedProposals,
-        numberOfQueuedProposals: daoState.numberOfQueuedProposals,
-        register: daoState.register,
-        // reputationId: reputation.id,
-        reputationTotalSupply: parseInt(daoState.reputationTotalSupply),
-        fundingGoal: fundingGoal.toString(),
-        minFeeToJoin: minFeeToJoin.toString(),
-        memberReputation: memberReputation.toString()
+        const daoState = dao.coreState
+        let metadata
+        console.log(daoState.metadata)
+        if (daoState.metadata) {
+          try {
+            metadata = JSON.parse(daoState.metadata)
+          } catch(err) {
+            metadata = {
+              error: err.message
+            }
+            throw err
+          }
+        } else {
+          metadata = {}
+        }
+        const doc = {
+          id: dao.id,
+          address: daoState.address,
+          memberCount: daoState.memberCount,
+          name: daoState.name,
+          numberOfBoostedProposals: daoState.numberOfBoostedProposals,
+          numberOfPreBoostedProposals: daoState.numberOfPreBoostedProposals,
+          numberOfQueuedProposals: daoState.numberOfQueuedProposals,
+          register: daoState.register,
+          // reputationId: reputation.id,
+          reputationTotalSupply: parseInt(daoState.reputationTotalSupply),
+          fundingGoal: fundingGoal.toString(),
+          minFeeToJoin: minFeeToJoin.toString(),
+          memberReputation: memberReputation.toString(),
+          metadata,
+          metadataHash: daoState.metadataHash
+        }
+        console.log(doc)
+        await db.collection('daos').doc(dao.id).set(doc)
+        const msg =`Updated dao ${dao.id}`
+        response.push(msg)
+        console.log(msg)
+      } catch(err) {
+        console.log(err)
+        throw err
       }
-      await db.collection('daos').doc(dao.id).set(doc)
-      const msg =`Updated dao ${dao.id}`
-      response.push(msg)
-      console.log(msg)
-    } catch(err) {
-      console.log(err)
-      throw err
-    }
     }
   }
   return response.join('\n')
