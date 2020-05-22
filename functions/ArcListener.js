@@ -67,6 +67,20 @@ async function updateDaos() {
       } = joinAndQuitPlugin.coreState.pluginParams;
       try {
       const daoState = dao.coreState
+      console.log(daoState)
+      let metadata
+      if (daoState.metaData) {
+        try {
+          metadata = JSON.parse(daoState.metaData)
+        } catch(err) {
+          metadata = {
+            error: err.message
+          }
+          throw err
+        }
+      } else {
+        metadata = {}
+      }
       const doc = {
         id: dao.id,
         address: daoState.address,
@@ -80,7 +94,8 @@ async function updateDaos() {
         reputationTotalSupply: parseInt(daoState.reputationTotalSupply),
         fundingGoal: fundingGoal.toString(),
         minFeeToJoin: minFeeToJoin.toString(),
-        memberReputation: memberReputation.toString()
+        memberReputation: memberReputation.toString(),
+        metadata
       }
       await db.collection('daos').doc(dao.id).set(doc)
       const msg =`Updated dao ${dao.id}`
