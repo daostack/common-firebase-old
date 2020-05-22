@@ -1,10 +1,8 @@
 const { Arc } = require('@daostack/arc.js');
 const admin = require('firebase-admin');
 
-const graphHttpLink =
-  'https://api.thegraph.com/subgraphs/name/daostack/v7_5_exp_rinkeby';
-const graphwsLink =
-  'wss://api.thegraph.com/subgraphs/name/daostack/v7_5_exp_rinkeby';
+const graphHttpLink = 'https://api.thegraph.com/subgraphs/name/daostack/v8_1_exp_xdai'
+const graphwsLink = 'wss://api.thegraph.com/subgraphs/name/daostack/v8_1_exp_xdai'
 
 const arc = new Arc({
   graphqlHttpProvider: graphHttpLink,
@@ -32,7 +30,7 @@ async function findUserByEthereumAddress(db, ethereumAddress) {
     // const query = await admin.database().ref(`users`)
     const query = db.collection(`users`)
       .where(`ethereumAddress`, `==`, ethereumAddress)
-    
+
     const snapshot = await query.get()
     if (snapshot.size === 0) {
       // we hae an ethereum address but no registered user: this is unexpected but not impossibl
@@ -44,10 +42,11 @@ async function findUserByEthereumAddress(db, ethereumAddress) {
     }
 }
 
+const db = admin.firestore();
+
 // get all DAOs data from graphql and read it into the subgraph
 async function updateDaos() {
   const response = []
-  const db = admin.firestore()
   const daos = await arc.daos().first()
   console.log(`found ${daos.length} DAOs`)
 
@@ -59,49 +58,70 @@ async function updateDaos() {
       console.log(msg);
       response.push(msg)
     } else {
-      console.log(`updating ${dao.id}`)
-      const joinAndQuitPlugin = joinAndQuitPlugins[0]
+      console.log(`updating ${dao.id}`);
+      const joinAndQuitPlugin = joinAndQuitPlugins[0];
       const {
         fundingGoal,
         minFeeToJoin,
         memberReputation
       } = joinAndQuitPlugin.coreState.pluginParams;
       try {
-      const daoState = dao.coreState
-      const doc = {
-        id: dao.id,
-        address: daoState.address,
-        memberCount: daoState.memberCount,
-        name: daoState.name,
-        numberOfBoostedProposals: daoState.numberOfBoostedProposals,
-        numberOfPreBoostedProposals: daoState.numberOfPreBoostedProposals,
-        numberOfQueuedProposals: daoState.numberOfQueuedProposals,
-        register: daoState.register,
-        // reputationId: reputation.id,
-        reputationTotalSupply: parseInt(daoState.reputationTotalSupply),
-        fundingGoal: fundingGoal.toString(),
-        minFeeToJoin: minFeeToJoin.toString(),
-        memberReputation: memberReputation.toString()
+        const daoState = dao.coreState
+        let metadata
+        console.log(daoState.metadata)
+        if (daoState.metadata) {
+          try {
+            metadata = JSON.parse(daoState.metadata)
+          } catch(err) {
+            metadata = {
+              error: err.message
+            }
+            throw err
+          }
+        } else {
+          metadata = {}
+        }
+        const doc = {
+          id: dao.id,
+          address: daoState.address,
+          memberCount: daoState.memberCount,
+          name: daoState.name,
+          numberOfBoostedProposals: daoState.numberOfBoostedProposals,
+          numberOfPreBoostedProposals: daoState.numberOfPreBoostedProposals,
+          numberOfQueuedProposals: daoState.numberOfQueuedProposals,
+          register: daoState.register,
+          // reputationId: reputation.id,
+          reputationTotalSupply: parseInt(daoState.reputationTotalSupply),
+          fundingGoal: fundingGoal.toString(),
+          minFeeToJoin: minFeeToJoin.toString(),
+          memberReputation: memberReputation.toString(),
+          metadata,
+          metadataHash: daoState.metadataHash
+        }
+        console.log(doc)
+        await db.collection('daos').doc(dao.id).set(doc)
+        const msg =`Updated dao ${dao.id}`
+        response.push(msg)
+        console.log(msg)
+      } catch(err) {
+        console.log(err)
+        throw err
       }
-      await db.collection('daos').doc(dao.id).set(doc)
-      const msg =`Updated dao ${dao.id}`
-      response.push(msg)
-      console.log(msg)
-    } catch(err) {
-      console.log(err)
-      throw err
-    }
     }
   }
   return response.join('\n')
 }
 
 
+async function updatePlugins() {
+
+}
+
 async function updateProposals(first=null) {
   const db = admin.firestore();
   const proposals = await arc.proposals({first}).first()
   console.log(`found ${proposals.length} proposals`)
-  
+
   for (const proposal of proposals) {
     const s = proposal.coreState
     console.log(s)
@@ -119,7 +139,7 @@ async function updateProposals(first=null) {
     } else {
       proposedMemberId = await findUserByEthereumAddress(db, s.proposedMember)
     }
-      
+
 
 
     const doc = {
@@ -158,13 +178,14 @@ async function updateProposals(first=null) {
       images: [],
     }
 
-    await db.collection('proposals').doc(proposal.id).set(doc)
+    await db.collection('proposals').doc(s.id).set(doc)
     return doc
   }
 }
 
 module.exports = {
   updateDaos,
+  updatePlugins,
   updateProposals,
   test
 }
