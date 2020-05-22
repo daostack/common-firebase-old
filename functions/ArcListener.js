@@ -47,7 +47,7 @@ const db = admin.firestore();
 // get all DAOs data from graphql and read it into the subgraph
 async function updateDaos() {
   const response = []
-  const daos = await arc.daos().first()
+  const daos = await arc.daos({},{fetchPolicy: 'no-cache'}).first()
   console.log(`found ${daos.length} DAOs`)
 
   for (const dao of daos) {
@@ -58,7 +58,8 @@ async function updateDaos() {
       console.log(msg);
       response.push(msg)
     } else {
-      console.log(`updating ${dao.id}`);
+       const daoState = dao.coreState
+      console.log(`updating ${dao.id}: ${daoState.name}`);
       const joinAndQuitPlugin = joinAndQuitPlugins[0];
       const {
         fundingGoal,
@@ -66,7 +67,6 @@ async function updateDaos() {
         memberReputation
       } = joinAndQuitPlugin.coreState.pluginParams;
       try {
-        const daoState = dao.coreState
         let metadata
         console.log(daoState.metadata)
         if (daoState.metadata) {
@@ -119,7 +119,7 @@ async function updatePlugins() {
 
 async function updateProposals(first=null) {
   const db = admin.firestore();
-  const proposals = await arc.proposals({first}).first()
+  const proposals = await arc.proposals({first}, {fetchPolicy: 'no-cache'}).first()
   console.log(`found ${proposals.length} proposals`)
 
   for (const proposal of proposals) {
