@@ -68,9 +68,10 @@ async function updateDaos() {
       try {
         const daoState = dao.coreState
         let metadata
-        if (daoState.metaData) {
+        console.log(daoState.metadata)
+        if (daoState.metadata) {
           try {
-            metadata = JSON.parse(daoState.metaData)
+            metadata = JSON.parse(daoState.metadata)
           } catch(err) {
             metadata = {
               error: err.message
@@ -97,6 +98,7 @@ async function updateDaos() {
           metadata,
           metadataHash: daoState.metadataHash
         }
+        console.log(doc)
         await db.collection('daos').doc(dao.id).set(doc)
         const msg =`Updated dao ${dao.id}`
         response.push(msg)
