@@ -66,45 +66,45 @@ async function updateDaos() {
         memberReputation
       } = joinAndQuitPlugin.coreState.pluginParams;
       try {
-      const daoState = dao.coreState
-      console.log(daoState)
-      let metadata
-      if (daoState.metaData) {
-        try {
-          metadata = JSON.parse(daoState.metaData)
-        } catch(err) {
-          metadata = {
-            error: err.message
+        const daoState = dao.coreState
+        let metadata
+        if (daoState.metaData) {
+          try {
+            metadata = JSON.parse(daoState.metaData)
+          } catch(err) {
+            metadata = {
+              error: err.message
+            }
+            throw err
           }
-          throw err
+        } else {
+          metadata = {}
         }
-      } else {
-        metadata = {}
+        const doc = {
+          id: dao.id,
+          address: daoState.address,
+          memberCount: daoState.memberCount,
+          name: daoState.name,
+          numberOfBoostedProposals: daoState.numberOfBoostedProposals,
+          numberOfPreBoostedProposals: daoState.numberOfPreBoostedProposals,
+          numberOfQueuedProposals: daoState.numberOfQueuedProposals,
+          register: daoState.register,
+          // reputationId: reputation.id,
+          reputationTotalSupply: parseInt(daoState.reputationTotalSupply),
+          fundingGoal: fundingGoal.toString(),
+          minFeeToJoin: minFeeToJoin.toString(),
+          memberReputation: memberReputation.toString(),
+          metadata,
+          metadataHash: daoState.metadataHash
+        }
+        await db.collection('daos').doc(dao.id).set(doc)
+        const msg =`Updated dao ${dao.id}`
+        response.push(msg)
+        console.log(msg)
+      } catch(err) {
+        console.log(err)
+        throw err
       }
-      const doc = {
-        id: dao.id,
-        address: daoState.address,
-        memberCount: daoState.memberCount,
-        name: daoState.name,
-        numberOfBoostedProposals: daoState.numberOfBoostedProposals,
-        numberOfPreBoostedProposals: daoState.numberOfPreBoostedProposals,
-        numberOfQueuedProposals: daoState.numberOfQueuedProposals,
-        register: daoState.register,
-        // reputationId: reputation.id,
-        reputationTotalSupply: parseInt(daoState.reputationTotalSupply),
-        fundingGoal: fundingGoal.toString(),
-        minFeeToJoin: minFeeToJoin.toString(),
-        memberReputation: memberReputation.toString(),
-        metadata
-      }
-      await db.collection('daos').doc(dao.id).set(doc)
-      const msg =`Updated dao ${dao.id}`
-      response.push(msg)
-      console.log(msg)
-    } catch(err) {
-      console.log(err)
-      throw err
-    }
     }
   }
   return response.join('\n')
