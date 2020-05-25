@@ -10,7 +10,7 @@ firebase-debug.log*
 .firebase/
 
 # Firebase config
-functions/_keys/
+_keys/
 
 # Uncomment this if you'd like others to create their own Firebase project.
 # For a team working on the same Firebase project(s), it is recommended to leave
@@ -68,5 +68,6 @@ node_modules/
 /env.json
 
 .idea
-functions/_keys/*
+_keys/*
 .DS_Store
+
