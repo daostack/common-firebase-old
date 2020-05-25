@@ -12,7 +12,7 @@ const Notification = require('./Notification');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const {updateDaos, updateProposals, test} = require('./ArcListener')
+const {updateDaos, updateProposals, test, updateUsers} = require('./ArcListener')
 const abi = require('./abi.json');
 const env = require('./_keys/env');
 const privateKey = env.wallet_info.private_key;
@@ -72,6 +72,20 @@ app.get('/update-proposals', async (req, res) => {
   }
 
 });
+app.get('/update-users', async (req, res) => {
+  try {
+    const result = await updateUsers();
+    console.log(result)
+    const code = 200;
+    res.status(code).send(`Updated users successfully: ${result}`);
+  } catch(e) {
+    const code = 500;
+    console.log(e)
+    res.status(code).send(new Error(`Unable to update users: ${e}`));
+  }
+
+});
+
 
 app.get('/send-test-eth/:address', async (req, res) => {
   try {
