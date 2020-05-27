@@ -100,7 +100,7 @@ async function updateDaos() {
         // also update the member information if it has changed
         const existingDoc = await db.collection("daos").doc(dao.id).get()
         const existingDocData = existingDoc.data()
-        if (true || !existingDocData.members || existingDocData.members.length !== daoState.memberCount) {
+        if (!existingDocData.members || existingDocData.members.length !== daoState.memberCount) {
           console.log(`Membercount changed, updating member collections`)
           const members = await dao.members().first()
           doc.members = []
