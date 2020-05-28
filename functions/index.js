@@ -200,9 +200,9 @@ app.get('/addWhitleList', async (req, res) => {
     const decodedToken = await admin.auth().verifyIdToken(idToken)
     const uid = decodedToken.uid;
     const userData = await admin.firestore().collection('users').doc(uid).get().then(doc => { return doc.data() })
-    const address = userData.smartWalletAddress 
+    const address = userData.safeAddress
     const result = await Relayer.addAddressToWhitelist([address]);
-    res.send(result);
+    res.send(result.data);
   } catch (err) {
     res.send(err);
   }
@@ -218,7 +218,7 @@ app.post('/execTransaction', async (req, res) => {
     const safeAddress = userData.safeAddress
     const ethereumAddress = userData.ethereumAddress
     const response = await Relayer.execTransaction(safeAddress, ethereumAddress, to, value, data, signature)
-    res.send(response);
+    res.send(response.data);
   } catch (err) {
     res.send(err);
   }
