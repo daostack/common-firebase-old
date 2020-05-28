@@ -140,9 +140,10 @@ app.get('/createWallet', async (req, res) => {
     const address = userData.ethereumAddress
     const response = await Relayer.createWallet(address)
     const txHash = response.data.txHash
-    const smartWalletAddress = Relayer.getAddressFromEvent(txHash)
-    await userRef.set({smartWalletAddress: smartWalletAddress})
-    res.send({txHash, smartWalletAddress})
+    const safeAddress = await Relayer.getAddressFromEvent(txHash)
+    await userRef.update({safeAddress: safeAddress})
+    const whitelist = await Relayer.addAddressToWhitelist([address]);
+    res.send({txHash, safeAddress, whitelist})
   } catch (err) {
     res.send(err);
   }
@@ -150,6 +151,9 @@ app.get('/createWallet', async (req, res) => {
 
 app.get('/create2Wallet', async (req, res) => {
   try {
+
+    // TODO: Change this with calculate address
+    // SaltNonce need to change
     const idToken = req.header('idToken');
     const decodedToken = await admin.auth().verifyIdToken(idToken)
     const uid = decodedToken.uid;
@@ -206,12 +210,12 @@ app.get('/addWhitleList', async (req, res) => {
 
 app.post('/execTransaction', async (req, res) => {
   try {
-    const idToken = req.header('idToken');
-    const {to, value, data, signature} = req.body;
+    // const idToken = req.header('idToken');
+    const {to, value, data, signature, idToken} = req.body;
     const decodedToken = await admin.auth().verifyIdToken(idToken)
     const uid = decodedToken.uid;
     const userData = await admin.firestore().collection('users').doc(uid).get().then(doc => { return doc.data() })
-    const safeAddress = userData.smartWalletAddress
+    const safeAddress = userData.safeAddress
     const ethereumAddress = userData.ethereumAddress
     const response = await Relayer.execTransaction(safeAddress, ethereumAddress, to, value, data, signature)
     res.send(response);
