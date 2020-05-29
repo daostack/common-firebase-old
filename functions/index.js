@@ -220,6 +220,7 @@ app.post('/execTransaction', async (req, res) => {
     const ethereumAddress = userData.ethereumAddress
     await Relayer.addAddressToWhitelist([to]);
     const response = await Relayer.execTransaction(safeAddress, ethereumAddress, to, value, data, signature)
+    // TODO: Once it failed, it will send detail to client which have apiKey
     res.send(response.data);
   } catch (err) {
     res.send(err);
