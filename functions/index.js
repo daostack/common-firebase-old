@@ -142,7 +142,8 @@ app.get('/createWallet', async (req, res) => {
     const txHash = response.data.txHash
     const safeAddress = await Relayer.getAddressFromEvent(txHash)
     await userRef.update({safeAddress: safeAddress})
-    const whitelist = await Relayer.addProxyToWhitelist([address]);
+    await Relayer.addAddressToWhitelist([address]);
+    const whitelist = await Relayer.addProxyToWhitelist([safeAddress]);
     res.send({txHash, safeAddress, whitelist: whitelist.data.message})
   } catch (err) {
     res.send(err);
