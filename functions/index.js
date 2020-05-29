@@ -142,7 +142,7 @@ app.get('/createWallet', async (req, res) => {
     const txHash = response.data.txHash
     const safeAddress = await Relayer.getAddressFromEvent(txHash)
     await userRef.update({safeAddress: safeAddress})
-    const whitelist = await Relayer.addAddressToWhitelist([address]);
+    const whitelist = await Relayer.addProxyToWhitelist([address]);
     res.send({txHash, safeAddress, whitelist: whitelist.data.message})
   } catch (err) {
     res.send(err);
@@ -201,7 +201,7 @@ app.get('/addWhitleList', async (req, res) => {
     const uid = decodedToken.uid;
     const userData = await admin.firestore().collection('users').doc(uid).get().then(doc => { return doc.data() })
     const address = userData.safeAddress
-    const result = await Relayer.addAddressToWhitelist([address]);
+    const result = await Relayer.addProxyToWhitelist([address]);
     res.send(result.data);
   } catch (err) {
     res.send(err);
@@ -217,6 +217,7 @@ app.post('/execTransaction', async (req, res) => {
     const userData = await admin.firestore().collection('users').doc(uid).get().then(doc => { return doc.data() })
     const safeAddress = userData.safeAddress
     const ethereumAddress = userData.ethereumAddress
+    await Relayer.addAddressToWhitelist([to]);
     const response = await Relayer.execTransaction(safeAddress, ethereumAddress, to, value, data, signature)
     res.send(response.data);
   } catch (err) {

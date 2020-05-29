@@ -78,10 +78,16 @@ module.exports = new class Relayer {
     return myTxHash;
   }
 
-  async addAddressToWhitelist(addresses) {
+  async addProxyToWhitelist(addresses) {
     const options = { headers: { 'Authorization': `User ${env.biconomy.whitelistKey}`, 'Content-Type': 'application/json' } }
     const data = { 'addresses': addresses }
     return await axios.post('https://api.biconomy.io/api/v1/dapp/whitelist/proxy-contracts', data, options)
+  }
+
+  async addAddressToWhitelist(addresses) {
+    const options = { headers: { 'Authorization': `User ${env.biconomy.whitelistKey}`, 'Content-Type': 'application/json' } }
+    const data = { 'destinationAddresses': addresses }
+    return await axios.post('https://api.biconomy.io/api/v1/dapp/whitelist/destination', data, options)
   }
 
   async getAddressFromEvent(hash) {
