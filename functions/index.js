@@ -17,7 +17,8 @@ const {updateDaos, updateProposals, test, updateUsers} = require('./ArcListener'
 const abi = require('./abi.json');
 const env = require('./_keys/env');
 const privateKey = env.wallet_info.private_key;
-const provider = ethers.getDefaultProvider('rinkeby');
+const provider = new ethers.providers.JsonRpcProvider('https://dai.poa.network/');
+
 let wallet = new ethers.Wallet(privateKey, provider);
 let amount = ethers.utils.parseEther('0.1');
 
@@ -94,10 +95,10 @@ app.get('/send-test-eth/:address', async (req, res) => {
     console.log('address: ', address);
     if (address) {
       let balance = ethers.utils.formatEther(await provider.getBalance(address));
-      // console.log(address + ': ' + balance);
+      console.log(address + ': ' + balance);
       if (balance > 0.5) {
         const code = 200;
-        res.status(code).send('Balance exceeds 0.1 ETH');
+        res.status(code).send('Balance exceeds 0.1 ETH: ', balance);
         return
       }
 
