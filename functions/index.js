@@ -4,7 +4,7 @@ const axios = require('axios');
 
 admin.initializeApp({
   credential: admin.credential.cert(require('./_keys/adminsdk-keys.json')),
-  databaseURL: "https://common-daostack.firebaseio.com",
+  databaseURL: "https://common-daostack.firebaseio.com",  // TODO: move to ./settings.js
 });
 
 const ethers = require('ethers');
@@ -17,7 +17,7 @@ const {updateDaos, updateProposals, test, updateUsers} = require('./ArcListener'
 const abi = require('./abi.json');
 const env = require('./_keys/env');
 const privateKey = env.wallet_info.private_key;
-const provider = new ethers.providers.JsonRpcProvider('https://dai.poa.network/');
+const provider = new ethers.providers.JsonRpcProvider('https://dai.poa.network/'); // TODO: move to ./settings.js
 
 let wallet = new ethers.Wallet(privateKey, provider);
 let amount = ethers.utils.parseEther('0.1');
@@ -50,7 +50,6 @@ app.get('/test', async (req, res) => {
 app.get('/update-daos', async (req, res) => {
   try {
     const result = await updateDaos();
-    console.log(result)
     const code = 200;
     res.status(code).send(`Updated DAOs successfully: ${result}`);
   } catch (e) {
@@ -64,10 +63,9 @@ app.get('/update-daos', async (req, res) => {
 app.get('/update-proposals', async (req, res) => {
   try {
     const result = await updateProposals();
-    console.log(result)
     const code = 200;
-    res.status(code).send(`Updated Propsals successfully: ${result}`);
-  } catch (e) {
+    res.status(code).send(`Updated ${result.length} proposals`);
+  } catch(e) {
     const code = 500;
     console.log(e)
     res.status(code).send(new Error(`Unable to update Proposals: ${e}`));
@@ -77,7 +75,6 @@ app.get('/update-proposals', async (req, res) => {
 app.get('/update-users', async (req, res) => {
   try {
     const result = await updateUsers();
-    console.log(result)
     const code = 200;
     res.status(code).send(`Updated users successfully: ${result}`);
   } catch(e) {
