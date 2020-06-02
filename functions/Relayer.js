@@ -30,7 +30,7 @@ module.exports = new class Relayer {
     return await axios.post('https://api.biconomy.io/api/v2/meta-tx/native', data, options)
   }
 
-  async execTransaction(safeWallet, nativeWallet, to, value, dataHash, signature) {
+  async execTransaction(safeWallet, localWallet, to, value, dataHash, signature) {
 
     const params = {
       to, 
@@ -48,7 +48,7 @@ module.exports = new class Relayer {
     const data = { 
       'apiId': env.biconomy.execTransaction,
       'to': safeWallet,
-      'from': nativeWallet,
+      'from': localWallet,
       'params': Object.values(params)
     }
     return await axios.post('https://api.biconomy.io/api/v2/meta-tx/native', data, options)
