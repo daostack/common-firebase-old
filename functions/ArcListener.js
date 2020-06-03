@@ -1,6 +1,6 @@
-const { Arc, Member } = require('@daostack/arc.js');
+const {Arc, Member} = require('@daostack/arc.js');
 const admin = require('firebase-admin');
-const { graphHttpLink, graphwsLink} = require('./settings')
+const {graphHttpLink, graphwsLink} = require('./settings');
 
 const arc = new Arc({
   graphqlHttpProvider: graphHttpLink,
@@ -10,62 +10,64 @@ const arc = new Arc({
 const db = admin.firestore();
 
 function error(msg) {
-  console.error(msg)
+  console.error(msg);
 }
 
 async function findUserByEthereumAddress(ethereumAddress) {
-    // const query = await admin.database().ref(`users`)
-    const query = db.collection(`users`)
-      .where(`ethereumAddress`, `==`, ethereumAddress)
+  // const query = await admin.database().ref(`users`)
+  const query = db
+    .collection(`users`)
+    .where(`ethereumAddress`, `==`, ethereumAddress);
 
-    const snapshot = await query.get()
-    if (snapshot.size === 0) {
-      // we hae an ethereum address but no registered user: this is unexpected but not impossibl
-      error(`No member found with ethereumAddress === ${ethereumAddress} `)
-      return null
-    } else {
-      const member = snapshot.docs[0]
-      return member
-    }
+  const snapshot = await query.get();
+  if (snapshot.size === 0) {
+    // we hae an ethereum address but no registered user: this is unexpected but not impossibl
+    error(`No member found with ethereumAddress === ${ethereumAddress} `);
+    return null;
+  } else {
+    const member = snapshot.docs[0];
+    return member;
+  }
 }
-
 
 // get all DAOs data from graphql and read it into the subgraph
 async function updateDaos() {
-  const response = []
-  const daos = await arc.daos({},{fetchPolicy: 'no-cache'}).first()
-  console.log(`found ${daos.length} DAOs`)
+  const response = [];
+  const daos = await arc.daos({}, {fetchPolicy: 'no-cache'}).first();
+  console.log(`found ${daos.length} DAOs`);
 
   for (const dao of daos) {
-    const joinAndQuitPlugins = await dao.plugins({where: {name: 'JoinAndQuit'}}).first();
+    const joinAndQuitPlugins = await dao
+      .plugins({where: {name: 'JoinAndQuit'}})
+      .first();
     if (joinAndQuitPlugins.length === 0) {
       // not a properly configured common DAO, skipping
       const msg = `Skipping ${dao.id} as it is not properly configured`;
       console.log(msg);
-      response.push(msg)
+      response.push(msg);
     } else {
-       const daoState = dao.coreState
+      const daoState = dao.coreState;
       console.log(`updating ${dao.id}: ${daoState.name}`);
       const joinAndQuitPlugin = joinAndQuitPlugins[0];
       const {
         fundingGoal,
         minFeeToJoin,
         memberReputation,
-        fundingGoalDeadline
+        fundingGoalDeadline,
       } = joinAndQuitPlugin.coreState.pluginParams;
       try {
-        let metadata
+        let metadata;
         if (daoState.metadata) {
           try {
-            metadata = JSON.parse(daoState.metadata)
-          } catch(err) {
+            metadata = JSON.parse(daoState.metadata);
+          } catch (err) {
             metadata = {
-              error: err.message
-            }
-            throw err
+              error: err.message,
+            };
+            throw err;
           }
         } else {
-          metadata = {}
+          metadata = {};
         }
         const doc = {
           id: dao.id,
@@ -83,80 +85,102 @@ async function updateDaos() {
           minFeeToJoin: minFeeToJoin.toString(),
           memberReputation: memberReputation.toString(),
           metadata,
-          metadataHash: daoState.metadataHash
-        }
+          metadataHash: daoState.metadataHash,
+        };
 
         // also update the member information if it has changed
-        const existingDoc = await db.collection("daos").doc(dao.id).get()
-        const existingDocData = existingDoc.data()
-        if (!existingDocData || !existingDocData.members || existingDocData.members.length !== daoState.memberCount) {
-          console.log(`Membercount changed, updating member collections`)
-          const members = await dao.members().first()
-          doc.members = []
+        const existingDoc = await db
+          .collection('daos')
+          .doc(dao.id)
+          .get();
+        const existingDocData = existingDoc.data();
+        if (
+          !existingDocData ||
+          !existingDocData.members ||
+          existingDocData.members.length !== daoState.memberCount
+        ) {
+          console.log(`Membercount changed, updating member collections`);
+          const members = await dao.members().first();
+          doc.members = [];
           for (const member of members) {
-            const user = await findUserByEthereumAddress(member.coreState.address)
+            const user = await findUserByEthereumAddress(
+              member.coreState.address,
+            );
             if (user === null) {
-              console.log(`no user found with this address ${member.coreState.address}`)  
+              console.log(
+                `no user found with this address ${member.coreState.address}`,
+              );
               doc.members.push({
                 address: member.coreState.address,
-                userId: null
-              })
+                userId: null,
+              });
             } else {
-              console.log(`user found with this address ${member.coreState.adress}`)  
-              const userDaos = user.daos || []
+              console.log(
+                `user found with this address ${member.coreState.adress}`,
+              );
+              const userDaos = user.daos || [];
               if (!(dao.id in userDaos)) {
-                userDaos.push(dao.id)
-                db.collection("users").doc(user.id).update({ daos: userDaos})
+                userDaos.push(dao.id);
+                db.collection('users')
+                  .doc(user.id)
+                  .update({daos: userDaos});
               }
               doc.members.push({
                 address: member.coreState.address,
-                userId: user.id 
-              })
+                userId: user.id,
+              });
             }
           }
         }
 
         if (existingDocData) {
-          await db.collection('daos').doc(dao.id).update(doc)
+          await db
+            .collection('daos')
+            .doc(dao.id)
+            .update(doc);
         } else {
-          await db.collection('daos').doc(dao.id).create(doc)
+          await db
+            .collection('daos')
+            .doc(dao.id)
+            .create(doc);
         }
-        const msg =`Updated dao ${dao.id}`
-        response.push(msg)
-        console.log(msg)
-      } catch(err) {
-        console.log(err)
-        throw err
+        const msg = `Updated dao ${dao.id}`;
+        response.push(msg);
+        console.log(msg);
+      } catch (err) {
+        console.log(err);
+        throw err;
       }
     }
   }
-  return response.join('\n')
+  return response.join('\n');
 }
 
-
-async function updateProposals(first=null) {
+async function updateProposals(first = null) {
   const db = admin.firestore();
-  const proposals = await arc.proposals({first}, {fetchPolicy: 'no-cache'}).first()
-  console.log(`found ${proposals.length} proposals`)
+  const proposals = await arc
+    .proposals({first}, {fetchPolicy: 'no-cache'})
+    .first();
+  console.log(`found ${proposals.length} proposals`);
 
-  const docs = []
+  const docs = [];
   for (const proposal of proposals) {
-    const s = proposal.coreState
+    const s = proposal.coreState;
 
     // TODO: for optimization, consider looking for a new member not as part of this update process
     // but as a separate cloudfunction instead (that watches for changes in the database and keeps it consistent)
 
     // try to find the memberId corresponding to this address
-    const proposer = await findUserByEthereumAddress(s.proposer)
-    const proposerId = proposer.id
-    let proposedMemberId
+    const proposer = await findUserByEthereumAddress(s.proposer);
+    const proposerId = proposer.id;
+    let proposedMemberId;
     if (!s.proposedMember) {
-      proposedMemberId = null
+      proposedMemberId = null;
     } else if (s.proposer === s.proposedMember) {
-      proposedMemberId = proposerId
+      proposedMemberId = proposerId;
     } else {
-      const proposedMember = await findUserByEthereumAddress(s.proposedMember)
-      proposedMemberId = proposedMember.id
+      const proposedMember = await findUserByEthereumAddress(s.proposedMember);
+      proposedMemberId = proposedMember.id;
     }
 
     const doc = {
@@ -178,55 +202,67 @@ async function updateProposals(first=null) {
       proposerId,
       resolvedAt: s.resolvedAt,
       stage: s.stage,
+      stageStr: s.stage.toString(),
       title: s.title,
       type: s.type,
       joinAndQuit: {
         proposedMemberAddress: s.proposedMember,
         proposedMemberId: proposedMemberId,
-        funding: s.funding.toString()
+        funding: s.funding.toString(),
       },
       votes: s.votes,
       winningOutcome: s.winningOutcome,
       // TODO: get actual links and images (these can be found in JSON.parse(s.description))
-      links: [{
-        title: "website",
-        url: s.url,
-      }],
+      links: [
+        {
+          title: 'website',
+          url: s.url,
+        },
+      ],
       images: [],
-    }
+    };
 
-    await db.collection('proposals').doc(s.id).set(doc)
-    docs.push(doc)
+    await db
+      .collection('proposals')
+      .doc(s.id)
+      .set(doc);
+    docs.push(doc);
   }
-  return docs
+  return docs;
 }
 async function updateUsers() {
   // this function is not used, leaving it here for reference
-  const response = []
-  const members = await Member.search(arc, {},{fetchPolicy: 'no-cache'}).first()
-  console.log(`found ${members.length} members`)
-  const mapMembersToDaos = {}
+  const response = [];
+  const members = await Member.search(
+    arc,
+    {},
+    {fetchPolicy: 'no-cache'},
+  ).first();
+  console.log(`found ${members.length} members`);
+  const mapMembersToDaos = {};
   for (const member of members) {
-    const daos = mapMembersToDaos[member.coreState.address] || [] 
-    daos.push(member.coreState.dao.id)
-    mapMembersToDaos[member.coreState.address] = daos
+    const daos = mapMembersToDaos[member.coreState.address] || [];
+    daos.push(member.coreState.dao.id);
+    mapMembersToDaos[member.coreState.address] = daos;
   }
   for (const memberAddress of Object.keys(mapMembersToDaos)) {
     // find the member with this address
-    const user = await findUserByEthereumAddress(memberAddress)
+    const user = await findUserByEthereumAddress(memberAddress);
     if (user) {
       const doc = {
-        daos: mapMembersToDaos[memberAddress]
-      }
-      await db.collection('users').doc(user.id).update(doc)
+        daos: mapMembersToDaos[memberAddress],
+      };
+      await db
+        .collection('users')
+        .doc(user.id)
+        .update(doc);
     }
   }
-  return response.join('\n')
+  return response.join('\n');
 }
-
 
 module.exports = {
   updateDaos,
   updateProposals,
-  updateUsers
-}
+  updateUsers,
+};
