@@ -1,39 +1,39 @@
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
-const axios = require("axios");
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+const axios = require('axios');
 
 admin.initializeApp({
-  credential: admin.credential.cert(require("./_keys/adminsdk-keys.json")),
-  databaseURL: "https://common-daostack.firebaseio.com", // TODO: move to ./settings.js
+  credential: admin.credential.cert(require('./_keys/adminsdk-keys.json')),
+  databaseURL: 'https://common-daostack.firebaseio.com', // TODO: move to ./settings.js
 });
 
-const ethers = require("ethers");
-const Notification = require("./Notification");
-const Relayer = require("./Relayer");
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
+const ethers = require('ethers');
+const Notification = require('./Notification');
+const Relayer = require('./Relayer');
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 const {
   updateDaos,
   updateProposals,
   test,
   updateUsers,
-} = require("./ArcListener");
+} = require('./ArcListener');
 const {
   createUser,
   createWallet,
   registerCard,
   payToDAOStackWallet,
-} = require("./Mangopay");
-const abi = require("./abi.json");
-const env = require("./_keys/env");
+} = require('./Mangopay');
+const abi = require('./abi.json');
+const env = require('./_keys/env');
 const privateKey = env.wallet_info.private_key;
 const provider = new ethers.providers.JsonRpcProvider(
-  "https://dai.poa.network/"
+  'https://dai.poa.network/'
 ); // TODO: move to ./settings.js
 
 let wallet = new ethers.Wallet(privateKey, provider);
-let amount = ethers.utils.parseEther("0.1");
+let amount = ethers.utils.parseEther('0.1');
 
 // create an Arc instance
 const app = express();
@@ -52,18 +52,18 @@ app.use(cors({ origin: true }));
 
 // const messaging = admin.messaging();
 
-app.get("/", async (req, res) => {
+app.get('/', async (req, res) => {
   const message = "G'day mate";
   res.send({ message });
 });
 
-app.get("/mangopay/createuser", async (req, res) => {
-  const idToken = req.header("idToken");
+app.get('/mangopay/createuser', async (req, res) => {
+  const idToken = req.header('idToken');
   const decodedToken = await admin.auth().verifyIdToken(idToken);
   const uid = decodedToken.uid;
   const userData = await admin
     .firestore()
-    .collection("users")
+    .collection('users')
     .doc(uid)
     .get()
     .then((doc) => {
@@ -75,26 +75,26 @@ app.get("/mangopay/createuser", async (req, res) => {
   res.send({ result });
 });
 
-app.get("/mangopay/createwallet", async (req, res) => {
+app.get('/mangopay/createwallet', async (req, res) => {
   const result = await createWallet();
   res.send({ result });
 });
 
-app.get("/mangopay/registercard", async (req, res) => {
+app.get('/mangopay/registercard', async (req, res) => {
   const result = await registerCard();
   res.send({ result });
 });
 
-app.get("/mangopay/pay", async (req, res) => {
+app.get('/mangopay/pay', async (req, res) => {
   const result = await payToDAOStackWallet();
   res.send({ result });
 });
 
-app.get("/test", async (req, res) => {
+app.get('/test', async (req, res) => {
   const message = await test();
   res.send(message);
 });
-app.get("/update-daos", async (req, res) => {
+app.get('/update-daos', async (req, res) => {
   try {
     const result = await updateDaos();
     const code = 200;
@@ -106,7 +106,7 @@ app.get("/update-daos", async (req, res) => {
   }
 });
 
-app.get("/update-proposals", async (req, res) => {
+app.get('/update-proposals', async (req, res) => {
   try {
     const result = await updateProposals();
     const code = 200;
@@ -117,7 +117,7 @@ app.get("/update-proposals", async (req, res) => {
     res.status(code).send(new Error(`Unable to update Proposals: ${e}`));
   }
 });
-app.get("/update-users", async (req, res) => {
+app.get('/update-users', async (req, res) => {
   try {
     const result = await updateUsers();
     const code = 200;
@@ -129,18 +129,18 @@ app.get("/update-users", async (req, res) => {
   }
 });
 
-app.get("/send-test-eth/:address", async (req, res) => {
+app.get('/send-test-eth/:address', async (req, res) => {
   try {
-    const address = req.param("address");
-    console.log("address: ", address);
+    const address = req.param('address');
+    console.log('address: ', address);
     if (address) {
       let balance = ethers.utils.formatEther(
         await provider.getBalance(address)
       );
-      console.log(address + ": " + balance);
+      console.log(address + ': ' + balance);
       if (balance > 0.5) {
         const code = 200;
-        res.status(code).send("Balance exceeds 0.1 ETH: ", balance);
+        res.status(code).send('Balance exceeds 0.1 ETH: ', balance);
         return;
       }
 
@@ -156,25 +156,25 @@ app.get("/send-test-eth/:address", async (req, res) => {
     }
   } catch (e) {
     const code = 500;
-    res.status(code).send(new Error("Unable to send transaction"));
+    res.status(code).send(new Error('Unable to send transaction'));
   }
 });
 
-app.get("/notification", async (req, res) => {
+app.get('/notification', async (req, res) => {
   try {
     // const message = await messaging.send(payload);
-    res.send({ message: "hello" });
+    res.send({ message: 'hello' });
   } catch (e) {
-    console.log("notification error: ", e);
+    console.log('notification error: ', e);
   }
 });
 
-app.get("/createWallet", async (req, res) => {
+app.get('/createWallet', async (req, res) => {
   try {
-    const idToken = req.header("idToken");
+    const idToken = req.header('idToken');
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     const uid = decodedToken.uid;
-    const userRef = admin.firestore().collection("users").doc(uid);
+    const userRef = admin.firestore().collection('users').doc(uid);
     const userData = await userRef.get().then((doc) => {
       return doc.data();
     });
@@ -191,16 +191,16 @@ app.get("/createWallet", async (req, res) => {
   }
 });
 
-app.get("/create2Wallet", async (req, res) => {
+app.get('/create2Wallet', async (req, res) => {
   try {
     // TODO: Change this with calculate address
     // SaltNonce need to change
-    const idToken = req.header("idToken");
+    const idToken = req.header('idToken');
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     const uid = decodedToken.uid;
     const userData = await admin
       .firestore()
-      .collection("users")
+      .collection('users')
       .doc(uid)
       .get()
       .then((doc) => {
@@ -209,20 +209,20 @@ app.get("/create2Wallet", async (req, res) => {
     const address = userData.ethereumAddress;
     const options = {
       headers: {
-        "x-api-key": env.biconomy.apiKey,
-        "Content-Type": "application/json",
+        'x-api-key': env.biconomy.apiKey,
+        'Content-Type': 'application/json',
       },
     };
     const iface = new ethers.utils.Interface(abi.MasterCopy);
-    const zeroAddress = `0x${"0".repeat(40)}`;
+    const zeroAddress = `0x${'0'.repeat(40)}`;
     const encodedData = iface.functions.setup.encode([
       [address],
       1,
       zeroAddress,
-      "0x",
+      '0x',
       zeroAddress,
       zeroAddress,
-      "0x",
+      '0x',
       zeroAddress,
     ]);
     const nonceSalt = Math.floor(Math.random() * 10000000000);
@@ -238,7 +238,7 @@ app.get("/create2Wallet", async (req, res) => {
       nonce: nonceSalt,
     });
     axios
-      .post("https://api.biconomy.io/api/v2/meta-tx/native", data, options)
+      .post('https://api.biconomy.io/api/v2/meta-tx/native', data, options)
       .then((receive) => {
         let object = Object.assign(receive.data, {
           address: testAddress,
@@ -254,14 +254,14 @@ app.get("/create2Wallet", async (req, res) => {
   }
 });
 
-app.get("/addWhitleList", async (req, res) => {
+app.get('/addWhitleList', async (req, res) => {
   try {
-    const idToken = req.header("idToken");
+    const idToken = req.header('idToken');
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     const uid = decodedToken.uid;
     const userData = await admin
       .firestore()
-      .collection("users")
+      .collection('users')
       .doc(uid)
       .get()
       .then((doc) => {
@@ -275,7 +275,7 @@ app.get("/addWhitleList", async (req, res) => {
   }
 });
 
-app.post("/execTransaction", async (req, res) => {
+app.post('/execTransaction', async (req, res) => {
   try {
     // const idToken = req.header('idToken');
     const { to, value, data, signature, idToken } = req.body;
@@ -283,7 +283,7 @@ app.post("/execTransaction", async (req, res) => {
     const uid = decodedToken.uid;
     const userData = await admin
       .firestore()
-      .collection("users")
+      .collection('users')
       .doc(uid)
       .get()
       .then((doc) => {
@@ -311,21 +311,21 @@ app.post("/execTransaction", async (req, res) => {
 exports.api = functions.https.onRequest(app);
 
 exports.listenToTransaction = functions.firestore
-  .document("/notification/transaction/{uid}/{txHash}")
+  .document('/notification/transaction/{uid}/{txHash}')
   .onCreate(async (change, context) => {
     const uid = context.params.uid;
     const txHash = context.params.txHash;
 
-    const tokenRef = admin.firestore().collection("users").doc(uid);
+    const tokenRef = admin.firestore().collection('users').doc(uid);
     const tokens = await tokenRef.get().then((doc) => {
       return doc.data().tokens;
     });
 
-    console.log("Token: ", tokens);
+    console.log('Token: ', tokens);
 
     const provider = new ethers.providers.InfuraProvider(
-      "rinkeby",
-      "3c08878d00734c0c98a3e4741d0b4cfc"
+      'rinkeby',
+      '3c08878d00734c0c98a3e4741d0b4cfc'
     );
 
     const receipt = await provider.waitForTransaction(txHash);
@@ -334,10 +334,10 @@ exports.listenToTransaction = functions.firestore
     let body;
 
     if (receipt.status === 0) {
-      title = "❌ Your transaction have failed";
+      title = '❌ Your transaction have failed';
       body = txHash;
     } else {
-      title = "✅ Your transaction have been confirmed";
+      title = '✅ Your transaction have been confirmed';
       body = txHash;
     }
 
@@ -346,9 +346,9 @@ exports.listenToTransaction = functions.firestore
 
 // Follow User
 function follow(userId, userList) {
-  console.log("Follow User", userId, userList);
+  console.log('Follow User', userId, userList);
   for (var targetUid of userList) {
-    console.log("New follow", userId, targetUid);
+    console.log('New follow', userId, targetUid);
     const writeNotifications = admin
       .firestore()
       .doc(`notification/follow/${userId}/${targetUid}`)
@@ -375,7 +375,7 @@ function unfollow(userId, userList) {
 }
 
 exports.userInfoTrigger = functions.firestore
-  .document("/users/{userId}")
+  .document('/users/{userId}')
   .onUpdate(async (change, context) => {
     Array.prototype.diff = function (a) {
       return this.filter(function (i) {
@@ -384,27 +384,27 @@ exports.userInfoTrigger = functions.firestore
     };
 
     const userId = context.params.userId;
-    const txBList = change.before.get("transactionHistory");
-    const txAList = change.after.get("transactionHistory");
+    const txBList = change.before.get('transactionHistory');
+    const txAList = change.after.get('transactionHistory');
     if (JSON.stringify(txBList) !== JSON.stringify(txAList)) {
       const txHash = txAList.pop();
-      console.log("New transaction", userId, txHash);
+      console.log('New transaction', userId, txHash);
       return admin
         .firestore()
         .doc(`notification/transaction/${userId}/${txHash}`)
         .set({ createdAt: new Date() });
     }
 
-    const followB = change.before.get("following");
-    const followA = change.after.get("following");
+    const followB = change.before.get('following');
+    const followA = change.after.get('following');
     const diffFollow = followB.diff(followA).concat(followA.diff(followB));
-    console.log("diffFollow", diffFollow);
+    console.log('diffFollow', diffFollow);
     if (diffFollow.length > 0) {
       if (followB.length > followA.length) {
-        console.log("UNFOLLOW");
+        console.log('UNFOLLOW');
         unfollow(userId, diffFollow);
       } else {
-        console.log("FOLLOW");
+        console.log('FOLLOW');
         follow(userId, diffFollow);
       }
     }
@@ -412,14 +412,14 @@ exports.userInfoTrigger = functions.firestore
   });
 
 exports.sendFollowerNotification = functions.firestore
-  .document("/notification/follow/{userId}/{targetUid}")
+  .document('/notification/follow/{userId}/{targetUid}')
   .onCreate(async (snapshot, context) => {
     const userId = context.params.userId;
     const targetUid = context.params.targetUid;
     // response.send(`Change: ${change.after.val()} - ID: ${commonId}`)
 
     console.log(`uid: ${targetUid} - ID: ${userId}`);
-    const tokenRef = admin.firestore().collection("users").doc(`${targetUid}`);
+    const tokenRef = admin.firestore().collection('users').doc(`${targetUid}`);
     const tokens = await tokenRef.get().then((doc) => {
       return doc.data().tokens;
     });
@@ -427,7 +427,7 @@ exports.sendFollowerNotification = functions.firestore
 
     console.log(`tokens: ${tokens}  - follower: ${follower.displayName}`);
 
-    let title = "You have a new follower";
+    let title = 'You have a new follower';
     let body = `${follower.displayName} is now following you.`;
     let image = follower.photoURL;
 

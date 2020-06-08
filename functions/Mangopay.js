@@ -1,12 +1,12 @@
-const env = require("./_keys/env");
-const { mangoPayApi } = require("./settings");
-const axios = require("axios");
-const Querystring = require("querystring");
+const env = require('./_keys/env');
+const { mangoPayApi } = require('./settings');
+const axios = require('axios');
+const Querystring = require('querystring');
 
 const options = {
   auth: { username: env.mangopay.clientId, password: env.mangopay.apiKey },
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
 };
 
@@ -34,18 +34,18 @@ The person's email address (not more than 12 consecutive numbers) - must be a va
 
 const createUser = async (userData) => {
   const userObject = {
-    FirstName: userData.displayName.split(" ")[0],
+    FirstName: userData.displayName.split(' ')[0],
     LastName:
-      userData.displayName.split(" ").length > 0 &&
-      userData.displayName.split(" ")[1],
+      userData.displayName.split(' ').length > 0 &&
+      userData.displayName.split(' ')[1],
     Birthday: -258443002,
-    Nationality: "BG",
-    CountryOfResidence: "BG",
+    Nationality: 'BG',
+    CountryOfResidence: 'BG',
     Email: userData.email,
   };
   try {
     const response = await axios.post(
-      `${mangoPayApi}` + "/users/natural",
+      `${mangoPayApi}` + '/users/natural',
       userObject,
       options
     );
@@ -72,16 +72,16 @@ Custom data that you can add to this item
 */
 
 const walletData = {
-  Owners: ["81533197"],
-  Description: "A very cool wallet",
-  Currency: "EUR",
-  Tag: "Cloud function create a wallet",
+  Owners: ['81533197'],
+  Description: 'A very cool wallet',
+  Currency: 'EUR',
+  Tag: 'Cloud function create a wallet',
 };
 
 const createWallet = async (userId) => {
   try {
     const response = await axios.post(
-      `${mangoPayApi}` + "/wallets",
+      `${mangoPayApi}` + '/wallets',
       walletData,
       options
     );
@@ -105,15 +105,15 @@ The type of card . The card type is optional, but the default parameter is "CB_V
 */
 
 const userCardData = {
-  UserId: "81533197",
-  Currency: "EUR",
-  CardType: "CB_VISA_MASTERCARD", // optional
+  UserId: '81533197',
+  Currency: 'EUR',
+  CardType: 'CB_VISA_MASTERCARD', // optional
 };
 
 const registerCard = async (userId) => {
   try {
     const preRegData = await axios.post(
-      `${mangoPayApi}` + "/CardRegistrations",
+      `${mangoPayApi}` + '/CardRegistrations',
       userCardData,
       options
     );
@@ -127,7 +127,7 @@ const registerCard = async (userId) => {
 
     console.log(preRegData.data);
 
-    const cardInfo = Querystring["stringify"]({
+    const cardInfo = Querystring['stringify']({
       data: PreregistrationData,
       accessKeyRef: AccessKey,
       cardNumber: 4970101122334422,
@@ -137,7 +137,7 @@ const registerCard = async (userId) => {
 
     const postCardInfo = await axios.post(CardRegistrationURL, cardInfo, {
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
     });
 
@@ -196,25 +196,25 @@ Custom data that you can add to this item
 */
 
 const PayInData = {
-  AuthorId: "81533197",
+  AuthorId: '81533197',
   DebitedFunds: {
-    Currency: "EUR",
+    Currency: 'EUR',
     Amount: 1000,
   },
   Fees: {
-    Currency: "EUR",
+    Currency: 'EUR',
     Amount: 0,
   },
-  CreditedWalletId: "81425984",
-  SecureModeReturnURL: "http://my_redirect_url_after_payment.com",
-  SecureMode: "DEFAULT",
-  CardID: "81538712",
+  CreditedWalletId: '81425984',
+  SecureModeReturnURL: 'http://my_redirect_url_after_payment.com',
+  SecureMode: 'DEFAULT',
+  CardID: '81538712',
 };
 
 const payToDAOStackWallet = async () => {
   try {
     const payInData = await axios.post(
-      `${mangoPayApi}` + "/payins/card/direct",
+      `${mangoPayApi}` + '/payins/card/direct',
       PayInData,
       options
     );
