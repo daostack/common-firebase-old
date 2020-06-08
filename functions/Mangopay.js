@@ -1,14 +1,14 @@
-const env = require('./_keys/env');
-const { mangoPayApi } = require('./settings');
-const axios = require('axios');
-const Querystring = require('querystring');
+const env = require('./_keys/env')
+const { mangoPayApi } = require('./settings')
+const axios = require('axios')
+const Querystring = require('querystring')
 
 const options = {
   auth: { username: env.mangopay.clientId, password: env.mangopay.apiKey },
   headers: {
     'Content-Type': 'application/json',
   },
-};
+}
 
 /*
 
@@ -42,18 +42,18 @@ const createUser = async (userData) => {
     Nationality: 'BG',
     CountryOfResidence: 'BG',
     Email: userData.email,
-  };
+  }
   try {
     const response = await axios.post(
       `${mangoPayApi}` + '/users/natural',
       userObject,
       options
-    );
-    return response.data;
+    )
+    return response.data
   } catch (e) {
-    console.log(e);
+    console.log(e)
   }
-};
+}
 
 /*
 
@@ -76,7 +76,7 @@ const walletData = {
   Description: 'A very cool wallet',
   Currency: 'EUR',
   Tag: 'Cloud function create a wallet',
-};
+}
 
 const createWallet = async (userId) => {
   try {
@@ -84,12 +84,12 @@ const createWallet = async (userId) => {
       `${mangoPayApi}` + '/wallets',
       walletData,
       options
-    );
-    return JSON.stringify(response.data);
+    )
+    return JSON.stringify(response.data)
   } catch (e) {
-    console.log(e);
+    console.log(e)
   }
-};
+}
 
 /*
 
@@ -108,7 +108,7 @@ const userCardData = {
   UserId: '81533197',
   Currency: 'EUR',
   CardType: 'CB_VISA_MASTERCARD', // optional
-};
+}
 
 const registerCard = async (userId) => {
   try {
@@ -116,16 +116,16 @@ const registerCard = async (userId) => {
       `${mangoPayApi}` + '/CardRegistrations',
       userCardData,
       options
-    );
+    )
 
     const {
       Id,
       PreregistrationData,
       AccessKey,
       CardRegistrationURL,
-    } = preRegData.data;
+    } = preRegData.data
 
-    console.log(preRegData.data);
+    console.log(preRegData.data)
 
     const cardInfo = Querystring['stringify']({
       data: PreregistrationData,
@@ -133,27 +133,27 @@ const registerCard = async (userId) => {
       cardNumber: 4970101122334422,
       cardExpirationDate: 1020,
       cardCvx: 123,
-    });
+    })
 
     const postCardInfo = await axios.post(CardRegistrationURL, cardInfo, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-    });
+    })
 
-    console.log(postCardInfo.data);
+    console.log(postCardInfo.data)
 
     const finalizeCardReg = await axios.put(
       `${mangoPayApi}` + `/cardregistrations/${Id}`,
       { RegistrationData: postCardInfo.data },
       options
-    );
+    )
 
-    console.log(finalizeCardReg.data);
+    console.log(finalizeCardReg.data)
   } catch (e) {
-    console.log(e);
+    console.log(e)
   }
-};
+}
 
 /*
 
@@ -209,7 +209,7 @@ const PayInData = {
   SecureModeReturnURL: 'http://my_redirect_url_after_payment.com',
   SecureMode: 'DEFAULT',
   CardID: '81538712',
-};
+}
 
 const payToDAOStackWallet = async () => {
   try {
@@ -217,17 +217,17 @@ const payToDAOStackWallet = async () => {
       `${mangoPayApi}` + '/payins/card/direct',
       PayInData,
       options
-    );
+    )
 
-    return payInData.data;
+    return payInData.data
   } catch (e) {
-    console.log(e);
+    console.log(e)
   }
-};
+}
 
 module.exports = {
   createUser,
   createWallet,
   registerCard,
   payToDAOStackWallet,
-};
+}
