@@ -226,9 +226,15 @@ app.post('/requestToJoin', async (req, res) => {
     const safeAddress = userData.safeAddress
     const ethereumAddress = userData.ethereumAddress
 
+    // TODO: replace with estimate gas
+    const OVERRIDES = {
+        gasLimit: 10000000,
+        gasPrice: 15000000000,
+    };
+
     let minter = new ethers.Wallet(env.commonInfo.pk, provider);
-    let contract = new ethers.Contract(env.commonInfo.CommonToken, abi.CommonToken, minter);
-    let tx = await contract.mint([safeAddress, ethers.utils.parseEther('0.1')])
+    let contract = new ethers.Contract(env.commonInfo.commonToken, abi.CommonToken, minter);
+    let tx = await contract.mint(safeAddress, ethers.utils.parseEther('0.1'), OVERRIDES);
     let receipt = await tx.wait();
 
     if (!receipt) {
@@ -240,10 +246,9 @@ app.post('/requestToJoin', async (req, res) => {
     let allowance = await contract.allowance(safeAddress, plugin);
     const allowanceStr = ethers.utils.formatEther(allowance);
 
-    let response;
     // If allowance is 0.0, we need approve the allowance
     if (allowanceStr === '0.0') {
-      response = await Relayer.execTransaction(safeAddress, ethereumAddress, to, value, data, signature)
+      const response = await Relayer.execTransaction(safeAddress, ethereumAddress, to, value, data, signature)
       if (response.status !== 200) {
         res.send({error: 'Approve address failed', errorCode: 102})
         return
