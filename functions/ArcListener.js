@@ -19,14 +19,6 @@ async function findUserByAddress(ethereumAddress, key = 'safeAddress') {
   
   const snapshot = await query.get()
   if (snapshot.size === 0) {
-
-    // TODO: remove looking for a user by ethereuAddress code once we reset the database
-    if (key === "safeAddress") {
-      let memberFromEthereumAddress = await findUserByAddress(ethereumAddress, "ethereumAddress")
-      if (memberFromEthereumAddress) {
-        return memberFromEthereumAddress
-      } 
-    }
     error(`No member found with ${key} === ${ethereumAddress}`)
     return null
   } else {
@@ -134,13 +126,15 @@ async function updateDaos() {
           }
         }
       }
-      
+
       if (existingDocData) {
         await db.collection('daos').doc(dao.id).update(doc)
       } else {
         await db.collection('daos').doc(dao.id).create(doc)
       }
-      const msg =`Updated dao ${dao.id}`
+
+      
+     const msg =`Updated dao ${dao.id}`
       response.push(msg)
       console.log(msg)
     } catch(err) {
@@ -166,7 +160,7 @@ async function updateProposals(first=null) {
     
     // try to find the memberId corresponding to this address
     const proposer = await findUserByAddress(s.proposer)
-    const proposerId = proposer.id
+    const proposerId = proposer && proposer.id
     let proposedMemberId
     if (!s.proposedMember) {
       proposedMemberId = null
