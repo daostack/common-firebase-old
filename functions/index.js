@@ -219,7 +219,18 @@ app.post('/execTransaction', async (req, res) => {
 
 app.post('/requestToJoin', async (req, res) => {
   try {
-    const {to, value, data, signature, idToken, plugin} = req.body;
+    const {
+      idToken,
+      to1,
+      value1,
+      data1,
+      signature1,
+      to2,
+      value2,
+      data2,
+      signature2
+    } = req.body;
+    // const {to, value, data, signature, idToken, plugin} = req.body;
     const decodedToken = await admin.auth().verifyIdToken(idToken)
     const uid = decodedToken.uid;
     const userData = await admin.firestore().collection('users').doc(uid).get().then(doc => { return doc.data() })
@@ -241,27 +252,83 @@ app.post('/requestToJoin', async (req, res) => {
       res.send({ error: 'Claim Token failed', errorCode: 101})
     }
 
-    await Relayer.addAddressToWhitelist([to]);
+    await Relayer.addAddressToWhitelist([to1, to2]);
 
-    let allowance = await contract.allowance(safeAddress, plugin);
+    let allowance = await contract.allowance(safeAddress, to2);
     const allowanceStr = ethers.utils.formatEther(allowance);
 
     // If allowance is 0.0, we need approve the allowance
     if (allowanceStr === '0.0') {
-      const response = await Relayer.execTransaction(safeAddress, ethereumAddress, to, value, data, signature)
+      const response = await Relayer.execTransaction(safeAddress, ethereumAddress, to1, value1, data1, signature1)
       if (response.status !== 200) {
         res.send({error: 'Approve address failed', errorCode: 102})
         return
       }
-      res.send({mint: tx.hash, approve: response.data.txHash});
+
+      const response2 = await Relayer.execTransaction(safeAddress, ethereumAddress, to2, value2, data2, signature2)
+      if (response2.status !== 200) {
+        res.send({error: 'Request to join failed', errorCode: 103})
+        return
+      }
+
+      const receipt = await provider.waitForTransaction(response2.data.txHash);
+      const interf = new ethers.utils.Interface(abi.JoinAndQuit)  
+      const events = getTransactionEvents(interf, receipt)
+      
+      if (!events.JoinInProposal) {
+        res.send({mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, msg: 'Join in failed'})
+        return
+      }
+
+      const proposalId = events.JoinInProposal._proposalId
+      await updateProposals(proposalId);
+
+      res.send({mint: tx.hash, approve: response.data.txHash, joinHash: response2.data.txHash, proposalId});
+
     } else {
-      res.send({mint: tx.hash, allowance: allowanceStr})
+
+      const response2 = await Relayer.execTransaction(safeAddress, ethereumAddress, to2, value2, data2, signature2)
+      if (response2.status !== 200) {
+        res.send({error: 'Request to join failed', errorCode: 104})
+        return
+      }
+
+      const receipt = await provider.waitForTransaction(response2.data.txHash);
+      const interf = new ethers.utils.Interface(abi.JoinAndQuit)  
+      const events = getTransactionEvents(interf, receipt)
+
+      if (!events.JoinInProposal) {
+        res.send({mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, msg: 'Join in failed'})
+        return
+      }
+
+      const proposalId = events.JoinInProposal._proposalId
+      await updateProposals(proposalId);
+      res.send({mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, proposalId});
     }
-    res.send({error: 'Should not be here', errorCode: 103})
+    
+    res.send({error: 'Should not be here', errorCode: 105})
   } catch (err) {
     res.send(err);
   }
 })
+
+function getTransactionEvents (interf, receipt) {
+  const txEvents = {};
+  const abiEvents = Object.values(interf.events);
+  for (const log of receipt.logs)
+  {
+      for (const abiEvent of abiEvents)
+      {
+          if (abiEvent.topic === log.topics[0])
+          {
+              txEvents[abiEvent.name] = abiEvent.decode(log.data, log.topics);
+              break;
+          }
+      }
+  }
+  return txEvents;
+}
 
 // Expose Express API as a single Cloud Function:
 exports.api = functions.https.onRequest(app);
@@ -276,12 +343,6 @@ exports.listenToTransaction = functions.firestore.document('/notification/transa
     const tokens = await tokenRef.get().then(doc => { return doc.data().tokens })
 
     console.log("Token: ", tokens);
-
-    const provider = new ethers.providers.InfuraProvider(
-      'rinkeby',
-      '3c08878d00734c0c98a3e4741d0b4cfc',
-    );
-
     const receipt = await provider.waitForTransaction(txHash);
 
     let title;
