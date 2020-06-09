@@ -82,6 +82,7 @@ async function updateDaos() {
       const doc = {
         id: dao.id,
         address: daoState.address,
+        balance: 0, // TODO: get the actual token balance here
         memberCount: daoState.memberCount,
         name: daoState.name,
         numberOfBoostedProposals: daoState.numberOfBoostedProposals,
