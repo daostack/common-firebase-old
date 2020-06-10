@@ -1,7 +1,7 @@
-const ethers = require('ethers');
+const ethers = require('../node_modules/ethers');
 const abi = require('./abi.json');
-const axios = require('axios');
-const env = require('./_keys/env');
+const axios = require('../node_modules/axios');
+const env = require('../_keys/env');
 
 const provider = new ethers.providers.JsonRpcProvider('https://dai.poa.network');
 const zeroAddress = `0x${'0'.repeat(40)}`;
