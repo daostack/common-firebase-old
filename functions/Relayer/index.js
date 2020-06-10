@@ -1,13 +1,14 @@
-const functions = require('../node_modules/firebase-functions');
-const admin = require('../node_modules/firebase-admin');
-const axios = require('../node_modules/axios');
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+const axios = require('axios');
 const abi = require('./abi.json');
 const Relayer = require('./Relayer');
-const express = require('../node_modules/express');
-const cors = require('../node_modules/cors');
-const bodyParser = require('../node_modules/body-parser');
-const ethers = require('../node_modules/ethers');
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const ethers = require('ethers');
 const env = require('../_keys/env');
+
 const provider = new ethers.providers.JsonRpcProvider('https://dai.poa.network/');
 
 // create an Arc instance

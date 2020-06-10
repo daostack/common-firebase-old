@@ -1,7 +1,7 @@
-const functions = require('../node_modules/firebase-functions');
-const express = require('../node_modules/express');
-const cors = require('../node_modules/cors');
-const bodyParser = require('../node_modules/body-parser');
+const functions = require('firebase-functions');
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 const { updateDaos, updateProposals, updateUsers } = require('./ArcListener')
 
 const graphql = express();
