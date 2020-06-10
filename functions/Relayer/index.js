@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 const ethers = require('ethers');
 const env = require('../_keys/env');
 
+const { updateProposals } = require('../graphql/ArcListener');
 const provider = new ethers.providers.JsonRpcProvider('https://dai.poa.network/');
 
 // create an Arc instance
@@ -124,14 +125,8 @@ relayer.post('/requestToJoin', async (req, res) => {
   try {
     const {
       idToken,
-      to1,
-      value1,
-      data1,
-      signature1,
-      to2,
-      value2,
-      data2,
-      signature2
+      commonTx,
+      pluginTx,
     } = req.body;
     // const {to, value, data, signature, idToken, plugin} = req.body;
     const decodedToken = await admin.auth().verifyIdToken(idToken)
@@ -155,22 +150,22 @@ relayer.post('/requestToJoin', async (req, res) => {
       res.send({ error: 'Claim Token failed', errorCode: 101 })
     }
 
-    await Relayer.addAddressToWhitelist([to1, to2]);
+    await Relayer.addAddressToWhitelist([commonTx.to, pluginTx.to]);
 
-    let allowance = await contract.allowance(safeAddress, to2);
+    let allowance = await contract.allowance(safeAddress, pluginTx.to);
     const allowanceStr = ethers.utils.formatEther(allowance);
 
     // If allowance is 0.0, we need approve the allowance
     if (allowance.isZero()) {
-      const response = await Relayer.execTransaction(safeAddress, ethereumAddress, to1, value1, data1, signature1)
+      const response = await Relayer.execTransaction(safeAddress, ethereumAddress, commonTx.to, commonTx.value, commonTx.data, commonTx.signature)
       if (response.status !== 200) {
-        res.send({ error: 'Approve address failed', errorCode: 102 })
+        res.status(500).send({ error: 'Approve address failed', errorCode: 102, mint: tx.hash })
         return
       }
 
-      const response2 = await Relayer.execTransaction(safeAddress, ethereumAddress, to2, value2, data2, signature2)
+      const response2 = await Relayer.execTransaction(safeAddress, ethereumAddress, pluginTx.to, pluginTx.value, pluginTx.data, pluginTx.signature)
       if (response2.status !== 200) {
-        res.send({ error: 'Request to join failed', errorCode: 104 })
+        res.status(500).send({ error: 'Request to join failed', errorCode: 104, mint: tx.hash, allowance: allowanceStr })
         return
       }
 
@@ -186,7 +181,7 @@ relayer.post('/requestToJoin', async (req, res) => {
       const proposalId = events.JoinInProposal._proposalId
 
       if (proposalId && proposalId.length) {
-        // await updateProposals(proposalId);
+        await updateProposals();
         res.send({ mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, proposalId: proposalId });
         return;
       }
@@ -195,9 +190,9 @@ relayer.post('/requestToJoin', async (req, res) => {
 
     } else {
 
-      const response2 = await Relayer.execTransaction(safeAddress, ethereumAddress, to2, value2, data2, signature2)
+      const response2 = await Relayer.execTransaction(safeAddress, ethereumAddress, pluginTx.to, pluginTx.value, pluginTx.data, pluginTx.signature)
       if (response2.status !== 200) {
-        res.send({ error: 'Request to join failed', errorCode: 104 })
+        res.status(500).send({ error: 'Request to join failed', errorCode: 105, mint: tx.hash, allowance: allowanceStr })
         return
       }
 
@@ -213,7 +208,7 @@ relayer.post('/requestToJoin', async (req, res) => {
       const proposalId = events.JoinInProposal._proposalId
 
       if (proposalId && proposalId.length) {
-        // await updateProposals(proposalId);
+        await updateProposals();
         res.send({ mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, proposalId: proposalId });
         return;
       }
@@ -221,7 +216,7 @@ relayer.post('/requestToJoin', async (req, res) => {
       res.send({ mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, msg: 'Join in failed' });
     }
 
-    res.send({ error: 'Should not be here', errorCode: 105 })
+    res.send({ error: 'Should not be here', errorCode: 106 })
   } catch (err) {
     res.send(err);
   }
