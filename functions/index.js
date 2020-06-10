@@ -267,23 +267,30 @@ app.post('/requestToJoin', async (req, res) => {
 
       const response2 = await Relayer.execTransaction(safeAddress, ethereumAddress, to2, value2, data2, signature2)
       if (response2.status !== 200) {
-        res.send({error: 'Request to join failed', errorCode: 103})
+        res.send({error: 'Request to join failed', errorCode: 104})
         return
       }
 
-      const receipt = await provider.waitForTransaction(response2.data.txHash);
+      // const receipt = await provider.waitForTransaction(response2.data.txHash);
+      // Test case
+      const receipt = await provider.waitForTransaction('0x073405e6bdd1d053e8af3ee17cc2399648f723fd9e55607de7087102dd13f199');
       const interf = new ethers.utils.Interface(abi.JoinAndQuit)  
       const events = getTransactionEvents(interf, receipt)
-      
+
       if (!events.JoinInProposal) {
         res.send({mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, msg: 'Join in failed'})
         return
       }
 
       const proposalId = events.JoinInProposal._proposalId
-      await updateProposals(proposalId);
 
-      res.send({mint: tx.hash, approve: response.data.txHash, joinHash: response2.data.txHash, proposalId});
+      if (proposalId && proposalId.length) {
+        // await updateProposals(proposalId);
+        res.send({mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, proposalId: proposalId});
+        return;
+      }
+
+      res.send({mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, msg: 'Join in failed'});
 
     } else {
 
@@ -305,8 +312,14 @@ app.post('/requestToJoin', async (req, res) => {
       }
 
       const proposalId = events.JoinInProposal._proposalId
-      // await updateProposals(proposalId);
-      res.send({mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, proposalId});
+
+      if (proposalId && proposalId.length) {
+        // await updateProposals(proposalId);
+        res.send({mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, proposalId: proposalId});
+        return;
+      }
+
+      res.send({mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, msg: 'Join in failed'});
     }
     
     res.send({error: 'Should not be here', errorCode: 105})
