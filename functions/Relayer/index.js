@@ -161,7 +161,7 @@ relayer.post('/requestToJoin', async (req, res) => {
     const allowanceStr = ethers.utils.formatEther(allowance);
 
     // If allowance is 0.0, we need approve the allowance
-    if (allowanceStr === '0.0') {
+    if (allowance.isZero()) {
       const response = await Relayer.execTransaction(safeAddress, ethereumAddress, to1, value1, data1, signature1)
       if (response.status !== 200) {
         res.send({ error: 'Approve address failed', errorCode: 102 })
@@ -174,9 +174,7 @@ relayer.post('/requestToJoin', async (req, res) => {
         return
       }
 
-      // const receipt = await provider.waitForTransaction(response2.data.txHash);
-      // Test case
-      const receipt = await provider.waitForTransaction('0x073405e6bdd1d053e8af3ee17cc2399648f723fd9e55607de7087102dd13f199');
+      const receipt = await provider.waitForTransaction(response2.data.txHash);
       const interf = new ethers.utils.Interface(abi.JoinAndQuit)
       const events = getTransactionEvents(interf, receipt)
 
@@ -204,8 +202,6 @@ relayer.post('/requestToJoin', async (req, res) => {
       }
 
       const receipt = await provider.waitForTransaction(response2.data.txHash);
-      // Test case
-      // const receipt = await provider.waitForTransaction('0x073405e6bdd1d053e8af3ee17cc2399648f723fd9e55607de7087102dd13f199');
       const interf = new ethers.utils.Interface(abi.JoinAndQuit)
       const events = getTransactionEvents(interf, receipt)
 
