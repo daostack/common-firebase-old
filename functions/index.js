@@ -294,6 +294,8 @@ app.post('/requestToJoin', async (req, res) => {
       }
 
       const receipt = await provider.waitForTransaction(response2.data.txHash);
+      // Test case
+      // const receipt = await provider.waitForTransaction('0x073405e6bdd1d053e8af3ee17cc2399648f723fd9e55607de7087102dd13f199');
       const interf = new ethers.utils.Interface(abi.JoinAndQuit)  
       const events = getTransactionEvents(interf, receipt)
 
@@ -303,7 +305,7 @@ app.post('/requestToJoin', async (req, res) => {
       }
 
       const proposalId = events.JoinInProposal._proposalId
-      await updateProposals(proposalId);
+      // await updateProposals(proposalId);
       res.send({mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, proposalId});
     }
     
