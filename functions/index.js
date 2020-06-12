@@ -8,8 +8,7 @@ admin.initializeApp({
 
 const relayer = require('./relayer');
 const graphql = require('./graphql');
-const notification = require('./notification');
 
 exports.relayer = relayer.relayer; 
 exports.graphql = graphql.graphql
-exports.notification = notification.notification;
+exports.notification = require('./notification');
