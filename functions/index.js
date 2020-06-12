@@ -6,6 +6,10 @@ admin.initializeApp({
   databaseURL: databaseURL,
 });
 
-exports.relayer = require('./relayer');
-exports.graphql = require('./graphql');
-exports.notification = require('./notification');
+const relayer = require('./relayer');
+const graphql = require('./graphql');
+const notification = require('./notification');
+
+exports.relayer = relayer.relayer; 
+exports.graphql = graphql.graphql
+exports.notification = notification.notification;
