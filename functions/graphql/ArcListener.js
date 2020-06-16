@@ -175,7 +175,7 @@ async function updateProposals(first = null) {
     } else if (s.proposer === s.proposedMember) {
       proposedMemberId = proposerId
     } else {
-      const proposedMember = await findUserByAddress(s.beneficiary)
+      const proposedMember = await findUserByAddress(s.proposedMember)
       proposedMemberId = proposedMember.id
     }
 
