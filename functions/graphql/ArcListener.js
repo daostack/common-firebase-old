@@ -225,8 +225,7 @@ async function updateProposals(first = null) {
     await db.collection('proposals').doc(s.id).set(doc)
     docs.push(doc)
   }
-  return "test";
-  
+  return docs;
 }
 async function updateUsers() {
   // this function is not used, leaving it here for reference
