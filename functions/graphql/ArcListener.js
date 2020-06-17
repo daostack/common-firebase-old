@@ -199,7 +199,6 @@ async function updateProposals(first = null) {
       executed: s.executed,
       executedAt: s.executedAt,
       expiresInQueueAt: s.expiresInQueueAt,
-      // TODO: votesFor and votesAgainst are in terms of reputation - we need to divide by 1000
       votesFor: s.votesFor.toNumber()/1000,
       votesAgainst: s.votesAgainst.toNumber()/1000,
       id: s.id,
