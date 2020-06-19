@@ -1,5 +1,5 @@
-const env = require('./_keys/env')
-const { mangoPayApi } = require('./settings')
+const env = require('../_keys/env.json')
+const { mangoPayApi } = require('../settings')
 const axios = require('axios')
 const Querystring = require('querystring')
 
@@ -38,11 +38,11 @@ const createUser = async (userData) => {
     LastName:
       userData.displayName.split(' ').length > 0 &&
       userData.displayName.split(' ')[1],
-    Birthday: -258443002,
-    Nationality: 'BG',
-    CountryOfResidence: 'BG',
+    Birthday: -258443002, // can be fake and hadcoded
+    Nationality: 'BG', // can be fake and hadcoded
+    CountryOfResidence: 'BG', // can be fake and hadcoded
     Email: userData.email,
-  }
+  };
   try {
     const response = await axios.post(
       `${mangoPayApi}` + '/users/natural',
