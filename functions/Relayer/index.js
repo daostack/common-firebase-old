@@ -162,7 +162,7 @@ relayer.post('/requestToJoin', async (req, res) => {
     await Relayer.addAddressToWhitelist([commonTx.to, pluginTx.to]);
 
     let allowance = await contract.allowance(safeAddress, pluginTx.to);
-    const allowanceStr = ethers.utils.formatEther(allowance);
+    let allowanceStr = ethers.utils.formatEther(allowance);
 
     // If allowance is 0.0, we need approve the allowance
     // TODO: we should check here for allowance > amounttopay
@@ -176,6 +176,9 @@ relayer.post('/requestToJoin', async (req, res) => {
       // Wait for the allowance to be confirm
       await provider.waitForTransaction(response.data.txHash)
 
+      allowance = await contract.allowance(safeAddress, pluginTx.to);
+      allowanceStr = ethers.utils.formatEther(allowance);
+
       const response2 = await Relayer.execTransaction(safeAddress, ethereumAddress, pluginTx.to, pluginTx.value, pluginTx.data, pluginTx.signature)
       if (response2.status !== 200) {
         res.status(500).send({ error: 'Request to join failed', errorCode: 104, mint: tx.hash, allowance: allowanceStr })
@@ -187,9 +190,8 @@ relayer.post('/requestToJoin', async (req, res) => {
       const events = getTransactionEvents(interf, receipt)
 
       // TODO:  if the transacdtion reverts, we can check for that here and include that in the error message
-
       if (!events.JoinInProposal) {
-        res.send({ mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, msg: 'Join in failed' })
+        res.send({ mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, msg: 'There is no JoinInProposal event' })
         return
       }
 
@@ -201,7 +203,7 @@ relayer.post('/requestToJoin', async (req, res) => {
         return;
       }
 
-      res.send({ mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, msg: 'Join in failed' });
+      res.send({ mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, msg: 'No proposalId found' });
 
     } else {
 
@@ -216,7 +218,7 @@ relayer.post('/requestToJoin', async (req, res) => {
       const events = getTransactionEvents(interf, receipt)
 
       if (!events.JoinInProposal) {
-        res.send({ mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, msg: 'Join in failed' })
+        res.send({ mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, msg: 'There is no JoinInProposal event' })
         return
       }
 
@@ -228,7 +230,7 @@ relayer.post('/requestToJoin', async (req, res) => {
         return;
       }
 
-      res.send({ mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, msg: 'Join in failed' });
+      res.send({ mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, msg: 'No proposalId found' });
     }
 
     res.send({ error: 'Should not be here', errorCode: 106 })
