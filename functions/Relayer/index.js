@@ -10,7 +10,7 @@ const ethers = require('ethers');
 const env = require('../_keys/env');
 
 const { jsonRpcProvider } = require('../settings')
-const { updateProposals, updateProposalById, updateDaos } = require('../graphql/ArcListener');
+const { updateProposalById, updateDaos } = require('../graphql/ArcListener');
 const provider = new ethers.providers.JsonRpcProvider(jsonRpcProvider);
 
 const runtimeOptions = {
