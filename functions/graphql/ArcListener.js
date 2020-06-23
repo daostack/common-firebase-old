@@ -229,7 +229,7 @@ async function _updateProposalDb(proposal) {
 
 async function updateProposalById(proposalId) {
   const proposal = await arc.proposals({ where: { id: proposalId } }, { fetchPolicy: 'no-cache' }).first()
-  const updatedDoc = await this._updateProposalDb(proposal);
+  const updatedDoc = await _updateProposalDb(proposal);
   return updatedDoc;
 }
 
@@ -239,7 +239,7 @@ async function updateProposals(first = null) {
 
   const docs = []
   for (const proposal of proposals) {
-    const updatedDoc = await this._updateProposalDb(proposal);
+    const updatedDoc = await _updateProposalDb(proposal);
     docs.push(updatedDoc)
   }
   return docs
