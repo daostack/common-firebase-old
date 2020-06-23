@@ -209,7 +209,6 @@ async function updateProposals(first = null) {
       resolvedAt: s.resolvedAt,
       stage: s.stage,
       stageStr: s.stage.toString(),
-      title: s.title,
       type: s.type,
       joinAndQuit: {
         proposedMemberAddress: s.proposedMember || null,
