@@ -228,8 +228,9 @@ async function _updateProposalDb(proposal) {
 }
 
 async function updateProposalById(proposalId) {
-  const proposal = await arc.proposals({ where: { id: proposalId } }, { fetchPolicy: 'no-cache' }).first()
+  const proposal = await arc.proposal({ where: { id: proposalId } }, { fetchPolicy: 'no-cache' })
   const updatedDoc = await _updateProposalDb(proposal);
+  console.log("UPDATED PROPOSAL: ", proposal);
   return updatedDoc;
 }
 

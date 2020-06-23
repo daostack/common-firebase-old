@@ -47,7 +47,8 @@ graphql.get('/update-proposals', async (req, res) => {
 
 graphql.get('/update-proposal-by-id', async (req, res) => {
   try {
-    const { proposalId } = req.body;
+    console.log(req.query);
+    const { proposalId } = req.query;
     const result = await updateProposalById(proposalId);
     const code = 200;
     res.status(code).send(`Updated ${result.length} proposals`);
