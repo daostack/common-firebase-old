@@ -70,3 +70,4 @@ node_modules/
 .idea
 functions/_keys/*
 .DS_Store
+/functions/env
