@@ -198,6 +198,8 @@ async function updateDaoById(daoId, awaited = false) {
     
     if (awaited) {
       // TODO: Logic for retrying until the dao is updated in the DB
+      // HINT: Subscribe to firestore daos structure for the current Id and wait until it's updated. 
+      // If the dao is not created yet it will be updated from the common-listener once the graph is updated, so just wait for the firebase to be updated is enought.
     }
 
     return errorMsg;
@@ -292,6 +294,8 @@ async function updateProposalById(proposalId, awaited = false) {
 
     if (awaited) {
       // TODO: Logic for retrying until the proposal appear in the DB
+      // HINT: Subscribe to firestore proposals structure for the current Id and wait until it's updated. 
+      // If the proposal is not created yet it will be updated from the common-listener once the graph is updated, so just wait for the firebase to be updated is enought.
     }
 
     return error.toString()
