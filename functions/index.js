@@ -1,5 +1,4 @@
 const admin = require('firebase-admin');
-
 const { databaseURL } = require('./settings');
 
 admin.initializeApp({
