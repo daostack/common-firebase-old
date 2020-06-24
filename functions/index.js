@@ -1,4 +1,5 @@
 const admin = require('firebase-admin');
+
 const { databaseURL } = require('./settings');
 
 admin.initializeApp({
@@ -6,7 +7,7 @@ admin.initializeApp({
   databaseURL: databaseURL,
 });
 
-const relayer = require('./relayer');
+const relayer = require('./Relayer');
 const graphql = require('./graphql');
 
 exports.relayer = relayer.relayer; 
