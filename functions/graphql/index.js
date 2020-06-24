@@ -2,7 +2,7 @@ const functions = require('firebase-functions');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const { updateDaos, updateProposals, updateUsers, updateVotes, updateProposalById } = require('./ArcListener')
+const { updateDaos, updateDaoById, updateProposals, updateUsers, updateVotes, updateProposalById } = require('./ArcListener')
 
 const runtimeOptions = {
   timeoutSeconds: 540, // Maximum time 9 mins
@@ -28,6 +28,21 @@ graphql.get('/update-daos', async (req, res) => {
     const code = 500;
     console.log(e)
     res.status(code).send(new Error(`Unable to update DAOs: ${e}`));
+  }
+
+});
+
+graphql.get('/update-dao-by-id', async (req, res) => {
+  try {
+    console.log(req.query);
+    const { daoId } = req.query;
+    const result = await updateDaoById(daoId);
+    const code = 200;
+    res.status(code).send(`Updated dao with id ${daoId}`);
+  } catch (e) {
+    const code = 500;
+    console.log(e)
+    res.status(code).send(new Error(`Unable to update Dao: ${e}`));
   }
 
 });

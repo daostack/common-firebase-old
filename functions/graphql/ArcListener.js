@@ -39,121 +39,176 @@ async function updateDaos() {
   console.log(`found ${daos.length} DAOs`)
 
   for (const dao of daos) {
-    const daoState = dao.coreState
-    if (!daoState.metadata) {
-      console.log(`${dao.id} Skipping this dao ${dao.coreState.name}  as it has no metadata`)
-      continue
-    }
-    const metadata = JSON.parse(daoState.metadata)
-    const daoVersion = metadata.VERSION
-    if (!daoVersion) {
-      console.log(`${dao.id} Skipping this dao ${dao.coreState.name}  as it has no metadata.VERSION`)
-      continue
-    }
-    if (daoVersion < "000001") {
-      console.log(`${dao.id} Skipping this dao ${dao.coreState.name} as has an unsupported version ${daoVersion}`)
-      continue
+    const { updatedDoc, errorMsg }  = await _updateDaoDb(dao);
+
+    if (errorMsg) {
+      response.push(errorMsg);
+      console.log(errorMsg);
+      continue;
     }
 
-    const plugins = await dao.plugins().first()
-    let joinAndQuitPlugin
-    let fundingPlugin
-    for (const plugin of plugins) {
-      if (plugin.coreState.name === "JoinAndQuit") {
-        joinAndQuitPlugin = plugin
-      }
-      if (plugin.coreState.name === "FundingRequest") {
-        fundingPlugin = plugin
-      }
-    }
-    if (!joinAndQuitPlugin || !fundingPlugin) {
-      const msg = `Skipping ${dao.id} as it is not properly configured`;
-      console.log(msg);
-      response.push(msg)
-      continue
-    }
-
-    console.log(`UPDATING ${dao.id}: ${daoState.name}`);
-    const {
-      // fundingGoal, // We ignore the "official" funding gaol, instead we use the one from the metadata field
-      minFeeToJoin,
-      memberReputation,
-    } = joinAndQuitPlugin.coreState.pluginParams;
-
-    const fundingGoal = Number(metadata.fundingGoal)
-    const { activationTime } = fundingPlugin.coreState.pluginParams.voteParams
-
-    try {
-      const doc = {
-        id: dao.id,
-        address: daoState.address,
-        balance: 0, // TODO: get the actual token balance here
-        memberCount: daoState.memberCount,
-        name: daoState.name,
-        numberOfBoostedProposals: daoState.numberOfBoostedProposals,
-        numberOfPreBoostedProposals: daoState.numberOfPreBoostedProposals,
-        numberOfQueuedProposals: daoState.numberOfQueuedProposals,
-        register: daoState.register,
-        // reputationId: reputation.id,
-        reputationTotalSupply: parseInt(daoState.reputationTotalSupply),
-        fundingGoal: fundingGoal,
-        fundingGoalDeadline: activationTime,
-        minFeeToJoin: minFeeToJoin.toNumber(),
-        memberReputation: memberReputation.toNumber(),
-        metadata,
-        metadataHash: daoState.metadataHash
-      }
-
-      // also update the member information if it has changed
-      const existingDoc = await db.collection("daos").doc(dao.id).get()
-      const existingDocData = existingDoc.data()
-      if (!existingDocData || !existingDocData.members || existingDocData.members.length !== daoState.memberCount) {
-        console.log(`Membercount changed, updating member collections`)
-        const members = await dao.members().first()
-        doc.members = []
-        for (const member of members) {
-          const user = await findUserByAddress(member.coreState.address)
-          if (user === null) {
-            console.log(`no user found with this address ${member.coreState.address}`)
-            doc.members.push({
-              address: member.coreState.address,
-              userId: null
-            })
-          } else {
-            console.log(`user found with this address ${member.coreState.address}`)
-            console.log(user)
-            const userDaos = user.daos || []
-            if (!(dao.id in userDaos)) {
-              userDaos.push(dao.id)
-              db.collection("users").doc(user.id).update({ daos: userDaos })
-            }
-            doc.members.push({
-              address: member.coreState.address,
-              userId: user.id
-            })
-          }
-        }
-      }
-
-      if (existingDocData) {
-        await db.collection('daos').doc(dao.id).update(doc)
-      } else {
-        await db.collection('daos').doc(dao.id).create(doc)
-      }
-
-
-      const msg = `Updated dao ${dao.id}`
-      response.push(msg)
-      console.log(msg)
-    } catch (err) {
-      console.log(err)
-      throw err
-    }
+    await db.collection('daos').doc(dao.id).set(updatedDoc)
+    const msg = `Updated dao ${dao.id}`
+    response.push(msg)
+    console.log(msg)
   }
   return response.join('\n')
 }
 
+function _validateDaoPlugins(plugins) {
+  const daoPlugins = {
+    joinAndQuitPlugin: null,
+    fundingPlugin: null,
+  }
+  for (const plugin of plugins) {
+    if (plugin.coreState.name === "JoinAndQuit") {
+      daoPlugins.joinAndQuitPlugin = plugin
+    }
+    if (plugin.coreState.name === "FundingRequest") {
+      daoPlugins.fundingPlugin = plugin
+    }
+  }
+  if (!daoPlugins.joinAndQuitPlugin || !daoPlugins.fundingPlugin) {
+    const msg = `Skipping dao as it is not properly configured`;
+    
+    return { isValid: false, errorMsg: msg};
+  }
+
+  return { isValid: true, plugins: daoPlugins};
+  
+}
+
+function _validateDaoState(daoState) {
+  
+  if (!daoState.metadata) {
+    return { isValid: false, errorMsg: `Skipping this dao ${daoState.name}  as it has no metadata`};
+  }
+  const metadata = JSON.parse(daoState.metadata)
+  const daoVersion = metadata.VERSION
+  if (!daoVersion) {
+    return { isValid: false, errorMsg: `Skipping this dao ${daoState.name}  as it has no metadata.VERSION`};
+  }
+  if (daoVersion < "000001") {
+    return { isValid: false, errorMsg: `Skipping this dao ${daoState.name} as has an unsupported version ${daoVersion}`};
+  }
+
+  return { isValid: true };
+}
+
+async function _updateDaoDb(dao) {
+
+  const daoState = dao.coreState
+  
+  // Validate Dao state
+  const validation = _validateDaoState(daoState);
+  if (!validation.isValid) {
+    console.log(`Dao state validation failed for id: ${dao.id}!`);
+    return { errorMsg: validation.errorMsg };
+  }
+
+  // Validate plugins
+  const plugins = await dao.plugins().first()
+  const pluginValidation = _validateDaoPlugins(plugins);
+
+  if (!pluginValidation.isValid) {
+    console.log(`Dao plugins validation failed for id: ${dao.id}!`);
+    return { errorMsg: pluginValidation.errorMsg };
+  }
+
+  const { joinAndQuitPlugin, fundingPlugin } = pluginValidation.plugins;
+  
+  console.log(`UPDATING ${dao.id}: ${daoState.name}`);
+  const {
+    // fundingGoal, // We ignore the "official" funding gaol, instead we use the one from the metadata field
+    minFeeToJoin,
+    memberReputation,
+  } = joinAndQuitPlugin.coreState.pluginParams;
+
+  const metadata = JSON.parse(daoState.metadata)
+  const fundingGoal = Number(metadata.fundingGoal)
+  const { activationTime } = fundingPlugin.coreState.pluginParams.voteParams
+
+  try {
+    const doc = {
+      id: dao.id,
+      address: daoState.address,
+      balance: 0, // TODO: get the actual token balance here
+      memberCount: daoState.memberCount,
+      name: daoState.name,
+      numberOfBoostedProposals: daoState.numberOfBoostedProposals,
+      numberOfPreBoostedProposals: daoState.numberOfPreBoostedProposals,
+      numberOfQueuedProposals: daoState.numberOfQueuedProposals,
+      register: daoState.register,
+      // reputationId: reputation.id,
+      reputationTotalSupply: parseInt(daoState.reputationTotalSupply),
+      fundingGoal: fundingGoal,
+      fundingGoalDeadline: activationTime,
+      minFeeToJoin: minFeeToJoin.toNumber(),
+      memberReputation: memberReputation.toNumber(),
+      metadata,
+      metadataHash: daoState.metadataHash
+    }
+
+    // also update the member information if it has changed
+    const existingDoc = await db.collection("daos").doc(dao.id).get()
+    const existingDocData = existingDoc.data()
+    if (!existingDocData || !existingDocData.members || existingDocData.members.length !== daoState.memberCount) {
+      console.log(`Membercount changed, updating member collections`)
+      const members = await dao.members().first()
+      doc.members = []
+      for (const member of members) {
+        const user = await findUserByAddress(member.coreState.address)
+        if (user === null) {
+          console.log(`no user found with this address ${member.coreState.address}`)
+          doc.members.push({
+            address: member.coreState.address,
+            userId: null
+          })
+        } else {
+          console.log(`user found with this address ${member.coreState.address}`)
+          console.log(user)
+          const userDaos = user.daos || []
+          if (!(dao.id in userDaos)) {
+            userDaos.push(dao.id)
+            db.collection("users").doc(user.id).update({ daos: userDaos })
+          }
+          doc.members.push({
+            address: member.coreState.address,
+            userId: user.id
+          })
+        }
+      }
+    }
+
+    return { updatedDoc: doc };
+
+    
+  } catch (err) {
+    console.log(err)
+    throw err
+  }
+}
+
+async function updateDaoById(daoId, awaited = false) {
+  const dao = arc.dao(daoId);
+  const { updatedDoc, errorMsg }  = await _updateDaoDb(dao);
+  if (errorMsg) {
+    console.log(`Dao update failed for id: ${dao.id}!`);
+    console.log(errorMsg);
+    
+    if (awaited) {
+      // TODO: Logic for retrying until the dao is updated in the DB
+    }
+
+    return errorMsg;
+  }
+  console.log("UPDATED DAO WITH ID: ", daoId);
+  return updatedDoc;
+}
+
 async function _updateProposalDb(proposal) {
+
+  const result = { updatedDoc: null, errorMsg: null }; 
   
     const s = proposal.coreState
 
@@ -223,13 +278,33 @@ async function _updateProposalDb(proposal) {
     }
 
   await db.collection('proposals').doc(s.id).set(doc)
-  return doc;
-  
+  result.updatedDoc = doc;
+
+  return result;
 }
 
-async function updateProposalById(proposalId) {
-  const proposal = await arc.proposal({ where: { id: proposalId } }, { fetchPolicy: 'no-cache' })
-  const updatedDoc = await _updateProposalDb(proposal);
+async function updateProposalById(proposalId, awaited = false) {
+  let proposal = null;
+  try {
+    proposal = await arc.proposal({ where: { id: proposalId } }, { fetchPolicy: 'no-cache' })
+  } catch(error) {
+    // Catch the case if there is no proposal with given id.
+
+    if (awaited) {
+      // TODO: Logic for retrying until the proposal appear in the DB
+    }
+
+    return error.toString()
+  }
+  const { updatedDoc, errorMsg } = await _updateProposalDb(proposal);
+  
+  if (errorMsg) {
+    console.log(`Proposal update failed for id: ${proposalId}!`);
+    console.log(errorMsg);
+    
+    return errorMsg;
+  }
+  
   console.log("UPDATED PROPOSAL: ", proposal);
   return updatedDoc;
 }
