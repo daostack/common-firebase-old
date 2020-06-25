@@ -1,4 +1,5 @@
 const { Arc, Member, Vote } = require('../node_modules/@daostack/arc.js');
+const promiseRetry = require('promise-retry');
 const admin = require('firebase-admin');
 const { graphHttpLink, graphwsLink } = require('../settings')
 
@@ -34,16 +35,22 @@ const parseVotes = (votesArr) => {
 
 // get all DAOs data from graphql and read it into the subgraph
 async function updateDaos() {
+  console.log("UPDATE DAOS:");
+  console.log("----------------------------------------------------------");
+
   const response = []
   const daos = await arc.daos({}, { fetchPolicy: 'no-cache' }).first()
   console.log(`found ${daos.length} DAOs`)
 
   for (const dao of daos) {
+    console.log(`UPDATE DAO WITH ID: ${dao.id}`);
     const { updatedDoc, errorMsg }  = await _updateDaoDb(dao);
+    
 
     if (errorMsg) {
       response.push(errorMsg);
       console.log(errorMsg);
+      console.log("----------------------------------------------------------");
       continue;
     }
 
@@ -51,6 +58,7 @@ async function updateDaos() {
     const msg = `Updated dao ${dao.id}`
     response.push(msg)
     console.log(msg)
+    console.log("----------------------------------------------------------");
   }
   return response.join('\n')
 }
@@ -97,6 +105,7 @@ function _validateDaoState(daoState) {
 
 async function _updateDaoDb(dao) {
 
+  
   const daoState = dao.coreState
   
   // Validate Dao state
@@ -117,7 +126,7 @@ async function _updateDaoDb(dao) {
 
   const { joinAndQuitPlugin, fundingPlugin } = pluginValidation.plugins;
   
-  console.log(`UPDATING ${dao.id}: ${daoState.name}`);
+  console.log(`UPDATING dao ${daoState.name} ...`);
   const {
     // fundingGoal, // We ignore the "official" funding gaol, instead we use the one from the metadata field
     minFeeToJoin,
@@ -159,14 +168,13 @@ async function _updateDaoDb(dao) {
       for (const member of members) {
         const user = await findUserByAddress(member.coreState.address)
         if (user === null) {
-          console.log(`no user found with this address ${member.coreState.address}`)
+          console.log(`No user found with this address ${member.coreState.address}`)
           doc.members.push({
             address: member.coreState.address,
             userId: null
           })
         } else {
-          console.log(`user found with this address ${member.coreState.address}`)
-          console.log(user)
+          console.log(`User found with this address ${member.coreState.address}`)
           const userDaos = user.daos || []
           if (!(dao.id in userDaos)) {
             userDaos.push(dao.id)
@@ -190,21 +198,54 @@ async function _updateDaoDb(dao) {
 }
 
 async function updateDaoById(daoId, awaited = false) {
-  const dao = arc.dao(daoId);
+  //const dao = arc.dao(daoId);
+  //const daos = await arc.daos({ where: { id: daoId } }, { fetchPolicy: 'no-cache' }).first();
+
+  console.log(`UPDATE DAO BY ID: ${daoId}`);
+  console.log("----------------------------------------------------------");
+
+  const dao = await promiseRetry(
+        
+    async function (retry, number) {
+      console.log(`Try #${number} to get Dao...`);
+      const currDaosResult = await arc.daos({ where: { id: daoId } }, { fetchPolicy: 'no-cache' }).first();
+      
+      if (currDaosResult.length === 0) {
+        retry(`Not found Dao with id ${daoId} in the graph. Retrying...`);
+      }
+      return currDaosResult[0];
+    }
+  );
+
   const { updatedDoc, errorMsg }  = await _updateDaoDb(dao);
   if (errorMsg) {
     console.log(`Dao update failed for id: ${dao.id}!`);
     console.log(errorMsg);
     
     if (awaited) {
-      // TODO: Logic for retrying until the dao is updated in the DB
-      // HINT: Subscribe to firestore daos structure for the current Id and wait until it's updated. 
-      // If the dao is not created yet it will be updated from the common-listener once the graph is updated, so just wait for the firebase to be updated is enought.
+      // Begin retry functionality
+      const awaitedResult = await promiseRetry(
+        
+        async function (retry, number) {
+          console.log(`Try #${number} to update Dao...`);
+          const currResult = await _updateDaoDb(dao);
+          if (currResult.errorMsg) {
+            retry(errorMsg);
+          }
+          return currResult;
+        }, 
+        {
+          minTimeout: 1000
+        }
+      );
+
+      return awaitedResult.updatedDoc;
     }
 
     return errorMsg;
   }
   console.log("UPDATED DAO WITH ID: ", daoId);
+  console.log("----------------------------------------------------------");
   return updatedDoc;
 }
 
@@ -379,6 +420,7 @@ async function updateVotes() {
 
 module.exports = {
   updateDaos,
+  updateDaoById,
   updateProposals,
   updateProposalById,
   updateUsers,
