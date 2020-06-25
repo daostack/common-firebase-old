@@ -38,10 +38,11 @@ const createUser = async (userData) => {
     LastName:
       userData.displayName.split(' ').length > 0 &&
       userData.displayName.split(' ')[1],
+    Email: userData.email,
     Birthday: -258443002, // can be fake and hadcoded
     Nationality: 'BG', // can be fake and hadcoded
     CountryOfResidence: 'BG', // can be fake and hadcoded
-    Email: userData.email,
+    
   };
   try {
     const response = await axios.post(
@@ -71,21 +72,22 @@ Custom data that you can add to this item
 
 */
 
-const walletData = {
-  Owners: ['81533197'],
-  Description: 'A very cool wallet',
-  Currency: 'EUR',
-  Tag: 'Cloud function create a wallet',
-}
 
-const createWallet = async (userId) => {
+
+const createWallet = async (mangopayId) => {
+  const walletData = {
+    Owners: [mangopayId],
+    Description: 'A very cool wallet',
+    Currency: 'EUR',
+    Tag: 'Cloud function create a wallet',
+  }
   try {
     const response = await axios.post(
       `${mangoPayApi}` + '/wallets',
       walletData,
       options
     )
-    return JSON.stringify(response.data)
+    return response.data;
   } catch (e) {
     console.log(e)
   }
@@ -104,13 +106,13 @@ The type of card . The card type is optional, but the default parameter is "CB_V
 
 */
 
-const userCardData = {
-  UserId: '81533197',
-  Currency: 'EUR',
-  CardType: 'CB_VISA_MASTERCARD', // optional
-}
-
-const registerCard = async (userId) => {
+const registerCard = async ({ paymentData, userData }) => {
+  console.log('Registering card with data:', paymentData, userData);
+  const userCardData = {
+    UserId: userData.mangopayId,
+    Currency: 'EUR',
+    CardType: 'CB_VISA_MASTERCARD', // optional
+  }
   try {
     const preRegData = await axios.post(
       `${mangoPayApi}` + '/CardRegistrations',
@@ -130,9 +132,9 @@ const registerCard = async (userId) => {
     const cardInfo = Querystring['stringify']({
       data: PreregistrationData,
       accessKeyRef: AccessKey,
-      cardNumber: 4970101122334422,
-      cardExpirationDate: 1020,
-      cardCvx: 123,
+      cardNumber: paymentData.cardNumber,
+      cardExpirationDate: paymentData.expDate,
+      cardCvx: paymentData.cvv,
     })
 
     const postCardInfo = await axios.post(CardRegistrationURL, cardInfo, {
@@ -149,9 +151,71 @@ const registerCard = async (userId) => {
       options
     )
 
-    console.log(finalizeCardReg.data)
+    console.log('Card registered', finalizeCardReg.data)
+    const { CardId } = finalizeCardReg.data;
+    return CardId;
   } catch (e) {
     console.log(e)
+  }
+}
+
+/* 
+
+AuthorId string REQUIRED
+A user's ID
+
+DebitedFunds Money REQUIRED
+Information about the funds that are being debited
+
+CardId string REQUIRED
+
+SecureModeReturnURL string REQUIRED
+
+ */
+
+const preauthorizePayment = async ({ paymentData, userData }) => {
+  try {
+    const preAuthData = {
+      "AuthorId": userData.mangopayId,
+        "DebitedFunds": {
+        "Currency": "USD",
+          "Amount": paymentData.funding
+      },
+      "CardId": userData.mangopayCardId,
+      "SecureModeReturnURL": "http://google.com",
+    }
+    
+    const preAuthReqData = await axios.post(
+      `${mangoPayApi}` + '/preauthorizations/card/direct',
+      preAuthData,
+      options
+    );
+    
+    console.log('PRE AUTH DATA', preAuthReqData.data);
+    return preAuthReqData.data;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+
+
+const cancelPreauthorizedPayment = async (preAuthId) => {
+  try {
+    const cancelData = {
+      "PaymentStatus": "CANCELED"
+    }
+
+    const preAuthReqData = await axios.put(
+      `${mangoPayApi}` + `preauthorizations/${preAuthId}/`,
+      cancelData,
+      options
+    );
+
+    console.log('PRE AUTH DATA', preAuthReqData.data);
+    return preAuthReqData.data;
+  } catch (e) {
+    console.log(e);
   }
 }
 
@@ -195,26 +259,24 @@ Custom data that you can add to this item
 
 */
 
-const PayInData = {
-  AuthorId: '81533197',
-  DebitedFunds: {
-    Currency: 'EUR',
-    Amount: 1000,
-  },
-  Fees: {
-    Currency: 'EUR',
-    Amount: 0,
-  },
-  CreditedWalletId: '81425984',
-  SecureModeReturnURL: 'http://my_redirect_url_after_payment.com',
-  SecureMode: 'DEFAULT',
-  CardID: '81538712',
-}
-
-const payToDAOStackWallet = async () => {
+const payToDAOStackWallet = async ({preAuthId, Amount, userData }) => {
+  const PayInData = {
+    "AuthorId": userData.mangopayId,
+    "CreditedWalletId": "82642751", // The DAOSTACK USD WALLET ID
+    "DebitedFunds": {
+      "Currency": "USD",
+      "Amount": Amount
+    },
+    "Fees": {
+      "Currency": "USD",
+        "Amount": 0
+    },
+    "PreauthorizationId": preAuthId
+  }
+  
   try {
     const payInData = await axios.post(
-      `${mangoPayApi}` + '/payins/card/direct',
+      `${mangoPayApi}` + '/payins/preauthorized/direct/',
       PayInData,
       options
     )
@@ -229,5 +291,7 @@ module.exports = {
   createUser,
   createWallet,
   registerCard,
+  preauthorizePayment,
+  cancelPreauthorizedPayment,
   payToDAOStackWallet,
 }

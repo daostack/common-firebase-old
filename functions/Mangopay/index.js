@@ -1,4 +1,5 @@
 const functions = require('firebase-functions');
+const admin = require('firebase-admin');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mangopay = express();
@@ -6,8 +7,8 @@ const cors = require('cors');
 
 const {
   createUser,
-  /* createWallet,
-  registerCard,
+  createWallet,
+  /*registerCard,
   payToDAOStackWallet, */
 } = require('./Mangopay');
 
@@ -28,9 +29,22 @@ mangopay.use(cors({ origin: true }));
 
 
 
-mangopay.get('/create-user', async (req, res) => {
+mangopay.post('/create-user', async (req, res) => {
   try {
-    const result = await createUser();
+    let result;
+    const { idToken } = req.body;
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const userRef = admin.firestore().collection('users').doc(decodedToken.uid);
+    let userData = await userRef.get().then(doc => { return doc.data() });
+    if (!userData.mangopayId) {
+      const { Id: mangopayId } = await createUser(userData);
+      await userRef.update({ mangopayId });
+    }
+    userData = await userRef.get().then(doc => { return doc.data() }); // update document if changes
+    if (!userData.mangopayWalletId) {
+      const { Id: mangopayWalletId } = await createWallet(userData.mangopayId);
+      await userRef.update({ mangopayWalletId });
+    }
     const code = 200;
     res.status(code).send(`Created mangopay user successfully: ${result}`);
   } catch (e) {
