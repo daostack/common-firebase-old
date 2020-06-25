@@ -197,7 +197,7 @@ async function _updateDaoDb(dao) {
   }
 }
 
-async function updateDaoById(daoId, awaited = false) {
+async function updateDaoById(daoId, retry = false) {
   //const dao = arc.dao(daoId);
   //const daos = await arc.daos({ where: { id: daoId } }, { fetchPolicy: 'no-cache' }).first();
 
@@ -206,12 +206,12 @@ async function updateDaoById(daoId, awaited = false) {
 
   const dao = await promiseRetry(
         
-    async function (retry, number) {
+    async function (retryFunc, number) {
       console.log(`Try #${number} to get Dao...`);
       const currDaosResult = await arc.daos({ where: { id: daoId } }, { fetchPolicy: 'no-cache' }).first();
       
       if (currDaosResult.length === 0) {
-        retry(`Not found Dao with id ${daoId} in the graph. Retrying...`);
+        retryFunc(`Not found Dao with id ${daoId} in the graph. Retrying...`);
       }
       return currDaosResult[0];
     }
@@ -222,15 +222,15 @@ async function updateDaoById(daoId, awaited = false) {
     console.log(`Dao update failed for id: ${dao.id}!`);
     console.log(errorMsg);
     
-    if (awaited) {
+    if (retry) {
       // Begin retry functionality
       const awaitedResult = await promiseRetry(
         
-        async function (retry, number) {
+        async function (retryFunc, number) {
           console.log(`Try #${number} to update Dao...`);
           const currResult = await _updateDaoDb(dao);
           if (currResult.errorMsg) {
-            retry(errorMsg);
+            retryFunc(errorMsg);
           }
           return currResult;
         }, 
@@ -242,7 +242,7 @@ async function updateDaoById(daoId, awaited = false) {
       return awaitedResult.updatedDoc;
     }
 
-    return errorMsg;
+    throw Error(errorMsg);
   }
   console.log("UPDATED DAO WITH ID: ", daoId);
   console.log("----------------------------------------------------------");
@@ -326,20 +326,20 @@ async function _updateProposalDb(proposal) {
   return result;
 }
 
-async function updateProposalById(proposalId, awaited = false) {
+async function updateProposalById(proposalId, retry = false) {
   let proposal = null;
   try {
     proposal = await arc.proposal({ where: { id: proposalId } }, { fetchPolicy: 'no-cache' })
   } catch(error) {
     // Catch the case if there is no proposal with given id.
 
-    if (awaited) {
+    if (retry) {
       // TODO: Logic for retrying until the proposal appear in the DB
       // HINT: Subscribe to firestore proposals structure for the current Id and wait until it's updated. 
       // If the proposal is not created yet it will be updated from the common-listener once the graph is updated, so just wait for the firebase to be updated is enought.
     }
 
-    return error.toString()
+    throw error;
   }
   const { updatedDoc, errorMsg } = await _updateProposalDb(proposal);
   
