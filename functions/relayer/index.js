@@ -7,11 +7,11 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const ethers = require('ethers');
-const env = require('../_keys/env');
-
+const env = require('../env/env');
+const { jsonRpcProvider } = require('../settings')
+const { updateProposalById, updateDaos } = require('../graphql/ArcListener');
+const provider = new ethers.providers.JsonRpcProvider(jsonRpcProvider);
 const { registerCard, preauthorizePayment, payToDAOStackWallet, cancelPreauthorizedPayment } = require('../Mangopay/Mangopay');
-const { updateProposals, updateDaos } = require('../graphql/ArcListener');
-const provider = new ethers.providers.JsonRpcProvider('https://dai.poa.network/');
 
 const runtimeOptions = {
   timeoutSeconds: 540, // Maximum time 9 mins
@@ -193,6 +193,9 @@ relayer.post('/requestToJoin', async (req, res) => {
         return
       }
 
+      // Wait for the allowance to be confirm
+      await provider.waitForTransaction(response.data.txHash)
+
       const response2 = await Relayer.execTransaction(safeAddress, ethereumAddress, pluginTx.to, pluginTx.value, pluginTx.data, pluginTx.signature)
       if (response2.status !== 200) {
         res.status(500).send({ error: 'Request to join failed', errorCode: 104, mint: tx.hash, allowance: allowanceStr })
@@ -214,7 +217,7 @@ relayer.post('/requestToJoin', async (req, res) => {
       const proposalId = events.JoinInProposal._proposalId
 
       if (proposalId && proposalId.length) {
-        await updateProposals();
+        await updateProposalById(proposalId);
         res.send({ mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, proposalId: proposalId });
         return;
       }
@@ -246,7 +249,7 @@ relayer.post('/requestToJoin', async (req, res) => {
       console.log('PayIn Status:', payInStatus);
 
       if (proposalId && proposalId.length) {
-        await updateProposals();
+        await updateProposalById(proposalId);
         res.send({ mint: tx.hash, allowance: allowanceStr, joinHash: response2.data.txHash, proposalId: proposalId });
         return;
       }
