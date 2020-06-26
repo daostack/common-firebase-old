@@ -10,7 +10,7 @@ const {
   createWallet,
   /*registerCard,
   payToDAOStackWallet, */
-} = require('./Mangopay');
+} = require('./mangopay');
 
 const runtimeOptions = {
   timeoutSeconds: 540, // Maximum time 9 mins
