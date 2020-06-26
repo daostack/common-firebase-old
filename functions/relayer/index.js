@@ -144,22 +144,27 @@ relayer.post('/requestToJoin', async (req, res) => {
     let userData = await admin.firestore().collection('users').doc(uid).get().then(doc => { return doc.data() })
     const safeAddress = userData.safeAddress
     const ethereumAddress = userData.ethereumAddress
-    
+    let _preAuthId;
+    let _amount = 0;
     
     // TO-DO what if uses another 2nd card, decide if will keep the cardId at all
+    if (paymentData.funding > 0) {
+      if (!userData.mangopayCardId) {
+        const cardId = await registerCard({ paymentData, userData });
+        await userRef.update({ mangopayCardId: cardId });
+      }
+      userData = await admin.firestore().collection('users').doc(uid).get().then(doc => { return doc.data() }) // re-get userData if cardId is saved
     
-    if (!userData.mangopayCardId) {
-      const cardId = await registerCard({ paymentData, userData });
-      await userRef.update({ mangopayCardId: cardId });
-    }
-    userData = await admin.firestore().collection('users').doc(uid).get().then(doc => { return doc.data() }) // re-get userData if cardId is saved
+      const { Id: preAuthId, Status, DebitedFunds: { Amount } } = await preauthorizePayment({ paymentData, userData })
+      _preAuthId = preAuthId;
+      _amount = Amount;
+      console.log('PRE AUTH STATUS', Status);
     
-    const { Id: preAuthId, Status, DebitedFunds: {Amount} } = await preauthorizePayment({ paymentData, userData })
-    
-    console.log('PRE AUTH STATUS', Status);
-    
-    if (Status === 'FAILED') {
-      res.status(500).send({ error: 'Request to join failed. Card preauthorization failed.', errorCode: 105, mint: tx.hash, allowance: allowanceStr })
+      if (Status === 'FAILED') {
+        res.status(500).send({ error: 'Request to join failed. Card preauthorization failed.' })
+      }
+    } else {
+      console.log();  
     }
     
     // TODO: replace with estimate gas
@@ -171,7 +176,7 @@ relayer.post('/requestToJoin', async (req, res) => {
     let minter = new ethers.Wallet(env.commonInfo.pk, provider);
     let contract = new ethers.Contract(env.commonInfo.commonToken, abi.CommonToken, minter);
     // TODO: fix the bug here: this must be the amount the user is actually paying!!!
-    let tx = await contract.mint(safeAddress, Amount, OVERRIDES); // Amount is USD * 100, so the exact token number
+    let tx = await contract.mint(safeAddress, _amount, OVERRIDES); // Amount is USD * 100, so the exact token number
     // TODO: we probably want to send this transaction through the relayer (?)
     let receipt = await tx.wait();
 
@@ -192,7 +197,7 @@ relayer.post('/requestToJoin', async (req, res) => {
       if (response.status !== 200) {
         // TODO: please do not return the tx.hash here, which is the has from the minting transaction which ahppend earlier
         res.status(500).send({ error: 'Approve address failed', errorCode: 102, mint: tx.hash })
-        cancelPreauthorizedPayment(preAuthId);
+        cancelPreauthorizedPayment(_preAuthId);
         return
       }
 
@@ -202,7 +207,7 @@ relayer.post('/requestToJoin', async (req, res) => {
       const response2 = await Relayer.execTransaction(safeAddress, ethereumAddress, pluginTx.to, pluginTx.value, pluginTx.data, pluginTx.signature)
       if (response2.status !== 200) {
         res.status(500).send({ error: 'Request to join failed', errorCode: 104, mint: tx.hash, allowance: allowanceStr })
-        cancelPreauthorizedPayment(preAuthId);
+        cancelPreauthorizedPayment(_preAuthId);
         return
       }
 
@@ -232,7 +237,7 @@ relayer.post('/requestToJoin', async (req, res) => {
       const response2 = await Relayer.execTransaction(safeAddress, ethereumAddress, pluginTx.to, pluginTx.value, pluginTx.data, pluginTx.signature)
       if (response2.status !== 200) {
         res.status(500).send({ error: 'Request to join failed', errorCode: 105, mint: tx.hash, allowance: allowanceStr })
-        cancelPreauthorizedPayment(preAuthId);
+        cancelPreauthorizedPayment(_preAuthId);
         return
       }
 
@@ -247,9 +252,10 @@ relayer.post('/requestToJoin', async (req, res) => {
 
       const proposalId = events.JoinInProposal._proposalId
       
-      const { Status: payInStatus } = await payToDAOStackWallet({ preAuthId, Amount, userData });
-      
-      console.log('PayIn Status:', payInStatus);
+      if (paymentData.funding > 0) {
+        const { Status: payInStatus } = await payToDAOStackWallet({ _preAuthId, _amount, userData });
+        console.log('PayIn Status:', payInStatus);
+      }
 
       if (proposalId && proposalId.length) {
         await updateProposalById(proposalId, true);
