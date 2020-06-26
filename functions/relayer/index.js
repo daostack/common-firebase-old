@@ -162,7 +162,7 @@ relayer.post('/requestToJoin', async (req, res) => {
     await Relayer.addAddressToWhitelist([commonTx.to, pluginTx.to]);
 
     let allowance = await contract.allowance(safeAddress, pluginTx.to);
-    let allowanceStr = allowance.toString();
+    let allowanceStr = allowance.toString(10);
 
     // If allowance is 0.0, we need approve the allowance
     // TODO: we should check here for allowance > amounttopay
