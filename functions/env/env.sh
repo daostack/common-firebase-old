@@ -27,12 +27,10 @@ currentMD5=`md5sum $currentENV | awk '{ print $1 }'`
 stagingMD5=`md5sum $stagingENV | awk '{ print $1 }'`
 productionMD5=`md5sum $productionENV | awk '{ print $1 }'`
 
-currentENV='Unknow'
 currentBranch=`git branch --no-color | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
 
 if [ "$currentMD5" = "$stagingMD5" ]; then
   echo "Current environment is $(tput setaf 2)Staging $(tput sgr0)"
-  currentENV='Staging'
   if [[ $1 = "-check" ]]; then
     if [[ "$currentBranch" = "staging" ]]; then
       echo "$(tput setaf 2)Enviroment check pass$(tput sgr0)"
@@ -45,7 +43,6 @@ if [ "$currentMD5" = "$stagingMD5" ]; then
   fi
 elif [ "$currentMD5" = "$productionMD5" ]; then
   echo "Current environment is $(tput setaf 2)Production $(tput sgr0)"
-  currentENV='Production'
   if [[ $1 = "-check" ]]; then
     if [[ "$currentBranch" = "master" ]]; then
       echo "$(tput setaf 2)Enviroment check pass$(tput sgr0)"
