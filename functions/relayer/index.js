@@ -164,7 +164,7 @@ relayer.post('/requestToJoin', async (req, res) => {
         res.status(500).send({ error: 'Request to join failed. Card preauthorization failed.' })
       }
     } else {
-      console.log();  
+      console.log('Funding is 0. NO PAYMENT SERVICES.');  
     }
     
     // TODO: replace with estimate gas
