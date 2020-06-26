@@ -1,4 +1,4 @@
-const env = require('../_keys/env.json')
+const env = require('../env/env.json')
 const { mangoPayApi } = require('../settings')
 const axios = require('axios')
 const Querystring = require('querystring')
