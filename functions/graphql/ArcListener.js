@@ -345,8 +345,6 @@ async function updateProposalById(proposalId, retry = false) {
     }
   );
 
-  console.log("PROPOSAL -> ", proposal);
-
   const { updatedDoc, errorMsg } = await _updateProposalDb(proposal);
   
   if (errorMsg) {
