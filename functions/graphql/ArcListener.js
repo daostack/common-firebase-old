@@ -198,12 +198,10 @@ async function _updateDaoDb(dao) {
 
 async function updateDaoById(daoId, retry = false) {
 
-  console.log(`UPDATE DAO BY ID: ${daoId}`);
-  console.log("----------------------------------------------------------");
   if (!daoId) {
     throw Error(`You must provide a daoId (current value is "${daoId}")`)
   }
-
+  daoId = daoId.toLowerCase()
   const dao = await promiseRetry(
         
     async function (retryFunc, number) {
@@ -211,7 +209,7 @@ async function updateDaoById(daoId, retry = false) {
       const currDaosResult = await arc.daos({ where: { id: daoId } }, { fetchPolicy: 'no-cache' }).first();
       
       if (currDaosResult.length === 0) {
-        retryFunc(`Not found Dao with id ${daoId} in the graph. Retrying...`);
+        retryFunc(`We could not find an wid ${daoId} in the graph. Retrying...`);
       }
       return currDaosResult[0];
     }, 
@@ -328,7 +326,6 @@ async function _updateProposalDb(proposal) {
 
 async function updateProposalById(proposalId, retry = false) {
   let proposal = await promiseRetry(
-        
     async function (retryFunc, number) {
       console.log(`Try #${number} to get Proposal...`);
       let currProposalResult = null;
