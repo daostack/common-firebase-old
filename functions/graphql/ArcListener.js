@@ -44,9 +44,9 @@ async function updateDaos() {
 
   for (const dao of daos) {
     console.log(`UPDATE DAO WITH ID: ${dao.id}`);
-    const { updatedDoc, errorMsg }  = await _updateDaoDb(dao);
+    const { errorMsg }  = await _updateDaoDb(dao);
     
-
+    // TODO: this is not the way to handle errors
     if (errorMsg) {
       response.push(errorMsg);
       console.log(errorMsg);
@@ -54,7 +54,6 @@ async function updateDaos() {
       continue;
     }
 
-    await db.collection('daos').doc(dao.id).set(updatedDoc, {merge: true})
     const msg = `Updated dao ${dao.id}`
     response.push(msg)
     console.log(msg)
@@ -174,11 +173,11 @@ async function _updateDaoDb(dao) {
           })
         } else {
           console.log(`User found with this address ${member.coreState.address}`)
-          const userDaos = user.daos || []
-          if (!(dao.id in userDaos)) {
-            userDaos.push(dao.id)
-            db.collection("users").doc(user.id).update({ daos: userDaos })
-          }
+          // const userDaos = user.daos || []
+          // if (!(dao.id in userDaos)) {
+          //   userDaos.push(dao.id)
+          //   db.collection("users").doc(user.id).update({ daos: userDaos })
+          // }
           doc.members.push({
             address: member.coreState.address,
             userId: user.id
@@ -186,7 +185,7 @@ async function _updateDaoDb(dao) {
         }
       }
     }
-
+    await db.collection('daos').doc(dao.id).set(doc, {merge: true})
     return { updatedDoc: doc };
 
     
