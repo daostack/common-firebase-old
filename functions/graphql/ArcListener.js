@@ -195,49 +195,30 @@ async function _updateDaoDb(dao) {
   }
 }
 
-async function updateDaoById(daoId, retry = false) {
+async function updateDaoById(daoId, customRetryOptions = {} ) {
 
   if (!daoId) {
     throw Error(`You must provide a daoId (current value is "${daoId}")`)
   }
   daoId = daoId.toLowerCase()
   const dao = await promiseRetry(
-        
     async function (retryFunc, number) {
       console.log(`Try #${number} to get Dao...`);
       const currDaosResult = await arc.daos({ where: { id: daoId } }, { fetchPolicy: 'no-cache' }).first();
       
       if (currDaosResult.length === 0) {
-        retryFunc(`We could not find an wid ${daoId} in the graph.`);
+        retryFunc(`We could not find a dao with id "${daoId}" in the graph.`);
       }
       return currDaosResult[0];
     }, 
-    retryOptions
+    {...retryOptions, ...customRetryOptions }
   );
 
+  // TODO: _updateDaoDb should throw en error, not ereturn error messages
   const { updatedDoc, errorMsg }  = await _updateDaoDb(dao);
   if (errorMsg) {
     console.log(`Dao update failed for id: ${dao.id}!`);
     console.log(errorMsg);
-    
-    if (retry) {
-      // Begin retry functionality
-      const awaitedResult = await promiseRetry(
-        
-        async function (retryFunc, number) {
-          console.log(`Try #${number} to update Dao...`);
-          const currResult = await _updateDaoDb(dao);
-          if (currResult.errorMsg) {
-            retryFunc(errorMsg);
-          }
-          return currResult;
-        },
-        retryOptions
-      );
-
-      return awaitedResult.updatedDoc;
-    }
-
     throw Error(errorMsg);
   }
   console.log("UPDATED DAO WITH ID: ", daoId);
