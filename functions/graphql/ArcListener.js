@@ -209,7 +209,7 @@ async function updateDaoById(daoId, retry = false) {
       const currDaosResult = await arc.daos({ where: { id: daoId } }, { fetchPolicy: 'no-cache' }).first();
       
       if (currDaosResult.length === 0) {
-        retryFunc(`We could not find an wid ${daoId} in the graph. Retrying...`);
+        retryFunc(`We could not find an wid ${daoId} in the graph.`);
       }
       return currDaosResult[0];
     }, 
@@ -333,7 +333,7 @@ async function updateProposalById(proposalId, retry = false) {
         currProposalResult = await arc.proposal({ where: { id: proposalId } }, { fetchPolicy: 'no-cache' })
       } catch(error) {
         if (retry) {
-          retryFunc(`Not found Proposal with id ${proposalId} in the graph. Retrying... `);
+          retryFunc(`Not found Proposal with id ${proposalId} in the graph`);
         } else {
           throw error;
         }
