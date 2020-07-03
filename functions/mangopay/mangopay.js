@@ -198,7 +198,6 @@ const preauthorizePayment = async ({ paymentData, userData }) => {
     return preAuthReqData.data;
   } catch (e) {
     console.log(e);
-    throw e;
   }
 }
 
@@ -220,7 +219,6 @@ const cancelPreauthorizedPayment = async (preAuthId) => {
     return preAuthReqData.data;
   } catch (e) {
     console.log(e);
-    throw e;
   }
 }
 
