@@ -53,6 +53,7 @@ const createUser = async (userData) => {
     return response.data
   } catch (e) {
     console.log(e)
+    throw e;
   }
 }
 
@@ -90,6 +91,7 @@ const createWallet = async (mangopayId) => {
     return response.data;
   } catch (e) {
     console.log(e)
+    throw e;
   }
 }
 
@@ -156,6 +158,7 @@ const registerCard = async ({ paymentData, userData }) => {
     return CardId;
   } catch (e) {
     console.log(e)
+    throw e;
   }
 }
 
@@ -195,6 +198,7 @@ const preauthorizePayment = async ({ paymentData, userData }) => {
     return preAuthReqData.data;
   } catch (e) {
     console.log(e);
+    throw e;
   }
 }
 
@@ -216,6 +220,7 @@ const cancelPreauthorizedPayment = async (preAuthId) => {
     return preAuthReqData.data;
   } catch (e) {
     console.log(e);
+    throw e;
   }
 }
 
@@ -284,6 +289,7 @@ const payToDAOStackWallet = async ({preAuthId, Amount, userData }) => {
     return payInData.data
   } catch (e) {
     console.log(e)
+    throw e;
   }
 }
 
