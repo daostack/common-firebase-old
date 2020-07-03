@@ -401,7 +401,6 @@ async function updateVotes() {
 
 
 module.exports = {
-  arc,
   updateDaos,
   updateDaoById,
   updateProposals,
