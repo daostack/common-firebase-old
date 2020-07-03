@@ -52,7 +52,7 @@ const createUser = async (userData) => {
     )
     return response.data
   } catch (e) {
-    console.log(e)
+    console.log(e);
   }
 }
 
