@@ -8,9 +8,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const ethers = require('ethers');
 const env = require('../env/env');
-const { jsonRpcProvider } = require('../settings')
+const { provider } = require('../settings')
 const { updateProposalById, updateDaoById } = require('../graphql/ArcListener');
-const provider = new ethers.providers.JsonRpcProvider(jsonRpcProvider);
 const { registerCard, preauthorizePayment, cancelPreauthorizedPayment } = require('../mangopay/mangopay');
 
 const runtimeOptions = {
@@ -104,7 +103,9 @@ relayer.get('/addWhitleList', async (req, res) => {
     const result = await Relayer.addProxyToWhitelist([address]);
     res.send(result.data);
   } catch (err) {
-    res.send(err.response.data);
+    const errDoc = { error: `${err}`, data: res.data, response: err.response}
+    console.log(errDoc)
+    res.status(500).send(errDoc)
   }
 })
 
@@ -124,8 +125,9 @@ relayer.post('/execTransaction', async (req, res) => {
     // TODO: Once it failed, it will send detail to client which have apiKey
     res.send(response.data);
   } catch (err) {
-    res.send(err.response.data);
-    console.log(err.response.data)
+    const errDoc = { error: `${err}`, data: res.data, response: err.response}
+    console.log(errDoc)
+    res.status(500).send(errDoc)
   }
 })
 
