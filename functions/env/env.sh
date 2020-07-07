@@ -3,13 +3,18 @@
 CURRENTDIR=`pwd`
 DIRNAME=`dirname "$0"`
 
-stagingENV="$CURRENTDIR/$DIRNAME/staging/env.json"
-productionENV="$CURRENTDIR/$DIRNAME/production/env.json"
-currentENV="$CURRENTDIR/$DIRNAME/env.json"
+stagingENV="$CURRENTDIR/$DIRNAME/staging/env_secrets.json"
+productionENV="$CURRENTDIR/$DIRNAME/production/env_secrets.json"
+currentENV="$CURRENTDIR/$DIRNAME/env_sencrets.json"
+
+stagingCONFIG="$CURRENTDIR/$DIRNAME/staging/env_secrets.json"
+productionCONFIG="$CURRENTDIR/$DIRNAME/production/env_secrets.json"
+currentCONFIG="$CURRENTDIR/$DIRNAME/env_secrets.json"
 
 if [[ $1 == "-stg" ]]; then
   echo "Switching $(tput setaf 2) staging $(tput sgr0) environment ..."
   cp -f "$stagingENV" "$currentENV"
+  cp -f "$stagingCONFIG" "$currentCONFIG"
   cp -f "$CURRENTDIR/$DIRNAME/staging/adminsdk-keys.json" "$CURRENTDIR/$DIRNAME/adminsdk-keys.json"
   echo "Configuration changed"
   exit
@@ -18,7 +23,9 @@ fi
 if [[ $1 = "-prod" ]]; then
   echo "Switching $(tput setaf 2) production $(tput sgr0) environment ..."
   cp -f "$productionENV" "$currentENV"
+  cp -f "$productionCONFIG" "$currentCONFIG"
   cp -f "$CURRENTDIR/$DIRNAME/production/adminsdk-keys.json" "$CURRENTDIR/$DIRNAME/adminsdk-keys.json"
+  cp -f ""
   echo "Configuration changed"
   exit
 fi
