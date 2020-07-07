@@ -283,7 +283,8 @@ const payToDAOStackWallet = async ({preAuthId, Amount, userData }) => {
 
     return payInData.data
   } catch (e) {
-    console.log(e)
+    console.log(e);
+    throw e;
   }
 }
 
