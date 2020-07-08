@@ -1,5 +1,5 @@
-const envSecrets = require('./env/env_secrets.json');
-const envConfig = require('./env/env_config.json');
+const envSecrets = require('./env_secrets.json');
+const envConfig = require('./env_config.json');
 
 const env = {...envConfig, ...envSecrets};
 
