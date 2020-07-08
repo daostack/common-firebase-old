@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { updateDaos, updateDaoById, updateProposals, updateUsers, updateVotes, updateProposalById } = require('./ArcListener')
+const { updateDAOBalance} = require("./updateDAOBalance")
 
 const runtimeOptions = {
   timeoutSeconds: 540, // Maximum time 9 mins
@@ -23,11 +24,11 @@ graphql.get('/update-daos', async (req, res) => {
   try {
     const result = await updateDaos();
     const code = 200;
-    res.status(code).send(`Updated DAOs successfully: ${result}`);
+    res.status(code).send({message: `Updated DAOs successfully`, result});
   } catch (e) {
     const code = 500;
     console.log(e)
-    res.status(code).send(new Error(`Unable to update DAOs: ${e}`));
+    res.status(code).send({error: `Unable to update Daos: ${e}`});
   }
 
 });
@@ -36,13 +37,13 @@ graphql.get('/update-dao-by-id', async (req, res) => {
   try {
     console.log(req.query);
     const { daoId } = req.query;
-    await updateDaoById(daoId, true);
+    const daoData = await updateDaoById(daoId, { retries: 1 });
     const code = 200;
-    res.status(code).send(`Updated dao with id ${daoId}`);
+    res.status(code).send({message: `Updated dao with id ${daoId}`, daoId, data: daoData});
   } catch (e) {
     const code = 500;
     console.log(e)
-    res.status(code).send(new Error(`Unable to update Dao: ${e}`));
+    res.status(code).send({error: `Unable to update Dao: ${e}`, daoId: req.query.daoId});
   }
 
 });
@@ -55,23 +56,22 @@ graphql.get('/update-proposals', async (req, res) => {
   } catch (e) {
     const code = 500;
     console.log(e)
-    res.status(code).send(new Error(`Unable to update Proposals: ${e}`));
+    res.status(code).send({error: `Unable to update Proposals: ${e}`});
   }
 
 });
 
 graphql.get('/update-proposal-by-id', async (req, res) => {
   try {
-    const { proposalId } = req.query;
-    const result = await updateProposalById(proposalId);
+    const { proposalId, retries } = req.query;
+    const data = await updateProposalById(proposalId, { retries: retries || 0 });
     const code = 200;
-    res.status(code).send(`Updated ${result.length} proposals`);
+    res.status(code).send({message: `Updated proposal ${proposalId}`, data });
   } catch (e) {
     const code = 500;
     console.log(e)
-    res.status(code).send(new Error(`Unable to update Proposals: ${e}`));
+    res.status(code).send({error: `Unable to update Proposal by id: ${e}`, proposalId: req.query.proposalId});
   }
-
 });
 
 graphql.get('/update-users', async (req, res) => {
@@ -82,7 +82,7 @@ graphql.get('/update-users', async (req, res) => {
   } catch (e) {
     const code = 500;
     console.log(e)
-    res.status(code).send(new Error(`Unable to update users: ${e}`));
+    res.status(code).send({error: `Unable to update users: ${e}`});
   }
 });
 graphql.get('/update-votes', async (req, res) => {
@@ -93,7 +93,20 @@ graphql.get('/update-votes', async (req, res) => {
   } catch (e) {
     const code = 500;
     console.log(e)
-    res.status(code).send(new Error(`Unable to update votes: ${e}`));
+    res.status(code).send({error: `Unable to update votes: ${e}`});
+  }
+});
+
+graphql.get('/update-dao-balance', async (req, res) => {
+  const { daoId } = req.query;
+  try {
+    const data = await updateDAOBalance(daoId);
+    const code = 200;
+    res.status(code).send({message: `Updated balance of Common at ${daoId}`, data });
+  } catch (e) {
+    const code = 500;
+    console.log(e)
+    res.status(code).send({error: `Unable to update Common balance ${e}`, query: req.query});
   }
 });
 

@@ -1,14 +1,10 @@
-const { Arc, Member, Vote } = require('../node_modules/@daostack/arc.js');
+const { Member, Vote } = require('@daostack/arc.js');
 const promiseRetry = require('promise-retry');
 const admin = require('firebase-admin');
-const { graphHttpLink, graphwsLink , retryOptions} = require('../settings')
+const { arc, retryOptions} = require('../settings')
+const { getBalance } = require("./updateDAOBalance.js")
 
-const arc = new Arc({
-  graphqlHttpProvider: graphHttpLink,
-  graphqlWsProvider: graphwsLink,
-});
-
-const db = admin.firestore();
+const db = admin.firestore()
 
 function error(msg) {
   console.error(msg)
@@ -44,9 +40,9 @@ async function updateDaos() {
 
   for (const dao of daos) {
     console.log(`UPDATE DAO WITH ID: ${dao.id}`);
-    const { updatedDoc, errorMsg }  = await _updateDaoDb(dao);
+    const { errorMsg }  = await _updateDaoDb(dao);
     
-
+    // TODO: this is not the way to handle errors
     if (errorMsg) {
       response.push(errorMsg);
       console.log(errorMsg);
@@ -54,7 +50,6 @@ async function updateDaos() {
       continue;
     }
 
-    await db.collection('daos').doc(dao.id).set(updatedDoc)
     const msg = `Updated dao ${dao.id}`
     response.push(msg)
     console.log(msg)
@@ -105,7 +100,6 @@ function _validateDaoState(daoState) {
 
 async function _updateDaoDb(dao) {
 
-  
   const daoState = dao.coreState
   
   // Validate Dao state
@@ -137,11 +131,13 @@ async function _updateDaoDb(dao) {
   const fundingGoal = Number(metadata.fundingGoal)
   const { activationTime } = fundingPlugin.coreState.pluginParams.voteParams
 
+  // also get the balance
+  const balance = await getBalance(dao.id)
   try {
     const doc = {
       id: dao.id,
       address: daoState.address,
-      balance: 0, // TODO: get the actual token balance here
+      balance,
       memberCount: daoState.memberCount,
       name: daoState.name,
       numberOfBoostedProposals: daoState.numberOfBoostedProposals,
@@ -175,11 +171,11 @@ async function _updateDaoDb(dao) {
           })
         } else {
           console.log(`User found with this address ${member.coreState.address}`)
-          const userDaos = user.daos || []
-          if (!(dao.id in userDaos)) {
-            userDaos.push(dao.id)
-            db.collection("users").doc(user.id).update({ daos: userDaos })
-          }
+          // const userDaos = user.daos || []
+          // if (!(dao.id in userDaos)) {
+          //   userDaos.push(dao.id)
+          //   db.collection("users").doc(user.id).update({ daos: userDaos })
+          // }
           doc.members.push({
             address: member.coreState.address,
             userId: user.id
@@ -187,7 +183,7 @@ async function _updateDaoDb(dao) {
         }
       }
     }
-
+    await db.collection('daos').doc(dao.id).set(doc, {merge: true})
     return { updatedDoc: doc };
 
     
@@ -197,50 +193,33 @@ async function _updateDaoDb(dao) {
   }
 }
 
-async function updateDaoById(daoId, retry = false) {
-  //const dao = arc.dao(daoId);
-  //const daos = await arc.daos({ where: { id: daoId } }, { fetchPolicy: 'no-cache' }).first();
+async function updateDaoById(daoId, customRetryOptions = {} ) {
 
-  console.log(`UPDATE DAO BY ID: ${daoId}`);
-  console.log("----------------------------------------------------------");
-
+  if (!daoId) {
+    throw Error(`You must provide a daoId (current value is "${daoId}")`)
+  }
+  daoId = daoId.toLowerCase()
   const dao = await promiseRetry(
-        
     async function (retryFunc, number) {
       console.log(`Try #${number} to get Dao...`);
       const currDaosResult = await arc.daos({ where: { id: daoId } }, { fetchPolicy: 'no-cache' }).first();
       
       if (currDaosResult.length === 0) {
-        retryFunc(`Not found Dao with id ${daoId} in the graph. Retrying...`);
+        retryFunc(`We could not find a dao with id "${daoId}" in the graph.`);
+      }
+      if (!currDaosResult[0].coreState.metadata) {
+        retryFunc(`The dao with id "${daoId}" has no metadata`);
       }
       return currDaosResult[0];
     }, 
-    retryOptions
+    {...retryOptions, ...customRetryOptions }
   );
 
+  // TODO: _updateDaoDb should throw en error, not ereturn error messages
   const { updatedDoc, errorMsg }  = await _updateDaoDb(dao);
   if (errorMsg) {
     console.log(`Dao update failed for id: ${dao.id}!`);
     console.log(errorMsg);
-    
-    if (retry) {
-      // Begin retry functionality
-      const awaitedResult = await promiseRetry(
-        
-        async function (retryFunc, number) {
-          console.log(`Try #${number} to update Dao...`);
-          const currResult = await _updateDaoDb(dao);
-          if (currResult.errorMsg) {
-            retryFunc(errorMsg);
-          }
-          return currResult;
-        },
-        retryOptions
-      );
-
-      return awaitedResult.updatedDoc;
-    }
-
     throw Error(errorMsg);
   }
   console.log("UPDATED DAO WITH ID: ", daoId);
@@ -282,11 +261,10 @@ async function _updateProposalDb(proposal) {
       };
     }
 
-    console.log(s)
-
     const doc = {
       boostedAt: s.boostedAt,
       description: proposalDescription,
+      closingAt: s.closingAt,
       createdAt: s.createdAt,
       dao: s.dao.id,
       executionState: s.executionState,
@@ -319,30 +297,29 @@ async function _updateProposalDb(proposal) {
       winningOutcome: s.winningOutcome,
     }
 
-  await db.collection('proposals').doc(s.id).set(doc)
+  await db.collection('proposals').doc(s.id).set(doc, {merge: true})
   result.updatedDoc = doc;
 
   return result;
 }
 
-async function updateProposalById(proposalId, retry = false) {
+async function updateProposalById(proposalId, customRetryOptions = {}) {
   let proposal = await promiseRetry(
-        
     async function (retryFunc, number) {
       console.log(`Try #${number} to get Proposal...`);
       let currProposalResult = null;
       try {
         currProposalResult = await arc.proposal({ where: { id: proposalId } }, { fetchPolicy: 'no-cache' })
-      } catch(error) {
-        if (retry) {
-          retryFunc(`Not found Proposal with id ${proposalId} in the graph. Retrying... `);
-        } else {
-          throw error;
+      } catch (err) {
+        if (err.message.match(/Could not find a unique proposal satisfying these options/)) {
+          retryFunc(`We could not find a proposal with id "${proposalId}" in the graph.`);
         }
+        console.log(err)
+        throw err
       }
       return currProposalResult;
     },
-    retryOptions
+    {...retryOptions, ...customRetryOptions}
   );
 
   const { updatedDoc, errorMsg } = await _updateProposalDb(proposal);
@@ -350,16 +327,17 @@ async function updateProposalById(proposalId, retry = false) {
   if (errorMsg) {
     console.log(`Proposal update failed for id: ${proposalId}!`);
     console.log(errorMsg);
-    
-    return errorMsg;
+    throw Error(errorMsg) 
   }
   
   console.log("UPDATED PROPOSAL: ", proposal);
   return updatedDoc;
 }
 
-async function updateProposals(first = null) {
-  const proposals = await arc.proposals({ first }, { fetchPolicy: 'no-cache' }).first()
+async function updateProposals() {
+  // TOOD: this function will be useless once we have > 1000 proposals!
+  // take first: 1000  (this is the maximum, the default is 100)
+  const proposals = await arc.proposals({ first: 1000 }, { fetchPolicy: 'no-cache' }).first()
   console.log(`found ${proposals.length} proposals`)
 
   const docs = []
@@ -388,7 +366,7 @@ async function updateUsers() {
       const doc = {
         daos: mapMembersToDaos[memberAddress]
       }
-      await db.collection('users').doc(user.id).update(doc)
+      await db.collection('users').doc(user.id).set(doc, { merge: true})
     }
   }
   return response.join('\n')
