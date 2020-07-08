@@ -25,7 +25,6 @@ if [[ $1 = "-prod" ]]; then
   cp -f "$productionENV" "$currentENV"
   cp -f "$productionCONFIG" "$currentCONFIG"
   cp -f "$CURRENTDIR/$DIRNAME/production/adminsdk-keys.json" "$CURRENTDIR/$DIRNAME/adminsdk-keys.json"
-  cp -f ""
   echo "Configuration changed"
   exit
 fi

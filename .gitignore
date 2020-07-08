@@ -69,8 +69,8 @@ env_secrets.json
 adminsdk-keys.json
 
 .idea
-functions/_keys/*
 functions/env/env_config.json
 functions/env/env_secrets.json
+functions/_keys/*
 .DS_Store
 
