@@ -64,7 +64,8 @@ node_modules/
 
 # dotenv environment variables file
 .env
-env.json
+env_config.json
+env_secrets.json
 adminsdk-keys.json
 
 .idea
