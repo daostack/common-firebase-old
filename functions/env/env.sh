@@ -3,13 +3,17 @@
 CURRENTDIR=`pwd`
 DIRNAME=`dirname "$0"`
 
+echo "DIRNAME"
+echo $DIRNAME
+echo $0
+
 stagingENV="$CURRENTDIR/$DIRNAME/staging/env_secrets.json"
 productionENV="$CURRENTDIR/$DIRNAME/production/env_secrets.json"
-currentENV="$CURRENTDIR/$DIRNAME/env_sencrets.json"
+currentENV="$CURRENTDIR/$DIRNAME/env_secrets.json"
 
-stagingCONFIG="$CURRENTDIR/$DIRNAME/staging/env_secrets.json"
-productionCONFIG="$CURRENTDIR/$DIRNAME/production/env_secrets.json"
-currentCONFIG="$CURRENTDIR/$DIRNAME/env_secrets.json"
+stagingCONFIG="$CURRENTDIR/config/staging/env_config.json"
+productionCONFIG="$CURRENTDIR/config/production/env_config.json"
+currentCONFIG="$CURRENTDIR/$DIRNAME/env_config.json"
 
 if [[ $1 == "-stg" ]]; then
   echo "Switching $(tput setaf 2) staging $(tput sgr0) environment ..."
