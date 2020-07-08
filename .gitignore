@@ -70,4 +70,7 @@ adminsdk-keys.json
 
 .idea
 functions/_keys/*
+functions/env/env_config.json
+functions/env/env_secrets.json
 .DS_Store
+
