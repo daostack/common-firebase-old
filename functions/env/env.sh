@@ -3,10 +3,6 @@
 CURRENTDIR=`pwd`
 DIRNAME=`dirname "$0"`
 
-echo "DIRNAME"
-echo $DIRNAME
-echo $0
-
 stagingENV="$CURRENTDIR/$DIRNAME/staging/env_secrets.json"
 productionENV="$CURRENTDIR/$DIRNAME/production/env_secrets.json"
 currentENV="$CURRENTDIR/$DIRNAME/env_secrets.json"
