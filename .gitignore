@@ -64,9 +64,11 @@ node_modules/
 
 # dotenv environment variables file
 .env
-env.json
+env_secrets.json
 adminsdk-keys.json
 
 .idea
 functions/_keys/*
+
+functions/node_modules/
 .DS_Store
