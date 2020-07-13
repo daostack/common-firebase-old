@@ -7,6 +7,8 @@ const cors = require('cors');
 
 const {
   createUser,
+  checkMangopayUserValidity,
+  getCardRegistrationObject,
   // createWallet,
   /*registerCard,
   payToDAOStackWallet, */
@@ -32,11 +34,17 @@ mangopay.use(cors({ origin: true }));
 mangopay.post('/create-user', async (req, res) => {
   try {
     let result;
+    let isValid = false;
     const { idToken } = req.body;
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     const userRef = admin.firestore().collection('users').doc(decodedToken.uid);
     let userData = await userRef.get().then(doc => { return doc.data() });
-    if (!userData.mangopayId) {
+    
+    if (userData.mangopayId) {
+       isValid = checkMangopayUserValidity(userData.mangopayId);
+    }
+    
+    if (!userData.mangopayId || !isValid) {
       const { Id: mangopayId } = await createUser(userData);
       await userRef.update({ mangopayId });
       result = 'Created new user in mangopay.'
@@ -47,12 +55,25 @@ mangopay.post('/create-user', async (req, res) => {
       const { Id: mangopayWalletId } = await createWallet(userData.mangopayId);
       await userRef.update({ mangopayWalletId });
     } */
-    const code = 200;
-    res.status(code).send(`Mangopay user status: ${result ? result : 'User is already registred in mangopay.'}`);
+    res.status(200).send(`Mangopay user status: ${result ? result : 'User is already registred in mangopay.'}`);
   } catch (e) {
-    const code = 500;
     console.log(e);
-    res.status(code).send(new Error(`Unable to create mangopay user: ${e}`));
+    res.status(500).send(new Error(`Unable to create mangopay user: ${e}`));
+  }
+});
+
+
+
+mangopay.post('/pre-reg-data', async (req, res) => {
+  try {
+    const { idToken } = req.body;
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const userRef = admin.firestore().collection('users').doc(decodedToken.uid);
+    let userData = await userRef.get().then(doc => { return doc.data() });
+    const preRegData = await getCardRegistrationObject(userData);
+    res.status(200).send({ preRegData });
+  } catch (e) {
+    console.log(e);
   }
 });
 
