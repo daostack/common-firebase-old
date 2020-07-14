@@ -10,7 +10,8 @@ const {
   checkMangopayUserValidity,
   getCardRegistrationObject,
   finalizeCardReg,
-  preauthorizePayment
+  preauthorizePayment,
+  viewPreauthorization
 } = require('./mangopay');
 
 const runtimeOptions = {
@@ -85,15 +86,27 @@ mangopay.post('/finalize-card-reg', async (req, res) => {
     const cardId = await finalizeCardReg(cardRegistrationResult, Id);
     console.log('CARD REGISTERED', cardId);
     await userRef.update({ mangopayCardId: cardId });
-    const { Id: preAuthId, Status, DebitedFunds: { Amount }, ResultMessage } = await preauthorizePayment({ funding, userData });
+    const { Id: preAuthId, Status, DebitedFunds: { Amount }, ResultMessage, SecureModeRedirectURL } = await preauthorizePayment({ funding, userData });
     if (Status === 'FAILED') {
       throw new Error(`Request to join failed. ${ResultMessage}`);
     } else {
-      res.status(200).send({ message: 'Card registered successfully', preAuthData: {preAuthId, Amount} });
+      res.status(200).send({ message: 'Card registered successfully', preAuthData: { preAuthId, Amount, SecureModeRedirectURL} });
     }
   } catch (e) {
     console.log('Error in finalizing card registration and preauthorization', e);
     res.status(500).send({ error: e});
+  }
+});
+
+
+mangopay.post('/view-preauth', async (req, res) => {
+  try {
+    //const { preAuthId } = req.body;
+    //const { Status } = await viewPreauthorization(preAuthId);
+    res.status(200).send({ message: 'PreauthStatus', Status: 'FAILED' });
+  } catch (e) {
+    console.log('Error viewing preauthorization', e);
+    res.status(500).send({ error: `${e}` });
   }
 });
 
