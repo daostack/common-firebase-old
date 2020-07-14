@@ -135,6 +135,21 @@ const getCardRegistrationObject = async (userData) => {
   }
 }
 
+const finalizeCardReg = async (cardRegistrationResult, Id) => {
+  try {
+    const {data: {CardId}} = await axios.put(
+      `${mangoPayApi}` + `/cardregistrations/${Id}`,
+      { RegistrationData: cardRegistrationResult.data },
+      options
+    );
+    return CardId;
+  } catch (e) {
+    console.log(e);
+    throw (e);
+  }
+  
+}
+
 const registerCard = async ({ paymentData, userData }) => {
   console.log('Registering card with data:', paymentData, userData);
   const userCardData = {
@@ -203,13 +218,13 @@ SecureModeReturnURL string REQUIRED
 
  */
 
-const preauthorizePayment = async ({ paymentData, userData }) => {
+const preauthorizePayment = async ({ funding, userData }) => {
   try {
     const preAuthData = {
       AuthorId: userData.mangopayId,
       DebitedFunds: {
         Currency: 'USD',
-        Amount: paymentData.funding,
+        Amount: funding,
       },
       CardId: userData.mangopayCardId,
       SecureModeReturnURL: 'http://google.com',
@@ -325,5 +340,6 @@ module.exports = {
   cancelPreauthorizedPayment,
   payToDAOStackWallet,
   checkMangopayUserValidity,
-  getCardRegistrationObject
+  getCardRegistrationObject,
+  finalizeCardReg
 };
