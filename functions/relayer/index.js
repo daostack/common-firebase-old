@@ -143,7 +143,6 @@ relayer.post('/requestToJoin', async (req, res) => {
     // const {to, value, data, signature, idToken, plugin} = req.body;
     const decodedToken = await admin.auth().verifyIdToken(idToken)
     const uid = decodedToken.uid;
-    const userRef = admin.firestore().collection('users').doc(decodedToken.uid);
     let userData = await admin.firestore().collection('users').doc(uid).get().then(doc => { return doc.data() })
     const safeAddress = userData.safeAddress
     const ethereumAddress = userData.ethereumAddress
