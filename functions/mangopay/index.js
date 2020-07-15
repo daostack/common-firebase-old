@@ -101,9 +101,9 @@ mangopay.post('/finalize-card-reg', async (req, res) => {
 
 mangopay.post('/view-preauth', async (req, res) => {
   try {
-    //const { preAuthId } = req.body;
-    //const { Status } = await viewPreauthorization(preAuthId);
-    res.status(200).send({ message: 'PreauthStatus', Status: 'FAILED' });
+    const { preAuthId } = req.body;
+    const { Status } = await viewPreauthorization(preAuthId);
+    res.status(200).send({ message: 'PreauthStatus', Status });
   } catch (e) {
     console.log('Error viewing preauthorization', e);
     res.status(500).send({ error: `${e}` });
