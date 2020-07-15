@@ -99,7 +99,7 @@ mangopay.post('/finalize-card-reg', async (req, res) => {
 });
 
 
-mangopay.post('/view-preauth', async (req, res) => {
+mangopay.post('/get-preauthorisation-status', async (req, res) => {
   try {
     const { preAuthId } = req.body;
     const { Status } = await viewPreauthorization(preAuthId);
