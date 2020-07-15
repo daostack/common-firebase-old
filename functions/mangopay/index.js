@@ -62,7 +62,7 @@ mangopay.post('/create-user', async (req, res) => {
 });
 
 
-mangopay.post('/pre-reg-data', async (req, res) => {
+mangopay.post('/get-card-registration', async (req, res) => {
   try {
     const { idToken } = req.body;
     const decodedToken = await admin.auth().verifyIdToken(idToken);
@@ -72,17 +72,17 @@ mangopay.post('/pre-reg-data', async (req, res) => {
     res.status(200).send({ preRegData });
   } catch (e) {
     console.log('Error in pre card registration', e);
-    res.status(500).send({ error:  'Error in card pre-registration.' });
+    res.status(500).send({ error:  'Error getting card registration.' });
   }
 });
 
-mangopay.post('/finalize-card-reg', async (req, res) => {
+mangopay.post('/register-card', async (req, res) => {
   try {
-    const { idToken, cardRegistrationResult, Id, funding } = req.body;
+    const { idToken, cardRegistrationData, Id, funding } = req.body;
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     const userRef = admin.firestore().collection('users').doc(decodedToken.uid);
     let userData = await userRef.get().then(doc => { return doc.data() });
-    const cardId = await finalizeCardReg(cardRegistrationResult, Id);
+    const cardId = await finalizeCardReg(cardRegistrationData, Id);
     console.log('CARD REGISTERED', cardId);
     await userRef.update({ mangopayCardId: cardId });
     const { Id: preAuthId, Status, DebitedFunds: { Amount }, ResultMessage } = await preauthorizePayment({ funding, userData });
