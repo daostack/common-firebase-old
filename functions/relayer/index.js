@@ -10,7 +10,7 @@ const ethers = require('ethers');
 const { env } = require('../env');
 const { provider } = require('../settings')
 const { updateProposalById, updateDaoById } = require('../graphql/ArcListener');
-const { registerCard, preauthorizePayment, cancelPreauthorizedPayment } = require('../mangopay/mangopay');
+const { cancelPreauthorizedPayment } = require('../mangopay/mangopay');
 
 const runtimeOptions = {
   timeoutSeconds: 540, // Maximum time 9 mins
@@ -143,7 +143,6 @@ relayer.post('/requestToJoin', async (req, res) => {
     // const {to, value, data, signature, idToken, plugin} = req.body;
     const decodedToken = await admin.auth().verifyIdToken(idToken)
     const uid = decodedToken.uid;
-    const userRef = admin.firestore().collection('users').doc(decodedToken.uid);
     let userData = await admin.firestore().collection('users').doc(uid).get().then(doc => { return doc.data() })
     const safeAddress = userData.safeAddress
     const ethereumAddress = userData.ethereumAddress
