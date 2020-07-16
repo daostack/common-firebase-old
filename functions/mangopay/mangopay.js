@@ -3,6 +3,7 @@ const { mangoPayApi } = require('../settings');
 const axios = require('axios');
 const Querystring = require('querystring');
 
+
 const options = {
   auth: { username: env.mangopay.clientId, password: env.mangopay.apiKey },
   headers: {
@@ -34,10 +35,8 @@ The person's email address (not more than 12 consecutive numbers) - must be a va
 
 const createUser = async (userData) => {
   const userObject = {
-    FirstName: userData.displayName.split(' ')[0],
-    LastName:
-      userData.displayName.split(' ').length > 0 &&
-      userData.displayName.split(' ')[1],
+    FirstName: 'FakeFirstName',
+    LastName: userData.displayName,
     Email: userData.email,
     Birthday: -258443002, // can be fake and hadcoded
     Nationality: 'BG', // can be fake and hadcoded
@@ -55,6 +54,17 @@ const createUser = async (userData) => {
     throw e;
   }
 };
+
+const checkMangopayUserValidity = async (mangopayId) => {
+  try {
+    const response = await axios.get(`${mangoPayApi}` + `/users/${mangopayId}`, options);
+    return !response.errors ? true : false;
+  } catch (e) {
+    console.log(e);
+    throw e;
+  }
+}
+
 
 /*
 
@@ -104,6 +114,39 @@ CardType CardType OPTIONAL
 The type of card . The card type is optional, but the default parameter is "CB_VISA_MASTERCARD" .
 
 */
+
+const getCardRegistrationObject = async (userData) => {
+  const userCardData = {
+    UserId: userData.mangopayId,
+    Currency: 'USD',
+  };
+  try {
+    const response = await axios.post(
+      `${mangoPayApi}` + '/CardRegistrations',
+      userCardData,
+      options
+    );
+    return response.data;
+  } catch (e) {
+    console.log('Error while getting Card Registration Object', e);
+    throw e;
+  }
+}
+
+const finalizeCardReg = async (cardRegistrationResult, Id) => {
+  try {
+    const {data: {CardId}} = await axios.put(
+      `${mangoPayApi}` + `/cardregistrations/${Id}`,
+      { RegistrationData: cardRegistrationResult.data },
+      options
+    );
+    return CardId;
+  } catch (e) {
+    console.log(e);
+    throw (e);
+  }
+  
+}
 
 const registerCard = async ({ paymentData, userData }) => {
   console.log('Registering card with data:', paymentData, userData);
@@ -173,18 +216,18 @@ SecureModeReturnURL string REQUIRED
 
  */
 
-const preauthorizePayment = async ({ paymentData, userData }) => {
+const preauthorizePayment = async ({ funding, userData }) => {
   try {
     const preAuthData = {
       AuthorId: userData.mangopayId,
       DebitedFunds: {
         Currency: 'USD',
-        Amount: paymentData.funding,
+        Amount: funding,
       },
       CardId: userData.mangopayCardId,
-      SecureModeReturnURL: 'http://google.com',
+      SecureModeReturnURL: 'https://common.io',
     };
-    
+
     const preAuthReqData = await axios.post(
       `${mangoPayApi}` + '/preauthorizations/card/direct',
       preAuthData,
@@ -206,7 +249,7 @@ const cancelPreauthorizedPayment = async (preAuthId) => {
     };
 
     const preAuthReqData = await axios.put(
-      `${mangoPayApi}` + `preauthorizations/${preAuthId}/`,
+      `${mangoPayApi}` + `/preauthorizations/${preAuthId}/`,
       cancelData,
       options
     );
@@ -215,6 +258,19 @@ const cancelPreauthorizedPayment = async (preAuthId) => {
     return preAuthReqData.data;
   } catch (e) {
     console.log(e);
+  }
+};
+
+const viewPreauthorization = async (preAuthId) => {
+  try {
+    const { data } = await axios.get(
+      `${mangoPayApi}` + `/preauthorizations/${preAuthId}/`,
+      options
+    );
+    return data;
+  } catch (e) {
+    console.log(e);
+    throw (e);
   }
 };
 
@@ -293,5 +349,9 @@ module.exports = {
   registerCard,
   preauthorizePayment,
   cancelPreauthorizedPayment,
+  viewPreauthorization,
   payToDAOStackWallet,
+  checkMangopayUserValidity,
+  getCardRegistrationObject,
+  finalizeCardReg
 };

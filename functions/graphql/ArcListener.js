@@ -194,7 +194,7 @@ async function _updateDaoDb(dao) {
 }
 
 async function updateDaoById(daoId, customRetryOptions = {} ) {
-
+  console.log('UPDATING DAO', daoId);
   if (!daoId) {
     throw Error(`You must provide a daoId (current value is "${daoId}")`)
   }

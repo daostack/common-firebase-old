@@ -6,6 +6,7 @@ const {
 } = require('../mangopay/mangopay');
 const { sendMail } = require('../mailer');
 const { env } = require('../env');
+const { updateDAOBalance } = require("../graphql/updateDAOBalance");
 
 exports.watchForExecutedProposals = functions.firestore
   .document('/proposals/{id}')
@@ -15,7 +16,7 @@ exports.watchForExecutedProposals = functions.firestore
     if (
       data.executed !== previousData.executed &&
       data.executed === true &&
-      data.winningOutcome === 1
+      data.winningOutcome === 1 && data.description.preAuthId
     ) {
       console.log(
         'Proposal EXECUTED and WINNING OUTCOME IS 1 -> INITIATING PAYMENT'
@@ -30,7 +31,7 @@ exports.watchForExecutedProposals = functions.firestore
         });
       try {
         const { Status } = await payToDAOStackWallet({
-          preAuthId: data.preAuthId,
+          preAuthId: data.description.preAuthId,
           Amount: data.joinAndQuit.funding,
           userData,
         });
@@ -40,6 +41,7 @@ exports.watchForExecutedProposals = functions.firestore
             'Successfull pay-In',
             `Pay-In successfull for Proposal with ID ${data.id}`
           );
+          await updateDAOBalance(data.dao);
           return change.after.ref.set(
             {
               paymentStatus: 'paid',
@@ -66,6 +68,6 @@ exports.watchForExecutedProposals = functions.firestore
       data.executed === true &&
       data.winningOutcome === 0
     ) {
-      await cancelPreauthorizedPayment(data.preAuthId);
+      await cancelPreauthorizedPayment(data.description.preAuthId);
     }
   });
