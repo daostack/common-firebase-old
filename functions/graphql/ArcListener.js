@@ -194,6 +194,7 @@ async function _updateDaoDb(dao) {
 }
 
 async function updateDaoById(daoId, customRetryOptions = {} ) {
+
   if (!daoId) {
     throw Error(`You must provide a daoId (current value is "${daoId}")`)
   }
@@ -284,8 +285,7 @@ async function _updateProposalDb(proposal) {
       joinAndQuit: {
         proposedMemberAddress: s.proposedMember || null,
         proposedMemberId: proposedMemberId,
-        funding: s.funding && s.funding.toString() || null,
-        reputationMinted: s.reputationMinted && s.reputationMinted.toString() || null
+        funding: s.funding && s.funding.toString() || null
       },
       fundingRequest: {
         beneficiary: s.beneficiary || null,
@@ -306,26 +306,31 @@ async function _updateProposalDb(proposal) {
 async function updateProposalById(proposalId, customRetryOptions = {}) {
   let proposal = await promiseRetry(
     async function (retryFunc, number) {
-      console.log(`Try #${number} to get Proposal ${proposalId}`);
-      const proposals = await arc.proposals({ where: { id: proposalId } }, { fetchPolicy: 'no-cache' }).first()
-      if (proposals.length === 0) {
-        await retryFunc(`We could not find a proposal with id "${proposalId}" in the graph.`);
+      console.log(`Try #${number} to get Proposal...`);
+      let currProposalResult = null;
+      try {
+        currProposalResult = await arc.proposal({ where: { id: proposalId } }, { fetchPolicy: 'no-cache' })
+      } catch (err) {
+        if (err.message.match(/Could not find a unique proposal satisfying these options/)) {
+          retryFunc(`We could not find a proposal with id "${proposalId}" in the graph.`);
+        }
+        console.log(err)
+        throw err
       }
-      return proposals[0]
+      return currProposalResult;
     },
     {...retryOptions, ...customRetryOptions}
   );
 
-  // TODO: remove this errorMsg logic, and just throw and catch proper errors
   const { updatedDoc, errorMsg } = await _updateProposalDb(proposal);
   
   if (errorMsg) {
-    const msg = `Proposal update failed for id: ${proposalId}, ${errorMsg}`;
-    console.log(msg)
-    throw Error(msg) 
+    console.log(`Proposal update failed for id: ${proposalId}!`);
+    console.log(errorMsg);
+    throw Error(errorMsg) 
   }
   
-  console.log("UPDATED PROPOSAL: ", proposal.id);
+  console.log("UPDATED PROPOSAL: ", proposal);
   return updatedDoc;
 }
 
