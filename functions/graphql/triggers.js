@@ -41,7 +41,7 @@ exports.newDaoCreated = functions.firestore
     sendMail(
       userData.email,
       `Your DAO is ready`,
-      `Your DAO ${newDao.data} has been created.`
+      `Your DAO ${daoName} has been created.`
     );
     sendMail(
       env.mail.adminMail,
