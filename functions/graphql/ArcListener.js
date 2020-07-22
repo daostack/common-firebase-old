@@ -91,7 +91,7 @@ function _validateDaoState(daoState) {
   if (!daoVersion) {
     return { isValid: false, errorMsg: `Skipping this dao ${daoState.name}  as it has no metadata.VERSION`};
   }
-  if (daoVersion < "000001") {
+  if (daoVersion !== "000002") {
     return { isValid: false, errorMsg: `Skipping this dao ${daoState.name} as has an unsupported version ${daoVersion}`};
   }
 
