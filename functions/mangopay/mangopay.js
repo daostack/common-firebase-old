@@ -2,7 +2,6 @@ const { env } = require('../env')
 const { mangoPayApi } = require('../settings');
 const axios = require('axios');
 
-
 const options = {
   auth: { username: env.mangopay.clientId, password: env.mangopay.apiKey },
   headers: {
@@ -294,7 +293,6 @@ const payToDAOStackWallet = async ({ preAuthId, Amount, userData }) => {
 module.exports = {
   createUser,
   createWallet,
-  registerCard,
   preauthorizePayment,
   cancelPreauthorizedPayment,
   viewPreauthorization,
