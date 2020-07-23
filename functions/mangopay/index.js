@@ -64,7 +64,7 @@ mangopay.post('/create-user', async (req, res) => {
     });
   } catch (e) {
     console.log(e);
-    res.status(500).send({ error: 'Error in creating mangopay user' });
+    res.status(500).send({ error: e.response ? e.response.data.Message : e.message });
   }
 });
 
