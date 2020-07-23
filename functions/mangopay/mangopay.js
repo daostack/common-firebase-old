@@ -139,7 +139,7 @@ const finalizeCardReg = async (cardRegistrationResult, Id) => {
       { RegistrationData: cardRegistrationResult.data },
       options
     );
-    if (Status === 'ERROR' || !!CardId) {
+    if (Status === 'ERROR') {
       throw new Error(ResultMessage);
     }
     return CardId;
