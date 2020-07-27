@@ -1,4 +1,4 @@
-const Relayer = require('./relayer');
+const Relayer = require('./Relayer');
 const Utils = require('../util/util');
 // const { env } = require('../env');
 const { updateProposalById } = require('../graphql/ArcListener');

@@ -1,5 +1,5 @@
 const functions = require('firebase-functions');
-const Notification = require('./notification');
+const Notification = require('./Notification');
 const admin = require('firebase-admin');
 
 // Follow User

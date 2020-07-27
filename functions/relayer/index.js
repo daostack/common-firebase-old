@@ -1,5 +1,5 @@
 const functions = require('firebase-functions');
-const Relayer = require('./relayer');
+const Relayer = require('./Relayer');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
