@@ -43,7 +43,7 @@ exports.newDaoCreated = functions.firestore
       const { Id: mangopayId } = await createLegalUser(newDao);
       const { Id: mangopayWalletId } = await createWallet(mangopayId);
       if (mangopayId && mangopayWalletId) {
-        return snap.ref.set({ mangopayId, mangopayWalletId });
+        return snap.ref.set({ mangopayId, mangopayWalletId }, { merge: true });
       }
     } catch (e) {
       sendMail(
