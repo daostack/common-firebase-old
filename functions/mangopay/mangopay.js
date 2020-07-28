@@ -53,6 +53,31 @@ const createUser = async (userData) => {
   }
 };
 
+const createLegalUser = async (daoData) => {
+  const legalUserObject = {
+    LegalPersonType: 'ORGANIZATION',
+    Name: daoData.name,
+    Email: 'jelle@daostack.io',
+    LegalRepresentativeBirthday: -258443002, 
+    LegalRepresentativeCountryOfResidence: 'IT', 
+    LegalRepresentativeNationality: 'IT',
+    LegalRepresentativeFirstName: 'Jelle',
+    LegalRepresentativeLastName: 'Gerbrandy'
+  };
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const response = await axios.post(
+      `${mangoPayApi}` + '/users/legal',
+      legalUserObject,
+      options
+    );
+    return response.data;
+  } catch (e) {
+    console.log(e);
+    throw e;
+  }
+};
+
 const checkMangopayUserValidity = async (mangopayId) => {
   try {
     const response = await axios.get(`${mangoPayApi}` + `/users/${mangopayId}`, options);
@@ -292,6 +317,7 @@ const payToDAOStackWallet = async ({ preAuthId, Amount, userData }) => {
 
 module.exports = {
   createUser,
+  createLegalUser,
   createWallet,
   preauthorizePayment,
   cancelPreauthorizedPayment,

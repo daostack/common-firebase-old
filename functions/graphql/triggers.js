@@ -3,6 +3,7 @@ const admin = require('firebase-admin');
 const { updateDaoById } = require('./ArcListener');
 const { sendMail } = require('../mailer');
 const { env } = require('../env');
+const { createLegalUser, createWallet} = require('../mangopay/mangopay');
 
 exports.watchForReputationRedeemed = functions.firestore
     .document('/proposals/{id}')
@@ -38,6 +39,19 @@ exports.newDaoCreated = functions.firestore
         return doc.data();
       });
     const daoName = newDao.name;
+    try {
+      const { Id: mangopayId } = await createLegalUser(newDao);
+      const { Id: mangopayWalletId } = await createWallet(mangopayId);
+      if (mangopayId && mangopayWalletId) {
+        return snap.ref.set({ mangopayId, mangopayWalletId });
+      }
+    } catch (e) {
+      sendMail(
+        env.mail.adminMail,
+        `Failed to create mangopayId or walletId for DAO: ${daoName} with id: ${newDao.id}`,
+        `Your DAO ${daoName} has been created.`
+      );
+    }
     sendMail(
       userData.email,
       `Your DAO is ready`,
