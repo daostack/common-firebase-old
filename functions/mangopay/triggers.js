@@ -28,6 +28,7 @@ exports.watchForExecutedProposals = functions.firestore
       const userData = await util.getUserById(data.proposerId);
       let daoData = await util.getCommonById(data.dao);
       try {
+        // this block here up to line 46 can be extracted to a method, same is used in graphql's trigger newDaoCreated
         if (!daoData.mangopayId) {
           const { Id: mangopayId } = await createLegalUser(daoData);
           const { Id: mangopayWalletId } = await createWallet(mangopayId);
