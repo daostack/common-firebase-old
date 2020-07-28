@@ -49,7 +49,7 @@ exports.newDaoCreated = functions.firestore
       sendMail(
         env.mail.adminMail,
         `Failed to create mangopayId or walletId for DAO: ${daoName} with id: ${newDao.id}`,
-        `Your DAO ${daoName} has been created.`
+        `Failed to create mangopayId or walletId`
       );
     }
     sendMail(

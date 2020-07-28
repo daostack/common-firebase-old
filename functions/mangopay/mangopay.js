@@ -109,7 +109,7 @@ const createWallet = async (mangopayId) => {
   const walletData = {
     Owners: [mangopayId],
     Description: 'A very cool wallet',
-    Currency: 'EUR',
+    Currency: 'USD',
     Tag: 'Cloud function create a wallet',
   };
   try {
@@ -286,10 +286,10 @@ Custom data that you can add to this item
 
 */
 
-const payToDAOStackWallet = async ({ preAuthId, Amount, userData }) => {
+const payToDAOWallet = async ({ preAuthId, Amount, userData, daoData }) => {
   const PayInData = {
     AuthorId: userData.mangopayId,
-    CreditedWalletId: env.mangopay.daoStackWalletId, // The DAOSTACK USD WALLET ID
+    CreditedWalletId: daoData.mangopayWalletId, // The DAO USD WALLET ID
     DebitedFunds: {
       Currency: 'USD',
       Amount: Amount,
@@ -322,7 +322,7 @@ module.exports = {
   preauthorizePayment,
   cancelPreauthorizedPayment,
   viewPreauthorization,
-  payToDAOStackWallet,
+  payToDAOWallet,
   checkMangopayUserValidity,
   getCardRegistrationObject,
   finalizeCardReg
