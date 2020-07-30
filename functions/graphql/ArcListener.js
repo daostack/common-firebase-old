@@ -46,7 +46,6 @@ async function updateDaos() {
     if (errorMsg) {
       response.push(errorMsg);
       console.error(errorMsg);
-      console.error("----------------------------------------------------------");
       continue;
     }
 

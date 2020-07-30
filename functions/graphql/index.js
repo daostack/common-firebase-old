@@ -25,8 +25,9 @@ graphql.get('/update-daos', async (req, res) => {
     const result = await updateDaos();
     res.status(200).send({message: `Updated DAOs successfully`, result});
   } catch (e) {
-    console.error(500)
-    res.status(500).send({error: `Unable to update Daos: ${e}`, query: req.query});
+    const msg = `Unable to update Daos: ${e}`
+    console.error(msg)
+    res.status(500).send({error: msg, query: req.query});
   }
 
 });
