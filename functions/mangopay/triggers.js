@@ -35,7 +35,7 @@ exports.watchForExecutedProposals = functions.firestore
           if (mangopayId && mangopayWalletId) {
             const daoRef = await util.getDaoRef(daoData.id);
             await daoRef.update({ mangopayId, mangopayWalletId });
-            daoData = await util.getCommonById(data.mangopayWalletId); // update daoData
+            daoData = await util.getCommonById(data.dao); // update daoData
           } else {
             sendMail(
               env.mail.adminMail,
@@ -45,7 +45,7 @@ exports.watchForExecutedProposals = functions.firestore
           }
         }
         const preAuthId = data.description.preAuthId;
-        const amount = parseInt(data.description.funding, 16);
+        const amount = data.description.funding;
         const { Status } = await payToDAOWallet({
           preAuthId,
           Amount: amount,
