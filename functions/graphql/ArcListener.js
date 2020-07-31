@@ -25,7 +25,7 @@ async function findUserByAddress(ethereumAddress, key = 'safeAddress') {
 }
 
 const parseVotes = (votesArr) => {
-  return votesArr.map(item => item.id)
+  return votesArr.map(({coreState: {voter, outcome}}) => {return {voter, outcome}})
 }
 
 
@@ -45,8 +45,7 @@ async function updateDaos() {
     // TODO: this is not the way to handle errors
     if (errorMsg) {
       response.push(errorMsg);
-      console.log(errorMsg);
-      console.log("----------------------------------------------------------");
+      console.error(errorMsg);
       continue;
     }
 
@@ -188,7 +187,7 @@ async function _updateDaoDb(dao) {
 
     
   } catch (err) {
-    console.log(err)
+    console.error(err)
     throw err
   }
 }
@@ -218,8 +217,8 @@ async function updateDaoById(daoId, customRetryOptions = {} ) {
   // TODO: _updateDaoDb should throw en error, not ereturn error messages
   const { updatedDoc, errorMsg }  = await _updateDaoDb(dao);
   if (errorMsg) {
-    console.log(`Dao update failed for id: ${dao.id}!`);
-    console.log(errorMsg);
+    console.error(`Dao update failed for id: ${dao.id}!`);
+    console.error(errorMsg);
     throw Error(errorMsg);
   }
   console.log("UPDATED DAO WITH ID: ", daoId);
@@ -232,6 +231,8 @@ async function _updateProposalDb(proposal) {
   const result = { updatedDoc: null, errorMsg: null }; 
   
     const s = proposal.coreState
+
+    const votes = await Vote.search(arc, {where: {proposal: s.id}}, { fetchPolicy: 'no-cache' }).first();
 
     // TODO: for optimization, consider looking for a new member not as part of this update process
     // but as a separate cloudfunction instead (that watches for changes in the database and keeps it consistent)
@@ -300,7 +301,7 @@ async function _updateProposalDb(proposal) {
         amount: s.amount && s.amount.toString() || null,
         amountRedemeed: s.amountRedeemd && s.amountRedeemed.toString() || null,
       },
-      votes: parseVotes(s.votes),
+      votes: votes.length > 0 ? parseVotes(votes) : [],
       winningOutcome: s.winningOutcome,
     }
 
@@ -336,13 +337,16 @@ async function updateProposals() {
   console.log(`found ${proposals.length} proposals`)
 
   const docs = [];
-  let notUpdated = 0;
+  const notUpdated = [];
   for (const proposal of proposals) {
     try {
       const updatedDoc = await _updateProposalDb(proposal);
       docs.push(updatedDoc);
     } catch (e) {
-      if (e.code === 1) { notUpdated++; continue; } else throw e;
+      if (e.code === 1) { 
+        notUpdated.push(proposal.id); 
+        continue; 
+      } else throw e;
     }
   }
   return { docs, notUpdated };
