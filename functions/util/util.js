@@ -1,4 +1,5 @@
 const admin = require('firebase-admin');
+const { provider } = require('../settings')
 const { CommonError, CFError} = require('./error')
 
 module.exports = new class Utils {
@@ -22,6 +23,10 @@ module.exports = new class Utils {
 
   getUserRef(uid) {
     return admin.firestore().collection('users').doc(uid);
+  }
+  
+  getDaoRef(daoId) {
+    return admin.firestore().collection('daos').doc(daoId);
   }
 
   async getUserById(uid) {
@@ -59,7 +64,7 @@ module.exports = new class Utils {
   }
 
   async isRelayerTxSuccess(txHash) {
-    const receipt = await this.provider.waitForTransaction(txHash);
+    const receipt = await provider.waitForTransaction(txHash);
     return this.isRelayerTxSuccessWithReceipt(receipt);
   }
   
