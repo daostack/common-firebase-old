@@ -1,8 +1,12 @@
 const admin = require('firebase-admin');
 const { provider } = require('../settings')
 const { CommonError, CFError} = require('./error')
+const fetch = require('node-fetch');
+
+const QUERY_LATEST_BLOCK_NUMBER = '{ indexingStatusForCurrentVersion(subgraphName: “daostack/v8_10_exp_kovan”) { chains { network ... on EthereumIndexingStatus { latestBlock { number } chainHeadBlock { number  } } } } }';
 
 module.exports = new class Utils {
+  
   async verifyId(idToken) {
     try {
       const decodedToken = await admin.auth().verifyIdToken(idToken)
@@ -76,5 +80,14 @@ module.exports = new class Utils {
       }
     }
     return true;
+  }
+
+  async getGraphLatestBloackNumber() {
+    const response = await fetch('https://api.thegraph.com/index-node/graphql', {
+      method: 'POST',
+      body: JSON.stringify({QUERY_LATEST_BLOCK_NUMBER})
+    });  
+
+    return await response.json();
   }
 }

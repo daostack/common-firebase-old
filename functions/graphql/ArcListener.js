@@ -3,6 +3,7 @@ const promiseRetry = require('promise-retry');
 const admin = require('firebase-admin');
 const { arc, retryOptions, ipfsDataVersion} = require('../settings')
 const { getBalance } = require("./updateDAOBalance.js")
+const Utils = require('../util/util');
 
 const db = admin.firestore()
 
@@ -311,12 +312,22 @@ async function _updateProposalDb(proposal) {
   return result;
 }
 
-async function updateProposalById(proposalId, customRetryOptions = {}) {
+async function updateProposalById(proposalId, customRetryOptions = {}, txBlockNumber) {
   let proposal = await promiseRetry(
     async function (retryFunc, number) {
       console.log(`Try #${number} to get Proposal ${proposalId}`);
       const proposals = await arc.proposals({ where: { id: proposalId } }, { fetchPolicy: 'no-cache' }).first()
-      if (proposals.length === 0) {
+
+      
+      let isTxBlockChangeApplied = false;
+      if (txBlockNumber) {
+        const graphData = Utils.getGraphLatestBloackNumber();
+        isTxBlockChangeApplied = txBlockNumber <= graphData.data.indexingStatusForCurrentVersion.chains[0].latestBlock;
+      } else {
+        isTxBlockChangeApplied = true;
+      }
+
+      if (proposals.length === 0 || isTxBlockChangeApplied) {
         await retryFunc(`We could not find a proposal with id "${proposalId}" in the graph.`);
       }
       return proposals[0]
