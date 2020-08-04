@@ -327,7 +327,7 @@ async function updateProposalById(proposalId, customRetryOptions = {}, txBlockNu
         isTxBlockChangeApplied = true;
       }
 
-      if (proposals.length === 0 && isTxBlockChangeApplied) {
+      if (proposals.length === 0 || !isTxBlockChangeApplied) {
         await retryFunc(`We could not find a proposal with id "${proposalId}" in the graph.`);
       }
       return proposals[0]
