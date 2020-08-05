@@ -7,11 +7,13 @@ const runtimeOptions = {
   timeoutSeconds: 540
 };
 
-app.get('/test/email', async (req, res) => {
+app.get('/test/sending', async (req, res) => {
   try {
     res.send(await testEmailSending(req));
   } catch(e) {
-    res.send('An error occurred while trying to send the test email. Please consult the logs for more information')
+    res.send('An error occurred while trying to send the test email. Please consult the logs for more information');
+
+    throw e;
   }
 });
 
