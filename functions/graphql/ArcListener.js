@@ -313,6 +313,11 @@ async function _updateProposalDb(proposal) {
 }
 
 async function updateProposalById(proposalId, customRetryOptions = {}, blockNumber) {
+  let currBlockNumber = Number(blockNumber);
+  if (Number.isNaN(currBlockNumber)) {
+    throw Error(`The blockNumber parameter should be a number between 0 and ${Number.MAX_SAFE_INTEGER}`);
+  }
+
   let proposal = await promiseRetry(
     async function (retryFunc, number) {
       console.log(`Try #${number} to get Proposal ${proposalId}`);
@@ -320,15 +325,8 @@ async function updateProposalById(proposalId, customRetryOptions = {}, blockNumb
       
       let isBehindLatestBlock = false;
       if (blockNumber) {
-        let currBlockNumber = null;
-        try {
-          currBlockNumber = Number(blockNumber);
-          const latestBlockNumber = await Utils.getGraphLatestBloackNumber();
-          isBehindLatestBlock = currBlockNumber <= latestBlockNumber;
-        } catch (error) {
-          console.error(`The blockNumber parameter should be a number between 0 and ${Number.MAX_SAFE_INTEGER}`, error);
-          throw error;
-        }
+        const latestBlockNumber = await Utils.getGraphLatestBloackNumber();
+        isBehindLatestBlock = currBlockNumber <= latestBlockNumber;
       }
 
       if (proposals.length === 0 || !isBehindLatestBlock) {
