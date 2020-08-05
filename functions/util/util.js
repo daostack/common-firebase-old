@@ -2,8 +2,22 @@ const admin = require('firebase-admin');
 const { provider } = require('../settings')
 const { CommonError, CFError} = require('./error')
 const fetch = require('node-fetch');
+const { env } = require('../env');
 
-const QUERY_LATEST_BLOCK_NUMBER = '{ indexingStatusForCurrentVersion(subgraphName: “daostack/v8_10_exp_kovan”) { chains { network ... on EthereumIndexingStatus { latestBlock { number } chainHeadBlock { number  } } } } }';
+const QUERY_LATEST_BLOCK_NUMBER = `query {
+  indexingStatusForCurrentVersion(subgraphName: "${env.graphql.subgraphName}") { 
+    chains { 
+      network ... on EthereumIndexingStatus { 
+        latestBlock { 
+          number 
+        } 
+        chainHeadBlock { 
+          number  
+        } 
+      } 
+    } 
+  } 
+}`;
 
 module.exports = new class Utils {
   
@@ -85,9 +99,12 @@ module.exports = new class Utils {
   async getGraphLatestBloackNumber() {
     const response = await fetch('https://api.thegraph.com/index-node/graphql', {
       method: 'POST',
-      body: JSON.stringify({QUERY_LATEST_BLOCK_NUMBER})
+      body: JSON.stringify({ query: QUERY_LATEST_BLOCK_NUMBER }),
+      headers: { 'Content-Type': 'application/graphql' },
     });  
 
-    return await response.json();
+    const graphData = await response.json();
+    const blockNumber = graphData.data.indexingStatusForCurrentVersion.chains[0].latestBlock.number;
+    return Number(blockNumber);
   }
 }

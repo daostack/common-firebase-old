@@ -312,23 +312,30 @@ async function _updateProposalDb(proposal) {
   return result;
 }
 
-async function updateProposalById(proposalId, customRetryOptions = {}, txBlockNumber) {
+async function updateProposalById(proposalId, customRetryOptions = {}, blockNumber) {
   let proposal = await promiseRetry(
     async function (retryFunc, number) {
       console.log(`Try #${number} to get Proposal ${proposalId}`);
       const proposals = await arc.proposals({ where: { id: proposalId } }, { fetchPolicy: 'no-cache' }).first()
-
       
-      let isTxBlockChangeApplied = false;
-      if (txBlockNumber) {
-        const graphData = Utils.getGraphLatestBloackNumber();
-        isTxBlockChangeApplied = txBlockNumber <= graphData.data.indexingStatusForCurrentVersion.chains[0].latestBlock;
-      } else {
-        isTxBlockChangeApplied = true;
+      let isBehindLatestBlock = false;
+      if (blockNumber) {
+        let currBlockNumber = null;
+        try {
+          currBlockNumber = Number(blockNumber);
+          const latestBlockNumber = await Utils.getGraphLatestBloackNumber();
+          isBehindLatestBlock = currBlockNumber <= latestBlockNumber;
+        } catch (error) {
+          console.error(`The blockNumber parameter should be a number between 0 and ${Number.MAX_SAFE_INTEGER}`, error);
+          throw error;
+        }
       }
 
-      if (proposals.length === 0 || !isTxBlockChangeApplied) {
-        await retryFunc(`We could not find a proposal with id "${proposalId}" in the graph.`);
+      if (proposals.length === 0 || !isBehindLatestBlock) {
+        await retryFunc( proposals.length === 0 
+          ? `We could not find a proposal with id "${proposalId}" in the graph.`
+          : `We could not find an update for block "${blockNumber}" in the graph.`
+          );
       }
       return proposals[0]
     },
