@@ -326,7 +326,7 @@ async function updateProposalById(proposalId, customRetryOptions = {}, blockNumb
       console.log(`Try #${number} to get Proposal ${proposalId}`);
       const proposals = await arc.proposals({ where: { id: proposalId } }, { fetchPolicy: 'no-cache' }).first()
       
-      let isBehindLatestBlock = false;
+      let isBehindLatestBlock = true; // set initally to true and change only if the blockNumber is provided and checked
       if (currBlockNumber) {
         const latestBlockNumber = await Utils.getGraphLatestBlockNumber();
         isBehindLatestBlock = currBlockNumber <= latestBlockNumber;
