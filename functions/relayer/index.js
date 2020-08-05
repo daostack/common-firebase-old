@@ -8,6 +8,8 @@ const {createWallet} = require('./createWallet');
 const {requestToJoin} = require('./requestToJoin');
 const {execTransaction} = require('./execTransaction');
 
+const { getCurrentDaoBalance } = require('../graphql/updateDAOBalance');
+
 const runtimeOptions = {
   timeoutSeconds: 540, // Maximum time 9 mins
 }
@@ -69,5 +71,18 @@ relayer.post('/execTransaction', async (req, res) => {
     res.status(500).send(errDoc)
   }
 })
+
+relayer.get('/mangobal', async (req, res) => {
+  try {
+    const data = await getCurrentDaoBalance(req.query.daoId);
+
+    res.send(data);
+  } catch (e) {
+
+    throw e;
+    res.send('error');
+
+  }
+});
 
 exports.relayer = functions.runWith(runtimeOptions).https.onRequest(relayer);
