@@ -313,9 +313,12 @@ async function _updateProposalDb(proposal) {
 }
 
 async function updateProposalById(proposalId, customRetryOptions = {}, blockNumber) {
-  let currBlockNumber = Number(blockNumber);
-  if (Number.isNaN(currBlockNumber)) {
-    throw Error(`The blockNumber parameter should be a number between 0 and ${Number.MAX_SAFE_INTEGER}`);
+  let currBlockNumber = null;
+  if (blockNumber) {
+    currBlockNumber = Number(blockNumber);
+    if (Number.isNaN(currBlockNumber)) {
+      throw Error(`The blockNumber parameter should be a number between 0 and ${Number.MAX_SAFE_INTEGER}`);
+    }
   }
 
   let proposal = await promiseRetry(
@@ -324,17 +327,17 @@ async function updateProposalById(proposalId, customRetryOptions = {}, blockNumb
       const proposals = await arc.proposals({ where: { id: proposalId } }, { fetchPolicy: 'no-cache' }).first()
       
       let isBehindLatestBlock = false;
-      if (blockNumber) {
-        const latestBlockNumber = await Utils.getGraphLatestBloackNumber();
+      if (currBlockNumber) {
+        const latestBlockNumber = await Utils.getGraphLatestBlockNumber();
         isBehindLatestBlock = currBlockNumber <= latestBlockNumber;
       }
 
-      if (proposals.length === 0 || !isBehindLatestBlock) {
-        await retryFunc( proposals.length === 0 
-          ? `We could not find a proposal with id "${proposalId}" in the graph.`
-          : `We could not find an update for block "${blockNumber}" in the graph.`
-          );
+      if ( proposals.length === 0 ) {
+        await retryFunc( `We could not find a proposal with id "${proposalId}" in the graph.`);
+      } else if (!isBehindLatestBlock) {
+        await retryFunc( `We could not find an update for block "${blockNumber}" in the graph.`);
       }
+
       return proposals[0]
     },
     {...retryOptions, ...customRetryOptions}

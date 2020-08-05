@@ -95,9 +95,9 @@ module.exports = new class Utils {
     }
     return true;
   }
-
-  async getGraphLatestBloackNumber() {
-    const response = await fetch('https://api.thegraph.com/index-node/graphql', {
+  
+  async getGraphLatestBlockNumber() {
+    const response = await fetch( env.graphql.graphApiUrl, {
       method: 'POST',
       body: JSON.stringify({ query: QUERY_LATEST_BLOCK_NUMBER }),
       headers: { 'Content-Type': 'application/graphql' },
