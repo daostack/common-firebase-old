@@ -9,11 +9,19 @@ const runtimeOptions = {
 
 app.get('/test/sending', async (req, res) => {
   try {
-    res.send(await testEmailSending(req));
-  } catch(e) {
-    res.send('An error occurred while trying to send the test email. Please consult the logs for more information');
+    const res = await testEmailSending(req);
 
-    throw e;
+    res.status(200).send({
+      message: 'Email processed successfully.',
+      data: {
+        response: res
+      }
+    })
+  } catch(e) {
+    res.status(500).send({
+      message: 'An error occurred while trying to send the email',
+      error: e.message,
+    });
   }
 });
 
