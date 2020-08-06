@@ -1,5 +1,5 @@
-const functions = require('firebase-functions');
 const app = require('express')();
+const functions = require('firebase-functions');
 
 const { testEmailSending } = require('./testEmailSending');
 
@@ -7,14 +7,14 @@ const runtimeOptions = {
   timeoutSeconds: 540
 };
 
-app.get('/test/sending', async (req, res) => {
+app.get('/sendEmail', async (req, res) => {
   try {
-    const res = await testEmailSending(req);
+    const result = await testEmailSending(req);
 
     res.status(200).send({
       message: 'Email processed successfully.',
       data: {
-        response: res
+        response: result
       }
     })
   } catch(e) {
