@@ -46,11 +46,11 @@ There are API endpoint for testing the functionality of the application. They ar
 
 1. For testing the email sending functionality
    
-   **Endpoint** `/email/test/sending`
+   **Endpoint** `/tests/sendEmail
    
    **Query Parameters**
    
-    - **Email (required)** - the email address of the test mail receiver
+    - **To (required)** - the email address of the test mail receiver
     - **Subject (optional)** - optional subject for the test email
     - **Message (optional)** - optional message for the test email
 
