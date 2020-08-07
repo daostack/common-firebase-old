@@ -8,8 +8,6 @@ const {createWallet} = require('./createWallet');
 const {requestToJoin} = require('./requestToJoin');
 const {execTransaction} = require('./execTransaction');
 
-const { getCurrentDaoBalance } = require('../graphql/updateDAOBalance');
-
 const runtimeOptions = {
   timeoutSeconds: 540, // Maximum time 9 mins
 }
