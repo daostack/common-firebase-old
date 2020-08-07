@@ -72,17 +72,4 @@ relayer.post('/execTransaction', async (req, res) => {
   }
 })
 
-relayer.get('/mangobal', async (req, res) => {
-  try {
-    const data = await getCurrentDaoBalance(req.query.daoId);
-
-    res.send(data);
-  } catch (e) {
-
-    throw e;
-    res.send('error');
-
-  }
-});
-
 exports.relayer = functions.runWith(runtimeOptions).https.onRequest(relayer);

@@ -17,9 +17,7 @@ const getCurrentDaoWallet = async (daoId) => {
     const dao = (await db.collection('daos')
       .doc(daoId).get()).data();
 
-    const walletBalance = mangopayClient.Wallets.get(dao.mangopayWalletId);
-
-    return walletBalance;
+    return mangopayClient.Wallets.get(dao.mangopayWalletId);
 };
 
 const getBalance = async (daoId) => {
