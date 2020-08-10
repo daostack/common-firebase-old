@@ -16,6 +16,6 @@ exports.relayer = relayer.relayer;
 exports.graphql = graphql.graphql;
 exports.mangopay = mangopay.mangopay;
 exports.mangopaySubs = mangopayTriggers;
-exports.graphqlSubs = graphqlTriggers
+exports.graphqlSubs = graphqlTriggers;
 // Disable notification
 // exports.notification = require('./notification');
