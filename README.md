@@ -1,4 +1,9 @@
 
+# Firebase code in support for common
+
+This repository contains code for the clodufunctions and the website hosting, and some scripts to manage the code.
+
+# Cloud functions
 ## Running the Cloud functions
 
 To run the firebase functions for the api you can run the following commands to:
