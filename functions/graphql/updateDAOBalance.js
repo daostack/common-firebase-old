@@ -16,15 +16,14 @@ async function updateDAOBalance(daoId) {
 const getCurrentDaoWallet = async (daoId) => {
   const dao = (await db.collection('daos')
     .doc(daoId).get()).data();
-  
-  return mangopayClient.Wallets.get(dao.mangopayWalletId)
+
+  return dao.mangopayWalletId
+    ? mangopayClient.Wallets.get(dao.mangopayWalletId)
+    : null;
 };
 
 const getBalance = async (daoId) => {
-  const wallet = await getCurrentDaoWallet(daoId)
-    .catch(() => {
-      console.log("Cannot find the dao wallet")
-    });
+  const wallet = await getCurrentDaoWallet(daoId);
 
   return {
     balance: wallet
