@@ -3,7 +3,7 @@ const { databaseURL } = require('./settings');
 
 admin.initializeApp({
   credential: admin.credential.cert(require('./env/adminsdk-keys.json')),
-  databaseURL: databaseURL,
+  databaseURL: databaseURL
 });
 
 const relayer = require('./relayer');
@@ -16,6 +16,6 @@ exports.relayer = relayer.relayer;
 exports.graphql = graphql.graphql;
 exports.mangopay = mangopay.mangopay;
 exports.mangopaySubs = mangopayTriggers;
-exports.graphqlSubs = graphqlTriggers;
+exports.graphqlSubs = graphqlTriggers
 // Disable notification
 // exports.notification = require('./notification');
