@@ -11,7 +11,23 @@ const template = `
   Collaborative Social Action.
 `;
 
+const emailStubs = {
+  name: {
+    required: true
+  },
+  link: {
+    required: true
+  },
+  commonName: {
+    required: true
+  },
+  supportChatLink: {
+    required: true
+  }
+};
+
 module.exports = {
   subject: 'Request to join submitted',
+  emailStubs,
   template
-}
+};

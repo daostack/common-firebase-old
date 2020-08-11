@@ -22,7 +22,7 @@ const testEmailSending = async (req) => {
   const templatedEmail = getTemplatedEmail('requestToJoinSubmitted', {
     emailStubs: {
       name: "Test Email",
-      commonName: "Common",
+      commonName: "New",
       link: "https://www.google.com/?client=safari",
       supportChatLink: "https://www.google.com/?client=safari"
     }
