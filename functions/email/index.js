@@ -1,7 +1,9 @@
 const requestToJoinSubmitted = require('./templates/requestToJoinSubmitted');
+const adminPreauthorizationFailed = require('./templates/adminPreauthorizationFailed');
 
 const templates = {
-  requestToJoinSubmitted
+  requestToJoinSubmitted,
+  adminPreauthorizationFailed
 }
 
 /***
