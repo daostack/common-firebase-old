@@ -1,13 +1,19 @@
 const template = `
 Hello {{name}},
+<br /><br />
+Congratulations! <br />
+Your new Common: {{commonName}}, is all set up. You can share it with friends via this direct link:
 
-The Common you created: {{commonName}}, was selected to appear on the app’s “discover” section. Log in to find it there, and feel free to share the news with your fellow members.
+<br /><br />
+<a href="{{commonLink}}">{{commonLink}}</a>
+<br /><br />
 
-<a href="{{commonLin}}">{{commonLink}}</a>
-
+This Common is visible to you and anyone you share it with. Inspiring or highly active Commons will be featured, and publicly visible on the app’s home screen.
+<br />
 For more information you can contact us any time using our  <a href="{{supportChatLink}}">support chat</a>
-
+<br />
 Common,
+<br />
 Collaborative Social Action.
 `;
 
@@ -27,7 +33,7 @@ const emailStubs = {
 };
 
 module.exports = {
-  subject: 'Your Common is now featured',
+  subject: 'Common successfully created',
   emailStubs,
   template
 };

@@ -1,23 +1,31 @@
 const template = `
 Notice to Admin
+
+<br />
 New common created and pending approval.
+
+<br /><br />
 
 <a href="{{commonLink}}">{{commonLink}}</a>
 
-User Full Name: {{userName}}
-User ID: {{userId}}
-User Email: {{userEmail}}
-Created on: {{commonCreatedOn}}
+<br /><br />
+
+User Full Name: {{userName}} <br />
+User ID: {{userId}} <br />
+User Email: {{userEmail}} <br />
+Created on: {{commonCreatedOn}} <br />
 Log/info:
 
+<br /><br />
 {{log}}
+<br /><br />
 
-Common Id: {{commonId}}
-Common name: {{commonName}}
-Short Description: {{description}}
-About: {{about}}
-Payment type: {{paymentType}}
-Min. contribution: {{minContribution}}
+Common Id: {{commonId}}<br />
+Common name: {{commonName}}<br />
+Short Description: {{description}}<br />
+About: {{about}}<br />
+Payment type: {{paymentType}}<br />
+Min. contribution: {{minContribution}}<br />
 `;
 
 const emailStubs = {
