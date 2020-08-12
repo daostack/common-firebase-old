@@ -1,3 +1,3 @@
 module.exports = {
-  '**/*.js?(x)': (filenames) => `eslint ${filenames.join(' ')} --strict`
+  '**/*.js?(x)': (filenames) => `eslint ${filenames.join(' ')}`
 }
