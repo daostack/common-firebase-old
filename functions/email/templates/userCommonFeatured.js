@@ -1,24 +1,24 @@
 const template = `
 Hello {{name}},
+<br />
+The Common you created: {{commonName}}, was selected to appear on the app’s “discover” section. Log in to find it there, and feel free to share the news with your fellow members.
 
-Congratulations,
-Your request to join <a href="{{commonLink}}">{{commonName}}</a> has been approved. You are now an equal member. You can join the discussion, vote, and submit proposals to the common.
+<a href="{{commonLink}}">{{commonLink}}</a>
 
 For more information you can contact us any time using our <a href="{{supportChatLink}}">support chat</a>
 
 Common,
 Collaborative Social Action.
-
 `;
 
 const emailStubs = {
   name: {
     required: true
   },
-  commonLink: {
+  commonName: {
     required: true
   },
-  commonName: {
+  commonLink: {
     required: true
   },
   supportChatLink: {
@@ -27,7 +27,7 @@ const emailStubs = {
 };
 
 module.exports = {
-  subject: 'Payment could not be processed',
+  subject: 'Your Common is now featured ',
   emailStubs,
   template
 };

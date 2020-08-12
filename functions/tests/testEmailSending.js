@@ -24,7 +24,7 @@ const testEmailSending = async (req) => {
       name: "Test Email",
       commonName: "New",
       link: "https://www.google.com/?client=safari",
-      supportChatLink: "https://www.google.com/?client=safari"
+      // supportChatLink: "https://www.google.com/?client=safari"
     }
   })
 
