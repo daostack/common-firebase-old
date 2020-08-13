@@ -127,7 +127,7 @@ const testPreauthFailedEmails = async (req) => {
     templateKey: "adminPreauthorizationFailed",
     emailStubs: {
       commonName: common.name,
-      membershipRequestId: proposal.id, // @todo Ask if this is right
+      membershipRequestId: proposal.id, // @question Ask if this is right
       userId: requester.uid,
       userEmail: requester.email,
       userFullName: requester.displayName,
