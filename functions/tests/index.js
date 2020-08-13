@@ -1,15 +1,15 @@
 const app = require('express')();
 const functions = require('firebase-functions');
 
-const { testEmailSending } = require('./testEmailSending');
+const { testEmailSending, testDaoCreationEmails } = require('./testEmailSending');
 
 const runtimeOptions = {
   timeoutSeconds: 540
 };
 
-app.get('/sendEmail', async (req, res) => {
+const processReq = async (req, res, func) => {
   try {
-    const result = await testEmailSending(req);
+    const result = await func();
 
     res.status(200).send({
       message: 'Email processed successfully.',
@@ -23,6 +23,19 @@ app.get('/sendEmail', async (req, res) => {
       error: e.message,
     });
   }
+}
+
+
+app.get('/sendEmail', async (req, res) => {
+  await processReq(req, res, async () => {
+    return await testEmailSending(req);
+  })
+});
+
+app.get('/sendNewDaoEmails', async (req, res) => {
+  await processReq(req, res, async () => {
+    return await testDaoCreationEmails(req);
+  })
 });
 
 exports.tests = functions
