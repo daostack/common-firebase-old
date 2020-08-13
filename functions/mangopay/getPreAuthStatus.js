@@ -33,7 +33,7 @@ const getPreAuthStatus = async (req) => {
         .data()
 
       await emailClient.sendTemplatedEmail({
-        to,
+        to: env.mail.adminMail,
         templateKey: "adminPreauthorizationFailed",
         emailStubs: {
           commonName: common.name,
