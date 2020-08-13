@@ -1,7 +1,7 @@
 const app = require('express')();
 const functions = require('firebase-functions');
 
-const { testEmailSending, testDaoCreationEmails, testPreauthFailedEmails } = require('./testEmailSending');
+const { testEmailSending, testDaoCreationEmails, testPreauthFailedEmails, testEmailProposalsEmails } = require('./testEmailSending');
 
 const runtimeOptions = {
   timeoutSeconds: 540
@@ -41,6 +41,12 @@ app.get('/sendNewDaoEmails', async (req, res) => {
 app.get('/sendPreauthFailedEmails', async (req, res) => {
   await processReq(req, res, async () => {
     return await testPreauthFailedEmails(req);
+  })
+});
+
+app.get('/sendMakeProposalsEmails', async (req, res) => {
+  await processReq(req, res, async () => {
+    return await testEmailProposalsEmails(req);
   })
 });
 
