@@ -5,6 +5,8 @@ const util = require('../util/util');
 const {getTemplatedEmail} = require('../email');
 const {sendMail} = require('../mailer');
 
+const proposalCollection = 'proposals';
+
 const testEmailSending = async (req) => {
   const {to, subject, message, template} = req.query;
 
@@ -41,7 +43,7 @@ const testEmailSending = async (req) => {
 };
 
 const testDaoCreationEmails = async (req) => {
-  const { to } = req.query;
+  const {to} = req.query;
 
   const newDao = (await db.collection('daos').doc("0x1d169610875b37d39ea71868b75b6160146a2c9d").get()).data();
   const userId = newDao.members[0].userId;
@@ -91,7 +93,21 @@ const testDaoCreationEmails = async (req) => {
   ]);
 }
 
+const testPreauthFailedEmails = async (req) => {
+  const {to} = req.query;
+
+  const proposalsSnapshot = await db.collection(proposalCollection)
+    .where('description.links', 'array-contains', { preAuthId: '85337215' })
+    .get()
+
+  const proposals = proposalsSnapshot.docs.map(doc => doc.data());
+
+
+  console.log(proposals);
+}
+
 module.exports = {
   testEmailSending,
-  testDaoCreationEmails
+  testDaoCreationEmails,
+  testPreauthFailedEmails
 };
