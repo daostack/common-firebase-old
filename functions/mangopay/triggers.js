@@ -174,6 +174,8 @@ exports.watchForExecutedProposals = functions.firestore
           to: 'admin',
           templateKey: 'adminFundingRequestAccepted',
           emailStubs: {
+            userId: userData.uid,
+            userFullName: userData.displayName,
             commonName: daoData.name,
             commonLink: util.getCommonLink(daoData.id),
             commonId: daoData.id,
