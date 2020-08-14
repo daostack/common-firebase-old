@@ -41,7 +41,8 @@ exports.newDaoCreated = functions.firestore
 exports.newDaoCreated = functions.firestore
   .document('/daos/{id}')
   .onCreate(async (snap) => {
-    const newDao = snap.data();
+    let newDao = snap.data();
+
     const userId = newDao.members[0].userId;
     const userData = await util.getUserById(userId);
     const daoName = newDao.name;
@@ -51,12 +52,50 @@ exports.newDaoCreated = functions.firestore
       const { Id: mangopayWalletId } = await createWallet(mangopayId);
 
       if (mangopayId && mangopayWalletId) {
+        const commonLink = `https://app.common.io/common/${newDao.id}`;
+
+        console.debug(`Sending admin email for CommonCreated to ${env.mail.adminMail}`);
+        console.debug(`Sending user email for CommonCreated to ${userData.email}`);
+
+        await Promise.all([
+          emailClient.sendTemplatedEmail({
+            to: userData.email,
+            templateKey: 'userCommonCreated',
+            emailStubs: {
+              commonLink,
+              name: userData.displayName,
+              commonName: daoName
+            }
+          }),
+
+          emailClient.sendTemplatedEmail({
+            to: env.mail.adminMail,
+            templateKey: 'adminCommonCreated',
+            emailStubs: {
+              userId,
+              commonLink,
+              userName: userData.displayName,
+              userEmail: userData.email,
+              commonCreatedOn: new Date().toDateString(),
+              log: 'Successfully created common',
+              commonId: newDao.id,
+              commonName: newDao.name,
+              description: newDao.metadata.description,
+              about: newDao.metadata.byline,
+              paymentType: 'one-time',
+              minContribution: newDao.minFeeToJoin
+            }
+          })
+        ]);
+
+        console.debug('Done sending emails for dao creation');
+
         return snap.ref.set({ mangopayId, mangopayWalletId }, { merge: true });
       }
     } catch (e) {
       console.error(e);
 
-      console.debug(`Sending admin email for WalletCreataionFailed to ${env.mail.adminMail}`);
+      console.debug(`Sending admin email for WalletCreationFailed to ${env.mail.adminMail}`);
       await emailClient.sendTemplatedEmail({
         to: env.mail.adminMail,
         templateKey: 'adminWalletCreationFailed',
@@ -65,45 +104,5 @@ exports.newDaoCreated = functions.firestore
           commonId: newDao.id
         }
       });
-
-      return;
     }
-
-    const commonLink = `https://app.common.io/common/${newDao.id}`;
-
-    console.debug(`Sending admin email for CommonCreated to ${env.mail.adminMail}`);
-    console.debug(`Sending admin user for CommonCreated to ${userData.email}`);
-
-    await Promise.all([
-      emailClient.sendTemplatedEmail({
-        to: userData.email,
-        templateKey: 'userCommonCreated',
-        emailStubs: {
-          commonLink,
-          name: userData.displayName,
-          commonName: daoName
-        }
-      }),
-
-      emailClient.sendTemplatedEmail({
-        to: env.mail.adminMail,
-        templateKey: 'adminCommonCreated',
-        emailStubs: {
-          userId,
-          commonLink,
-          userName: userData.displayName,
-          userEmail: userData.email,
-          commonCreatedOn: new Date().toDateString(),
-          log: 'Successfully created common',
-          commonId: newDao.id,
-          commonName: newDao.name,
-          description: newDao.metadata.description,
-          about: newDao.metadata.byline,
-          paymentType: 'one-time',
-          minContribution: newDao.minFeeToJoin
-        }
-      })
-    ]);
-
-    console.debug('Done sending emails for dao creation');
   });
