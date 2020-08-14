@@ -27,14 +27,24 @@ exports.watchForReputationRedeemed = functions.firestore
     }
   });
 
-exports.newDaoCreated = functions.firestore
+exports.daoUpdated = functions.firestore
   .document('/daos/{id}')
   .onUpdate(async (snap) => {
     const dao = snap.after.data();
     const oldDao = snap.before.data();
 
     if (dao.register === 'registered' && (dao.register !== oldDao.register)) {
-      // @todo Template userCommonFeatured
+      const creator = await util.getUserById(dao.members[0].userId);
+
+      await emailClient.sendTemplatedEmail({
+        to: creator.email,
+        templateKey: 'userCommonFeatured',
+        emailStubs: {
+          name: creator.displayName,
+          commonName: dao.name,
+          commonLink: util.getCommonLink(dao.id)
+        }
+      })
     }
   });
 
@@ -52,7 +62,7 @@ exports.newDaoCreated = functions.firestore
       const { Id: mangopayWalletId } = await createWallet(mangopayId);
 
       if (mangopayId && mangopayWalletId) {
-        const commonLink = `https://app.common.io/common/${newDao.id}`;
+        const commonLink = util.getCommonLink(newDao.id);
 
         console.debug(`Sending admin email for CommonCreated to ${env.mail.adminMail}`);
         console.debug(`Sending user email for CommonCreated to ${userData.email}`);

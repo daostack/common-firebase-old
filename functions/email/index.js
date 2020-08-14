@@ -9,7 +9,7 @@ const userJoinedButFailedPayment = require('./templates/userJoinedButFailedPayme
 const userJoinedSuccess = require('./templates/userJoinedSuccess');
 const adminWalletCreationFailed = require('./templates/adminWalletCreationFailed');
 
-const mailer = require("../mailer");
+const mailer = require('../mailer');
 
 const templates = {
   requestToJoinSubmitted,
@@ -22,7 +22,7 @@ const templates = {
   userFundingRequestAccepted,
   userJoinedButFailedPayment,
   userJoinedSuccess
-}
+};
 
 const globalDefaultStubs = {
   supportChatLink: 'https://common.io/help'
@@ -30,7 +30,7 @@ const globalDefaultStubs = {
 
 const replaceAll = (string, search, replace) => {
   return string.split(search).join(replace);
-}
+};
 
 const isNullOrUndefined = (val) =>
   val === null || val === undefined;
@@ -64,7 +64,7 @@ const isNullOrUndefined = (val) =>
 const getTemplatedEmail = (templateKey, payload) => {
   let { template, subject, emailStubs, subjectStubs } = templates[templateKey];
 
-  console.debug("Email templating started");
+  console.debug('Email templating started');
 
   if (isNullOrUndefined(template)) {
     throw new Error(`The requested template (${templateKey}) cannot be found`);
@@ -81,31 +81,31 @@ const getTemplatedEmail = (templateKey, payload) => {
         isNullOrUndefined(globalDefaultStubs[stub])
       )
     ) {
-      throw new Error(`Required stub ${stub} was not provided for email template`)
+      throw new Error(`Required stub ${stub} was not provided for email template`);
     }
 
     // If there is a default value for the stub and has not been replaced add it here
     if (!isNullOrUndefined(emailStubs[stub].default) && isNullOrUndefined(payload.emailStubs[stub])) {
-      template = template.replace(`{{${stub}}}`, emailStubs[stub])
+      template = template.replace(`{{${stub}}}`, emailStubs[stub]);
     } else if (!isNullOrUndefined(globalDefaultStubs[stub]) && isNullOrUndefined(payload.emailStubs[stub])) {
-      template = template.replace(`{{${stub}}}`, globalDefaultStubs[stub])
+      template = template.replace(`{{${stub}}}`, globalDefaultStubs[stub]);
     }
   }
 
   // Replace all provided stubs in the template
   for (const stub in payload.emailStubs) {
-    template = replaceAll(template, `{{${stub}}}`, payload.emailStubs[stub])
+    template = replaceAll(template, `{{${stub}}}`, payload.emailStubs[stub]);
   }
 
   // Validate the email subject
   for (const stub in subjectStubs) {
     if (subjectStubs[stub].required && isNullOrUndefined(payload.subjectStubs[stub])) {
-      throw new Error(`Required stub ${stub} was not provided for subject template`)
+      throw new Error(`Required stub ${stub} was not provided for subject template`);
     }
   }
 
   for (const stub in payload.subjectStubs) {
-    subject = replaceAll(subject, `{{${stub}}}`, payload.subjectStubs[stub])
+    subject = replaceAll(subject, `{{${stub}}}`, payload.subjectStubs[stub]);
   }
 
   console.debug(`Email templating finished for template ${templateKey}`);
@@ -114,7 +114,7 @@ const getTemplatedEmail = (templateKey, payload) => {
     template,
     subject
   };
-}
+};
 
 /***
  *
@@ -134,24 +134,39 @@ const getTemplatedEmail = (templateKey, payload) => {
  * @param { object } emailStubs
  * @param { object } subjectStubs
  *
- * @param { string } to
+ * @param { string | string[] } to
  */
 const sendTemplatedEmail = async ({ templateKey, emailStubs, subjectStubs, to }) => {
-  console.log("Template email begin sending");
+  console.log('Template email begin sending');
 
   const { template, subject } = getTemplatedEmail(templateKey, { emailStubs, subjectStubs });
 
-  await mailer.sendMail(
-    to,
-    subject,
-    template
-  );
+  if (Array.isArray(to)) {
+    const emailPromises = [];
 
-  console.log("Templated email send successfully");
-}
+    to.forEach((emailTo) => {
+      emailPromises.push(mailer.sendMail({
+        to: emailTo,
+        subject,
+        template
+      }));
+    });
+
+    await Promise.all(emailPromises);
+  } else {
+    await mailer.sendMail(
+      to,
+      subject,
+      template
+    );
+  }
+
+
+  console.log('Templated email send successfully');
+};
 
 module.exports = {
   getTemplatedEmail,
   sendTemplatedEmail,
   sendPreauthorizationFailedEmail: require('./sendPreauthorizationFailedEmail')
-}
+};
