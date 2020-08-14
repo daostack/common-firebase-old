@@ -8,8 +8,12 @@ const userFundingRequestAccepted = require('./templates/userFundingRequestAccept
 const userJoinedButFailedPayment = require('./templates/userJoinedButFailedPayment');
 const userJoinedSuccess = require('./templates/userJoinedSuccess');
 const adminWalletCreationFailed = require('./templates/adminWalletCreationFailed');
+const adminJoinedButPaymentFailed = require('./templates/adminJoinedButPaymentFailed');
+const adminPayInSuccess = require('./templates/adminPayInSuccess');
 
 const mailer = require('../mailer');
+const env = require('../env').env;
+
 
 const templates = {
   requestToJoinSubmitted,
@@ -21,7 +25,9 @@ const templates = {
   userCommonFeatured,
   userFundingRequestAccepted,
   userJoinedButFailedPayment,
-  userJoinedSuccess
+  userJoinedSuccess,
+  adminJoinedButPaymentFailed,
+  adminPayInSuccess
 };
 
 const globalDefaultStubs = {
@@ -48,7 +54,9 @@ const isNullOrUndefined = (val) =>
  *  'userFundingRequestAccepted',
  *  'userJoinedButFailedPayment',
  *  'userJoinedSuccess',
- *  'adminWalletCreationFailed'
+ *  'adminWalletCreationFailed',
+ *  'adminJoinedButPaymentFailed',
+ *  'adminPayInSuccess'
  * } templateKey
  *
  * @param {{
@@ -123,21 +131,25 @@ const getTemplatedEmail = (templateKey, payload) => {
  *  'adminCommonCreated',
  *  'adminFundingRequestAccepted',
  *  'adminPreauthorizationFailed' ,
+ *  'adminJoinedButPaymentFailed',
  *  'userCommonCreated',
  *  'userCommonFeatured',
  *  'userFundingRequestAccepted',
  *  'userJoinedButFailedPayment',
  *  'userJoinedSuccess',
- *  'adminWalletCreationFailed'
+ *  'adminWalletCreationFailed',
+ *  'adminPayInSuccess'
  * } templateKey
  *
  * @param { object } emailStubs
  * @param { object } subjectStubs
  *
- * @param { string | string[] } to
+ * @param { string | string[] | 'admin' } to
  */
 const sendTemplatedEmail = async ({ templateKey, emailStubs, subjectStubs, to }) => {
   console.log('Template email begin sending');
+
+  to === 'admin' && (to = env.mail.adminMail);
 
   const { template, subject } = getTemplatedEmail(templateKey, { emailStubs, subjectStubs });
 
