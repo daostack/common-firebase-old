@@ -30,7 +30,7 @@ module.exports = async (preAuthId, failureReason = 'Unknown') => {
     emailStubs: {
       failureReason,
       commonName: common.name,
-      membershipRequestId: proposal.id, // @question Ask if this is right
+      membershipRequestId: proposal.id,
       userId: requester.uid,
       userEmail: requester.email,
       userFullName: requester.displayName,

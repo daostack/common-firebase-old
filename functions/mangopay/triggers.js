@@ -13,7 +13,6 @@ const util = require('../util/util');
 
 const emailClient = require('../email');
 
-
 exports.watchForExecutedProposals = functions.firestore
   .document('/proposals/{id}')
   .onUpdate(async (change) => {
@@ -65,6 +64,16 @@ exports.watchForExecutedProposals = functions.firestore
           //   'Successfull payment',
           //   `Your request to join has been approved and the amount of ${data.joinAndQuit.funding}$ was charged.`
           // );
+
+          await Promise.all([
+            emailClient.sendTemplatedEmail({
+              templateKey: "userJoinedSuccess",
+            })
+          ]);
+
+          // @todo Template userJoinedSuccess
+          // @todo Template adminPayInSuccess
+
           await minterToken(data.dao, amount)
           await updateDAOBalance(data.dao);
           return change.after.ref.set(
@@ -74,6 +83,9 @@ exports.watchForExecutedProposals = functions.firestore
             { merge: true }
           );
         } else {
+          // @todo Template userJoinedButPaymentFailed
+          // @todo Template adminJoinedButFailedPayment
+
           throw new Error('Payment failed');
         }
       } catch (e) {
@@ -95,5 +107,14 @@ exports.watchForExecutedProposals = functions.firestore
       data.winningOutcome === 0
     ) {
       await cancelPreauthorizedPayment(data.description.preAuthId);
+    }
+
+    if (
+      data.name === "FundingRequest" &&
+      data.executed !== previousData.executed &&
+      data.executed === true &&
+      data.winningOutcome === 1
+    ) {
+      // @todo Template fundingRequestAccepted (admin & user)
     }
   });

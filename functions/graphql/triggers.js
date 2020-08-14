@@ -1,7 +1,7 @@
 const functions = require('firebase-functions');
-const {updateDaoById} = require('./ArcListener');
-const {env} = require('../env');
-const {createLegalUser, createWallet} = require('../mangopay/mangopay');
+const { updateDaoById } = require('./ArcListener');
+const { env } = require('../env');
+const { createLegalUser, createWallet } = require('../mangopay/mangopay');
 const util = require('../util/util');
 
 const emailClient = require('../email');
@@ -29,6 +29,17 @@ exports.watchForReputationRedeemed = functions.firestore
 
 exports.newDaoCreated = functions.firestore
   .document('/daos/{id}')
+  .onUpdate(async (snap) => {
+    const dao = snap.after.data();
+    const oldDao = snap.before.data();
+
+    if (dao.register === 'registered' && (dao.register !== oldDao.register)) {
+      // @todo Template userCommonFeatured
+    }
+  });
+
+exports.newDaoCreated = functions.firestore
+  .document('/daos/{id}')
   .onCreate(async (snap) => {
     const newDao = snap.data();
     const userId = newDao.members[0].userId;
@@ -36,15 +47,16 @@ exports.newDaoCreated = functions.firestore
     const daoName = newDao.name;
 
     try {
-      const {Id: mangopayId} = await createLegalUser(newDao);
-      const {Id: mangopayWalletId} = await createWallet(mangopayId);
+      const { Id: mangopayId } = await createLegalUser(newDao);
+      const { Id: mangopayWalletId } = await createWallet(mangopayId);
 
       if (mangopayId && mangopayWalletId) {
-        return snap.ref.set({mangopayId, mangopayWalletId}, {merge: true});
+        return snap.ref.set({ mangopayId, mangopayWalletId }, { merge: true });
       }
     } catch (e) {
       console.error(e);
 
+      console.debug(`Sending admin email for WalletCreataionFailed to ${env.mail.adminMail}`);
       await emailClient.sendTemplatedEmail({
         to: env.mail.adminMail,
         templateKey: 'adminWalletCreationFailed',
@@ -59,20 +71,23 @@ exports.newDaoCreated = functions.firestore
 
     const commonLink = `https://app.common.io/common/${newDao.id}`;
 
+    console.debug(`Sending admin email for CommonCreated to ${env.mail.adminMail}`);
+    console.debug(`Sending admin user for CommonCreated to ${userData.email}`);
+
     await Promise.all([
       emailClient.sendTemplatedEmail({
         to: userData.email,
-        templateKey: "userCommonCreated",
+        templateKey: 'userCommonCreated',
         emailStubs: {
           commonLink,
           name: userData.displayName,
-          commonName: daoName,
+          commonName: daoName
         }
       }),
 
       emailClient.sendTemplatedEmail({
         to: env.mail.adminMail,
-        templateKey: "adminCommonCreated",
+        templateKey: 'adminCommonCreated',
         emailStubs: {
           userId,
           commonLink,
@@ -89,4 +104,6 @@ exports.newDaoCreated = functions.firestore
         }
       })
     ]);
+
+    console.debug('Done sending emails for dao creation');
   });

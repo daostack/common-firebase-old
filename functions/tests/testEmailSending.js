@@ -127,7 +127,7 @@ const testPreauthFailedEmails = async (req) => {
     templateKey: "adminPreauthorizationFailed",
     emailStubs: {
       commonName: common.name,
-      membershipRequestId: proposal.id, // @question Ask if this is right
+      membershipRequestId: proposal.id,
       userId: requester.uid,
       userEmail: requester.email,
       userFullName: requester.displayName,
@@ -140,47 +140,46 @@ const testPreauthFailedEmails = async (req) => {
   return "Templated email sent successfully!";
 }
 
-const testEmailProposalsEmails = async (req) => {
-  const {to, proposalId} = req.query;
-
-  const data = (await db.collection(proposalCollection).doc(proposalId || "0x015056f2499f40f09ef36e588adcbead8d06aea64652772ff12d5706bc65ae67").get()).data();
-  const userData = await util.getUserById(data.proposerId);
-  let daoData = await util.getCommonById(data.dao);
-
-  const preAuthId = data.description.preAuthId;
-  const amount = data.description.funding;
-
-
-  await Promise.all([
-    emailClient.sendTemplatedEmail({
-      to,
-      templateKey: 'adminWalletCreationFailed',
-      emailStubs: {
-        commonName: daoName,
-        commonId: newDao.id
-      }
-    }),
-    sendMail(
-      env.mail.adminMail,
-      'Successfull pay-In',
-      `Pay-In successfull for Proposal with ID ${data.id}`
-    ),
-    sendMail(
-      userData.email,
-      'Successfull payment',
-      `Your request to join has been approved and the amount of ${data.joinAndQuit.funding}$ was charged.`
-    ),
-    sendMail(
-      env.mail.adminMail,
-      'Failed pay-In',
-      `Pay-In failed for Proposal with ID ${data.id}`
-    )
-  ]);
-}
+// const testEmailProposalsEmails = async (req) => {
+//   const {to, proposalId} = req.query;
+//
+//   const data = (await db.collection(proposalCollection).doc(proposalId || "0x015056f2499f40f09ef36e588adcbead8d06aea64652772ff12d5706bc65ae67").get()).data();
+//   const userData = await util.getUserById(data.proposerId);
+//   let daoData = await util.getCommonById(data.dao);
+//
+//   const preAuthId = data.description.preAuthId;
+//   const amount = data.description.funding;
+//
+//
+//   await Promise.all([
+//     emailClient.sendTemplatedEmail({
+//       to,
+//       templateKey: 'adminWalletCreationFailed',
+//       emailStubs: {
+//         commonName: dao.Name,
+//         commonId: newDao.id
+//       }
+//     }),
+//     sendMail(
+//       env.mail.adminMail,
+//       'Successfull pay-In',
+//       `Pay-In successfull for Proposal with ID ${data.id}`
+//     ),
+//     sendMail(
+//       userData.email,
+//       'Successfull payment',
+//       `Your request to join has been approved and the amount of ${data.joinAndQuit.funding}$ was charged.`
+//     ),
+//     sendMail(
+//       env.mail.adminMail,
+//       'Failed pay-In',
+//       `Pay-In failed for Proposal with ID ${data.id}`
+//     )
+//   ]);
+// }
 
 module.exports = {
   testEmailSending,
   testDaoCreationEmails,
-  testPreauthFailedEmails,
-  testEmailProposalsEmails
+  testPreauthFailedEmails
 };

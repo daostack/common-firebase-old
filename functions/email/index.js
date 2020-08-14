@@ -62,7 +62,9 @@ const isNullOrUndefined = (val) =>
  * }}
  */
 const getTemplatedEmail = (templateKey, payload) => {
-  let {template, subject, emailStubs, subjectStubs} = templates[templateKey];
+  let { template, subject, emailStubs, subjectStubs } = templates[templateKey];
+
+  console.debug("Email templating started");
 
   if (isNullOrUndefined(template)) {
     throw new Error(`The requested template (${templateKey}) cannot be found`);
@@ -106,6 +108,8 @@ const getTemplatedEmail = (templateKey, payload) => {
     subject = replaceAll(subject, `{{${stub}}}`, payload.subjectStubs[stub])
   }
 
+  console.debug(`Email templating finished for template ${templateKey}`);
+
   return {
     template,
     subject
@@ -132,14 +136,18 @@ const getTemplatedEmail = (templateKey, payload) => {
  *
  * @param { string } to
  */
-const sendTemplatedEmail = async ({ templateKey, emailStubs, subjectStubs, to}) => {
-  const {template, subject} = getTemplatedEmail(templateKey, { emailStubs, subjectStubs });
+const sendTemplatedEmail = async ({ templateKey, emailStubs, subjectStubs, to }) => {
+  console.log("Template email begin sending");
+
+  const { template, subject } = getTemplatedEmail(templateKey, { emailStubs, subjectStubs });
 
   await mailer.sendMail(
     to,
     subject,
     template
   );
+
+  console.log("Templated email send successfully");
 }
 
 module.exports = {
