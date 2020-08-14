@@ -8,7 +8,7 @@ const userFundingRequestAccepted = require('./templates/userFundingRequestAccept
 const userJoinedButFailedPayment = require('./templates/userJoinedButFailedPayment');
 const userJoinedSuccess = require('./templates/userJoinedSuccess');
 const adminWalletCreationFailed = require('./templates/adminWalletCreationFailed');
-const adminJoinedButPaymentFailed = require('./templates/adminJoinedButPaymentFailed');
+const adminJoinedButPaymentFailed = require('./templates/adminJoinedButFailedPayment');
 const adminPayInSuccess = require('./templates/adminPayInSuccess');
 
 const mailer = require('../mailer');

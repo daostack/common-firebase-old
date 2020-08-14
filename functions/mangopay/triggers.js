@@ -5,8 +5,7 @@ const {
   createLegalUser,
   createWallet
 } = require('../mangopay/mangopay');
-const { sendMail } = require('../mailer');
-const { env } = require('../env');
+
 const { updateDAOBalance } = require("../graphql/updateDAOBalance");
 const { minterToken } = require('../relayer/minterToken')
 const util = require('../util/util');
@@ -74,7 +73,7 @@ exports.watchForExecutedProposals = functions.firestore
               to: userData.email,
               templateKey: "userJoinedSuccess",
               emailStubs: {
-                name: userData.name,
+                name: userData.displayName,
                 commonName: daoData.name,
                 commonLink: util.getCommonLink(daoData.id)
               }
