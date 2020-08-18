@@ -275,7 +275,7 @@ async function updateDaoById(daoId, customRetryOptions = {} ) {
       createdAt: s.createdAt,
       dao: s.dao.id,
       executionState: s.executionState,
-      executed: s.executed,
+      executed: Boolean(s.executed),
       executedAt: s.executedAt,
       expiresInQueueAt: s.expiresInQueueAt,
       votesFor: s.votesFor.toNumber()/1000,
@@ -361,10 +361,8 @@ async function updateDaoById(daoId, customRetryOptions = {} ) {
           const updatedDoc = await _updateProposalDb(proposal);
           docs.push(updatedDoc);
         } catch (e) {
-          if (e.code === 1) { 
-            notUpdated.push(proposal.id); 
-            continue; 
-          } else throw e;
+          notUpdated.push({id: proposal.id, error: String(e)}); 
+          continue; 
         }
       }
       return { docs, notUpdated };
