@@ -7,8 +7,8 @@ stagingENV="$CURRENTDIR/$DIRNAME/staging/env_secrets.json"
 productionENV="$CURRENTDIR/$DIRNAME/production/env_secrets.json"
 currentENV="$CURRENTDIR/$DIRNAME/env_secrets.json"
 
-stagingCONFIG="$CURRENTDIR/config/staging/env_config.json"
-productionCONFIG="$CURRENTDIR/config/production/env_config.json"
+stagingCONFIG="$CURRENTDIR/env/staging/env_config.json"
+productionCONFIG="$CURRENTDIR/env/production/env_config.json"
 currentCONFIG="$CURRENTDIR/$DIRNAME/env_config.json"
 
 if [[ $1 == "-stg" ]]; then
