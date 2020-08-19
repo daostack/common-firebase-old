@@ -10,9 +10,8 @@
     "chainId": 42
   },
   "graphql": {
-    "httpLink": "https://api.thegraph.com/subgraphs-daostack/name/daostack/v8_10_exp_kovan",
-    "websocket": "wss://api.thegraph.com/subgraphs-daostack/name/daostack/v8_10_exp_kovan",
-    "arcVersion": "0.1.2-rc.2",
+    "subgraphName": "daostack/v8_10_exp_kovan",
+    "graphApiUrl": "https://api.thegraph.com/index-node/graphql",
     "ipfsDataVersion": "000003"
   },
   "commonInfo": {
@@ -33,7 +32,7 @@
     "daoStackWalletId": "83405793"
   },
   "mail": {
-    "sender": "staging@common.io",
+    "sender": "support@common.io",
     "adminMail": "jelle@daostack.io"
   }
 }
