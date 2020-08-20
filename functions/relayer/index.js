@@ -5,8 +5,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const Utils = require('../util/util');
 const {createWallet} = require('./createWallet');
-const {requestToJoin} = require('./requestToJoin');
-const {execTransaction} = require('./execTransaction');
+const {createRequestToJoin} = require('./createRequestToJoin');
+const {execTransaction} = require('./util/execTransaction');
 
 const runtimeOptions = {
   timeoutSeconds: 540, // Maximum time 9 mins
@@ -36,7 +36,7 @@ relayer.get('/createWallet', async (req, res) => {
 
 relayer.post('/requestToJoin', async (req, res) => {
   try {
-    const data = await requestToJoin(req, res);
+    const data = await createRequestToJoin(req, res);
     res.send(JSON.stringify(data));
   } catch (err) {
     console.error(err);
