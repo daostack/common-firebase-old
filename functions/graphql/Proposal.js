@@ -138,19 +138,18 @@ async function updateProposals() {
     console.log(`found ${proposals.length} proposals`)
 
     const docs = [];
-    const notUpdated = [];
     for (const proposal of proposals) {
         try {
             const updatedDoc = await _updateProposalDb(proposal);
             docs.push(updatedDoc);
         } catch (e) {
             if (e.code === 1) {
-                notUpdated.push(proposal.id);
+                console.log(`Skipped ${proposal.id} due to old data version.`);
                 continue;
             } else throw e;
         }
     }
-    return { docs, notUpdated };
+    return docs;
 }
 
 

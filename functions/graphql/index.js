@@ -58,16 +58,6 @@ graphql.get('/update-dao-by-id', async (req, res) => {
 });
 
 graphql.get('/update-proposals', async (req, res) => {
-    //TBD: how to handle the case of logging the skipped data? 
-    //UpdateDaos also have a logic for that but it's logged directly in the updateDaos method 
-
-    // customMessage =
-    // {
-    //     message: `Updated ${docs.length} proposals. Skipped ${notUpdated} due to old data version.`,
-    //     docs: docs.map((d) => d.updatedDoc.id),
-    //     notUpdated
-    // }
-
     responseExecutor(
         async () => {
             return await updateProposals();

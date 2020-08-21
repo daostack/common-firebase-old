@@ -5,9 +5,6 @@ const promiseRetry = require('promise-retry');
 
 const { updateDao, getDaoById } = require('../db/daoDbService');
 
-//const admin = require('firebase-admin');
-//const db = admin.firestore();
-
 // get all DAOs data from graphql and read it into the subgraph
 async function updateDaos() {
     console.log("UPDATE DAOS:");

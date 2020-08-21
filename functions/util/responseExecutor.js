@@ -20,8 +20,10 @@ const responseExecutor = async (action, { req, res, successMessage, errorMessage
         res.status(HTTP_STATUS_CODE.INTERNAL_SERVER)
             .json(
                 {
-                    error: `${errorMessage} \n ${e.message ? e.message : e}`,
-                    errorCode: e.errorCode,
+                    error: {
+                        commonMessage: errorMessage,
+                        errorObject: JSON.stringify(e, null, 4)
+                    },
                     query: req.query
                 });
     }
