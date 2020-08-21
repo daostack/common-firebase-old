@@ -9,7 +9,7 @@ const responseExecutor = async (action, { req, res, successMessage, errorMessage
     try {
         const actionResult = await action();
         res.status(HTTP_STATUS_CODE.OK)
-            .send(
+            .json(
                 {
                     message: successMessage,
                     data: actionResult
@@ -18,7 +18,7 @@ const responseExecutor = async (action, { req, res, successMessage, errorMessage
     } catch (e) {
         console.error(e)
         res.status(HTTP_STATUS_CODE.INTERNAL_SERVER)
-            .send(
+            .json(
                 {
                     error: `${errorMessage} \n ${e.message ? e.message : e}`,
                     errorCode: e.errorCode,
