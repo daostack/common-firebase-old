@@ -13,9 +13,11 @@
     "deploy:graphql": "./env/env.sh -check && firebase deploy --only functions:graphql",
     "deploy:mangopay": "./env/env.sh -check && firebase deploy --only functions:mangopay",
     "emulator": "firebase emulators:start --only functions",
+    "emulators": "firebase emulators:start",
     "use:staging": "firebase use staging && ./env/env.sh -stg",
     "use:production": "firebase use production && ./env/env.sh -prod",
-    "env": "./env/env.sh"
+    "env": "./env/env.sh",
+    "precommit": "lint-staged"
   },
   "engines": {
     "node": "10"
@@ -48,7 +50,14 @@
     "subscriptions-transport-ws": "^0.9.16"
   },
   "devDependencies": {
-    "firebase-functions-test": "^0.1.6"
+    "firebase-functions-test": "^0.1.6",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.11"
   },
-  "private": true
+  "private": true,
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn precommit"
+    }
+  }
 }
