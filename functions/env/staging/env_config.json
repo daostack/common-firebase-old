@@ -1,4 +1,5 @@
 {
+  "logLevel": 5,
   "tests": {
     "enabled": true
   },

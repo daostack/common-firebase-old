@@ -3,12 +3,21 @@ const { updateDaoById } = require('./ArcListener');
 const { env } = require('../env');
 const { createLegalUser, createWallet } = require('../mangopay/mangopay');
 const util = require('../util/util');
+const logger = require('../util/logger');
 
 const emailClient = require('../email');
+
+exports.newProposalCreated = functions.firestore
+  .document('/proposals/{id}')
+  .onCreate(async (proposal) => {
+    logger.debug('{Proposal Created Trigger}', proposal.data());
+  });
 
 exports.watchForReputationRedeemed = functions.firestore
   .document('/proposals/{id}')
   .onUpdate(async (change) => {
+    logger.debug('{Proposal Updated Trigger}', change.after.data(), change.before.data());
+
     const data = change.after.data();
     const previousData = change.before.data();
     if (
@@ -30,6 +39,8 @@ exports.watchForReputationRedeemed = functions.firestore
 exports.daoUpdated = functions.firestore
   .document('/daos/{id}')
   .onUpdate(async (snap) => {
+    logger.debug('{Dao Updated Trigger}', snap.after.data(), snap.before.data());
+
     const dao = snap.after.data();
     const oldDao = snap.before.data();
 
@@ -51,6 +62,8 @@ exports.daoUpdated = functions.firestore
 exports.newDaoCreated = functions.firestore
   .document('/daos/{id}')
   .onCreate(async (snap) => {
+    logger.debug('{Dao Created Trigger}', snap.data());
+
     let newDao = snap.data();
 
     const userId = newDao.members[0].userId;
@@ -90,7 +103,7 @@ exports.newDaoCreated = functions.firestore
               log: 'Successfully created common',
               commonId: newDao.id,
               commonName: newDao.name,
-              description: newDao.metadata.description,
+              description: newDao.metadata.description || 'No description was provided for this dao',
               about: newDao.metadata.byline,
               paymentType: 'one-time',
               minContribution: newDao.minFeeToJoin
