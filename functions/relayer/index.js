@@ -37,10 +37,14 @@ relayer.get('/createWallet', async (req, res) => {
 relayer.post('/requestToJoin', async (req, res) => {
   try {
     const data = await requestToJoin(req, res);
-    res.send(JSON.stringify(data));
+    
+    res.status(200)
+      .send(JSON.stringify(data));
   } catch (err) {
     console.error(err);
-    res.send(err.response && err.response.data || err);
+
+    res.status(500)
+      .send(err.response && err.response.data || err);
   }
 })
 
