@@ -17,6 +17,7 @@ async function updateDaos() {
     const promiseArr = [];
 
     for (const dao of daos) {
+        // eslint-disable-next-line no-loop-func
         promiseArr.push(async () => {
             console.log(`UPDATE DAO WITH ID: ${dao.id}`);
 
@@ -189,7 +190,7 @@ async function updateDaoById(daoId, customRetryOptions = {}) {
     }
     daoId = daoId.toLowerCase()
     const dao = await promiseRetry(
-        async function (retryFunc, number) {
+        async (retryFunc, number) => {
             console.log(`Try #${number} to get Dao...`);
             const currDaosResult = await arc.daos({ where: { id: daoId } }, { fetchPolicy: 'no-cache' }).first();
 

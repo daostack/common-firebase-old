@@ -104,7 +104,7 @@ async function updateProposalById(proposalId, customRetryOptions = {}, blockNumb
     }
 
     let proposal = await promiseRetry(
-        async function (retryFunc, number) {
+        async (retryFunc, number) => {
             console.log(`Try #${number} to get Proposal ${proposalId}`);
             const proposals = await arc.proposals({ where: { id: proposalId } }, { fetchPolicy: 'no-cache' }).first()
 

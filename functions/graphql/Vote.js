@@ -1,8 +1,7 @@
 const { findUserByAddress } = require('../db/userDbService');
 const { Vote } = require('@daostack/arc.js');
-const { arc} = require('../settings')
-const admin = require('firebase-admin');
-const db = admin.firestore();
+const { arc } = require('../settings')
+const { updateVote } = require('../db/voteDbService');
 
 async function updateVotes() {
 
@@ -27,8 +26,7 @@ async function updateVotes() {
 
         }
 
-        await db.collection('votes')
-          .doc(vote.id).set(doc);
+        await updateVote(vote.id, doc);
 
         docs.push(doc);
     }));
