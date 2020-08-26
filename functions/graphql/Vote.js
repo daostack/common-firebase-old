@@ -9,11 +9,15 @@ async function updateVotes() {
     const votes = await Vote.search(arc, {}, { fetchPolicy: 'no-cache' }).first()
     console.log(`found ${votes.length} votes`)
 
-    const docs = []
-    for (const vote of votes) {
 
-        const user = await findUserByAddress(vote.voter)
-        const voteUserId = user ? user.id : null;
+    const docs = []
+    await Promise.all(
+      votes.map(async vote =>  {
+        const user = await findUserByAddress(vote.voter);
+
+        const voteUserId = user
+          ? user.id
+          : null;
 
         const doc = {
             id: vote.id,
@@ -22,10 +26,13 @@ async function updateVotes() {
             proposalId: vote.proposal.id,
 
         }
-        await db.collection('votes').doc(vote.id).set(doc)
-        docs.push(doc)
 
-    }
+        await db.collection('votes')
+          .doc(vote.id).set(doc);
+
+        docs.push(doc);
+    }));
+
     return docs;
 }
 
