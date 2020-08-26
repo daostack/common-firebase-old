@@ -3,6 +3,7 @@ const { Vote } = require('@daostack/arc.js');
 const { arc, retryOptions, ipfsDataVersion } = require('../settings')
 const promiseRetry = require('promise-retry');
 const Utils = require('../util/util');
+const { UnsupportedVersionError } = require('../util/error');
 const { updateProposal } = require('../db/proposalDbService');
 
 const parseVotes = (votesArr) => {
@@ -10,7 +11,6 @@ const parseVotes = (votesArr) => {
 }
 
 async function _updateProposalDb(proposal) {
-
     const result = { updatedDoc: null, errorMsg: null };
     const s = proposal.coreState
 
@@ -47,9 +47,10 @@ async function _updateProposalDb(proposal) {
     const proposalDataVersion = proposalDescription.VERSION;
 
     if (proposalDataVersion < ipfsDataVersion) {
-        throw Error(`Skipping this proposal ${s.id} as it has an unsupported version ${proposalDataVersion} (should be >= ${ipfsDataVersion})`);
+        throw new UnsupportedVersionError(`Skipping this proposal ${s.id} as it has an unsupported version ${proposalDataVersion} (should be >= ${ipfsDataVersion})`);
     }
 
+    // @refactor
     const doc = {
         boostedAt: s.boostedAt,
         description: proposalDescription,
@@ -137,20 +138,35 @@ async function updateProposals() {
     const proposals = await arc.proposals({ first: 1000 }, { fetchPolicy: 'no-cache' }).first()
     console.log(`found ${proposals.length} proposals`)
 
-    const docs = [];
+    const updatedProposals = [];
+    const skippedProposals = [];
+
+    // @refactor Do this asynchronously. That way even if we have a lot of proposals
+    // the function relatively take small amount of time to execute
     for (const proposal of proposals) {
         try {
             // eslint-disable-next-line
-            const updatedDoc = await _updateProposalDb(proposal);
-            docs.push(updatedDoc);
+            updatedProposals.push(await _updateProposalDb(proposal));
         } catch (e) {
-            if (e.code === 1) {
+            if (e.code === 1 || e instanceof UnsupportedVersionError) {
                 console.log(`Skipped ${proposal.id} due to old data version.`);
+
+                skippedProposals.push({
+                    proposal,
+                    skippedDueTo: e.message
+                });
+
                 continue;
-            } else throw e;
+            }
+
+            throw e;
         }
     }
-    return docs;
+
+    return {
+        updatedProposals,
+        skippedProposals
+    };
 }
 
 
