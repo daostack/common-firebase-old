@@ -1,3 +1,7 @@
+![Statements Coverage](docs/assests/badges/badge-statements.svg)
+![Functions Coverage](docs/assests/badges/badge-functions.svg)
+![Lines Coverage](docs/assests/badges/badge-lines.svg)
+
 
 # Firebase code in support for common
 
