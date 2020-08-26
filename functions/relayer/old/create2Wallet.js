@@ -38,9 +38,8 @@ const create2Wallet = async (req, res) => {
 
     const testAddress = ethers.utils.getContractAddress({ from: env.biconomy.proxyFactory, nonce: nonceSalt })
     axios.post('https://api.biconomy.io/api/v2/meta-tx/native', data, options)
-      .then(receive => {
-        let object = Object.assign(receive.data, { address: testAddress, nonce: nonceSalt })
-        res.send(object);
+      .then((receive) => {
+        return res.send(Object.assign(receive.data, { address: testAddress, nonce: nonceSalt }));
       })
       .catch(err => {
         res.send(err);

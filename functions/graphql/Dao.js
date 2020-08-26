@@ -14,22 +14,33 @@ async function updateDaos() {
     const daos = await arc.daos({}, { fetchPolicy: 'no-cache' }).first()
     console.log(`found ${daos.length} DAOs`)
 
+    const promiseArr = [];
+
     for (const dao of daos) {
-        console.log(`UPDATE DAO WITH ID: ${dao.id}`);
-        const { errorMsg } = await _updateDaoDb(dao);
+        promiseArr.push(async () => {
+            console.log(`UPDATE DAO WITH ID: ${dao.id}`);
 
-        // TODO: this is not the way to handle errors
-        if (errorMsg) {
-            response.push(errorMsg);
-            console.error(errorMsg);
-            continue;
-        }
+            // eslint-disable-next-line
+            const { errorMsg } = await _updateDaoDb(dao);
 
-        const msg = `Updated dao ${dao.id}`
-        response.push(msg)
-        console.log(msg)
-        console.log("----------------------------------------------------------");
+            // TODO: this is not the way to handle errors
+            if (errorMsg) {
+                response.push(errorMsg);
+                console.error(errorMsg);
+
+                // continue;
+                return;
+            }
+
+            const msg = `Updated dao ${dao.id}`
+            response.push(msg)
+            console.log(msg)
+            console.log("----------------------------------------------------------");
+        })
     }
+
+    await Promise.all(promiseArr);
+
     return response.join('\n')
 }
 
@@ -139,6 +150,7 @@ async function _updateDaoDb(dao) {
             const members = await dao.members().first()
             doc.members = []
             for (const member of members) {
+                // eslint-disable-next-line
                 const user = await findUserByAddress(member.coreState.address)
                 if (user === null) {
                     console.log(`No user found with this address ${member.coreState.address}`)

@@ -140,6 +140,7 @@ async function updateProposals() {
     const docs = [];
     for (const proposal of proposals) {
         try {
+            // eslint-disable-next-line
             const updatedDoc = await _updateProposalDb(proposal);
             docs.push(updatedDoc);
         } catch (e) {
