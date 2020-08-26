@@ -11,6 +11,13 @@ stagingCONFIG="$CURRENTDIR/env/staging/env_config.json"
 productionCONFIG="$CURRENTDIR/env/production/env_config.json"
 currentCONFIG="$CURRENTDIR/$DIRNAME/env_config.json"
 
+if ! command -v md5sum &> /dev/null
+then
+    echo "$(tput setaf 1)md5sum $(tput sgr0) could not be found"
+    echo "You can use $(tput setaf 2)brew install md5sha1sum $(tput sgr0)"
+    exit
+fi
+
 if [[ $1 == "-stg" ]]; then
   echo "Switching $(tput setaf 2) staging $(tput sgr0) environment ..."
   cp -f "$stagingENV" "$currentENV"

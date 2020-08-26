@@ -1,5 +1,5 @@
 {
-  "name": "common_firebase",
+  "name": "@common/firebase",
   "description": "Cloud Functions for Firebase",
   "scripts": {
     "lint": "eslint .",

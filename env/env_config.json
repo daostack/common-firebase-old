@@ -10,7 +10,7 @@
     "chainId": 42
   },
   "graphql": {
-    "subgraphName": "daostack/v8_10_exp_kovan",
+    "subgraphName": "daostack/v8_10_exp_xdai",
     "graphApiUrl": "https://api.thegraph.com/index-node/graphql",
     "ipfsDataVersion": "000003"
   },
@@ -32,7 +32,7 @@
     "daoStackWalletId": "83405793"
   },
   "mail": {
-    "sender": "support@common.io",
+    "sender": "staging@common.io",
     "adminMail": "jelle@daostack.io"
   }
 }
