@@ -28,6 +28,7 @@ fi
 if [[ $1 == "-backup" ]]; then
 	if echo "$ENV_String" | grep -q "$SOURCE"; then
 		echo "Backup $(tput setaf 2) Production $(tput sgr0) Firestore ..."
+		echo "Crating $(tput setaf 2) $Date $(tput sgr0) ..."
 		gcloud firestore export gs://common-daostack.appspot.com/backup/$Date
 		echo "$(tput setaf 2)Updating local backup Firestore ... $(tput sgr0)"
 		gsutil -m cp -r gs://common-daostack.appspot.com/backup/* $CURRENTDIR/$DIRNAME/backup/production
