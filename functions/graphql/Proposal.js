@@ -141,27 +141,22 @@ async function updateProposals() {
     const updatedProposals = [];
     const skippedProposals = [];
 
-    // @refactor Do this asynchronously. That way even if we have a lot of proposals
-    // the function relatively take small amount of time to execute
-    for (const proposal of proposals) {
+    await Promise.all(proposals.map(async proposal => {
         try {
-            // eslint-disable-next-line
             updatedProposals.push(await _updateProposalDb(proposal));
         } catch (e) {
             if (e.code === 1 || e instanceof UnsupportedVersionError) {
                 console.log(`Skipped ${proposal.id} due to old data version.`);
 
                 skippedProposals.push({
-                    proposal,
+                    proposalId: proposal.id,
                     skippedDueTo: e.message
                 });
-
-                continue;
+            } else {
+                throw e;
             }
-
-            throw e;
         }
-    }
+    }));
 
     return {
         updatedProposals,
