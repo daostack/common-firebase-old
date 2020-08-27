@@ -1,6 +1,6 @@
 module.exports = {
   testMatch: [
-    '**/tests/**/*.ts',
+    // '**/__tests__/**/*.ts',
     '**/?(*.)+(spec|test).ts'
   ],
   preset: 'ts-jest',
@@ -9,5 +9,11 @@ module.exports = {
     'json-summary',
     'text',
     'lcov'
-  ]
+  ],
+  // setupFilesAfterEnv: ['<rootDir>/__tests__/setup.tests.ts'],
+  "moduleNameMapper": {
+    "^@root(.*)$": "<rootDir>/$1",
+    "^@env(.*)$": "<rootDir>/env/$1",
+    "^@functions(.*)$": "<rootDir>/functions/$1",
+  }
 };
