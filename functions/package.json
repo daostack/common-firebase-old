@@ -1,0 +1,9 @@
+{
+  "name": "@common/functions",
+  "description": "Cloud Functions for Common",
+  "engines": {
+    "node": "10"
+  },
+  "main": "index.js",
+  "private": true
+}
