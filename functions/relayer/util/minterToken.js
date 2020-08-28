@@ -1,6 +1,6 @@
-const { provider } = require('../settings')
+const { provider } = require('../../settings')
 const ethers = require('ethers');
-const { env } = require('../env');
+const { env } = require('@env');
 const abi = require('./abi.json');
 
 const minterToken = async (address, amount) => {
@@ -24,8 +24,8 @@ const minterToken = async (address, amount) => {
     return receipt.txHash;
   } catch (error) {
     console.error(error);
-    throw error; 
+    throw error;
   }
 }
 
- module.exports = { minterToken };
+module.exports = { minterToken };

@@ -6,8 +6,8 @@ const {
   createWallet
 } = require('../mangopay/mangopay');
 
-const { updateDAOBalance } = require("../graphql/updateDAOBalance");
-const { minterToken } = require('../relayer/minterToken')
+const { updateDAOBalance } = require("../db/daoDbService");
+const { minterToken } = require('../relayer/util/minterToken')
 const util = require('../util/util');
 
 const emailClient = require('../email');
@@ -50,6 +50,9 @@ exports.watchForExecutedProposals = functions.firestore
         }
         const preAuthId = data.description.preAuthId;
         const amount = data.description.funding;
+
+        // @question Ask about this. Maybe make the whole function async?
+        // eslint-disable-next-line
         const { Status, ...paymentInfo } = await payToDAOWallet({
           preAuthId,
           Amount: amount,
@@ -86,7 +89,7 @@ exports.watchForExecutedProposals = functions.firestore
               }
             })
           ]);
-          
+
           await minterToken(data.dao, amount)
           await updateDAOBalance(data.dao);
           return change.after.ref.set(
