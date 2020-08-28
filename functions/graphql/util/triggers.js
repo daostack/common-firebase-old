@@ -13,7 +13,7 @@ exports.newProposalCreated = functions
     const proposal = snap.data();
 
     if(proposal.name === 'JoinAndQuit') {
-      const proposer = await util.getUserById(proposal.fundingRequest.proposedMemberId);
+      const proposer = await util.getUserById(proposal.proposerId);
       const common = await util.getCommonById(proposal.dao);
 
       await emailClient.sendTemplatedEmail({
