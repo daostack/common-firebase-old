@@ -1,12 +1,8 @@
 // @ts-ignore
 import { getTemplatedEmail } from '@functions/email';
 
-import admin from 'firebase-admin';
-import { runTest } from '../helpers/runTest';
-
+import { runTest } from '@helpers/runTest';
 const functions = require('@functions');
-const test = require('firebase-functions-test')();
-
 
 const requestToJoinStubs = {
   name: 'Test Name',
@@ -17,40 +13,6 @@ const requestToJoinStubs = {
 const requestToJoinPartialStubs = {
   name: 'Test Name'
 };
-//
-// const mockQueryResponse = jest.fn();
-//
-// mockQueryResponse.mockResolvedValue([
-//   {
-//     id: 1
-//   }
-// ]);
-//
-// jest.mock('firebase-admin', () => ({
-//   initializeApp: jest.fn(),
-//   firestore: () => ({
-//     collection: jest.fn(path => ({
-//       where: jest.fn(queryString => ({
-//         get: mockQueryResponse
-//       }))
-//     }))
-//   })
-// }));
-//
-// describe('Emails Sending', () => {
-//   beforeAll(() => {
-//     jest.mock('firebase-admin', () => (
-//         {
-//           initializeApp: jest.fn()
-//         }
-//       )
-//     )
-//
-//     admin.initializeApp();
-//   })
-//
-//
-// });
 
 runTest((funcs) => {
   it('should be successful with all stubs', () => {

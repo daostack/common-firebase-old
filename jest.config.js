@@ -15,5 +15,6 @@ module.exports = {
     "^@root(.*)$": "<rootDir>/$1",
     "^@env(.*)$": "<rootDir>/env/$1",
     "^@functions(.*)$": "<rootDir>/functions/$1",
+    "^@helpers(.*)$": "<rootDir>/__tests__/helpers/$1",
   }
 };
