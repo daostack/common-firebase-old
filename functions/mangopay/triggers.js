@@ -11,6 +11,7 @@ const { minterToken } = require('../relayer/util/minterToken')
 const util = require('../util/util');
 
 const emailClient = require('../email');
+const sendPreauthorizationFailedEmail = require('../email/sendPreauthorizationFailedEmail');
 
 exports.watchForExecutedProposals = functions.firestore
   .document('/proposals/{id}')
@@ -138,7 +139,7 @@ exports.watchForExecutedProposals = functions.firestore
 
         const preAuthId = data.description.preAuthId;
 
-        await emailClient.sendPreauthorizationFailedEmail(preAuthId, e.message);
+        await sendPreauthorizationFailedEmail(preAuthId, e.message);
 
         return change.after.ref.set({
           paymentStatus: 'failed',
@@ -157,8 +158,8 @@ exports.watchForExecutedProposals = functions.firestore
     if (
       data.name === "FundingRequest" &&
       data.executed !== previousData.executed &&
-      data.executed === true &&
-      data.winningOutcome === 1
+      data.winningOutcome === 1 &&
+      Boolean(data.executed)
     ) {
       const userData = await util.getUserById(data.proposerId);
       let daoData = await util.getCommonById(data.dao);
