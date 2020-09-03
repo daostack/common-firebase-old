@@ -14,8 +14,16 @@ jobs:
         with:
           node-version: 10.22.0
 
-      - name: Install modules
-        run: yarn
+      - uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install packages
+        run: yarn install
+
+      - name: Setup CI environment
+        run: yarn ci:setup --token ${{ secrets.FIREBASE_TOKEN }}
 
       - name: Run tests
         run: yarn ci:test
