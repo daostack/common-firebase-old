@@ -69,7 +69,7 @@ exports.watchForExecutedProposals = functions.firestore
           // sendMail(
           //   userData.email,
           //   'Successfull payment',
-          //   `Your request to join has been approved and the amount of ${data.joinAndQuit.funding}$ was charged.`
+          //   `Your request to join has been approved and the amount of ${data.join.funding}$ was charged.`
           // );
 
           await Promise.all([

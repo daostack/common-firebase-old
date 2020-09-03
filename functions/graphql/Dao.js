@@ -46,18 +46,18 @@ const updateDaos = async () => {
 
 function _validateDaoPlugins(plugins) {
     const daoPlugins = {
-        joinAndQuitPlugin: null,
+        joinPlugin: null,
         fundingPlugin: null,
     }
     for (const plugin of plugins) {
         if (plugin.coreState.name === PROPOSAL_TYPE.Join) {
-            daoPlugins.joinAndQuitPlugin = plugin
+            daoPlugins.joinPlugin = plugin
         }
         if (plugin.coreState.name === PROPOSAL_TYPE.FundingRequest) {
             daoPlugins.fundingPlugin = plugin
         }
     }
-    if (!daoPlugins.joinAndQuitPlugin || !daoPlugins.fundingPlugin) {
+    if (!daoPlugins.joinPlugin || !daoPlugins.fundingPlugin) {
         const msg = `Skipping dao as it is not properly configured`;
 
         return { isValid: false, errorMsg: msg };
@@ -104,14 +104,14 @@ async function _updateDaoDb(dao) {
         return { errorMsg: pluginValidation.errorMsg };
     }
 
-    const { joinAndQuitPlugin, fundingPlugin } = pluginValidation.plugins;
+    const { joinPlugin, fundingPlugin } = pluginValidation.plugins;
 
     console.log(`UPDATING dao ${daoState.name} ...`);
     const {
         // fundingGoal, // We ignore the "official" funding gaol, instead we use the one from the metadata field
         minFeeToJoin,
         memberReputation,
-    } = joinAndQuitPlugin.coreState.pluginParams;
+    } = joinPlugin.coreState.pluginParams;
 
     const metadata = JSON.parse(daoState.metadata)
     const fundingGoal = Number(metadata.fundingGoal)

@@ -118,7 +118,7 @@ const testPreauthFailedEmails = async (req) => {
     .data();
 
   const requester = (await db.collection(usersCollection)
-    .doc(proposal.joinAndQuit.proposedMemberId)
+    .doc(proposal.join.proposedMemberId)
     .get())
     .data()
   
@@ -131,7 +131,7 @@ const testPreauthFailedEmails = async (req) => {
       userId: requester.uid,
       userEmail: requester.email,
       userFullName: requester.displayName,
-      paymentAmount: proposal.joinAndQuit.funding,
+      paymentAmount: proposal.join.funding,
       submittedOn: new Date(proposal.executedAt * 1000).toDateString(),
       failureReason: 'Unknown'
     }
@@ -168,7 +168,7 @@ const testPreauthFailedEmails = async (req) => {
 //     sendMail(
 //       userData.email,
 //       'Successfull payment',
-//       `Your request to join has been approved and the amount of ${data.joinAndQuit.funding}$ was charged.`
+//       `Your request to join has been approved and the amount of ${data.join.funding}$ was charged.`
 //     ),
 //     sendMail(
 //       env.mail.adminMail,

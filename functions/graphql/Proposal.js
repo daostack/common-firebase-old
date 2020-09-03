@@ -72,7 +72,7 @@ async function _updateProposalDb(proposal) {
         stage: s.stage,
         stageStr: s.stage.toString(),
         type: s.type,
-        joinAndQuit: {
+        join: {
             proposedMemberAddress: s.proposedMember || null,
             proposedMemberId: proposedMemberId,
             funding: s.funding && s.funding.toString() || null,
