@@ -54,9 +54,9 @@ const createRequestToJoin = async (req, res) => {
     console.log('tx mined', receipt);
 
     // await arc.fetchContractInfos();
-    // const JoinAndQuitABI = arc.getABI("JoinAndQuit", env.graphql.arcVersion)
+    // const JoinABI = arc.getABI("Join", env.graphql.arcVersion)
 
-    const interf = new ethers.utils.Interface(abi.JoinAndQuit)
+    const interf = new ethers.utils.Interface(abi.Join)
     const events = Utils.getTransactionEvents(interf, receipt)
 
     // TODO:  if the transacdtion reverts, we can check for that here and include that in the error message

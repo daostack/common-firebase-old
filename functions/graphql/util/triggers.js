@@ -3,6 +3,7 @@ const { updateDaoById } = require('../Dao');
 const env = require('@env');
 const { createLegalUser, createWallet } = require('../../mangopay/mangopay');
 const util = require('../../util/util');
+const { PROPOSAL_TYPE } = require('../../util/util');
 
 const emailClient = require('../../email');
 
@@ -12,7 +13,7 @@ exports.newProposalCreated = functions
   .onCreate(async (snap) => {
     const proposal = snap.data();
 
-    if(proposal.name === 'JoinAndQuit') {
+    if(proposal.name === PROPOSAL_TYPE.Join) {
       const proposer = await util.getUserById(proposal.proposerId);
       const common = await util.getCommonById(proposal.dao);
 
@@ -34,12 +35,12 @@ exports.watchForReputationRedeemed = functions.firestore
     const data = change.after.data();
     const previousData = change.before.data();
     if (
-      data.type === 'JoinAndQuit' &&
+      data.type === PROPOSAL_TYPE.Join &&
       previousData.joinAndQuit.reputationMinted === '0' &&
       data.joinAndQuit.reputationMinted !== '0'
     ) {
       console.log(
-        'JoinAndQuit proposal reputationMinted changed from "0" Initiating DAO update'
+        'Join proposal reputationMinted changed from "0" Initiating DAO update'
       );
       try {
         await updateDaoById(data.dao);

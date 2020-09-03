@@ -2,6 +2,7 @@ const { findUserByAddress } = require('../db/userDbService');
 const { arc, retryOptions, ipfsDataVersion } = require('../settings')
 const { getBalance } = require("../db/daoDbService")
 const promiseRetry = require('promise-retry');
+const { PROPOSAL_TYPE } = require('../util/util');
 
 const { updateDao, getDaoById } = require('../db/daoDbService');
 
@@ -49,10 +50,10 @@ function _validateDaoPlugins(plugins) {
         fundingPlugin: null,
     }
     for (const plugin of plugins) {
-        if (plugin.coreState.name === "JoinAndQuit") {
+        if (plugin.coreState.name === PROPOSAL_TYPE.Join) {
             daoPlugins.joinAndQuitPlugin = plugin
         }
-        if (plugin.coreState.name === "FundingRequest") {
+        if (plugin.coreState.name === PROPOSAL_TYPE.FundingRequest) {
             daoPlugins.fundingPlugin = plugin
         }
     }
