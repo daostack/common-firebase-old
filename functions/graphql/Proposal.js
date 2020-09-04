@@ -139,7 +139,7 @@ async function updateProposals() {
     
     do {
         // eslint-disable-next-line no-await-in-loop
-        currProposals = await arc.proposals({ first: 1000, skip }, { fetchPolicy: 'no-cache' }).first();
+        currProposals = await arc.proposals({ first: 1000, skip: skip * 1000 }, { fetchPolicy: 'no-cache' }).first();
         allProposals.push(...currProposals);
         skip++;
     } while (currProposals && currProposals.length > 0);

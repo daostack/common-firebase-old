@@ -5,33 +5,42 @@ const { updateVote } = require('../db/voteDbService');
 
 async function updateVotes() {
 
-    const votes = await Vote.search(arc, {}, { fetchPolicy: 'no-cache' }).first()
-    console.log(`found ${votes.length} votes`)
+  const allVotes = [];
+  let currVotes = null;
+  let skip = 0;
 
+  do {
+    // eslint-disable-next-line no-await-in-loop
+    currVotes = await Vote.search(arc, { first: 1000, skip: skip * 1000 }, { fetchPolicy: 'no-cache' }).first();
+    allVotes.push(...currVotes);
+    skip++;
+  } while (currVotes && currVotes.length > 0);
 
-    const docs = []
-    await Promise.all(
-      votes.map(async vote =>  {
-        const user = await findUserByAddress(vote.voter);
+  console.log(`found ${allVotes.length} votes`)
 
-        const voteUserId = user
-          ? user.id
-          : null;
+  const docs = []
+  await Promise.all(
+    allVotes.map(async vote =>  {
+      const user = await findUserByAddress(vote.voter);
 
-        const doc = {
-            id: vote.id,
-            voterAddress: vote.voter,
-            voterUserId: voteUserId,
-            proposalId: vote.proposal.id,
+      const voteUserId = user
+        ? user.id
+        : null;
 
-        }
+      const doc = {
+          id: vote.id,
+          voterAddress: vote.voter,
+          voterUserId: voteUserId,
+          proposalId: vote.proposal.id,
 
-        await updateVote(vote.id, doc);
+      }
 
-        docs.push(doc);
-    }));
+      await updateVote(vote.id, doc);
 
-    return docs;
+      docs.push(doc);
+  }));
+
+  return docs;
 }
 
 module.exports = {
