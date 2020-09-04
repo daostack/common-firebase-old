@@ -26,9 +26,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --collectCoverage",
-    "test:badges": "yarn test:coverage && jest-coverage-badges --output \"./docs/assests/badges\"",
     "ci:setup": "yarn use:ci",
-    "ci:test": "yarn test"
+    "ci:test": "yarn test",
+    "test:badges": "yarn test:coverage && jest-coverage-badges --output \"./docs/assests/badges\""
   },
   "engines": {
     "node": "10"
