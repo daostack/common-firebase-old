@@ -9,6 +9,8 @@ async function updateVotes() {
   let currVotes = null;
   let skip = 0;
 
+  const docs = [];
+  
   do {
     // eslint-disable-next-line no-await-in-loop
     currVotes = await Vote.search(arc, { first: 1000, skip: skip * 1000 }, { fetchPolicy: 'no-cache' }).first();
@@ -17,29 +19,26 @@ async function updateVotes() {
   } while (currVotes && currVotes.length > 0);
 
   console.log(`found ${allVotes.length} votes`)
-
-  const docs = []
+  
   await Promise.all(
-    allVotes.map(async vote =>  {
-      const user = await findUserByAddress(vote.voter);
-
+    allVotes.map(async vote => {
+      const user = await findUserByAddress(vote.coreState.voter);
       const voteUserId = user
         ? user.id
         : null;
 
       const doc = {
-          id: vote.id,
-          voterAddress: vote.voter,
-          voterUserId: voteUserId,
-          proposalId: vote.proposal.id,
-
+        id: vote.id,
+        voterAddress: vote.coreState.voter,
+        voterUserId: voteUserId,
+        proposalId: vote.coreState.proposal.id,
       }
 
       await updateVote(vote.id, doc);
 
       docs.push(doc);
-  }));
-
+    }));
+  
   return docs;
 }
 
