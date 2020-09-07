@@ -5,6 +5,8 @@ const ethers = require('ethers');
 const { provider } = require('../settings.js');
 const { cancelPreauthorizedPayment } = require('../mangopay/mangopay');
 const abi = require('./util/abi.json')
+const { minterToken } = require('./util/minterToken')
+const { updateDAOBalance } = require("../db/daoDbService");
 
 const createRequestToJoin = async (req, res) => {
   // eslint-disable-next-line no-useless-catch
@@ -15,7 +17,9 @@ const createRequestToJoin = async (req, res) => {
     const {
       idToken,
       createProposalTx, // This is the signed transacxtion to create the proposal. 
-      preAuthId
+      preAuthId,
+      daoId,
+      amount, // TODO: need to signed for security or fetch from other platform
     } = req.body;
     const uid = await Utils.verifyId(idToken)
     const userData = await Utils.getUserById(uid);
@@ -61,6 +65,7 @@ const createRequestToJoin = async (req, res) => {
 
     // TODO:  if the transacdtion reverts, we can check for that here and include that in the error message
     if (!events.JoinInProposal) {
+      // TODO: add error handling wrapper
       console.error('Request to join failed, Transaction was mined, but no JoinInProposal event was not found in the receipt')
       res.status(500).send({
         txHash: response.data.txHash,
@@ -73,6 +78,7 @@ const createRequestToJoin = async (req, res) => {
     console.debug(`Created proposal ${proposalId}`)
 
     if (!proposalId) {
+      // TODO: add error handling wrapper
       res.status(500).send({
         txHash: response.data.txHash,
         error: 'Transation was mined, but no proposalId was found in the JoinInProposal event'
@@ -81,7 +87,10 @@ const createRequestToJoin = async (req, res) => {
       return
     }
 
-    await updateProposalById(proposalId, { retries: 4 });
+    await updateProposalById(proposalId, { retries: 8 });
+    await minterToken(daoId, amount);
+    await updateDAOBalance(daoId);
+    // TODO: add error handling wrapper
     res.send({ txHash: response.data.txHash, proposalId: proposalId });
   } catch (error) {
     console.error('Request to join failed')
