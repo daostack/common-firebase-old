@@ -16,7 +16,7 @@
     "emulator": "open -a Safari http://localhost:4000 && firebase emulators:start --import ./firestore/data",
     "emulator:functions": "open -a Safari http://localhost:4000 && firebase emulators:start --only functions",
     "use:ci": "./env/env.sh -dev",
-    "use:dev": "firebase use staging && ./env/env.sh -dev",
+    "use:dev": "./env/env.sh -dev",
     "use:staging": "firebase use staging && ./env/env.sh -stg",
     "use:production": "firebase use production && ./env/env.sh -prod",
     "data:backup": "./firestore/data.sh -backup",
