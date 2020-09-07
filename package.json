@@ -23,9 +23,9 @@
     "data:update": "./firestore/data.sh -update",
     "env": "./functions/env/env.sh",
     "precommit": "lint-staged && yarn test",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --collectCoverage",
+    "test": "yarn use:dev && jest",
+    "test:watch": "yarn test --watch",
+    "test:coverage": "yarn test --collectCoverage",
     "ci:setup": "yarn use:ci",
     "ci:test": "yarn test",
     "test:badges": "yarn test:coverage && jest-coverage-badges --output \"./docs/assests/badges\""
@@ -63,7 +63,8 @@
   },
   "_moduleAliases": {
     "@env": "./functions/env",
-    "@util": "./functions/util"
+    "@util": "./functions/util",
+    "@settings": "./functions/settings"
   },
   "devDependencies": {
     "@types/jest": "^26.0.10",

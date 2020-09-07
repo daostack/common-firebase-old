@@ -1,20 +1,23 @@
 #!/bin/bash
 
 CURRENTDIR=`pwd`
-DIRNAME=`dirname "$0"`
+DIRNAME=`dirname "$0"` #OUTPUT DIRECTORY
+OUTPUTDIR="$CURRENTDIR/functions/env"
+echo "writing config files to $OUTPUTDIR"
 
 devENV="$CURRENTDIR/env/dev/env_secrets.dev.json"
 stagingENV="$CURRENTDIR/$DIRNAME/staging/env_secrets.json"
 productionENV="$CURRENTDIR/$DIRNAME/production/env_secrets.json"
-currentENV="$CURRENTDIR/$DIRNAME/env_secrets.json"
+currentENV="$OUTPUTDIR/env_secrets.json"
 
 devCONFIG="$CURRENTDIR/env/dev/env_config.dev.json"
 stagingCONFIG="$CURRENTDIR/env/staging/env_config.json"
 productionCONFIG="$CURRENTDIR/env/production/env_config.json"
-currentCONFIG="$CURRENTDIR/$DIRNAME/env_config.json"
+currentCONFIG="$OUTPUTDIR/env_config.json"
 
 echo $devENV
 echo $devCONFIG
+echo on
 
 if ! command -v md5sum &> /dev/null
 then
@@ -27,7 +30,7 @@ if [[ $1 == "-stg" ]]; then
   echo "Switching $(tput setaf 2) staging $(tput sgr0) environment ..."
   cp -f "$stagingENV" "$currentENV"
   cp -f "$stagingCONFIG" "$currentCONFIG"
-  cp -f "$CURRENTDIR/$DIRNAME/staging/adminsdk-keys.json" "$CURRENTDIR/$DIRNAME/adminsdk-keys.json"
+  cp -f "$CURRENTDIR/$DIRNAME/staging/adminsdk-keys.json" "$OUTPUTDIR/adminsdk-keys.json"
   echo "Configuration changed"
   exit
 fi
@@ -36,7 +39,7 @@ if [[ $1 = "-prod" ]]; then
   echo "Switching $(tput setaf 2) production $(tput sgr0) environment ..."
   cp -f "$productionENV" "$currentENV"
   cp -f "$productionCONFIG" "$currentCONFIG"
-  cp -f "$CURRENTDIR/$DIRNAME/production/adminsdk-keys.json" "$CURRENTDIR/$DIRNAME/adminsdk-keys.json"
+  cp -f "$CURRENTDIR/$DIRNAME/production/adminsdk-keys.json" "$OUTPUTDIR/adminsdk-keys.json"
   echo "Configuration changed"
   exit
 fi
@@ -45,7 +48,7 @@ if [[ $1 = "-dev" ]]; then
   echo "Switching $(tput setaf 2) development/testing $(tput sgr0) environment ..."
   cp -f "$devENV" "$currentENV"
   cp -f "$devCONFIG" "$currentCONFIG"
-  cp -f "$CURRENTDIR/$DIRNAME/dev/adminsdk-keys.dev.json" "$CURRENTDIR/$DIRNAME/adminsdk-keys.json"
+  cp -f "$CURRENTDIR/$DIRNAME/dev/adminsdk-keys.dev.json" "$OUTPUTDIR/adminsdk-keys.json"
   echo "Configuration changed"
   exit
 fi
