@@ -5,8 +5,6 @@ const ethers = require('ethers');
 const { provider } = require('../settings.js');
 const { cancelPreauthorizedPayment } = require('../mangopay/mangopay');
 const abi = require('./util/abi.json')
-const { minterToken } = require('./util/minterToken')
-const { updateDAOBalance } = require("../db/daoDbService");
 
 const createRequestToJoin = async (req, res) => {
   // eslint-disable-next-line no-useless-catch
@@ -18,8 +16,6 @@ const createRequestToJoin = async (req, res) => {
       idToken,
       createProposalTx, // This is the signed transacxtion to create the proposal. 
       preAuthId,
-      daoId,
-      amount, // TODO: need to signed for security or fetch from other platform
     } = req.body;
     const uid = await Utils.verifyId(idToken)
     const userData = await Utils.getUserById(uid);
