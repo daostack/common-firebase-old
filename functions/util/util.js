@@ -114,7 +114,7 @@ class Utils {
   }
 }
 
-module.exports.Utils = new this.Utils();
+module.exports.Utils = new Utils();
 module.exports.PROPOSAL_TYPE = {
   Join: 'Join',
   FundingRequest: 'FundingRequest',
