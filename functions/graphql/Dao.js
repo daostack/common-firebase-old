@@ -11,14 +11,23 @@ const updateDaos = async () => {
     console.log("UPDATE DAOS:");
     console.log("----------------------------------------------------------");
 
+    const allDaos = [];
+    let currDaos = null;
+    let skip = 0;
+
+    do {
+        // eslint-disable-next-line no-await-in-loop
+        currDaos = await arc.daos({ first: 1000, skip: skip * 1000 }, { fetchPolicy: 'no-cache' }).first();
+        allDaos.push(...currDaos);
+        skip++;
+    } while (currDaos && currDaos.length > 0);
+
     const updatedDaos = [];
     const skippedDaos = [];
 
-    const daos = await arc.daos({}, { fetchPolicy: 'no-cache' }).first()
+    console.log(`Found ${allDaos.length} DAOs`);
 
-    console.log(`Found ${daos.length} DAOs`);
-
-    await Promise.all(daos.map(async (dao) => {
+    await Promise.all(allDaos.map(async (dao) => {
         console.log(`UPDATE DAO WITH ID: ${dao.id}`);
 
         const { errorMsg } = await _updateDaoDb(dao);
@@ -194,7 +203,8 @@ async function updateDaoById(daoId, customRetryOptions = {}) {
             const currDaosResult = await arc.daos({ where: { id: daoId } }, { fetchPolicy: 'no-cache' }).first();
 
             if (currDaosResult.length === 0) {
-                retryFunc(`We could not find a dao with id "${daoId}" in the graph.`);
+                console.log(arc)
+                retryFunc(`We could not find a dao with id "${daoId}" in the graph at ${arc.graphqlHttpProvider}.`);
             }
             if (!currDaosResult[0].coreState.metadata) {
                 retryFunc(`The dao with id "${daoId}" has no metadata`);

@@ -3,10 +3,14 @@ const admin = require('firebase-admin');
 const { databaseURL } = require('./settings');
 const {env} = require('@env');
 
-admin.initializeApp({
-  credential: admin.credential.cert(require('@env/adminsdk-keys.json')),
-  databaseURL: databaseURL
-});
+if(env.environment === 'dev') {
+  admin.initializeApp();
+} else {
+  admin.initializeApp({
+    credential: admin.credential.cert(require('@env/adminsdk-keys.json')),
+    databaseURL: databaseURL
+  });
+}
 
 const relayer = require('./relayer');
 const graphql = require('./graphql');
@@ -26,3 +30,5 @@ exports.mangopaySubs = mangopayTriggers;
 exports.graphqlSubs = graphqlTriggers;
 // Disable notification
 // exports.notification = require('./notification');
+
+exports.cronJobs = require('./cron').crons;
