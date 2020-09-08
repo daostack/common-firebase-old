@@ -41,8 +41,10 @@ Note that this these cloud functions will operate on the production instance if 
 To deploy these functions, you will need some secrets in ./functions/_keys.
 Please ask the administrators for these keys.
 
+
 ```
-firebase deploy --only functions
+yarn deploy:staging
+yarn deploy:production
 ```
 
 ### Development
