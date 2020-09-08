@@ -22,13 +22,14 @@
     "data:backup": "./firestore/data.sh -backup",
     "data:update": "./firestore/data.sh -update",
     "env": "./functions/env/env.sh",
-    "precommit": "lint-staged && yarn test",
+    "precommit": "lint-staged",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --collectCoverage",
     "ci:setup": "yarn use:ci",
     "ci:test": "yarn test",
-    "test:badges": "yarn test:coverage && jest-coverage-badges --output \"./docs/assests/badges\""
+    "test:badges": "yarn test:coverage && jest-coverage-badges --output \"./docs/assests/badges\"",
+    "clean": "find ./ -name '*.log' -delete"
   },
   "engines": {
     "node": "10"
@@ -68,6 +69,8 @@
   "devDependencies": {
     "@types/jest": "^26.0.10",
     "@types/sinon": "^9.0.5",
+    "@typescript-eslint/eslint-plugin": "^4.1.0",
+    "@typescript-eslint/parser": "^4.1.0",
     "babel-jest": "^26.3.0",
     "concurrently": "^5.3.0",
     "eslint": "^7.8.1",

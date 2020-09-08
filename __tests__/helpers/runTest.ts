@@ -1,7 +1,8 @@
 import * as sinon from 'sinon';
-const test = require('firebase-functions-test')();
-
 import * as admin from 'firebase-admin';
+import functionsTest from 'firebase-functions-test';
+
+const test = functionsTest();
 
 export const runTest = (testsFunc: (functions: any) => any) => {
   describe('Cloud Functions', () => {

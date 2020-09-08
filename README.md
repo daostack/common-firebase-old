@@ -108,7 +108,7 @@ Example usage:
 import { runTest } from '@helpers/runTest';
 
 // Required for the Firebase Setup
-const functions = require('@functions'); 
+import '@functions';
 
 runTest((funcs) => {
   it('should do stuff', () => {
