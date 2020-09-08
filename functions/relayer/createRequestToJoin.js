@@ -88,8 +88,6 @@ const createRequestToJoin = async (req, res) => {
     }
 
     await updateProposalById(proposalId, { retries: 8 });
-    await minterToken(daoId, amount);
-    await updateDAOBalance(daoId);
     // TODO: add error handling wrapper
     res.send({ txHash: response.data.txHash, proposalId: proposalId });
   } catch (error) {
