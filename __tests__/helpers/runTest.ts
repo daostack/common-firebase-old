@@ -4,7 +4,7 @@ import functionsTest from 'firebase-functions-test';
 
 const test = functionsTest();
 
-export const runTest = (testsFunc: (functions: any) => any) => {
+export const runTest = (testsFunc: (functions: any) => any): void => {
   describe('Cloud Functions', () => {
     let functions, adminInitStub;
 
