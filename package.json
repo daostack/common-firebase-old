@@ -23,7 +23,7 @@
     "data:backup": "./firestore/data.sh -backup",
     "data:update": "./firestore/data.sh -update",
     "env": "./env/env.sh",
-    "test": "yarn use:dev && jest",
+    "test": "jest",
     "test:watch": "yarn test --watch",
     "test:coverage": "yarn test --collectCoverage",
     "ci:test": "start-server-and-test 'yarn emulator:headless' 4000 'yarn test'",
