@@ -1,6 +1,6 @@
-![Statements Coverage](docs/assests/badges/badge-statements.svg)
-![Functions Coverage](docs/assests/badges/badge-functions.svg)
-![Lines Coverage](docs/assests/badges/badge-lines.svg)
+![Statements Coverage](docs/assets/badges/badge-statements.svg)
+![Functions Coverage](docs/assets/badges/badge-functions.svg)
+![Lines Coverage](docs/assets/badges/badge-lines.svg)
 
 
 # Firebase code in support for common
@@ -110,7 +110,7 @@ Example usage:
 import { runTest } from '@helpers/runTest';
 
 // Required for the Firebase Setup
-const functions = require('@functions'); 
+import '@functions';
 
 runTest((funcs) => {
   it('should do stuff', () => {
