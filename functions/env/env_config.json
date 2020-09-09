@@ -1,0 +1,40 @@
+{
+  "environment": "dev",
+  "tests": {
+    "enabled": true
+  },
+  "firebase": {
+    "databaseURL": ""
+  },
+  "blockchain": {
+    "jsonRpcProvider": "http://127.0.0.1:8545",
+    "chainId": 0
+  },
+  "graphql": {
+    "graphqlHttpProvider": "http://127.0.0.1:8000/subgraphs/name/daostack",
+    "graphqlWsProvider": "http://127.0.0.1:8000/subgraphs/name/daostack",
+    "graphApiUrl": "http://127.0.0.1:8000/subgraphs/name",
+    "ipfsDataVersion": "00003"
+  },
+  "commonInfo": {
+    "commonToken": ""
+  },
+  "biconomy": {
+    "apiKey": "",
+    "whitelistKey": "",
+    "createProxy": "",
+    "execTransaction": "",
+    "create2Proxy": "",
+    "proxyFactory": "",
+    "masterCopy": ""
+  },
+  "mangopay": {
+    "apiUrl": "",
+    "clientId": "",
+    "daoStackWalletId": ""
+  },
+  "mail": {
+    "sender": "dev@common.io",
+    "adminMail": "jelle@daostack.io"
+  }
+}
