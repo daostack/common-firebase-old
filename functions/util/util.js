@@ -114,8 +114,10 @@ class Utils {
   }
 }
 
-module.exports.Utils = new Utils();
-module.exports.PROPOSAL_TYPE = {
-  Join: 'Join',
-  FundingRequest: 'FundingRequest',
+module.exports = {
+  Utils: new Utils(),
+  PROPOSAL_TYPE: {
+    Join: 'Join',
+    FundingRequest: 'FundingRequest',
+  },
 }

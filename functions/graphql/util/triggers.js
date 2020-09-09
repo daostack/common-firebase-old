@@ -2,8 +2,7 @@ const functions = require('firebase-functions');
 const { updateDaoById } = require('../Dao');
 const env = require('@env');
 const { createLegalUser, createWallet } = require('../../mangopay/mangopay');
-const util = require('../../util/util');
-const { PROPOSAL_TYPE } = require('../../util/util');
+const { Utils, PROPOSAL_TYPE } = require('../../util/util');
 
 const emailClient = require('../../email');
 
@@ -14,15 +13,15 @@ exports.newProposalCreated = functions
     const proposal = snap.data();
 
     if(proposal.name === PROPOSAL_TYPE.Join) {
-      const proposer = await util.getUserById(proposal.proposerId);
-      const common = await util.getCommonById(proposal.dao);
+      const proposer = await Utils.getUserById(proposal.proposerId);
+      const common = await Utils.getCommonById(proposal.dao);
 
       await emailClient.sendTemplatedEmail({
         to: proposer.email,
         templateKey: 'requestToJoinSubmitted',
         emailStubs: {
           name: proposer.displayName,
-          link: util.getCommonLink(common.id),
+          link: Utils.getCommonLink(common.id),
           commonName: common.metadata.name
         }
       })
@@ -57,7 +56,7 @@ exports.daoUpdated = functions.firestore
     const oldDao = snap.before.data();
 
     if (dao.register === 'registered' && (dao.register !== oldDao.register)) {
-      const creator = await util.getUserById(dao.members[0].userId);
+      const creator = await Utils.getUserById(dao.members[0].userId);
 
       await emailClient.sendTemplatedEmail({
         to: creator.email,
@@ -65,7 +64,7 @@ exports.daoUpdated = functions.firestore
         emailStubs: {
           name: creator.displayName,
           commonName: dao.name,
-          commonLink: util.getCommonLink(dao.id)
+          commonLink: Utils.getCommonLink(dao.id)
         }
       })
     }
@@ -77,7 +76,7 @@ exports.newDaoCreated = functions.firestore
     let newDao = snap.data();
 
     const userId = newDao.members[0].userId;
-    const userData = await util.getUserById(userId);
+    const userData = await Utils.getUserById(userId);
     const daoName = newDao.name;
 
     try {
@@ -85,7 +84,7 @@ exports.newDaoCreated = functions.firestore
       const { Id: mangopayWalletId } = await createWallet(mangopayId);
 
       if (mangopayId && mangopayWalletId) {
-        const commonLink = util.getCommonLink(newDao.id);
+        const commonLink = Utils.getCommonLink(newDao.id);
 
         console.debug(`Sending admin email for CommonCreated to ${env.mail.adminMail}`);
         console.debug(`Sending user email for CommonCreated to ${userData.email}`);
