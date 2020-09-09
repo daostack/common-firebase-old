@@ -1,4 +1,10 @@
 {
+  "ignorePatterns": [
+    "*.md",
+    "*.json",
+    "*.yml",
+    "*.sh"
+  ],
   "parserOptions": {
     // Required for certain syntax usages
     "ecmaVersion": 2018

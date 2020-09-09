@@ -1,19 +1,9 @@
 import { runTest } from '@helpers/runTest';
-import { getTemplatedEmail } from '@functions/email';
-const functions = require('@functions');
 import axios from "axios"
-const { env } = require('@env');
-const { arc, jsonRpcProvider } = require('../functions/settings')
+import { env } from '@env';
+import { arc, jsonRpcProvider } from '@functions/settings';
 
-const requestToJoinStubs = {
-  name: 'Test Name',
-  link: 'https://google.com',
-  commonName: 'Test Common Name'
-};
-
-const requestToJoinPartialStubs = {
-  name: 'Test Name'
-};
+import '@functions';
 
 runTest((funcs) => {
   it('check if we are using development settings', () => {
@@ -27,16 +17,15 @@ runTest((funcs) => {
     // if it is not, perhaps try `docker-compose up`
     try {
       await axios.get(jsonRpcProvider)
-    } catch(e) {
+    } catch (e) {
       expect(e.response.status).toEqual(400)
     }
+
     // the graph should be running, and responds with a redirect code on a get request
     try {
       await axios.get(arc.graphqlHttpProvider)
-    } catch(e) {
+    } catch (e) {
       expect(e.response.status).toEqual(400)
     }
-    
-
   })
 })
