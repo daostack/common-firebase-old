@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "concurrently -n \"Tests,Emulator\" \"yarn test:watch\" \"yarn emulator\"",
     "lint": "eslint .",
+    "clean": "find ./ -name '*.log' -delete",
     "logs": "firebase functions:log",
     "serve": "firebase serve --only functions",
     "shell": "firebase functions:shell",
@@ -50,7 +51,6 @@
     "jest-coverage-badges": "^1.1.2",
     "lint-staged": "^10.2.11",
     "sinon": "^9.0.3",
-    "start-server-and-test": "1.10.11",
     "supertest": "^4.0.2",
     "ts-jest": "^26.3.0",
     "typescript": "^4.0.2"
