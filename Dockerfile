@@ -21,7 +21,7 @@ RUN export JAVA_HOME
 RUN yarn
 RUN yarn global add firebase-tools
 
-RUN firebase use staging --token 1//03AnLmd_hpCJtCgYIARAAGAMSNwF-L9IrDLhVD3-Z_ew5ePZapEzzv48DMrXeOKk_zLaBEydJTvxE79PpNP--bVH8XCFSptVYf2s
+RUN firebase use staging --token $firebaseToken
 
 # Firestore
 EXPOSE 8080
