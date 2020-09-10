@@ -56,5 +56,10 @@
   "private": true,
   "workspaces": [
     "functions"
-  ]
+  ],
+  "_moduleAliases": {
+    "@env": "./functions/env",
+    "@settings": "./functions/settings",
+    "@util": "./functions/util"
+  }
 }
