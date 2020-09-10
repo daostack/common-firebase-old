@@ -33,8 +33,8 @@ jobs:
       - name: Install packages
         run: yarn install
       
-#      - name: Start docker containers
-#        run: docker-compose up -d
+      - name: Start docker containers
+        run: docker-compose up -d
 
       - name: Setup CI environment
         run: yarn use:ci
