@@ -32,12 +32,20 @@ jobs:
 
       - name: Install packages
         run: yarn install
-      
-      - name: Start docker containers
-        run: docker-compose up -d
+
+#      - name: Start docker containers
+#        run: docker-compose up -d
 
       - name: Setup CI environment
-        run: yarn use:ci
+        run: yarn use:ci --token ${{ secrets.FIREBASE_TOKEN }}
+
+#      - name: Run Fire Suit
+#        run: yarn emulator:headless &
+#
+#      - name: Give some time to fire suite to start
+#        run: sleep 10
 
       - name: Run tests
-        run: yarn ci:test
+        run: |
+          yarn emulator:headless &
+          sleep 30 && yarn ci:test
