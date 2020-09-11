@@ -20,6 +20,11 @@ jobs:
         with:
           node-version: 10.22.0
 
+      - name: Setting-up JAVA
+        uses: actions/setup-java@v1.3.0
+        with:
+          java-version: "12.x"
+
       - uses: actions/cache@v2
         with:
           path: '**/node_modules'
@@ -27,12 +32,14 @@ jobs:
 
       - name: Install packages
         run: yarn install
-      
+
       - name: Start docker containers
         run: docker-compose up -d
 
       - name: Setup CI environment
-        run: yarn use:ci 
+        run: yarn use:ci --token ${{ secrets.FIREBASE_TOKEN }}
 
       - name: Run tests
-        run: yarn ci:test
+        run: |
+          yarn emulator:headless &
+          sleep 30 && yarn ci:test
