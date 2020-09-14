@@ -33,7 +33,7 @@
     "daoStackWalletId": ""
   },
   "mail": {
-    "sender": "dev@common.io",
-    "adminMail": "jelle@daostack.io"
+    "sender": "support@common.io",
+    "adminMail": "support@common.io"
   }
 }
