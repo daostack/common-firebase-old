@@ -4,6 +4,10 @@ const db = admin.firestore();
 
 const COLLECTION_NAME = 'users';
 
+async function findUserById(userId) {
+    return db.collection('COLLECTION_NAME').doc(`${userId}`)
+}
+
 async function findUserByAddress(ethereumAddress, key = 'safeAddress') {
     const query = db.collection(COLLECTION_NAME)
         .where(key, `==`, ethereumAddress)

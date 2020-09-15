@@ -1,3 +1,5 @@
+import { INotification } from ".";
+
 /* eslint-disable no-unused-vars */
 const functions = require('firebase-functions');
 const Notification = require('./notification');
@@ -60,27 +62,20 @@ const userInfoTrigger = functions.firestore.document('/users/{userId}')
       }
     }
     return Promise.resolve(null);
-})
-
-const sendFollowerNotification = functions.firestore.document('/notification/follow/{userId}/{targetUid}')
-  .onCreate(async (snapshot, context) => {
-    const userId = context.params.userId;
-    const targetUid = context.params.targetUid;
-    // response.send(`Change: ${change.after.val()} - ID: ${commonId}`)
-
-    console.log(`uid: ${targetUid} - ID: ${userId}`);
-    const tokenRef = admin.firestore().collection('users').doc(`${targetUid}`)
-    const tokens = await tokenRef.get().then(doc => { return doc.data().tokens })
-    const follower = await admin.auth().getUser(userId);
-
-    console.log(`tokens: ${tokens}  - follower: ${follower.displayName}`);
-
-    let title = 'You have a new follower';
-    let body = `${follower.displayName} is now following you.`
-    let image = follower.photoURL
-
-    return Notification.send(tokens, title, body, image);
   })
+
+const sendFollowerNotification = async (notification: INotification, tokens: [string]) => {
+
+  const follower = await admin.auth().getUser(notification.userId);
+
+  console.log(`tokens: ${tokens}  - follower: ${follower.displayName}`);
+
+  let title = 'You have a new follower';
+  let body = `${follower.displayName} is now following you.`
+  let image = follower.photoURL
+
+  return Notification.send(tokens, title, body, image);
+}
 
 // Disable following logic
 // module.exports = { userInfoTrigger, sendFollowerNotification };
