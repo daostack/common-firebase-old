@@ -1,7 +1,11 @@
-const admin = require('firebase-admin');
+import admin from 'firebase-admin';
 const messaging = admin.messaging();
 
-module.exports = new class Notification {
+export interface INotification {
+  send: any
+}
+
+export default new class Notification <INotification> {
   send(tokens, title, body, image = '', options = {
     contentAvailable: true,
     mutable_content: true,

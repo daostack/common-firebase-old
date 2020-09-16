@@ -1,4 +1,10 @@
-import { INotification } from ".";
+import { INotificationModel } from ".";
+
+declare global {
+  interface Array<T> {
+    diff(array: Array<T>);
+  }
+}
 
 /* eslint-disable no-unused-vars */
 const functions = require('firebase-functions');
@@ -8,7 +14,7 @@ const admin = require('firebase-admin');
 // Follow User
 function follow(userId, userList) {
   console.log('Follow User', userId, userList);
-  for (var targetUid of userList) {
+  for (const targetUid of userList) {
     console.log('New follow', userId, targetUid);
     const writeNotifications = admin.firestore().doc(`notification/follow/${userId}/${targetUid}`).set({ createdAt: new Date() }, { merge: false });
     const writeFollow = admin.firestore().doc(`users/${targetUid}`).update({ follower: admin.firestore.FieldValue.arrayUnion(userId) })
@@ -64,15 +70,15 @@ const userInfoTrigger = functions.firestore.document('/users/{userId}')
     return Promise.resolve(null);
   })
 
-const sendFollowerNotification = async (notification: INotification, tokens: [string]) => {
+const sendFollowerNotification = async (notification: INotificationModel, tokens: [string]) => {
 
   const follower = await admin.auth().getUser(notification.userId);
 
   console.log(`tokens: ${tokens}  - follower: ${follower.displayName}`);
 
-  let title = 'You have a new follower';
-  let body = `${follower.displayName} is now following you.`
-  let image = follower.photoURL
+  const title = 'You have a new follower';
+  const body = `${follower.displayName} is now following you.`
+  const image = follower.photoURL
 
   return Notification.send(tokens, title, body, image);
 }

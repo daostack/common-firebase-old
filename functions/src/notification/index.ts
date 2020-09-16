@@ -1,7 +1,7 @@
-const functions = require('firebase-functions');
-const { findUserById } = require('../db/userDbService');
+import * as functions from 'firebase-functions';
+import { findUserById } from '../db/userDbService';
 
-export interface INotification {
+export interface INotificationModel {
     userId: string,
     objectId: string,
     type: string,
@@ -22,18 +22,19 @@ export enum NOTIFICATION_TYPES {
 }
 
 // const { userInfoTrigger, sendFollowerNotification } = require('./follow');
-const { commonCreation, commonCreationNotification } = require('./commonCreation');
+import { commonCreation, commonCreationNotification } from './commonCreation';
+import { QueryDocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
 
 // exports.userInfoTrigger = userInfoTrigger;
 // exports.sendFollowerNotification = sendFollowerNotification;
 exports.commonCreation = commonCreation;
 
 //const commonCreationNotification = functions.firestore.document('/notification/commonCreation/{userId}/{commonId}')
-functions.firestore.document('/notification').onCreate(async (snapshot) => {
-    return processNotificationEvent(snapshot)
+functions.firestore.document('/notification').onCreate(async (snapshot: QueryDocumentSnapshot) => {
+    return processNotificationEvent(snapshot.data() as INotificationModel)
 });
 
-const processNotificationEvent = async (notification: INotification) => {
+const processNotificationEvent = async (notification: INotificationModel) => {
     const tokenRef = findUserById(notification.userId);
     const tokens = await tokenRef.get().then(doc => { return doc.data().tokens });
 

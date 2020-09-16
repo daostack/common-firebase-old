@@ -1,11 +1,11 @@
-import { INotification, NOTIFICATION_TYPES } from ".";
+import { INotificationModel, NOTIFICATION_TYPES } from ".";
 import { createNotification } from '../db/notificationDbService'
 
-const functions = require('firebase-functions');
-const Notification = require('./notification');
-const admin = require('firebase-admin');
+import * as functions from 'firebase-functions';
+import Notification, { INotification } from './notification';
+import admin from 'firebase-admin';
 
-const commonCreation = functions.firestore.document('/daos/{daoId}')
+export const commonCreation = functions.firestore.document('/daos/{daoId}')
   .onCreate(async (snapshot, context) => {
     createNotification
     return admin.firestore().doc(`notification`).set({
@@ -16,16 +16,14 @@ const commonCreation = functions.firestore.document('/daos/{daoId}')
     })
   });
 
-const commonCreationNotification = async (notification: INotification, tokens: [string]) => {
+export const commonCreationNotification = async (notification: INotificationModel, tokens: [string]) => {
 
   const commonRef = await admin.firestore().collection('daos').doc(`${notification.objectId}`)
   const common = await commonRef.get().then(doc => { return doc.data() })
 
-  let title = 'Your common was created 🎉';
-  let body = `${common.name} is available on common list.`
-  let image = common.metadata.avatar || '';
+  const title = 'Your common was created 🎉';
+  const body = `${common.name} is available on common list.`
+  const image = common.metadata.avatar || '';
 
   return Notification.send(tokens, title, body, image);
 }
-
-module.exports = { commonCreation, commonCreationNotification };
