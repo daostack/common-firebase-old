@@ -18,18 +18,19 @@ import * as graphql from './graphql';
 import * as graphqlTriggers from './graphql/util/triggers';
 import * as  mangopay from './mangopay';
 import * as mangopayTriggers from './mangopay/triggers';
+import * as notification from './notification';
 
 // Add the __tests__ endpoints only if enabled
 if(env.tests.enabled) {
-  exports.tests = require('../tests').tests;
+  exports.tests = require('./tests').tests;
 }
 
 exports.relayer = relayer.relayer;
 exports.graphql = graphql.graphql;
 exports.mangopay = mangopay.mangopay;
+exports.notification = notification;
 exports.mangopaySubs = mangopayTriggers;
 exports.graphqlSubs = graphqlTriggers;
-// Disable notification
-// exports.notification = require('./notification');
+
 
 exports.cronJobs = require('./cron').crons;
