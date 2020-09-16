@@ -1,11 +1,12 @@
 import admin from 'firebase-admin';
+
 const messaging = admin.messaging();
 
 export interface INotification {
   send: any
 }
 
-export default new class Notification <INotification> {
+export default new class Notification implements INotification {
   send(tokens, title, body, image = '', options = {
     contentAvailable: true,
     mutable_content: true,

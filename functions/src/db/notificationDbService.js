@@ -9,6 +9,5 @@ async function createNotification(doc) {
 }
 
 module.exports = {
-    findUserByAddress,
-    updateUser
+    createNotification
 };

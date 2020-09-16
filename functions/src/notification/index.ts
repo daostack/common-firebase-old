@@ -35,8 +35,11 @@ functions.firestore.document('/notification').onCreate(async (snapshot: QueryDoc
 });
 
 const processNotificationEvent = async (notification: INotificationModel) => {
-    const tokenRef = findUserById(notification.userId);
-    const tokens = await tokenRef.get().then(doc => { return doc.data().tokens });
+    const tokenRef = await findUserById(notification.userId);
+
+    const tokens = await tokenRef
+      .get()
+      .then(doc => doc.data().tokens);
 
     switch (notification.type) {
         case NOTIFICATION_TYPES.CREATION_COMMON:

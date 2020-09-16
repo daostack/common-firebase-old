@@ -3,7 +3,7 @@
   "description": "Cloud Functions for Firebase",
   "scripts": {
     "build:dev": "rimraf ./functions/dist/**/* && tsc -p tsconfig.json --watch",
-    "dev": "concurrently -n \"Tests,Emulator\" \"yarn test:watch\" \"yarn emulator\"",
+    "dev": "concurrently -n \"Tests,Emulator,Compiler\" \"yarn test:watch\" \"yarn emulator\" \"nodemon\"",
     "lint": "eslint .",
     "clean": "find ./ -name '*.log' -delete",
     "logs": "firebase functions:log",
@@ -31,10 +31,19 @@
     "test:watch": "jest --watch",
     "test:coverage": "yarn test --collectCoverage",
     "test:badges": "yarn test:coverage && jest-coverage-badges --output \"./docs/assets/badges\"",
-    "precommit": "lint-staged && yarn test"
+    "precommit": "lint-staged && yarn test",
+    "compile": "tsc -p .",
+    "compile:watch": "nodemon"
   },
   "engines": {
     "node": "10"
+  },
+  "nodemonConfig": {
+    "ext": "*",
+    "exec": "yarn compile",
+    "watch": [
+      "functions/src/*"
+    ]
   },
   "devDependencies": {
     "@types/express": "^4.17.8",
@@ -51,6 +60,7 @@
     "jest": "^26.4.2",
     "jest-coverage-badges": "^1.1.2",
     "lint-staged": "^10.2.11",
+    "nodemon": "^2.0.4",
     "sinon": "^9.0.3",
     "supertest": "^4.0.2",
     "ts-jest": "^26.3.0",

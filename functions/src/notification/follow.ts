@@ -7,9 +7,9 @@ declare global {
 }
 
 /* eslint-disable no-unused-vars */
-const functions = require('firebase-functions');
-const Notification = require('./notification');
-const admin = require('firebase-admin');
+import functions from 'firebase-functions';
+import Notification from './notification';
+import admin from 'firebase-admin';
 
 // Follow User
 function follow(userId, userList) {
@@ -27,7 +27,7 @@ function follow(userId, userList) {
   }
 }
 
-function unfollow(userId, userList) {
+const unfollow = (userId, userList) => {
   // let tasks = [];
   for (const targetUid of userList) {
     const writeUnFollow = admin.firestore().doc(`users/${targetUid}`).update({ follower: admin.firestore.FieldValue.arrayRemove(userId) })

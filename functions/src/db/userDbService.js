@@ -37,5 +37,6 @@ async function updateUser(userId, doc) {
 
 module.exports = {
     findUserByAddress,
+    findUserById,
     updateUser
 };
