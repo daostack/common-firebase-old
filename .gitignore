@@ -69,6 +69,7 @@ adminsdk-keys.json
 
 .idea
 functions/_keys/*
+functions/dist
 
 functions/node_modules/
 .DS_Store

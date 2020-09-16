@@ -2,7 +2,7 @@ import * as sinon from 'sinon';
 import * as admin from 'firebase-admin';
 import functionsTest from 'firebase-functions-test';
 
-import functions from '@functions';
+import * as functions from '@functions';
 
 const test = functionsTest();
 

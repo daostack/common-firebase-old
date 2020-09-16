@@ -2,6 +2,7 @@
   "name": "@common/firebase",
   "description": "Cloud Functions for Firebase",
   "scripts": {
+    "build:dev": "rimraf ./functions/dist/**/* && tsc -p tsconfig.json --watch",
     "dev": "concurrently -n \"Tests,Emulator\" \"yarn test:watch\" \"yarn emulator\"",
     "lint": "eslint .",
     "clean": "find ./ -name '*.log' -delete",
@@ -60,8 +61,8 @@
     "functions"
   ],
   "_moduleAliases": {
-    "@env": "./functions/env",
-    "@settings": "./functions/settings",
-    "@util": "./functions/util"
+    "@env": "./functions/src/env",
+    "@settings": "./functions/src/settings",
+    "@util": "./functions/src/util"
   }
 }
