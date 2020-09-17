@@ -42,7 +42,6 @@
   "engines": {
     "node": "10"
   },
-
   "devDependencies": {
     "@types/jest": "^26.0.10",
     "@types/sinon": "^9.0.5",
@@ -59,10 +58,16 @@
     "lint-staged": "^10.2.11",
     "sinon": "^9.0.3",
     "ts-jest": "^26.3.0",
-    "typescript": "^4.0.2"
+    "typescript": "^4.0.2",
+    "module-alias": "^2.2.2"
   },
   "private": true,
   "workspaces": [
     "functions"
-  ]
+  ],
+  "_moduleAliases": {
+    "@env": "./functions/env",
+    "@settings": "./functions/settings",
+    "@util": "./functions/util"
+  }
 }
