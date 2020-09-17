@@ -181,7 +181,7 @@ exports.watchForExecutedProposals = functions.firestore
       data.executed === true &&
       data.winningOutcome === 0
     ) {
-      await cancelPreauthorizedPayment(data.description.preAuthId);
+       // await cancelPreauthorizedPayment(data.description.preAuthId);
     }
 
     if (
