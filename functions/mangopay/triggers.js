@@ -220,4 +220,5 @@ exports.watchForExecutedProposals = functions.firestore
         })
       ])
     }
+    return true
   });
