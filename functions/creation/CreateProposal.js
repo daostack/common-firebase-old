@@ -6,7 +6,9 @@ const { arc, PROPOSAL_TYPE } = require('../settings')
 const { cancelPreauthorizedPayment } = require('../mangopay/mangopay');
 const { updateProposalById } = require('../graphql/Proposal');
 const {first} = require('rxjs/operators');
-
+const Relayer = require('../relayer/relayer');
+const ethers = require('ethers');
+const abi = require('../relayer/util/abi.json')
   // data must look like this
   // {
   //   title: `A test proposal on ${Date()}`,
@@ -28,9 +30,7 @@ const preCreateRequestToJoin = async (req) => {
 
     const uid = await Utils.verifyId(idToken);
     const userData = await Utils.getUserById(uid);
-
     const IPFS_DATA_VERSION = env.graphql.ipfsDataVersion;
-
     const dao = arc.dao(daoId);
 
     let joinPlugin;
@@ -52,7 +52,6 @@ const preCreateRequestToJoin = async (req) => {
     // if (!data.funding) {
     //   throw Error('"funding" argument must be given');
     // }
-    const fee = Number(data.funding);
     const newData = {...data, VERSION: IPFS_DATA_VERSION};
     console.log('saving ipfs data');
     // not working :-()
@@ -68,8 +67,8 @@ const preCreateRequestToJoin = async (req) => {
     };
 
     const errorHandler = async () => {
-      // const errorJoinPlugin = await dao.plugin({where: {name: PROPOSAL_TYPE.Join}});
-      const oldJoinContract  = await arc.getContract(joinPlugin.coreState.address);
+      const errorJoinPlugin = await dao.plugin({where: {name: PROPOSAL_TYPE.Join}});
+      const oldJoinContract  = await arc.getContract(errorJoinPlugin.coreState.address);
       const joinContract = await oldJoinContract.addProvider();
       const proposer = userData.safeAddress;
 
@@ -109,7 +108,7 @@ const preCreateRequestToJoin = async (req) => {
     console.log('preconditions are ok - creating the transaction');
     const { contract, method, args } = await joinPlugin.createProposalTransaction(params);
     const encodedData = contract.interface.functions[method].encode(args);
-    const safeTxHash = await Utils.createSafeTransactionHash(userData.safeAddress, contract.address, 0, encodedData);
+    const safeTxHash = await Utils.createSafeTransactionHash(userData.safeAddress, contract.address, '0', encodedData);
     return {encodedData, safeTxHash, toAddress: contract.address}
   } catch (error) {
     throw error; 
@@ -152,7 +151,7 @@ const createRequestToJoin = async (req ) => {
     if (response.status !== 200) {
       console.error('Request to join failed, tx rejected in Relayer')
       console.error(response.data)
-      res.status(500).send({ error: 'Request to join failed', errorCode: 104, data: response.data })
+      console.error('Request to join failed, Transaction failed in relayer')
       cancelPreauthorizedPayment(preAuthId);
       return
     }
@@ -169,11 +168,7 @@ const createRequestToJoin = async (req ) => {
     if (!events.JoinInProposal) {
       // TODO: add error handling wrapper
       console.error('Request to join failed, Transaction was mined, but no JoinInProposal event was not found in the receipt')
-      res.status(500).send({
-        txHash: response.data.txHash,
-        error: 'Transaction was mined, but no JoinInProposal event was not found in the receipt'
-      })
-      return
+      throw new Error('Transaction was mined, but no JoinInProposal event was not found in the receipt')
     }
 
     const proposalId = events.JoinInProposal._proposalId
@@ -181,12 +176,7 @@ const createRequestToJoin = async (req ) => {
 
     if (!proposalId) {
       // TODO: add error handling wrapper
-      res.status(500).send({
-        txHash: response.data.txHash,
-        error: 'Transation was mined, but no proposalId was found in the JoinInProposal event'
-      });
-      console.error('Request to join failed, Transaction was mined, but no proposalId was found in the JoinInProposal event')
-      return
+      throw new Error('Request to join failed, Transaction was mined, but no proposalId was found in the JoinInProposal event')
     }
 
     await updateProposalById(proposalId, { retries: 8 });

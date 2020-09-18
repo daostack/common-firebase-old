@@ -78,6 +78,22 @@ const PROPOSAL_TYPE = {
   FundingRequest: 'FundingRequest',
 };
 
+const PROPOSAL_STAGE = {
+  ExpiredInQueue: '0',
+  Executed: '1',
+  Queued: '2',
+  PreBoosted: '3',
+  Boosted: '4',
+  QuietEndingPeriod: '5',
+};
+
+
+const PROPOSAL_STAGES_HISTORY = [
+  PROPOSAL_STAGE.ExpiredInQueue,
+  PROPOSAL_STAGE.Executed,
+];
+
+const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 module.exports = {
     arc,
@@ -91,4 +107,6 @@ module.exports = {
     retryOptions,
     ipfsDataVersion,
     PROPOSAL_TYPE,
+    PROPOSAL_STAGES_HISTORY,
+    NULL_ADDRESS
 }

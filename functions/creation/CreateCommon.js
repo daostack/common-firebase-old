@@ -1,5 +1,5 @@
 // const Utils = require('../util/util');
-const { IpfsClient, provider } = require('../settings');
+const { IpfsClient, provider, arc } = require('../settings');
 const { env } = require('@env');
 const DAOFactoryABI = require('@daostack/common-factory/abis/DAOFactory');
 const {getForgeOrgData} = require('@daostack/common-factory');
@@ -7,7 +7,7 @@ const { execTransaction } = require('../relayer/util/execTransaction');
 const { Utils } = require('../util/util');
 const { updateDaoById } = require('../graphql/Dao')
 
-const preCommonCreation = async (req, arc) => {
+const preCommonCreation = async (req) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const {
@@ -82,7 +82,7 @@ const preCommonCreation = async (req, arc) => {
   }
 }
 
-const createCommon = async (req, arc) => {
+const createCommon = async (req) => {
     const { encodedData, signedData, idToken, toAddress } = req.body;
     const reqest = {
       body: {
@@ -112,7 +112,7 @@ const createCommon = async (req, arc) => {
     const newOrgEvent = events.NewOrg;
     const daoId = newOrgEvent._avatar;
     await updateDaoById(daoId, { retries: 6 });
-    return response
+    return { daoId }
 };
 
  module.exports = { preCommonCreation, createCommon };

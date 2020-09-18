@@ -2,12 +2,11 @@ const functions = require('firebase-functions');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const env = require('@env')
-
-const { arc } = require('../settings')
 const { responseExecutor } = require('../util/responseExecutor');
 const { createCommon, preCommonCreation } = require('./CreateCommon')
 const { preCreateRequestToJoin, createRequestToJoin  } = require('./CreateProposal')
+const { preVoteProposal, voteProposal  } = require('./VoteProposal')
+const { preCreateFundingProposal, createFundingProposal } = require('./CreateFundingProposal');
 // const { Utils } = require('../util/util');
 // Utils.fetchAllContrarcts();
 
@@ -27,7 +26,7 @@ create.use(cors({ origin: true }));
 create.post('/preCommonCreation', async (req, res) => {
   responseExecutor(
     async () => {
-      return await preCommonCreation(req, arc);
+      return await preCommonCreation(req);
     },
     {
       req,
@@ -41,7 +40,7 @@ create.post('/preCommonCreation', async (req, res) => {
 create.post('/createCommon', async (req, res) => {
   responseExecutor(
     async () => {
-      return await createCommon(req, arc);
+      return await createCommon(req);
     },
     {
       req,
@@ -79,5 +78,61 @@ create.post('/createRequestToJoin', async (req, res) => {
     }
   );
 })
+
+  create.post('/preCreateFundingProposal', async (req, res) => {
+    responseExecutor(
+      async () => {
+        return await preCreateFundingProposal(req);
+      },
+      {
+        req,
+        res,
+        successMessage: `Pre common creation pass!`,
+        errorMessage: `Unable to create a wallet!`
+      }
+    );
+})
+  
+  create.post('/createFundingProposal', async (req, res) => {
+    responseExecutor(
+      async () => {
+        return await createFundingProposal(req);
+      },
+      {
+        req,
+        res,
+        successMessage: `Common Created successfully!`,
+        errorMessage: `Unable to create a wallet!`
+      }
+    );
+})
+
+  create.post('/preVotePropoal', async (req, res) => {
+    responseExecutor(
+      async () => {
+        return await preVoteProposal(req);
+      },
+      {
+        req,
+        res,
+        successMessage: `Pre common creation pass!`,
+        errorMessage: `Unable to create a wallet!`
+      }
+    );
+  })
+  
+  create.post('/votePropoal', async (req, res) => {
+    responseExecutor(
+      async () => {
+        return await voteProposal(req);
+      },
+      {
+        req,
+        res,
+        successMessage: `Common Created successfully!`,
+        errorMessage: `Unable to create a wallet!`
+      }
+    );
+  })
 
 exports.create = functions.runWith(runtimeOptions).https.onRequest(create);
