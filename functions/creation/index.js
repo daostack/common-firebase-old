@@ -3,10 +3,10 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { responseExecutor } = require('../util/responseExecutor');
-const { createCommon, preCommonCreation } = require('./CreateCommon')
-const { preCreateRequestToJoin, createRequestToJoin  } = require('./CreateProposal')
+const { createCommon, createCommonTransaction } = require('./Common')
+const { createRequestToJoinTransaction, createRequestToJoin  } = require('./RequestToJoin')
 const { preVoteProposal, voteProposal  } = require('./VoteProposal')
-const { preCreateFundingProposal, createFundingProposal } = require('./CreateFundingProposal');
+const { preCreateFundingProposal, createFundingProposal } = require('./FundingProposal');
 // const { Utils } = require('../util/util');
 // Utils.fetchAllContrarcts();
 
@@ -23,10 +23,10 @@ create.use(express.json());
 create.use(express.urlencoded({ extended: true }));
 create.use(cors({ origin: true }));
 
-create.post('/preCommonCreation', async (req, res) => {
+create.post('/createCommonTransaction', async (req, res) => {
   responseExecutor(
     async () => {
-      return await preCommonCreation(req);
+      return await createCommonTransaction(req);
     },
     {
       req,
@@ -51,10 +51,10 @@ create.post('/createCommon', async (req, res) => {
   );
 })
 
-create.post('/preCreateRequestToJoin', async (req, res) => {
+create.post('/createRequestToJoinTransaction', async (req, res) => {
   responseExecutor(
     async () => {
-      return await preCreateRequestToJoin(req);
+      return await createRequestToJoinTransaction(req);
     },
     {
       req,

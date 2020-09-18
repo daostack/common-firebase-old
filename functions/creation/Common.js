@@ -7,12 +7,12 @@ const { execTransaction } = require('../relayer/util/execTransaction');
 const { Utils } = require('../util/util');
 const { updateDaoById } = require('../graphql/Dao')
 
-const preCommonCreation = async (req) => {
+const createCommonTransaction = async (req) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const {
       idToken,
-      givenOpts
+      data
     } = req.body;
     const uid = await Utils.verifyId(idToken);
     const userData = await Utils.getUserById(uid);
@@ -30,7 +30,7 @@ const preCommonCreation = async (req) => {
       fundingToken: COMMONTOKENADDRESS,
       VERSION: IPFS_DATA_VERSION, // just some alphanumberic marker  that is useful for understanding what our data is shaped like
     };
-    const opts = {...defaultOptions, ...givenOpts};
+    const opts = {...defaultOptions, ...data};
     console.log('saving data on ipfs: ', opts);
     const ipfsHash = await IpfsClient.addAndPinString(JSON.stringify(opts));
     console.log('ipfsHash ->', ipfsHash);
@@ -50,7 +50,7 @@ const preCommonCreation = async (req) => {
       ARC_VERSION,
     );
 
-    const data = {
+    const args = {
       DAOFactoryInstance: daoFactoryInfo.address,
       orgName: opts.name,
       founderAddresses: [opts.founderAddresses],
@@ -65,8 +65,8 @@ const preCommonCreation = async (req) => {
       deadline: opts.fundingGoalDeadline,
       metaData: ipfsHash,
     };
-    console.log('Calling DAOFactory.forgeOrg(...)', data);
-    const params = getForgeOrgData(data);
+    console.log('Calling DAOFactory.forgeOrg(...)', args);
+    const params = getForgeOrgData(args);
     const encodedData = daoFactoryContract.interface.functions.forgeOrg.encode(params)
 
     const safeTxHash = await Utils.createSafeTransactionHash(userData.safeAddress, daoFactoryContract.address, 0, encodedData);
@@ -115,4 +115,4 @@ const createCommon = async (req) => {
     return { daoId }
 };
 
- module.exports = { preCommonCreation, createCommon };
+ module.exports = { createCommonTransaction, createCommon };

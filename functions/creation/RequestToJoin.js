@@ -1,4 +1,3 @@
-// const Utils = require('../util/util');
 const { IpfsClient, provider } = require('../settings');
 const { env } = require('@env');
 const { Utils } = require('../util/util');
@@ -19,7 +18,7 @@ const abi = require('../relayer/util/abi.json')
   //   funding: new BN(100000),
   // .  payment: { ... }
   // };
-const preCreateRequestToJoin = async (req) => {
+const createRequestToJoinTransaction = async (req) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const {
@@ -187,4 +186,4 @@ const createRequestToJoin = async (req ) => {
   }
 }
 
- module.exports = { preCreateRequestToJoin, createRequestToJoin };
+ module.exports = { createRequestToJoinTransaction, createRequestToJoin };

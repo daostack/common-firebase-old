@@ -7,7 +7,7 @@ const { updateProposalById } = require('../graphql/proposal')
 const { arc, PROPOSAL_TYPE, PROPOSAL_STAGES_HISTORY, NULL_ADDRESS } = require('../settings')
 const {JoinProposal, FundingRequestProposal} = require('@daostack/arc.js');
 
-const preVotePropoal = async (req ) => {
+const preVoteProposal = async (req ) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const {
@@ -51,20 +51,19 @@ const preVotePropoal = async (req ) => {
     // .. we are runnning the error handler here to check conditions before sending the transaction ...
     // .. this is expensive, and once we have reduced such errors to the minimmum, we should to error handling only ...
     // .. when the transaction actually failed
-    logger.log('checking preconditions for voting');
+    console.log('checking preconditions for voting');
     await errorHandler();
-    logger.log('creating the vote transaction');
+    console.log('creating the vote transaction');
 
     const contract = await proposal.votingMachine();
     const params = [
       proposal.id, // proposalId
       data.vote, // a value between 0 to and the proposal number of choices.
-      amount.toString(), // amount of reputation to vote with . if _amount == 0 it will use all voter reputation.
+      '0', // amount of reputation to vote with . if _amount == 0 it will use all voter reputation.
       NULL_ADDRESS,
     ]
 
-    logger.log('waiting for the transaction to be processed');
-    logger.log('transactionHash -> ', receipt.transactionHash);
+    console.log('waiting for the transaction to be processed');
     const encodedData = contract.interface.functions.vote.encode(params)
     const safeTxHash = await Utils.createSafeTransactionHash(userData.safeAddress, contract.address, 0, encodedData);
     console.log('safeTxHash -->', safeTxHash);
@@ -78,7 +77,7 @@ const preVotePropoal = async (req ) => {
   }
 }
 
-const votePropoal = async (req ) => {
+const voteProposal = async (req ) => {
     const { encodedData, signedData, idToken, toAddress, proposalId } = req.body;
     const reqest = {
       body: {
@@ -92,10 +91,8 @@ const votePropoal = async (req ) => {
     const response = await execTransaction(reqest);
     console.log('response  ->', response);
     const receipt = await provider.waitForTransaction(response.txHash);
-
     await updateProposalById(proposalId, { retries: 8 }, receipt.blockNumber);
-
-    return { proposalId, ...response }
+    return { receipt }
 };
 
- module.exports = { preVotePropoal, votePropoal };
+ module.exports = { preVoteProposal, voteProposal };
