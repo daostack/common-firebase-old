@@ -7,7 +7,7 @@ const { updateProposalById } = require('../graphql/proposal')
 const { arc, PROPOSAL_TYPE, PROPOSAL_STAGES_HISTORY, NULL_ADDRESS } = require('../settings')
 const {JoinProposal, FundingRequestProposal} = require('@daostack/arc.js');
 
-const preVoteProposal = async (req ) => {
+const createVoteProposalTransaction = async (req ) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const {
@@ -95,4 +95,4 @@ const voteProposal = async (req ) => {
     return { receipt }
 };
 
- module.exports = { preVoteProposal, voteProposal };
+ module.exports = { createVoteProposalTransaction, voteProposal };

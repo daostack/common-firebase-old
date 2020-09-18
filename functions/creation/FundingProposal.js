@@ -1,16 +1,61 @@
 // const Utils = require('../util/util');
-const { IpfsClient, provider } = require('../settings');
 const { env } = require('@env');
 const { Utils } = require('../util/util');
-const { arc, PROPOSAL_TYPE } = require('../settings')
+const { IpfsClient, provider, arc, PROPOSAL_TYPE } = require('../settings')
 const { cancelPreauthorizedPayment } = require('../mangopay/mangopay');
 const { updateProposalById } = require('../graphql/Proposal');
 const { first } = require('rxjs/operators');
 const Relayer = require('../relayer/relayer');
 const ethers = require('ethers');
-const abi = require('../relayer/util/abi.json')
+const { execTransaction } = require('../relayer/util/execTransaction');
 
-const preCreateFundingProposal = async (req) => {
+const fundingCheck = async (daoId, safeAddress) => {
+
+  const dao = arc.dao(daoId);
+  const oldDaoContract = await arc.getContract(daoId);
+  const daoContract = await oldDaoContract.addProvider();
+
+  // lets first check some sanity things about the dao
+  const joinPlugin = await dao.plugin({ where: { name: PROPOSAL_TYPE.Join } });
+  const joinPluginState = await joinPlugin.fetchState();
+  const errorFundingRequestPlugin = await dao.plugin({ where: { name: 'FundingRequest' } });
+  const fundingRequestPluginState = await errorFundingRequestPlugin.fetchState();
+  const activationTime = fundingRequestPluginState.pluginParams.voteParams.activationTime;
+  if (activationTime > ((new Date()).getTime() / 1000)) {
+    throw Error(`Canot create a funding request as the plugin is not actived yet (it activates on ${activationTime})`);
+  }
+
+  // TODO: The "FUNDED_BEFORE_DEADLINE" flag can (and should) be set on common creation, not on "first proposal creation"
+  let fundingGoalReachedFlag = await daoContract.functions.db('FUNDED_BEFORE_DEADLINE');
+  if (fundingGoalReachedFlag !== 'TRUE') {
+    const errorJoinPlugin = await dao.plugin({
+      where: { name: PROPOSAL_TYPE.Join },
+    });
+    console.log(`fundingGoalReachedFlag is not TRUE (its value is "${fundingGoalReachedFlag}") - so we cannot create a proposal`);
+
+    const fundingGoal = Number(joinPluginState.pluginParams.fundingGoal);
+    console.log(`funding goal: ${fundingGoal}`);
+    if (fundingGoal !== 0) {
+      throw Error(`Invalidly configured DAO - funding goal is not 0, it is ${fundingGoal} instead`);
+    }
+
+    // TODO: check fundingGoal < dao.balance ?
+
+    if (joinPluginState.pluginParams.fundingGoalDeadline < new Date()) {
+      throw Error('Invalidly configured DAO - cannot create funding request (the fundingGoalDeadline of the join plugin is in the past, so we cannot set the fundingGoalReeched flag to true)');
+    }
+    console.log('We will try to reset the fundingGoalReachedFlag');
+    const joinContract = await arc.getContract(errorJoinPlugin.coreState.address);
+    const encodedData = joinContract.interface.functions.setFundingGoalReachedFlag.encode([]);
+    const safeTxHash = await Utils.createSafeTransactionHash(safeAddress, joinContract.address, '0', encodedData);
+    const setFlagTx = { encodedData, safeTxHash, toAddress: joinContract.address }
+
+    return setFlagTx;
+  }
+  return null;
+}
+
+const createFundingProposalTransaction = async (req) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const {
@@ -23,11 +68,7 @@ const preCreateFundingProposal = async (req) => {
     const userData = await Utils.getUserById(uid);
     const IPFS_DATA_VERSION = env.graphql.ipfsDataVersion;
     const dao = arc.dao(daoId);
-
-    const plugins = await dao.plugins().first();
-    const abi = arc.getABI({ abiName: 'FundingRequest', version: ARC_VERSION });
-    const interf = new ethers.utils.Interface(abi);
-
+    
     let fundingRequestPlugin;
     try {
       fundingRequestPlugin = await dao.plugin({
@@ -51,58 +92,9 @@ const preCreateFundingProposal = async (req) => {
       throw Error('"funding" argument must be given');
     }
 
-    const oldDaoContract = await arc.getContract(dao.id);
-    const daoContract = await oldDaoContract.addProvider();
-
-    // lets first check some sanity things about the dao
-    const joinPlugin = await dao.plugin({ where: { name: PROPOSAL_TYPE.Join } });
-    const joinPluginState = await joinPlugin.fetchState();
-    const errorFundingRequestPlugin = await dao.plugin({ where: { name: 'FundingRequest' } });
-    const fundingRequestPluginState = await errorFundingRequestPlugin.fetchState();
-    const activationTime = fundingRequestPluginState.pluginParams.voteParams.activationTime;
-    if (activationTime > ((new Date()).getTime() / 1000)) {
-      throw Error(`Canot create a funding request as the plugin is not actived yet (it activates on ${activationTime})`);
-    }
-
-    let setFlagTx;
-
-    // TODO: The "FUNDED_BEFORE_DEADLINE" flag can (and should) be set on common creation, not on "first proposal creation"
-    let fundingGoalReachedFlag = await daoContract.functions.db('FUNDED_BEFORE_DEADLINE');
-    if (fundingGoalReachedFlag !== 'TRUE') {
-      const errorJoinPlugin = await dao.plugin({
-        where: { name: PROPOSAL_TYPE.Join },
-      });
-      console.log(`fundingGoalReachedFlag is not TRUE (its value is "${fundingGoalReachedFlag}") - so we cannot create a proposal`);
-
-      const fundingGoal = Number(joinPluginState.pluginParams.fundingGoal);
-      console.log(`funding goal: ${fundingGoal}`);
-      if (fundingGoal !== 0) {
-        throw Error(`Invalidly configured DAO - funding goal is not 0, it is ${fundingGoal} instead`);
-      }
-
-      // TODO: check fundingGoal < dao.balance ?
-
-      if (joinPluginState.pluginParams.fundingGoalDeadline < new Date()) {
-        throw Error('Invalidly configured DAO - cannot create funding request (the fundingGoalDeadline of the join plugin is in the past, so we cannot set the fundingGoalReeched flag to true)');
-      }
-      console.log('We will try to reset the fundingGoalReachedFlag');
-      const joinContract = await arc.getContract(errorJoinPlugin.coreState.address);
-      const encodedData = joinContract.interface.functions.setFundingGoalReachedFlag.encode([]);
-      const safeTxHash = await Utils.createSafeTransactionHash(userData.safeAddress, joinContract.address, '0', encodedData);
-      setFlagTx = { encodedData, safeTxHash, toAddress: joinContract.address }
-
-      console.log(setFlagTxReceipt);
-      console.log('setFlagTxReceipt.transactionHash ->', setFlagTxReceipt.transactionHash);
-      fundingGoalReachedFlag = await daoContract.db('FUNDED_BEFORE_DEADLINE');
-      console.log(`fundingGoalReachedFlag value is now ${fundingGoalReachedFlag}`);
-      if (fundingGoalReachedFlag !== 'TRUE') {
-        throw Error('funding goal is not reached yet - cannot create a funding request');
-      }
-    }
-
     // TODO: check if the user is a member
     const ipfsdata = { ...data, VERSION: IPFS_DATA_VERSION };
-    const ipfsHash = await ipfsUpload({ description: JSON.stringify(ipfsdata)});
+    const ipfsHash = await IpfsClient.addAndPinString(JSON.stringify(ipfsdata));
     console.log('ipfsHash', ipfsHash);
 
     const params = {
@@ -117,8 +109,9 @@ const preCreateFundingProposal = async (req) => {
     const { contract, method, args } = await fundingRequestPlugin.createProposalTransaction(params);
     const encodedData = contract.interface.functions[method].encode(args);
     const safeTxHash = await Utils.createSafeTransactionHash(userData.safeAddress, contract.address, '0', encodedData);
-    return { fundingRequestTx: { encodedData, safeTxHash, toAddress: contract.address }, setFlagTx }
 
+    const setFlagTx = await fundingCheck(dao.id, userData.safeAddress);
+    return { fundingRequestTx: { encodedData, safeTxHash, toAddress: contract.address }, setFlagTx }
   } catch (error) {
     throw error;
   }
@@ -132,22 +125,65 @@ const createFundingProposal = async (req) => {
 
     const {
       idToken,
-      createProposalTx, // This is the signed transacxtion to create the proposal. 
-      preAuthId,
+      daoId,
+      fundingRequestTx, // This is the signed transacxtion to create the proposal. 
+      setFlagTx,
     } = req.body;
     const uid = await Utils.verifyId(idToken)
     const userData = await Utils.getUserById(uid);
     const safeAddress = userData.safeAddress
     const ethereumAddress = userData.ethereumAddress
 
+    if (setFlagTx) {
+      const reqest1 = {
+        body: {
+          to: setFlagTx.toAddress,
+          value: '0',
+          data: setFlagTx.encodedData,
+          signature: setFlagTx.signedData,
+          idToken: idToken,
+        }
+      }
+      const response = await execTransaction(reqest1);
+      await provider.waitForTransaction(response.txHash);
+    }
 
+    const oldDaoContract = await arc.getContract(daoId);
+    const daoContract = await oldDaoContract.addProvider();
+    const fundingGoalReachedFlag = await daoContract.db('FUNDED_BEFORE_DEADLINE');
+    if (fundingGoalReachedFlag !== 'TRUE') {
+      throw Error('funding goal is not reached yet - cannot create a funding request');
+    }  
 
+    const reqest2 = {
+      body: {
+        to: fundingRequestTx.toAddress,
+        value: '0',
+        data: fundingRequestTx.encodedData,
+        signature: fundingRequestTx.signedData,
+        idToken: idToken,
+      }
+    }
+    const response = await execTransaction(reqest2);
+    console.log('response -->', response);
+
+    const ARC_VERSION = env.commonInfo.arcVersion;
+    const abi = arc.getABI({abiName: 'FundingRequest', version: ARC_VERSION});
+    const interf = new ethers.utils.Interface(abi);
+
+    const receipt = await provider.waitForTransaction(response.txHash);
+    const events = Utils.getTransactionEvents(interf, receipt);
+    
+    if (!events.NewFundingProposal) {
+      throw Error('Expected (but did not find a NewFundingProposal event: something went wrong');
+    }
+    const proposalId = events.NewFundingProposal._proposalId;
     await updateProposalById(proposalId, { retries: 8 });
-    return { txHash: response.data.txHash, proposalId: proposalId }
+    return { proposalId };
   } catch (error) {
     console.error('Request to join failed')
     throw error;
   }
 }
 
-module.exports = { preCreateFundingProposal, createFundingProposal };
+module.exports = { createFundingProposalTransaction, createFundingProposal };

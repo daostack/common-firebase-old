@@ -5,8 +5,8 @@ const bodyParser = require('body-parser');
 const { responseExecutor } = require('../util/responseExecutor');
 const { createCommon, createCommonTransaction } = require('./Common')
 const { createRequestToJoinTransaction, createRequestToJoin  } = require('./RequestToJoin')
-const { preVoteProposal, voteProposal  } = require('./VoteProposal')
-const { preCreateFundingProposal, createFundingProposal } = require('./FundingProposal');
+const { createVoteProposalTransaction, voteProposal  } = require('./VoteProposal')
+const { createFundingProposalTransaction, createFundingProposal } = require('./FundingProposal');
 // const { Utils } = require('../util/util');
 // Utils.fetchAllContrarcts();
 
@@ -79,10 +79,10 @@ create.post('/createRequestToJoin', async (req, res) => {
   );
 })
 
-  create.post('/preCreateFundingProposal', async (req, res) => {
+  create.post('/createFundingProposalTransaction', async (req, res) => {
     responseExecutor(
       async () => {
-        return await preCreateFundingProposal(req);
+        return await createFundingProposalTransaction(req);
       },
       {
         req,
@@ -107,10 +107,10 @@ create.post('/createRequestToJoin', async (req, res) => {
     );
 })
 
-  create.post('/preVotePropoal', async (req, res) => {
+  create.post('/createVoteProposalTransaction', async (req, res) => {
     responseExecutor(
       async () => {
-        return await preVoteProposal(req);
+        return await createVoteProposalTransaction(req);
       },
       {
         req,
