@@ -8,6 +8,7 @@ const { first } = require('rxjs/operators');
 const Relayer = require('../relayer/relayer');
 const ethers = require('ethers');
 const { execTransaction } = require('../relayer/util/execTransaction');
+let retried = false;
 
 const fundingCheck = async (daoId, safeAddress) => {
 
@@ -113,7 +114,13 @@ const createFundingProposalTransaction = async (req) => {
     const setFlagTx = await fundingCheck(dao.id, userData.safeAddress);
     return { fundingRequestTx: { encodedData, safeTxHash, toAddress: contract.address }, setFlagTx }
   } catch (error) {
-    throw error;
+    if ( error.message.match('^No contract with address') && !retried ) {
+      retried = true;
+      await arc.fetchAllContrarcts(false);
+      createFundingProposalTransaction(req);
+    } else {
+      throw error; 
+    }
   }
 }
 

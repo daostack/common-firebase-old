@@ -8,6 +8,9 @@ const {first} = require('rxjs/operators');
 const Relayer = require('../relayer/relayer');
 const ethers = require('ethers');
 const abi = require('../relayer/util/abi.json')
+
+let retried = false;
+
   // data must look like this
   // {
   //   title: `A test proposal on ${Date()}`,
@@ -110,7 +113,14 @@ const createRequestToJoinTransaction = async (req) => {
     const safeTxHash = await Utils.createSafeTransactionHash(userData.safeAddress, contract.address, '0', encodedData);
     return {encodedData, safeTxHash, toAddress: contract.address}
   } catch (error) {
-    throw error; 
+    if ( error.message.match('^No contract with address') && !retried ) {
+      retried = true;
+      await arc.fetchAllContrarcts(false);
+      createRequestToJoinTransaction(req);
+      console.log('AAAAAAAAA  <<<<<<<<<');
+    } else {
+      throw error; 
+    }
   }
 }
 

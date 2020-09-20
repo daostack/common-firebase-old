@@ -3,15 +3,27 @@ const { Arc } = require('@daostack/arc.js');
 const { env } = require('@env');
 const IPFSApiClient = require('./util/IPFSClient')
 const gql = require('graphql-tag');
-
+const admin = require('firebase-admin');
 const graphHttpLink = env.graphql.graphqlHttpProvider;
 const graphwsLink = env.graphql.graphqlWsProvider;
 const databaseURL = env.firebase.databaseURL;
 const jsonRpcProvider = env.blockchain.jsonRpcProvider;
 const mangoPayApi = env.mangopay.apiUrl;
 const ipfsDataVersion = env.graphql.ipfsDataVersion;
+const ipfsProvider = env.graphql.ipfsProvider;
 
-const ipfsProvider = 'https://api.thegraph.com/ipfs-daostack/api/v0';
+if(env.environment === 'dev') {
+  admin.initializeApp();
+} else {
+  admin.initializeApp({
+    credential: admin.credential.cert(require('@env/adminsdk-keys.json')),
+    databaseURL: databaseURL
+  });
+}
+
+const db = admin.firestore();
+
+db.settings({ ignoreUndefinedProperties: true})
 
 const retryOptions = {
     retries: 4, // The maximum amount of times to retry the operation. Default is 10.
@@ -21,13 +33,10 @@ const retryOptions = {
 };
 
 const provider = new ethers.providers.JsonRpcProvider(jsonRpcProvider);
-// const provider = new ethers.providers.JsonRpcProvider('https://dai.poa.network');
-
-console.log('jsonRpcProvider ->', provider);
 
 const arc = new Arc({
-  graphqlHttpProvider: 'https://api.thegraph.com/subgraphs/name/daostack/v8_11_exp_kovan',
-  graphqlWsProvider: 'wss://api.thegraph.com/subgraphs/name/daostack/v8_11_exp_kovan',
+  graphqlHttpProvider: graphHttpLink,
+  graphqlWsProvider: graphwsLink,
   ipfsProvider: ipfsProvider,
   web3Provider: provider,
 });
@@ -37,8 +46,15 @@ ethers.Contract.prototype.addProvider = async function() {
 };
 
 
-Arc.prototype.fetchAllContrarcts = async function () {
-  console.log('AAAAA -->');
+Arc.prototype.fetchAllContrarcts = async function (useCache) {
+  const contracts = await db.collection('arc').doc('contract').get();
+  if (contracts.exists && useCache) {
+    const allContractInfos = JSON.parse(contracts.data().allContractInfos);
+    this.setContractInfos(allContractInfos);
+    console.log('ARC is uing cache');
+    return
+  }
+
   let allContractInfos = [];
   let contractInfos = null;
   let skip = 0;
@@ -65,11 +81,15 @@ Arc.prototype.fetchAllContrarcts = async function () {
   const universalContracts = await this.fetchUniversalContractInfos();
   allContractInfos.push(...universalContracts);
   this.setContractInfos(allContractInfos);
-  console.log('ARC 2 --> setContractInfos');
-  return allContractInfos;
+  console.log('ARC is not using cache');
+  db.collection('arc').doc('contract').set(
+    {
+      'allContractInfos': JSON.stringify(allContractInfos)
+    }
+  )
 }
 
-arc.fetchAllContrarcts();
+arc.fetchAllContrarcts(true);
 
 const IpfsClient = new IPFSApiClient(ipfsProvider);
 
@@ -108,5 +128,6 @@ module.exports = {
     ipfsDataVersion,
     PROPOSAL_TYPE,
     PROPOSAL_STAGES_HISTORY,
-    NULL_ADDRESS
+    NULL_ADDRESS,
+    db
 }
