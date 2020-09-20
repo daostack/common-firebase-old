@@ -109,18 +109,13 @@ const createRequestToJoinTransaction = async (req) => {
     await errorHandler();
     console.log('preconditions are ok - creating the transaction');
     const { contract, method, args } = await joinPlugin.createProposalTransaction(params);
+    console.log('Encoding transaction');
     const encodedData = contract.interface.functions[method].encode(args);
     const safeTxHash = await Utils.createSafeTransactionHash(userData.safeAddress, contract.address, '0', encodedData);
+    console.log('safeTxHash -->', safeTxHash);
     return {encodedData, safeTxHash, toAddress: contract.address}
   } catch (error) {
-    if ( error.message.match('^No contract with address') && !retried ) {
-      retried = true;
-      await arc.fetchAllContrarcts(false);
-      createRequestToJoinTransaction(req);
-      console.log('AAAAAAAAA  <<<<<<<<<');
-    } else {
-      throw error; 
-    }
+    throw error; 
   }
 }
 

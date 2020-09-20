@@ -1,13 +1,10 @@
 // const Utils = require('../util/util');
 const { provider } = require('../settings');
-const { env } = require('@env');
 const { execTransaction } = require('../relayer/util/execTransaction');
 const { Utils } = require('../util/util');
 const { updateProposalById } = require('../graphql/proposal')
 const { arc, PROPOSAL_TYPE, PROPOSAL_STAGES_HISTORY, NULL_ADDRESS } = require('../settings')
 const {JoinProposal, FundingRequestProposal} = require('@daostack/arc.js');
-
-let retried = false;
 
 const createVoteProposalTransaction = async (req ) => {
   // eslint-disable-next-line no-useless-catch
@@ -75,13 +72,7 @@ const createVoteProposalTransaction = async (req ) => {
       safeTxHash: safeTxHash
      }
   } catch (error) {
-    if ( error.message.match('^No contract with address') && !retried ) {
-      retried = true;
-      await arc.fetchAllContrarcts(false);
-      createVoteProposalTransaction(req);
-    } else {
-      throw error; 
-    }
+    throw error;
   }
 }
 

@@ -2,13 +2,11 @@ const functions = require('firebase-functions');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const { responseExecutor } = require('../util/responseExecutor');
+const { responseExecutor, responseCreateExecutor } = require('../util/responseExecutor');
 const { createCommon, createCommonTransaction } = require('./Common')
 const { createRequestToJoinTransaction, createRequestToJoin  } = require('./RequestToJoin')
 const { createVoteProposalTransaction, voteProposal  } = require('./VoteProposal')
 const { createFundingProposalTransaction, createFundingProposal } = require('./FundingProposal');
-// const { Utils } = require('../util/util');
-// Utils.fetchAllContrarcts();
 
 const runtimeOptions = {
   timeoutSeconds: 540, // Maximum time 9 mins
@@ -24,15 +22,15 @@ create.use(express.urlencoded({ extended: true }));
 create.use(cors({ origin: true }));
 
 create.post('/createCommonTransaction', async (req, res) => {
-  responseExecutor(
+  responseCreateExecutor(
     async () => {
-      return await createCommonTransaction(req);
+      return await createCommonTransaction(req)
     },
     {
       req,
       res,
-      successMessage: `Pre common creation pass!`,
-      errorMessage: `Unable to create a wallet!`
+      successMessage: `Create common transaction successfully!`,
+      errorMessage: `Unable to create a common transaction`
     }
   );
 })
@@ -46,21 +44,21 @@ create.post('/createCommon', async (req, res) => {
       req,
       res,
       successMessage: `Common Created successfully!`,
-      errorMessage: `Unable to create a wallet!`
+      errorMessage: `Unable to create common!`
     }
   );
 })
 
 create.post('/createRequestToJoinTransaction', async (req, res) => {
-  responseExecutor(
+  responseCreateExecutor(
     async () => {
       return await createRequestToJoinTransaction(req);
     },
     {
       req,
       res,
-      successMessage: `Pre common creation pass!`,
-      errorMessage: `Unable to create a wallet!`
+      successMessage: `Create requestToJoin transaction successfully!`,
+      errorMessage: `Unable to create a request to join transaction!`
     }
   );
 })
@@ -73,22 +71,22 @@ create.post('/createRequestToJoin', async (req, res) => {
     {
       req,
       res,
-      successMessage: `Common Created successfully!`,
-      errorMessage: `Unable to create a wallet!`
+      successMessage: `Request to join successfully!`,
+      errorMessage: `Unable to create a request to join!`
     }
   );
 })
 
   create.post('/createFundingProposalTransaction', async (req, res) => {
-    responseExecutor(
+    responseCreateExecutor(
       async () => {
         return await createFundingProposalTransaction(req);
       },
       {
         req,
         res,
-        successMessage: `Pre common creation pass!`,
-        errorMessage: `Unable to create a wallet!`
+        successMessage: `Create funding proposal transaction successfully!!`,
+        errorMessage: `Unable to create a funding proposal transaction`
       }
     );
 })
@@ -101,22 +99,22 @@ create.post('/createRequestToJoin', async (req, res) => {
       {
         req,
         res,
-        successMessage: `Common Created successfully!`,
-        errorMessage: `Unable to create a wallet!`
+        successMessage: `Create funding proposal successfully!`,
+        errorMessage: `Unable to create a funding proposal !`
       }
     );
 })
 
   create.post('/createVoteProposalTransaction', async (req, res) => {
-    responseExecutor(
+    responseCreateExecutor(
       async () => {
         return await createVoteProposalTransaction(req);
       },
       {
         req,
         res,
-        successMessage: `Pre common creation pass!`,
-        errorMessage: `Unable to create a wallet!`
+        successMessage: `Create a vote proposal transaction successfully!`,
+        errorMessage: `Unable to create vote transaction!`
       }
     );
   })
@@ -129,8 +127,8 @@ create.post('/createRequestToJoin', async (req, res) => {
       {
         req,
         res,
-        successMessage: `Common Created successfully!`,
-        errorMessage: `Unable to create a wallet!`
+        successMessage: `Vote for the proposal successfully!`,
+        errorMessage: `Unable to vote for a proposal !`
       }
     );
   })

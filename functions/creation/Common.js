@@ -79,13 +79,7 @@ const createCommonTransaction = async (req) => {
       safeTxHash: safeTxHash
      }
   } catch (error) {
-    if ( error.message.match('^No contract with address') && !retried ) {
-      retried = true;
-      await arc.fetchAllContrarcts(false);
-      createCommonTransaction(req);
-    } else {
-      throw error; 
-    }
+    throw error; 
   }
 }
 

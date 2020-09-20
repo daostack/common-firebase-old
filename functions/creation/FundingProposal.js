@@ -114,13 +114,7 @@ const createFundingProposalTransaction = async (req) => {
     const setFlagTx = await fundingCheck(dao.id, userData.safeAddress);
     return { fundingRequestTx: { encodedData, safeTxHash, toAddress: contract.address }, setFlagTx }
   } catch (error) {
-    if ( error.message.match('^No contract with address') && !retried ) {
-      retried = true;
-      await arc.fetchAllContrarcts(false);
-      createFundingProposalTransaction(req);
-    } else {
-      throw error; 
-    }
+    throw error; 
   }
 }
 

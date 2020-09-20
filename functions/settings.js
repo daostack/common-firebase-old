@@ -107,7 +107,6 @@ const PROPOSAL_STAGE = {
   QuietEndingPeriod: '5',
 };
 
-
 const PROPOSAL_STAGES_HISTORY = [
   PROPOSAL_STAGE.ExpiredInQueue,
   PROPOSAL_STAGE.Executed,
