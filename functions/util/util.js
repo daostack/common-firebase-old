@@ -22,16 +22,6 @@ const QUERY_LATEST_BLOCK_NUMBER = `query {
   } 
 }`;
 
-// const arc = new Arc({
-//   graphqlHttpProvider: env.graphql.graphqlHttpProvider,
-//   graphqlWsProvider: env.graphql.graphqlWsProvider,
-//   ipfsProvider: `${env.graphql.graphApiUrl}/${env.graphql.subgraphName}`,
-//   web3Provider: provider,
-// });
-
-// arc.fetchContractInfos();
-
-// Arc.js related string constants
 class Utils {
 
   getCommonLink(commonId)  {
