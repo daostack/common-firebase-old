@@ -125,7 +125,7 @@ class Utils {
     return Number(blockNumber);
   }
 
-  async createSafeTransactionHash (myWallet, toAddress, value, data = '0x') {
+  async createSafeTransactionHash (myWallet, toAddress, value, data = '0x', useNextNonce = false) {
     try {
       const masterCopyContract = new ethers.Contract(
         myWallet,
@@ -133,7 +133,8 @@ class Utils {
         provider,
       );
       const zeroAddress = ethers.constants.AddressZero;
-      const nonce = await masterCopyContract.nonce();
+      let nonce = await masterCopyContract.nonce();
+      nonce = useNextNonce ? nonce + 1 : nonce;
       const SAFE_TX_TYPEHASH = '0xbb8310d486368db6bd6f849402fdd73ad53d316b5a4b2644ad6efe0f941286d8';
       const DOMAIN_SEPARATOR_TYPEHASH = '0x035aff83d86937d35b32e04f0ddc6ff469290eef2f1b692d8a815c89404d4749';
       const domainSeperator = ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(['bytes32', 'address'], [DOMAIN_SEPARATOR_TYPEHASH, myWallet]));

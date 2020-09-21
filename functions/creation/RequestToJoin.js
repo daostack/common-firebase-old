@@ -9,8 +9,6 @@ const Relayer = require('../relayer/relayer');
 const ethers = require('ethers');
 const abi = require('../relayer/util/abi.json')
 
-let retried = false;
-
   // data must look like this
   // {
   //   title: `A test proposal on ${Date()}`,

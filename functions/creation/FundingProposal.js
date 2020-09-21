@@ -2,13 +2,10 @@
 const { env } = require('@env');
 const { Utils } = require('../util/util');
 const { IpfsClient, provider, arc, PROPOSAL_TYPE } = require('../settings')
-const { cancelPreauthorizedPayment } = require('../mangopay/mangopay');
 const { updateProposalById } = require('../graphql/Proposal');
 const { first } = require('rxjs/operators');
-const Relayer = require('../relayer/relayer');
 const ethers = require('ethers');
 const { execTransaction } = require('../relayer/util/execTransaction');
-let retried = false;
 
 const fundingCheck = async (daoId, safeAddress) => {
 
@@ -106,12 +103,16 @@ const createFundingProposalTransaction = async (req) => {
       plugin: fundingRequestPlugin.coreState.address,
     };
 
+    const setFlagTx = await fundingCheck(dao.id, userData.safeAddress);
     // send the acdtual transaction
     const { contract, method, args } = await fundingRequestPlugin.createProposalTransaction(params);
     const encodedData = contract.interface.functions[method].encode(args);
-    const safeTxHash = await Utils.createSafeTransactionHash(userData.safeAddress, contract.address, '0', encodedData);
 
-    const setFlagTx = await fundingCheck(dao.id, userData.safeAddress);
+    // To avoid 2 tx in same time with same nonce will failed the second one
+    // We need check the setFlagTx is null or not.
+    const useNextNonce = setFlagTx === null ? false : true;
+    const safeTxHash = await Utils.createSafeTransactionHash(userData.safeAddress, contract.address, '0', encodedData, useNextNonce);
+    
     return { fundingRequestTx: { encodedData, safeTxHash, toAddress: contract.address }, setFlagTx }
   } catch (error) {
     throw error; 

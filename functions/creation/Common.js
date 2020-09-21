@@ -6,7 +6,6 @@ const {getForgeOrgData} = require('@daostack/common-factory');
 const { execTransaction } = require('../relayer/util/execTransaction');
 const { Utils } = require('../util/util');
 const { updateDaoById } = require('../graphql/Dao')
-let retried = false;
 
 const createCommonTransaction = async (req) => {
   // eslint-disable-next-line no-useless-catch
