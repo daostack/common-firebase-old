@@ -120,9 +120,7 @@ const createRequestToJoinTransaction = async (req) => {
 const createRequestToJoin = async (req ) => {
   // eslint-disable-next-line no-useless-catch
   try {
-
     console.log('---requestToJoin---')
-
     const {
       idToken,
       createProposalTx, // This is the signed transacxtion to create the proposal. 
@@ -155,7 +153,7 @@ const createRequestToJoin = async (req ) => {
       console.error(response.data)
       console.error('Request to join failed, Transaction failed in relayer')
       cancelPreauthorizedPayment(preAuthId);
-      return
+      throw new Error('Request to join failed, Transaction failed in relayer');
     }
 
     console.log('wait for tx to mined')
