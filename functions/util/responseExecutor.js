@@ -48,7 +48,7 @@ const responseCreateExecutor = async (action, { req, res, successMessage, errorM
     } catch (e) {
         if ( e.message.match('^No contract with address') && !retried ) {
             retried = true;
-            await arc.fetchAllContrarcts(false);
+            await arc.fetchAllContracts(false);
             console.log('<--- No contract with address error, updating new arc --->');
             await responseCreateExecutor(action, { req, res, successMessage, errorMessage });
             return;

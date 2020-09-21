@@ -154,38 +154,6 @@ class Utils {
       throw (err);
     }
   }
-
-  // async fetchAllContrarcts() {
-  //   let allContractInfos = [];
-  //   let contractInfos = null;
-  //   let skip = 0;
-  
-  //   do {
-  //     const query = gql`
-  //     query AllContractInfos {
-  //       contractInfos(first: 1000 skip: ${skip * 1000}) {
-  //         id
-  //         name
-  //         version
-  //         address
-  //         alias
-  //       }
-  //     }
-  //   `;
-  //     // eslint-disable-next-line no-await-in-loop
-  //     const response = await arc.sendQuery(query);
-  //     contractInfos = response.data.contractInfos;
-  //     allContractInfos.push(...contractInfos);
-  //     skip++;
-  //   } while (contractInfos && contractInfos.length > 0);
-  
-  //   const universalContracts = await arc.fetchUniversalContractInfos();
-  //   allContractInfos.push(...universalContracts);
-  //   arc.setContractInfos(allContractInfos);
-  //   console.log('ARC --> setContractInfos');
-  //   return allContractInfos;
-  // }
-  
 }
 
 module.exports = {

@@ -46,7 +46,7 @@ ethers.Contract.prototype.addProvider = async function() {
 };
 
 
-Arc.prototype.fetchAllContrarcts = async function (useCache) {
+Arc.prototype.fetchAllContracts = async function (useCache) {
   const contracts = await db.collection('arc').doc('contract').get();
   if (contracts.exists && useCache) {
     const allContractInfos = JSON.parse(contracts.data().allContractInfos);
@@ -89,7 +89,7 @@ Arc.prototype.fetchAllContrarcts = async function (useCache) {
   )
 }
 
-arc.fetchAllContrarcts(true);
+arc.fetchAllContracts(true);
 
 const IpfsClient = new IPFSApiClient(ipfsProvider);
 
