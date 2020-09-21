@@ -6,7 +6,7 @@ const { responseExecutor, responseCreateExecutor } = require('../util/responseEx
 const { createCommon, createCommonTransaction } = require('./common')
 const { createRequestToJoinTransaction, createRequestToJoin  } = require('./requestToJoin')
 const { createVoteProposalTransaction, voteProposal  } = require('./voteProposal')
-const { createFundingProposalTransaction, createFundingProposal } = require('./FundingProposal');
+const { createFundingProposalTransaction, createFundingProposal } = require('./fundingProposal');
 
 const runtimeOptions = {
   timeoutSeconds: 540, // Maximum time 9 mins
