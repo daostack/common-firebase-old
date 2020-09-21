@@ -122,21 +122,19 @@ const createFundingProposalTransaction = async (req) => {
 const createFundingProposal = async (req) => {
   // eslint-disable-next-line no-useless-catch
   try {
-
-    console.log('---requestToJoin---')
-
+    console.log('---Funding Proposal---');
     const {
       idToken,
       daoId,
       fundingRequestTx, // This is the signed transacxtion to create the proposal. 
       setFlagTx,
     } = req.body;
-    const uid = await Utils.verifyId(idToken)
-    const userData = await Utils.getUserById(uid);
-    const safeAddress = userData.safeAddress
-    const ethereumAddress = userData.ethereumAddress
 
-    if (setFlagTx) {
+    const waitForSetFlagTx = async () => {
+      if (!setFlagTx) {
+        return;
+      }
+      console.log('--- Execute setFlagTx ---');
       const reqest1 = {
         body: {
           to: setFlagTx.toAddress,
@@ -150,6 +148,8 @@ const createFundingProposal = async (req) => {
       await provider.waitForTransaction(response.txHash);
     }
 
+    await waitForSetFlagTx();
+    console.log('--- Execute fundingRequestTx ---');
     const oldDaoContract = await arc.getContract(daoId);
     const daoContract = await oldDaoContract.addProvider();
     const fundingGoalReachedFlag = await daoContract.db('FUNDED_BEFORE_DEADLINE');
