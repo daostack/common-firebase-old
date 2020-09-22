@@ -5,7 +5,7 @@ const DAOFactoryABI = require('@daostack/common-factory/abis/DAOFactory');
 const {getForgeOrgData} = require('@daostack/common-factory');
 const { execTransaction } = require('../relayer/util/execTransaction');
 const { Utils } = require('../util/util');
-const { updateDaoById } = require('../graphql/Dao')
+const { updateDaoById } = require('../graphql/dao')
 
 const createCommonTransaction = async (req) => {
   // eslint-disable-next-line no-useless-catch
@@ -31,7 +31,7 @@ const createCommonTransaction = async (req) => {
       VERSION: IPFS_DATA_VERSION, // just some alphanumberic marker  that is useful for understanding what our data is shaped like
     };
     const opts = {...defaultOptions, ...data};
-    console.log('saving data on ipfs: ', opts);
+    console.log('saving data on ipfs');
     const ipfsHash = await IpfsClient.addAndPinString(JSON.stringify(opts));
     console.log('ipfsHash ->', ipfsHash);
 
