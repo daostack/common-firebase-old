@@ -33,18 +33,14 @@ const retryOptions = {
 };
 
 const provider = new ethers.providers.JsonRpcProvider(jsonRpcProvider);
+const minterWallet = new ethers.Wallet(env.commonInfo.pk, provider);
 
 const arc = new Arc({
   graphqlHttpProvider: graphHttpLink,
   graphqlWsProvider: graphwsLink,
   ipfsProvider: ipfsProvider,
-  web3Provider: provider,
+  web3Provider: minterWallet,
 });
-
-ethers.Contract.prototype.addProvider = async function() {
-  return new Contract(this.address, this.interface.abi, provider);
-};
-
 
 Arc.prototype.fetchAllContracts = async function (useCache) {
   const contracts = await db.collection('arc').doc('contract').get();
