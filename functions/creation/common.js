@@ -10,6 +10,9 @@ const { updateDaoById } = require('../graphql/dao')
 const createCommonTransaction = async (req) => {
   // eslint-disable-next-line no-useless-catch
   try {
+    console.log(req.body);
+
+
     const {
       idToken,
       data

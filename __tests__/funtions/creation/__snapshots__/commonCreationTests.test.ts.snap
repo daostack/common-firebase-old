@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Cloud Functions Common creation should be fail creating common transaction without the id token provided 1`] = `"Unable to create a common transaction"`;
+
+exports[`Cloud Functions Common creation should fail creating common transaction with only id token 1`] = `"Unable to create a common transaction"`;
