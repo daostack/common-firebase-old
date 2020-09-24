@@ -10,15 +10,19 @@ const { updateDaoById } = require('../graphql/dao')
 const createCommonTransaction = async (req) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    console.log(req.body);
-
-
     const {
       idToken,
       data
     } = req.body;
-    const uid = await Utils.verifyId(idToken);
-    const userData = await Utils.getUserById(uid);
+
+    let uid, userData;
+
+    if(env.environment === 'dev') {
+      userData = req.body.user;
+    } else {
+      uid = await Utils.verifyId(idToken);
+      userData = await Utils.getUserById(uid);
+    }
 
     const MEMBER_REPUTATION = env.commonInfo.memberReputation;
     const COMMONTOKENADDRESS = env.commonInfo.commonToken;
@@ -35,6 +39,9 @@ const createCommonTransaction = async (req) => {
     };
     const opts = {...defaultOptions, ...data};
     console.log('saving data on ipfs');
+
+    console.log(opts);
+
     const ipfsHash = await IpfsClient.addAndPinString(JSON.stringify(opts));
     console.log('ipfsHash ->', ipfsHash);
 
@@ -114,6 +121,9 @@ const createCommon = async (req) => {
     const events = Utils.getTransactionEvents(daoFactoryContract.interface, receipt);
     const newOrgEvent = events.NewOrg;
     const daoId = newOrgEvent._avatar;
+
+    console.log("We are here");
+
     await updateDaoById(daoId, { retries: 6 });
     return { daoId }
 };

@@ -3,6 +3,8 @@ import supertest from 'supertest';
 import { runTest } from '@helpers/runTest';
 
 import "@functions";
+import { env } from '@env';
+import axios from 'axios';
 
 const url = 'http://localhost:5001/common-daostack/us-central1/create';
 
@@ -20,46 +22,57 @@ const data = {
   courseOfAction: 'Test, test and test',
   rules: [],
   links: [],
-}
+};
 
-runTest((funcs) => {
+const test = require("firebase-functions-test")({
+  projectId: process.env.GCLOUD_PROJECT,
+});
+
+runTest((funcs, test) => {
   const create = supertest(funcs.create);
+  const { auth } = test;
 
-  describe('Common creation', () => {
-    it('should be fail creating common transaction without the id token provided', async () => {
-      const res = await create.post('/createCommonTransaction');
+  // describe('Common creation', () => {
+  //   it('should be fail creating common transaction without the id token provided', async () => {
+  //     const res = await create.post('/createCommonTransaction');
+  //
+  //     expect(res.ok).toBeFalsy();
+  //     expect(res.status).toBe(500);
+  //
+  //     expect(res.body.error).not.toBe(null);
+  //     expect(res.body.error.commonMessage).toMatchSnapshot();
+  //   });
 
-      expect(res.ok).toBeFalsy();
-      expect(res.status).toBe(500);
+    // it('should fail creating common transaction with only id token',  async() => {
+    //   const res = await create.post('/createCommonTransaction', {
+    //     idToken
+    //   });
+    //
+    //   expect(res.ok).toBeFalsy();
+    //   expect(res.status).toBe(500);
+    //
+    //   expect(res.body.error).not.toBe(null);
+    //   expect(res.body.error.commonMessage).toMatchSnapshot();
+    // });
 
-      expect(res.body.error).not.toBe(null);
-      expect(res.body.error.commonMessage).toMatchSnapshot();
-    });
+    it.only('should successfully create common creation transaction with all the needed data present', async () => {
+      // const res = await create
+      //   .post('/createCommonTransaction')
+      //   .send({
+      //     idToken,
+      //     data,
+      //     user: auth.exampleUserRecord()
+      //   });
 
-    it('should fail creating common transaction with only id token',  async() => {
-      const res = await create.post('/createCommonTransaction', {
-        idToken
-      });
-
-      expect(res.ok).toBeFalsy();
-      expect(res.status).toBe(500);
-
-      expect(res.body.error).not.toBe(null);
-      expect(res.body.error.commonMessage).toMatchSnapshot();
-    });
-
-    it('should successfully create common creation transaction with all the needed data present', async () => {
-      const res = await create
-        .post('/createCommonTransaction')
-        .send({
+      const res = await axios.post(`${env.firebase.functions.endpoints.create}/createCommonTransaction`, {
           idToken,
-          data
-        });
+          data,
+          user: auth.exampleUserRecord()
+      });
 
       // expect(res.ok).toBeTruthy();
       // expect(res.status).toBe(200);
 
-      expect(res.body).toMatchSnapshot();
-    })
-  });
+      expect(res.data).toMatchSnapshot();
+    });
 });

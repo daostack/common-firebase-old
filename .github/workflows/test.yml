@@ -42,6 +42,9 @@ jobs:
       - name: Modify firebase.json
         run: npx json -I -f firebase.json -e "this.emulators.functions.port=5003"
 
+      - name: Add firebase token to secrets
+        run: npx json -I -f functions/env/env_secrets.json -e "this.firebaseToken=${{ secrets.FIREBASE_TOKEN }}"
+
       - name: Run tests
         run: |
           yarn emulator:headless &

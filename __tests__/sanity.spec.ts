@@ -7,7 +7,7 @@ import { arc, jsonRpcProvider } from '@settings';
 
 runTest((funcs) => {
   describe('the services', () => {
-    it('check if we are using development settings', () => {
+    it('check if we are using development settings', async () => {
       expect(env.environment).toEqual('dev');
       expect(arc.graphqlHttpProvider).toEqual('http://127.0.0.1:8000/subgraphs/name/daostack');
       expect(jsonRpcProvider).toEqual('http://127.0.0.1:8545');
