@@ -33,8 +33,6 @@ class Utils {
       const decodedToken = await admin.auth().verifyIdToken(idToken)
       return decodedToken.uid;
     } catch (error) {
-      console.error(error);
-
       throw new CommonError(CFError.invalidIdToken)
     }
   }
