@@ -7,7 +7,7 @@ const HTTP_STATUS_CODE = {
 }
 
 const responseExecutor = async (action, { req, res, successMessage, errorMessage }) => {
-    try {
+   try {
         const actionResult = await action();
         console.log(actionResult);
 
@@ -54,7 +54,7 @@ const responseCreateExecutor = async (action, { req, res, successMessage, errorM
             return;
         }
         
-        console.error(e)
+        console.error("Error ->", e)
         res.status(HTTP_STATUS_CODE.INTERNAL_SERVER)
             .json(
                 {
