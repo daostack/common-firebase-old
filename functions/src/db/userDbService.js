@@ -4,8 +4,10 @@ const db = admin.firestore();
 
 const COLLECTION_NAME = 'users';
 
-async function findUserById(userId) {
-    return db.collection('COLLECTION_NAME').doc(`${userId}`)
+async function getUserById(userId) {
+    return await db.collection(COLLECTION_NAME)
+        .doc(userId)
+        .get();
 }
 
 async function findUserByAddress(ethereumAddress, key = 'safeAddress') {
@@ -37,6 +39,6 @@ async function updateUser(userId, doc) {
 
 module.exports = {
     findUserByAddress,
-    findUserById,
+    getUserById,
     updateUser
 };

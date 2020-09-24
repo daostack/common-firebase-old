@@ -1,4 +1,4 @@
-import { INotificationModel } from ".";
+import { INotificationModel } from "./";
 
 declare global {
   interface Array<T> {
@@ -70,18 +70,18 @@ const userInfoTrigger = functions.firestore.document('/users/{userId}')
     return Promise.resolve(null);
   })
 
-const sendFollowerNotification = async (notification: INotificationModel, tokens: [string]) => {
+// const sendFollowerNotification = async (notification: INotificationModel, tokens: [string]) => {
 
-  const follower = await admin.auth().getUser(notification.userId);
+//   const follower = await admin.auth().getUser(notification.userId);
 
-  console.log(`tokens: ${tokens}  - follower: ${follower.displayName}`);
+//   console.log(`tokens: ${tokens}  - follower: ${follower.displayName}`);
 
-  const title = 'You have a new follower';
-  const body = `${follower.displayName} is now following you.`
-  const image = follower.photoURL
+//   const title = 'You have a new follower';
+//   const body = `${follower.displayName} is now following you.`
+//   const image = follower.photoURL
 
-  return Notification.send(tokens, title, body, image);
-}
+//   return Notification.send(tokens, title, body, image);
+// }
 
 // Disable following logic
 // module.exports = { userInfoTrigger, sendFollowerNotification };

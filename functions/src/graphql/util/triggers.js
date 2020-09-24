@@ -2,6 +2,7 @@ const functions = require('firebase-functions');
 const { updateDaoById } = require('../Dao');
 const env = require('@env');
 const { createLegalUser, createWallet } = require('../../mangopay/mangopay');
+const { createNotification } = require('../../db/notificationDbService');
 const { Utils, PROPOSAL_TYPE } = require('../../util/util');
 
 const emailClient = require('../../email');
@@ -77,64 +78,34 @@ exports.newDaoCreated = functions.firestore
 
     const userId = newDao.members[0].userId;
     const userData = await Utils.getUserById(userId);
-    const daoName = newDao.name;
-
+    
     try {
       const { Id: mangopayId } = await createLegalUser(newDao);
       const { Id: mangopayWalletId } = await createWallet(mangopayId);
 
       if (mangopayId && mangopayWalletId) {
-        const commonLink = Utils.getCommonLink(newDao.id);
-
+        
         console.debug(`Sending admin email for CommonCreated to ${env.mail.adminMail}`);
         console.debug(`Sending user email for CommonCreated to ${userData.email}`);
 
-        await Promise.all([
-          emailClient.sendTemplatedEmail({
-            to: userData.email,
-            templateKey: 'userCommonCreated',
-            emailStubs: {
-              commonLink,
-              name: userData.displayName,
-              commonName: daoName
-            }
-          }),
-
-          emailClient.sendTemplatedEmail({
-            to: env.mail.adminMail,
-            templateKey: 'adminCommonCreated',
-            emailStubs: {
-              userId,
-              commonLink,
-              userName: userData.displayName,
-              userEmail: userData.email,
-              commonCreatedOn: new Date().toDateString(),
-              log: 'Successfully created common',
-              commonId: newDao.id,
-              commonName: newDao.name,
-              description: newDao.metadata.description,
-              about: newDao.metadata.byline,
-              paymentType: 'one-time',
-              minContribution: newDao.minFeeToJoin
-            }
-          })
-        ]);
-
-        console.debug('Done sending emails for dao creation');
+        await createNotification({
+          userId: userId,
+          objectId: newDao.id,
+          createdAt: new Date(),
+          type: NOTIFICATION_TYPES.CREATION_COMMON
+        });
 
         return snap.ref.set({ mangopayId, mangopayWalletId }, { merge: true });
       }
     } catch (e) {
       console.error(e);
 
-      console.debug(`Sending admin email for WalletCreationFailed to ${env.mail.adminMail}`);
-      await emailClient.sendTemplatedEmail({
-        to: env.mail.adminMail,
-        templateKey: 'adminWalletCreationFailed',
-        emailStubs: {
-          commonName: daoName,
-          commonId: newDao.id
-        }
+      await createNotification({
+        userId: userId,
+        objectId: newDao.id,
+        createdAt: new Date(),
+        type: NOTIFICATION_TYPES.CREATION_COMMON_FAILED
       });
+
     }
   });

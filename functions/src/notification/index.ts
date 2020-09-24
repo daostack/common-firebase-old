@@ -1,54 +1,72 @@
 import * as functions from 'firebase-functions';
-import { findUserById } from '../db/userDbService';
+import { getUserById } from '../db/userDbService';
+import Notification from './notification';
+import emailClient from '../email';
+import { notifyData } from './notification';
+
+
+// import express from 'express';
+// import cors from 'cors';
+// import bodyParser from 'body-parser';
+// import { responseExecutor } from '../util/responseExecutor';
 
 export interface INotificationModel {
-    userId: string,
-    objectId: string,
-    type: string,
+    userFilter: string[],
     createdAt: string,
+    eventObjectId: string,
+    eventType: string,
+    eventId: string,
 }
 
-export enum NOTIFICATION_TYPES {
-    //CREATION notifications
-    CREATION_COMMON = 'creationCommon',
-    CREATION_PROPOSAL = 'creationProposal',
-    CREATION_REQUEST_TO_JOIN = 'creationReqToJoin',
-    //APPROVED notifications
-    APPROVED_REQUEST_TO_JOIN = 'approvedReqToJoin',
-    APPROVED_PROPOSAL = 'approvedProposal',
-    //REJECTED notifications
-    REJECTED_REQUEST_TO_JOIN = 'approvedReqToJoin',
-    REJECTED_PROPOSAL = 'rejectedProposal',
-}
+const processNotification = async (notification: INotificationModel) => {
 
-// const { userInfoTrigger, sendFollowerNotification } = require('./follow');
-import { commonCreation, commonCreationNotification } from './commonCreation';
-import { QueryDocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
+    const currNotifyObj = notifyData[notification.eventType];
+    
+    if (notification.userFilter) {
+        const eventNotifyData = await currNotifyObj.data(notification.eventObjectId);
+        notification.userFilter.forEach( async filterUserId => {
+            const userData: any = (await getUserById(filterUserId)).data();
 
-// exports.userInfoTrigger = userInfoTrigger;
-// exports.sendFollowerNotification = sendFollowerNotification;
-exports.commonCreation = commonCreation;
+            if (currNotifyObj.notification) {
+                const {title, body, image} = currNotifyObj.notification(eventNotifyData);
+                await Notification.send(userData.tokens, title, body, image);
+            }
 
-//const commonCreationNotification = functions.firestore.document('/notification/commonCreation/{userId}/{commonId}')
-functions.firestore.document('/notification').onCreate(async (snapshot: QueryDocumentSnapshot) => {
-    return processNotificationEvent(snapshot.data() as INotificationModel)
-});
+            // if (currNotifyObj.email) {
+            //     await emailClient.sendTemplatedEmail(currNotifyObj.email(eventNotifyData))
+            // }
 
-const processNotificationEvent = async (notification: INotificationModel) => {
-    const tokenRef = await findUserById(notification.userId);
+        } );
+    } else {
+        const eventNotifyData = await currNotifyObj.data(notification.eventObjectId);
+        if (currNotifyObj.notification) {
+            const {title, body, image} = currNotifyObj.notification(eventNotifyData);
+            await Notification.sendToAllUsers(title, body, image);
+        }
 
-    const tokens = await tokenRef
-      .get()
-      .then(doc => doc.data().tokens);
-
-    switch (notification.type) {
-        case NOTIFICATION_TYPES.CREATION_COMMON:
-            return commonCreationNotification(notification, tokens);
-        case NOTIFICATION_TYPES.CREATION_PROPOSAL:
-            return commonCreationNotification(notification, tokens);
-        case NOTIFICATION_TYPES.CREATION_REQUEST_TO_JOIN:
-            return commonCreationNotification(notification, tokens);
-        default:
-            return null;
+        // if (currNotifyObj.email) {
+        //     await emailClient.sendTemplatedEmail(currNotifyObj.email(eventNotifyData))
+        // }
     }
+        
 }
+
+exports.commonNotificationListener = functions
+  .firestore
+  .document('/notification/{id}')
+  .onCreate(async (snap) => {
+    const notification = snap.data();
+
+    console.log("NEW Notification !");
+    console.log("Notification -> ", notification);
+    //console.log(snapshot.data());
+    //return processNotification(snapshot.data() as IEventModel)
+
+    return await processNotification({
+        eventType: "creationCommon",
+        userFilter: ["Xlun3Ux94Zfc73axkiuVdkktOWf1"],
+        eventObjectId: "0x01103ee3fb107ed114a67475dd5ead57be35bf93",
+        createdAt: Date.now().toString(),
+    } as INotificationModel)
+  })
+//exports.notification = functions.runWith(runtimeOptions).https.onRequest(notification);

@@ -28,9 +28,10 @@ if(env.tests.enabled) {
 exports.relayer = relayer.relayer;
 exports.graphql = graphql.graphql;
 exports.mangopay = mangopay.mangopay;
-exports.notification = notification;
+exports.notificationSubs = notification;
 exports.mangopaySubs = mangopayTriggers;
 exports.graphqlSubs = graphqlTriggers;
+// Disable notification
 
 
 exports.cronJobs = require('./cron').crons;

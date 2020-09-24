@@ -32,6 +32,6 @@ exports.mangopay = mangopay.mangopay;
 exports.mangopaySubs = mangopayTriggers;
 exports.graphqlSubs = graphqlTriggers;
 // Disable notification
-exports.notification = notification;
+exports.notificationSub = notification;
 
 exports.cronJobs = require('./cron').crons;
