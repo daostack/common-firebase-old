@@ -1,5 +1,3 @@
-import functions from "firebase-functions-test";
-
 const mockSet = jest.fn();
 
 mockSet.mockReturnValue(true);
@@ -7,7 +5,7 @@ mockSet.mockReturnValue(true);
 jest.mock("firebase-admin", () => ({
   initializeApp: jest.fn(),
   database: () => ({
-    ref: jest.fn(path => ({
+    ref: jest.fn(() => ({
       set: mockSet
     }))
   })

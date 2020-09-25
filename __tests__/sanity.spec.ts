@@ -1,11 +1,9 @@
 import axios from 'axios';
-
-
 import { env } from '@env';
 import { runTest } from '@helpers/runTest';
 import { arc, jsonRpcProvider } from '@settings';
 
-runTest((funcs) => {
+runTest(() => {
   describe('the services', () => {
     it('check if we are using development settings', () => {
       expect(env.environment).toEqual('dev');
