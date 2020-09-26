@@ -8,7 +8,8 @@
     "functions": {
       "endpoint": "http://127.0.0.1:5003",
       "endpoints": {
-        "create": "http://127.0.0.1:5003/common-staging-50741/us-central1/create"
+        "create": "http://127.0.0.1:5003/common-staging-50741/us-central1/create",
+        "tests": "http://127.0.0.1:5003/common-staging-50741/us-central1/tests"
       }
     }
   },
@@ -20,7 +21,7 @@
     "graphqlHttpProvider": "http://127.0.0.1:8000/subgraphs/name/daostack",
     "graphqlWsProvider": "http://127.0.0.1:8000/subgraphs/name/daostack",
     "graphApiUrl": "http://127.0.0.1:8000/subgraphs/name",
-    "ipfsProvider": "http://127.0.0.1:5001",
+    "ipfsProvider": "http://127.0.0.1:5001/api/v0",
     "ipfsDataVersion": "00003"
   },
   "commonInfo": {

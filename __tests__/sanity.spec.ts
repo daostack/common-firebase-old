@@ -1,4 +1,5 @@
 import axios from 'axios';
+import FormData from 'form-data';
 
 
 import { env } from '@env';
@@ -32,10 +33,28 @@ runTest((funcs) => {
     });
 
     it('should have firebase running', async () => {
-      const res = await axios.get('http://localhost:4000');
+      const res = await axios.get(env.firebase.functions.endpoints.tests + '/ping');
 
       expect(res).not.toBe(undefined);
       expect(res).not.toBe(null);
+
+      expect(res.status).toBe(200);
+      expect(res.statusText).toBe('OK');
+
+      expect(res.data).toBe('pong');
+    });
+
+    it('should have working ipfs', async () => {
+      const bodyFormData = new FormData();
+
+      bodyFormData.append('file', 'hello');
+
+      const res = await axios.post(`${env.graphql.ipfsProvider}/add`, bodyFormData, {
+        headers: bodyFormData.getHeaders()
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.statusText).toBe('OK');
     });
   });
 });
