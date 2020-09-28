@@ -43,6 +43,9 @@ const arc = new Arc({
 });
 
 Arc.prototype.fetchAllContracts = async function (useCache) {
+  console.log("Arc.prototype.fetchAllContracts THIS -> ", this);
+
+
   const contracts = await db.collection('arc').doc('contract').get();
   if (contracts.exists && useCache) {
     const allContractInfos = JSON.parse(contracts.data().allContractInfos);
@@ -85,7 +88,7 @@ Arc.prototype.fetchAllContracts = async function (useCache) {
   )
 }
 
-arc.fetchAllContracts(true);
+
 
 const IpfsClient = new IPFSApiClient(ipfsProvider);
 
@@ -111,7 +114,6 @@ const PROPOSAL_STAGES_HISTORY = [
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 module.exports = {
-    arc,
     IpfsClient,
     graphwsLink,
     graphHttpLink,
@@ -124,5 +126,14 @@ module.exports = {
     PROPOSAL_TYPE,
     PROPOSAL_STAGES_HISTORY,
     NULL_ADDRESS,
-    db
+    db,
+    arc: (async () => {
+      if (arc.contractInfos && arc.contractInfos.length > 0) {
+        return arc;
+      }
+      else {
+        await arc.fetchAllContracts(true);
+        return arc;
+      }
+    })(),
 }
