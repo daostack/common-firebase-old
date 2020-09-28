@@ -446,7 +446,6 @@
     "@firebase/util" "0.3.1"
     tslib "^1.11.1"
 
-<<<<<<< HEAD
 "@firebase/analytics@0.5.0":
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/@firebase/analytics/-/analytics-0.5.0.tgz#587292ec9a24410ad795a65c07fb1ea238ccef95"
@@ -459,8 +458,6 @@
     "@firebase/util" "0.3.2"
     tslib "^1.11.1"
 
-=======
->>>>>>> dev
 "@firebase/app-types@0.6.1":
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/@firebase/app-types/-/app-types-0.6.1.tgz#dcbd23030a71c0c74fc95d4a3f75ba81653850e9"
@@ -479,7 +476,6 @@
     tslib "^1.11.1"
     xmlhttprequest "1.8.0"
 
-<<<<<<< HEAD
 "@firebase/app@0.6.11":
   version "0.6.11"
   resolved "https://registry.yarnpkg.com/@firebase/app/-/app-0.6.11.tgz#f73f9e4571ba62f4029d8f9c9880a97e5a94eb1d"
@@ -493,8 +489,6 @@
     tslib "^1.11.1"
     xmlhttprequest "1.8.0"
 
-=======
->>>>>>> dev
 "@firebase/auth-interop-types@0.1.5":
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/@firebase/auth-interop-types/-/auth-interop-types-0.1.5.tgz#9fc9bd7c879f16b8d1bb08373a0f48c3a8b74557"
@@ -548,11 +542,7 @@
     faye-websocket "0.11.3"
     tslib "^1.11.1"
 
-<<<<<<< HEAD
 "@firebase/database@0.6.13", "@firebase/database@^0.6.10":
-=======
-"@firebase/database@^0.6.10":
->>>>>>> dev
   version "0.6.13"
   resolved "https://registry.yarnpkg.com/@firebase/database/-/database-0.6.13.tgz#b96fe0c53757dd6404ee085fdcb45c0f9f525c17"
   integrity sha512-NommVkAPzU7CKd1gyehmi3lz0K78q0KOfiex7Nfy7MBMwknLm7oNqKovXSgQV1PCLvKXvvAplDSFhDhzIf9obA==
@@ -648,7 +638,6 @@
     idb "3.0.2"
     tslib "^1.11.1"
 
-<<<<<<< HEAD
 "@firebase/installations@0.4.17":
   version "0.4.17"
   resolved "https://registry.yarnpkg.com/@firebase/installations/-/installations-0.4.17.tgz#1367b721e2c6c4880646bbc4f257e8616986a004"
@@ -660,8 +649,6 @@
     idb "3.0.2"
     tslib "^1.11.1"
 
-=======
->>>>>>> dev
 "@firebase/logger@0.2.6":
   version "0.2.6"
   resolved "https://registry.yarnpkg.com/@firebase/logger/-/logger-0.2.6.tgz#3aa2ca4fe10327cabf7808bd3994e88db26d7989"
@@ -788,7 +775,6 @@
     "@firebase/util" "0.3.1"
     tslib "^1.11.1"
 
-<<<<<<< HEAD
 "@firebase/storage@0.3.43":
   version "0.3.43"
   resolved "https://registry.yarnpkg.com/@firebase/storage/-/storage-0.3.43.tgz#107fb5db2eff2561b5c4e35ee4cbff48f28c7e77"
@@ -799,8 +785,6 @@
     "@firebase/util" "0.3.2"
     tslib "^1.11.1"
 
-=======
->>>>>>> dev
 "@firebase/util@0.3.1":
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/@firebase/util/-/util-0.3.1.tgz#8c95152a00121bd31fb7c1fc6520ca208976e384"
@@ -4627,39 +4611,20 @@ google-gax@^1.14.2:
     walkdir "^0.4.0"
 
 google-gax@^2.2.0:
-<<<<<<< HEAD
-  version "2.8.0"
-  resolved "https://registry.yarnpkg.com/google-gax/-/google-gax-2.8.0.tgz#e62bb93c0a9255a76f24e180a0f92a58865f3ebb"
-  integrity sha512-MPaADY/FHittX5xfOUU2EVqIoE850e+OZ1ys8aO2GnUMaP4U0Bde2wop6kw5sp4fIOjKNlan4GATKAURsYbxSw==
-=======
   version "2.9.0"
   resolved "https://registry.yarnpkg.com/google-gax/-/google-gax-2.9.0.tgz#84edef8715d82c0f91a6e5485b8f2803d2690f00"
   integrity sha512-MFMwA7Fb8PEwjnYwfGXjZMidCNyMl3gSnvS/+kS8TQioJZQDpzK+W3dmwyNyig/U13+kbABqDnbkkAXJ5NiUkw==
->>>>>>> dev
   dependencies:
     "@grpc/grpc-js" "~1.1.1"
     "@grpc/proto-loader" "^0.5.1"
     "@types/long" "^4.0.0"
     abort-controller "^3.0.0"
-<<<<<<< HEAD
-    duplexify "^3.6.0"
-    google-auth-library "^6.0.0"
-    is-stream-ended "^0.1.4"
-    lodash.at "^4.6.0"
-    lodash.has "^4.5.2"
-    node-fetch "^2.6.0"
-    protobufjs "^6.9.0"
-    retry-request "^4.0.0"
-    semver "^6.0.0"
-    walkdir "^0.4.0"
-=======
     duplexify "^4.0.0"
     google-auth-library "^6.0.0"
     is-stream-ended "^0.1.4"
     node-fetch "^2.6.1"
     protobufjs "^6.9.0"
     retry-request "^4.0.0"
->>>>>>> dev
 
 google-gax@~1.12.0:
   version "1.12.0"
@@ -6868,7 +6833,7 @@ node-fetch@2.6.0, node-fetch@^2.2.0, node-fetch@^2.3.0, node-fetch@^2.6.0:
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
   integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
 
-node-fetch@2.6.1:
+node-fetch@2.6.1, node-fetch@^2.6.1:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
   integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
@@ -6881,14 +6846,6 @@ node-fetch@^1.0.1:
     encoding "^0.1.11"
     is-stream "^1.0.1"
 
-<<<<<<< HEAD
-=======
-node-fetch@^2.6.1:
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
-  integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
-
->>>>>>> dev
 node-forge@^0.10.0:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.10.0.tgz#32dea2afb3e9926f02ee5ce8794902691a676bf3"

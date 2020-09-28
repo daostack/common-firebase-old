@@ -19,6 +19,8 @@ const createCommonTransaction = async (req) => {
 
     if(env.environment === 'dev') {
       userData = req.body.user;
+
+      userData.safeAddress = data.founderAddresses;
     } else {
       uid = await Utils.verifyId(idToken);
       userData = await Utils.getUserById(uid);
