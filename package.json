@@ -30,7 +30,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "yarn test --collectCoverage",
     "test:badges": "yarn test:coverage && jest-coverage-badges --output \"./docs/assets/badges\"",
-    "script:deployTestContracts": "node scrits/deployTestContracts.js"
+    "script:deployTestContracts": "node scripts/deployTestContracts.js"
   },
   "engines": {
     "node": "10"
