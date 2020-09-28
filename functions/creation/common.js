@@ -89,7 +89,7 @@ const createCommonTransaction = async (req) => {
       safeTxHash: safeTxHash
      }
   } catch (error) {
-    throw error; 
+    throw error;
   }
 }
 
