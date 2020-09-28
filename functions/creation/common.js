@@ -18,8 +18,11 @@ const createCommonTransaction = async (req) => {
     let uid, userData;
 
     if(env.environment === 'dev') {
-      userData = req.body.user;
+      if(!data) {
+        throw new Error('Cannot create a common without the needed data!')
+      }
 
+      userData = req.body.user;
       userData.safeAddress = data.founderAddresses;
     } else {
       uid = await Utils.verifyId(idToken);
