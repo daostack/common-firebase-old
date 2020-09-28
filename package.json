@@ -24,13 +24,13 @@
     "use:dev": "./env/env.sh -dev",
     "use:staging": "firebase use staging && ./env/env.sh -stg",
     "use:production": "firebase use production && ./env/env.sh -prod",
-    "ci:test": "yarn test",
+    "ci:test": "firebase emulators:exec 'yarn test'",
     "ci:setup": "yarn use:ci",
-    "test": "firebase emulators:exec 'jest'",
-    "test:watch": "firebase emulators:exec 'jest --watch'",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "test:coverage": "yarn test --collectCoverage",
     "test:badges": "yarn test:coverage && jest-coverage-badges --output \"./docs/assets/badges\"",
-    "precommit": "lint-staged && yarn test"
+    "script:deployTestContracts": "node scrits/deployTestContracts.js"
   },
   "engines": {
     "node": "10"
@@ -39,6 +39,7 @@
     "@firebase/rules-unit-testing": "^1.0.3",
     "@types/express": "^4.17.8",
     "@types/jest": "^26.0.10",
+    "@types/shelljs": "^0.8.8",
     "@types/sinon": "^9.0.5",
     "@typescript-eslint/eslint-plugin": "^4.1.0",
     "@typescript-eslint/parser": "^4.1.0",
@@ -62,8 +63,11 @@
     "functions"
   ],
   "_moduleAliases": {
-    "@env": "./functions/env",
     "@settings": "./functions/settings",
-    "@util": "./functions/util"
+    "@util": "./functions/util",
+    "@env": "./functions/env"
+  },
+  "dependencies": {
+    "shelljs": "^0.8.4"
   }
 }
