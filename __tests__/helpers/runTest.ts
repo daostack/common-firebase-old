@@ -15,5 +15,11 @@ export const runTest = (testsFunc: (functions: any , test: FeaturesList) => any)
     });
 
     testsFunc(functions, test);
+
+    afterAll(() => {
+      // If after 5 seconds after the tests have executed
+      // the process has not finished quit it
+      setTimeout(() => process.exit(), 5000)
+    });
   });
 }
