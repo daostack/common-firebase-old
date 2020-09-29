@@ -69,7 +69,7 @@ Arc.prototype.fetchAllContracts = async function (useCache) {
   do {
     const query = gql`
     query AllContractInfos {
-      contractInfos(first: 1000 skip: ${skip * 1000}) {
+      contractInfos(first: 1000 skip: ${skip * 1000} where: { version: "${ipfsDataVersion}" }) {
         id
         name
         version
