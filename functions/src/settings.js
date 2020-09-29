@@ -12,6 +12,7 @@ const mangoPayApi = env.mangopay.apiUrl;
 const ipfsDataVersion = env.graphql.ipfsDataVersion;
 const ipfsProvider = env.graphql.ipfsProvider;
 const ARC_VERSION = env.commonInfo.arcVersion;
+const circlePayApi = env.circlepay.apiUrl;
 
 if(env.environment === 'dev') {
   admin.initializeApp();
@@ -137,4 +138,5 @@ module.exports = {
     NULL_ADDRESS,
     db,
     getArc,
+    circlePayApi,
 }
