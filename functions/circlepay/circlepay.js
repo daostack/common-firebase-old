@@ -34,28 +34,17 @@ const options = {
 	 */
 
 const createCard = async (cardData) => {
-	try {
-		const response = await axios.post(`${circlePayApi}/cards`,
-			cardData,
-			options
-		);
-		console.log('response', response);
-		return response.data;
-	} catch (error) {
-		// console.log('createCard.js---------------------------------------------', error.response);//.data)
-		throw error;
-	}
-	return 'success';
+	const response = await axios.post(`${circlePayApi}/cards`,
+		cardData,
+		options
+	);
+	console.log('response', response);
+	return response.data;
 }
 
 const encryption = async () => {
-	try {
-		const response = await axios.get(`${circlePayApi}/encryption/public`, options);
-		return response.data;
-	} catch (error) {
-		console.log('encryption error', error);
-		throw error;
-	}
+	const response = await axios.get(`${circlePayApi}/encryption/public`, options);
+	return response.data;
 }
 
 module.exports = {
