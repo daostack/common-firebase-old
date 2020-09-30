@@ -37,7 +37,7 @@
     "script:deployTestContracts": "node scripts/deployTestContracts.js"
   },
   "engines": {
-    "node": "12"
+    "node": "10"
   },
   "nodemonConfig": {
     "ext": "*",

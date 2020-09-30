@@ -6,7 +6,7 @@ const options = {
 	headers: {
 		accept: 'application/json',
 		'Content-Type': 'application/json',
-		authorization: `Bearer ${env.circlepay.apiKay}`
+		authorization: `Bearer ${env.circlepay.apiKey}`
 	},
 };
 
@@ -42,18 +42,23 @@ const createCard = async (cardData) => {
 		console.log('response', response);
 		return response.data;
 	} catch (error) {
-		console.log('createCard.js error message', error.response.data)
-		/*
-		possible errors:
-		422: message: Unprocessable Entity, code: 2 -> when data is not right
-		 */
+		// console.log('createCard.js---------------------------------------------', error.response);//.data)
 		throw error;
 	}
 	return 'success';
 }
-/*
-QVBJX0tFWTpmNThkOGFkYmEyMWE5Y2FlMzI4MzkxYjJjNGVlNWFmYjphMGNiN2UyYTUwYzEzNzNmNTVjNjg5ODYxZDdmZTIxZQ
- */
+
+const encryption = async () => {
+	try {
+		const response = await axios.get(`${circlePayApi}/encryption/public`, options);
+		return response.data;
+	} catch (error) {
+		console.log('encryption error', error);
+		throw error;
+	}
+}
+
 module.exports = {
-	createCard
+	createCard,
+	encryption
 }

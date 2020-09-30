@@ -9,8 +9,9 @@ const createCirclePayCard = async (req) => {
 		const uid = await Utils.verifyId(idToken);
 		const userData = await Utils.getUserById(uid);
     	const userRef = Utils.getUserRef(uid);
-    	const r = await createCard(cardData);
-		//console.log('body', cardData);
+    	// encryptedData is not a valid base64
+    	// const createdCard = await createCard(cardData);
+		// console.log('body', cardData);
 
 		return {
 			message: `CirclePay card creation status: ${

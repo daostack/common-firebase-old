@@ -6,19 +6,15 @@ const { env } = require('@env');
 const cors = require('cors');
 const {createCirclePayCard} = require('./createCirclePayCard'); 
 const { responseExecutor } = require('../util/responseExecutor');
-
-const config = {
-	headers: { Authorization: `Bearer ${env.circlepay.apiKey}` }
-}
+const {encryption} = require('./circlepay');
 
 const runtimeOptions = {
-  timeoutSeconds: 540, // Maximum time 9 mins
+  timeoutSeconds: 540,
 };
 
-circlepay.use(bodyParser.json()); // to support JSON-encoded bodies
+circlepay.use(bodyParser.json());
 circlepay.use(
   bodyParser.urlencoded({
-    // to support URL-encoded bodies
     extended: true,
   })
 );
@@ -40,8 +36,18 @@ circlepay.post('/create-card', async (req, res) => {
 		})
 });
 
+circlepay.get('/encryption', async (req, res) => {
+	console.log('index/encryption');
+	responseExecutor(
+	async () => {
+		return await encryption(); // create a file for this?
+	},
+	{
+		req,
+		res,
+		successMessage: `PCI encryption key generated!`,
+		errorMessage: `Unable to generate PCI encryption key!`
+	})
+})
+
 exports.circlepay = functions.runWith(runtimeOptions).https.onRequest(circlepay);
-
-
-
-
