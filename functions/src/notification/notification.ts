@@ -19,11 +19,13 @@ interface IEventData {
 
 export const notifyData: Record<string, IEventData> = {
   [EVENT_TYPES.CREATION_COMMON]: {
+      // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       data: async (objectId: string) => {
           return {
               commonData: (await getDaoById(objectId)).data()
           }
       },
+      // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       email: ( {commonData} ) => {
           return {
               to: env.mail.adminMail,
@@ -36,11 +38,13 @@ export const notifyData: Record<string, IEventData> = {
       }
   },
   [EVENT_TYPES.CREATION_COMMON_FAILED] : {
+      // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       data: async (objectId: string) => {
           return {
               commonData: (await getDaoById(objectId)).data()
           }
       },
+      // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       email: ( {commonData} ) => {
           return {
               to: env.mail.adminMail,
@@ -53,6 +57,7 @@ export const notifyData: Record<string, IEventData> = {
       }
   },
   [EVENT_TYPES.CREATION_PROPOSAL] : {
+      // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       data: async (objectId: string) => {
           return {
               proposalData: (await getProposalById(objectId)).data(),
@@ -60,6 +65,7 @@ export const notifyData: Record<string, IEventData> = {
               userData: (await getUserById(objectId)).data()
           }
       },
+      // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       notification: async ( {proposalData, commonData, userData} ) => {
           return {
               title: 'A new funding proposal in your Common!',
@@ -76,7 +82,7 @@ export default new class Notification implements INotification {
     contentAvailable: true,
     mutable_content: true,
     priority: 'high'
-  }, data = { }) {
+  }) {
     const payload = {
       notification: {
         title,

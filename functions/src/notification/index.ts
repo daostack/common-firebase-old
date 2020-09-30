@@ -1,14 +1,8 @@
 import * as functions from 'firebase-functions';
 import { getUserById } from '../db/userDbService';
 import Notification from './notification';
-import emailClient from '../email';
+//import emailClient from '../email';
 import { notifyData } from './notification';
-
-
-// import express from 'express';
-// import cors from 'cors';
-// import bodyParser from 'body-parser';
-// import { responseExecutor } from '../util/responseExecutor';
 
 export interface INotificationModel {
     userFilter: string[],

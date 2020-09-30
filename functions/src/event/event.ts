@@ -10,12 +10,14 @@ interface IEventData {
 export const eventData: Record<string, IEventData> = {
     [EVENT_TYPES.CREATION_COMMON]: {
         eventObject: async (commonId: string): Promise<any> => (await getDaoById(commonId)).data(),
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: (common: any): string[] => {
             return [common.members[0].userId];
         }
     },
     [EVENT_TYPES.CREATION_COMMON_FAILED]: {
         eventObject: async (commonId: string): Promise<any> => (await getDaoById(commonId)).data(),
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: (common: any): string[] => {
             return [common.members[0].userId];
         }
@@ -23,6 +25,7 @@ export const eventData: Record<string, IEventData> = {
     },
     [EVENT_TYPES.CREATION_PROPOSAL]: {
         eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: async (proposal: any): Promise<string[]> => {
             const proposalDao = (await getDaoById(proposal.dao)).data();
             const userFilter = proposalDao.memberrs.map(member => {

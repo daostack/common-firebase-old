@@ -2,13 +2,16 @@ require('module-alias/register');
 
 import * as admin from 'firebase-admin';
 import { databaseURL } from './settings';
-import {env} from '@env';
+import { env } from '@env';
+import * as adminSdkJson from '@env/adminsdk-keys.json';
+import * as tests from './tests';
+import * as cron from './cron';
 
 if(env.environment === 'dev') {
   admin.initializeApp();
 } else {
   admin.initializeApp({
-    credential: admin.credential.cert(require('@env/adminsdk-keys.json')),
+    credential: admin.credential.cert(adminSdkJson),
     databaseURL: databaseURL
   });
 }
@@ -24,7 +27,7 @@ import * as create from './creation';
 
 // Add the __tests__ endpoints only if enabled
 if(env.tests.enabled) {
-  exports.tests = require('./tests').tests;
+  exports.tests = tests.tests;
 }
 
 exports.relayer = relayer.relayer;
@@ -36,4 +39,4 @@ exports.create = create.create;
 exports.notificationSub = notification;
 exports.eventSub = event;
 
-exports.cronJobs = require('./cron').crons;
+exports.cronJobs = cron.crons;

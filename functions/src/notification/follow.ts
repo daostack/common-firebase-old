@@ -1,14 +1,15 @@
-import { INotificationModel } from "./";
+//import { INotificationModel } from "./";
 
-declare global {
-  interface Array<T> {
-    diff(array: Array<T>);
-  }
-}
+// declare global {
+//   interface Array<T> {
+//     diff(array: Array<T>);
+//   }
+// }
 
 /* eslint-disable no-unused-vars */
+/*
 import functions from 'firebase-functions';
-import Notification from './notification';
+//import Notification from './notification';
 import admin from 'firebase-admin';
 
 // Follow User
@@ -69,6 +70,7 @@ const userInfoTrigger = functions.firestore.document('/users/{userId}')
     }
     return Promise.resolve(null);
   })
+*/
 
 // const sendFollowerNotification = async (notification: INotificationModel, tokens: [string]) => {
 
