@@ -1,10 +1,6 @@
 import axios from 'axios';
-<<<<<<< HEAD
-=======
 import FormData from 'form-data';
 
-
->>>>>>> dev
 import { env } from '@env';
 import { runTest } from '@helpers/runTest';
 import { arc, jsonRpcProvider } from '@settings';
