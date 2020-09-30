@@ -1,5 +1,5 @@
 const admin = require('firebase-admin');
-const { provider, arc } = require('../settings')
+const { provider } = require('../settings')
 const { CommonError, CFError} = require('./error')
 const fetch = require('node-fetch');
 const { env } = require('@env');
@@ -33,6 +33,8 @@ class Utils {
       const decodedToken = await admin.auth().verifyIdToken(idToken)
       return decodedToken.uid;
     } catch (error) {
+      console.error(error);
+
       throw new CommonError(CFError.invalidIdToken)
     }
   }
@@ -111,8 +113,13 @@ class Utils {
     });  
 
     const graphData = await response.json();
-    const blockNumber = graphData.data.indexingStatusForCurrentVersion.chains[0].latestBlock.number;
-    return Number(blockNumber);
+    try {
+
+      const blockNumber = graphData.data.indexingStatusForCurrentVersion.chains[0].latestBlock.number;
+      return Number(blockNumber);
+    } catch(error) {
+      throw new Error(`Error trying to fetch latest blocknumber from ${env.graphql.graphApiUrl}: ${error}`)
+    }
   }
 
   async createSafeTransactionHash (myWallet, toAddress, value, data = '0x', useNextNonce = false) {

@@ -1,5 +1,5 @@
 const { findUserByAddress } = require('../db/userDbService');
-const { arc, retryOptions, ipfsDataVersion } = require('../settings')
+const { getArc, retryOptions, ipfsDataVersion } = require('../settings')
 const { getBalance } = require("../db/daoDbService")
 const promiseRetry = require('promise-retry');
 const { PROPOSAL_TYPE } = require('../util/util');
@@ -8,6 +8,7 @@ const { updateDao, getDaoById } = require('../db/daoDbService');
 
 // get all DAOs data from graphql and read it into the subgraph
 const updateDaos = async () => {
+    const arc = await getArc();
     console.log("UPDATE DAOS:");
     console.log("----------------------------------------------------------");
 
@@ -105,7 +106,7 @@ async function _updateDaoDb(dao) {
     }
 
     // Validate plugins
-    const plugins = await dao.plugins().first()
+    const plugins = await dao.plugins({}, { fetchPolicy: 'no-cache' }).first();
     const pluginValidation = _validateDaoPlugins(plugins);
 
     if (!pluginValidation.isValid) {
@@ -156,7 +157,7 @@ async function _updateDaoDb(dao) {
         const existingDocData = existingDoc.data()
         if (!existingDocData || !existingDocData.members || existingDocData.members.length !== daoState.memberCount) {
             console.log(`Membercount changed, updating member collections`)
-            const members = await dao.members().first()
+            const members = await dao.members({}, { fetchPolicy: 'no-cache' }).first();
             doc.members = []
             for (const member of members) {
                 // eslint-disable-next-line
@@ -192,7 +193,7 @@ async function _updateDaoDb(dao) {
 }
 
 async function updateDaoById(daoId, customRetryOptions = {}) {
-
+    const arc = await getArc();
     if (!daoId) {
         throw Error(`You must provide a daoId (current value is "${daoId}")`)
     }
