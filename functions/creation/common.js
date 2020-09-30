@@ -19,7 +19,7 @@ const createCommonTransaction = async (req) => {
 
   if (env.environment === 'dev') {
     if (!data) {
-      throw CommonError('Cannot create a common without the needed data!');
+      throw new CommonError('Cannot create a common without the needed data!');
     }
 
     userData = req.body.user;

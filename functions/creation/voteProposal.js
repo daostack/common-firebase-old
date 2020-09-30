@@ -29,7 +29,7 @@ const createVoteProposalTransaction = async (req) => {
   const errorHandler = async () => {
     const proposalState = await proposal.fetchState();
     if (proposalState.stage in PROPOSAL_STAGES_HISTORY) {
-      throw CommonError(
+      throw new CommonError(
         `Cannot vote: the proposal ${proposalId} has been already executed, or it expired`
       );
     }
@@ -41,7 +41,7 @@ const createVoteProposalTransaction = async (req) => {
     const reputationContract = await reputation.contract();
     const reputationBalance = await reputationContract.balanceOf(voter);
     if (Number(reputationBalance) === 0) {
-      throw CommonError(
+      throw new CommonError(
         `Voting failed because you (${voter}) are not a member of this DAO (${dao.id}) - rep: ${reputationBalance}`
       );
     }

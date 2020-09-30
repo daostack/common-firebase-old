@@ -3,7 +3,7 @@ const CommonError = require('./CommonError');
 const {
   UnsupportedVersionError,
   UnsupportedVersionErrorCode,
-} = require('./UnsupportedVersionError');
+} = require('./UnsupportedVerionError');
 
 module.exports = {
   CommonError,

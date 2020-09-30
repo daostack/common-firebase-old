@@ -87,7 +87,7 @@ const createRequestToJoinTransaction = async (req) => {
     const memberFund = await joinContract.membersState(proposer);
     if (memberFund === true) {
       // If this error is thrown from a user action, there is a ui bug:s it means that some action was enabled where it shoudl not
-      throw CommonError(`Cannot create the proposal, because the proposer ${proposer} has already a pending membership request`);
+      throw new CommonError(`Cannot create the proposal, because the proposer ${proposer} has already a pending membership request`);
     }
 
     // require(avatar.nativeReputation().balanceOf(proposer) == 0, "already a member");
@@ -96,7 +96,7 @@ const createRequestToJoinTransaction = async (req) => {
     var reputationContract = await reputation.contract();
     const reputationBalanceOfProposer = await reputationContract.balanceOf(proposer);
     if (Number(reputationBalanceOfProposer) !== 0) {
-      throw CommonError(`Request to join failed because you (${proposer}) are already a member of this DAO (${dao.id}) - rep: ${reputationBalanceOfProposer}`);
+      throw new CommonError(`Request to join failed because you (${proposer}) are already a member of this DAO (${dao.id}) - rep: ${reputationBalanceOfProposer}`);
     }
 
     // const minFeeToJoin = Number(joinPlugin.coreState.pluginParams.minFeeToJoin);
@@ -158,7 +158,7 @@ const createRequestToJoin = async (req) => {
 
     await cancelPreauthorizedPayment(preAuthId);
 
-    throw CommonError('Request to join failed, Transaction failed in relayer');
+    throw new CommonError('Request to join failed, Transaction failed in relayer');
   }
 
   console.log('wait for tx to mined');
@@ -173,7 +173,7 @@ const createRequestToJoin = async (req) => {
   if (!events.JoinInProposal) {
     // TODO: add error handling wrapper
     console.error('Request to join failed, Transaction was mined, but no JoinInProposal event was not found in the receipt');
-    throw CommonError('Transaction was mined, but no JoinInProposal event was not found in the receipt');
+    throw new CommonError('Transaction was mined, but no JoinInProposal event was not found in the receipt');
   }
 
   const proposalId = events.JoinInProposal._proposalId;
@@ -182,7 +182,7 @@ const createRequestToJoin = async (req) => {
 
   if (!proposalId) {
     // TODO: add error handling wrapper
-    throw CommonError('Request to join failed, Transaction was mined, but no proposalId was found in the JoinInProposal event');
+    throw new CommonError('Request to join failed, Transaction was mined, but no proposalId was found in the JoinInProposal event');
   }
 
   await updateProposalById(proposalId, { retries: 8 });

@@ -2,6 +2,7 @@ const functions = require('firebase-functions');
 const { updateDaoById } = require('../dao');
 const { createLegalUser, createWallet } = require('../../mangopay/mangopay');
 const { Utils, PROPOSAL_TYPE } = require('../../util/util');
+const { CommonError } = require('../../util/errors');
 const { env } = require('@env');
 
 const emailClient = require('../../email');
@@ -17,7 +18,7 @@ exports.newProposalCreated = functions
       const common = await Utils.getCommonById(proposal.dao);
 
       if(!common) {
-        throw newCommonError(`
+        throw new CommonError(`
           New proposal was created from user (${proposal.proposerId}) 
           in common (${proposal.dao}), but the common was not found. 
           Created proposal id is ${proposal.id}

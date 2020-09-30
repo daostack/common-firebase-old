@@ -22,7 +22,7 @@ const fundingCheck = async (daoId, safeAddress) => {
   const activationTime = fundingRequestPluginState.pluginParams.voteParams.activationTime;
 
   if (activationTime > ((new Date()).getTime() / 1000)) {
-    throw CommonError(
+    throw new CommonError(
       `Cannot create a funding request as the plugin is not activated yet (it activates on ${activationTime})`,
       'Cannot create a funding request'
     );
@@ -39,13 +39,13 @@ const fundingCheck = async (daoId, safeAddress) => {
     const fundingGoal = Number(joinPluginState.pluginParams.fundingGoal);
     console.log(`funding goal: ${fundingGoal}`);
     if (fundingGoal !== 0) {
-      throw CommonError(`Invalidly configured DAO - funding goal is not 0, it is ${fundingGoal} instead`);
+      throw new CommonError(`Invalidly configured DAO - funding goal is not 0, it is ${fundingGoal} instead`);
     }
 
     // TODO: check fundingGoal < dao.balance ?
 
     if (joinPluginState.pluginParams.fundingGoalDeadline < new Date()) {
-      throw CommonError('Invalidly configured DAO - cannot create funding request (the fundingGoalDeadline of the join plugin is in the past, so we cannot set the fundingGoalReeched flag to true)');
+      throw new CommonError('Invalidly configured DAO - cannot create funding request (the fundingGoalDeadline of the join plugin is in the past, so we cannot set the fundingGoalReeched flag to true)');
     }
     console.log('We will try to reset the fundingGoalReachedFlag');
     const joinContract = await arc.getContract(errorJoinPlugin.coreState.address);
@@ -97,7 +97,7 @@ const createFundingProposalTransaction = async (req) => {
 
   const funding = data.funding;
   if (!funding) {
-    throw CommonError(
+    throw new CommonError(
       '"funding" argument must be given',
       'The funding argument was not provided!'
     );
@@ -176,7 +176,7 @@ const createFundingProposal = async (req) => {
   const fundingGoalReachedFlag = await daoContract.db('FUNDED_BEFORE_DEADLINE');
 
   if (fundingGoalReachedFlag !== 'TRUE') {
-    throw CommonError(
+    throw new CommonError(
       'funding goal is not reached yet - cannot create a funding request',
       'Cannot create funding request, because the funding goal is not reached yet!'
     );
@@ -203,7 +203,7 @@ const createFundingProposal = async (req) => {
   const events = Utils.getTransactionEvents(interf, receipt);
 
   if (!events.NewFundingProposal) {
-    throw CommonError(
+    throw new CommonError(
       'Expected (but did not find a NewFundingProposal event: something went wrong',
       'Something went wrong'
     );

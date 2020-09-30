@@ -3,6 +3,7 @@ const abi = require('./util/abi.json')
 const axios = require('axios');
 const { env } = require('@env');
 const { jsonRpcProvider } = require('../settings');
+const { CommonError } = require('../util/errors');
 
 const provider = new ethers.providers.JsonRpcProvider(jsonRpcProvider);
 const zeroAddress = `0x${'0'.repeat(40)}`;
@@ -24,7 +25,7 @@ module.exports = new class Relayer {
       return error.request;
     } 
 
-    return newCommonError('');
+    return new CommonError('');
   }
 
   async createWallet(address) {

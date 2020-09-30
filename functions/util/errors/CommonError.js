@@ -1,3 +1,5 @@
+const { v4: uuidv4 } = require('uuid');
+
 class CommonError extends Error {
   constructor(
     message,
@@ -6,6 +8,7 @@ class CommonError extends Error {
   ) {
     super(message);
 
+    this.errorId = uuidv4();
     this.name = this.constructor.name;
 
     this.userMessage = userMessage;
