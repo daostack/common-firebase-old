@@ -2,7 +2,7 @@
 
 CURRENTDIR=$(pwd)
 DIRNAME=$(dirname "$0")
-OUTPUTDIR="$CURRENTDIR/functions/env"
+OUTPUTDIR="$CURRENTDIR/functions/src/env"
 
 echo "Writing config files to $OUTPUTDIR"
 
@@ -114,4 +114,4 @@ elif [ "$currentMD5" = "$devMD5" ]; then
 else
   echo "Environment not match"
 fi
-exit 
+exit
