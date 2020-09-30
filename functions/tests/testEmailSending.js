@@ -13,7 +13,7 @@ const testEmailSending = async (req) => {
   const {to, subject, message, template} = req.query;
 
   if (!to) {
-    throw new Error("Email is not provided!");
+    throw newCommonError("Email is not provided!");
   }
 
   if (!template) {
@@ -109,7 +109,7 @@ const testPreauthFailedEmails = async (req) => {
   const proposal = proposalsSnapshot.docs.map(doc => doc.data())[0];
 
   if(!proposal) {
-    throw new Error("Proposal not found for preauth id " + preAuthId);
+    throw newCommonError("Proposal not found for preauth id " + preAuthId);
   }
 
   const common = (await db.collection(commonsCollection)

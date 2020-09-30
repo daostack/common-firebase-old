@@ -124,7 +124,7 @@ class Utils {
       const blockNumber = graphData.data.indexingStatusForCurrentVersion.chains[0].latestBlock.number;
       return Number(blockNumber);
     } catch(error) {
-      throw new Error(`Error trying to fetch latest blocknumber from ${env.graphql.graphApiUrl}: ${error}`)
+      throw newCommonError(`Error trying to fetch latest blocknumber from ${env.graphql.graphApiUrl}: ${error}`)
     }
   }
 

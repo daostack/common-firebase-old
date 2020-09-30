@@ -21,7 +21,7 @@ exports.backup = () => {
       && `gs://common-daostack.appspot.com/backup/${timestamp}`;
 
   if(!bucket) {
-    throw new Error('Environment Error: cannot find the current GCloud project!');
+    throw newCommonError('EnvironmentCommonError: cannot find the current GCloud project!');
   }
 
   return client.exportDocuments({

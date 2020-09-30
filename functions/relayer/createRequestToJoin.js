@@ -44,8 +44,6 @@ const createRequestToJoin = async (req, res) => {
       new CommonError(`Request to join failed, tx rejected in Relayer. Response data: ${JSON.stringify(response.data)}`)
     );
 
-
-
     res
       .status(500)
       .send({
@@ -76,7 +74,7 @@ const createRequestToJoin = async (req, res) => {
     // TODO: add error handling wrapper
     console.error(
       'Request to join failed, Transaction was mined, but no JoinInProposal event was not found in the receipt',
-      new CommonError('Request to join failed, Transaction was mined, but no JoinInProposal event was not found in the receipt');
+      new CommonError('Request to join failed, Transaction was mined, but no JoinInProposal event was not found in the receipt')
     );
 
     res

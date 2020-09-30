@@ -10,7 +10,7 @@ module.exports = async (preAuthId, failureReason = 'Unknown') => {
   const proposal = proposalsSnapshot.docs.map(doc => doc.data())[0];
 
   if (!proposal) {
-    throw new Error("Proposal not found for preauth id " + preAuthId);
+    throw newCommonError("Proposal not found for preauth id " + preAuthId);
   }
 
   const common = (await db.collection('daos')

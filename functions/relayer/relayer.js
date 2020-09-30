@@ -24,7 +24,7 @@ module.exports = new class Relayer {
       return error.request;
     } 
 
-    return new Error('');
+    return newCommonError('');
   }
 
   async createWallet(address) {

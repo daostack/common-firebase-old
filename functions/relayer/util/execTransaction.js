@@ -14,7 +14,7 @@ const execTransaction = async req => {
     // TODO: Once it failed, it will send detail to client which have apiKey
     const success = await Utils.isRelayerTxSuccess(response.data.txHash)
     if (!success) {
-      throw new Error(`ExecutionFailure while executing ${response.data.txHash}`)
+      throw newCommonError(`ExecutionFailure while executing ${response.data.txHash}`)
     }
     return response.data;
   } catch (error) {

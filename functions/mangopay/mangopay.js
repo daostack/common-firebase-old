@@ -164,7 +164,7 @@ const finalizeCardReg = async (cardRegistrationResult, Id) => {
       options
     );
     if (Status === 'ERROR') {
-      throw new Error(ResultMessage);
+      throw newCommonError(ResultMessage);
     }
     return CardId;
   } catch (e) {
@@ -210,7 +210,7 @@ const preauthorizePayment = async ({ funding, userData }) => {
     return preAuthReqData.data;
   } catch (e) {
     console.error('ERROR in CARD PREAUTHORIZATION', e);
-    throw new Error(`Error with card pre-authorization, ${e.response ? e.response.data.Message : e.message}`);
+    throw newCommonError(`Error with card pre-authorization, ${e.response ? e.response.data.Message : e.message}`);
   }
 };
 

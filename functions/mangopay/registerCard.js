@@ -28,7 +28,7 @@ const registerCard = async (req) => {
   if (Status === 'FAILED') {
     await sendPreauthorizationFailedEmail(preAuthId)
 
-    throw new Error(`Request to join failed. ${ResultMessage}`);
+    throw newCommonError(`Request to join failed. ${ResultMessage}`);
   }
 
   return {
