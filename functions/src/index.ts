@@ -3,7 +3,6 @@ require('module-alias/register');
 import * as admin from 'firebase-admin';
 import { databaseURL } from './settings';
 import { env } from '@env';
-import * as adminSdkJson from '@env/adminsdk-keys.json';
 import * as tests from './tests';
 import * as cron from './cron';
 
@@ -11,7 +10,7 @@ if(env.environment === 'dev') {
   admin.initializeApp();
 } else {
   admin.initializeApp({
-    credential: admin.credential.cert(adminSdkJson),
+    credential: admin.credential.cert(require('@env/adminsdk-keys.json')),
     databaseURL: databaseURL
   });
 }
