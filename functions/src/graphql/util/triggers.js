@@ -4,7 +4,7 @@ const { createLegalUser, createWallet } = require('../../mangopay/mangopay');
 const { createEvent } = require('../../db/eventDbService');
 const { Utils, PROPOSAL_TYPE } = require('../../util/util');
 const { env } = require('@env');
-
+const { EVENT_TYPES } = require('../../event/event');
 const emailClient = require('../../email');
 
 exports.newProposalCreated = functions
@@ -86,13 +86,15 @@ exports.newDaoCreated = functions.firestore
 
     const userId = newDao.members[0].userId;
     const userData = await Utils.getUserById(userId);
+    const daoName = newDao.name;
     
     try {
       const { Id: mangopayId } = await createLegalUser(newDao);
       const { Id: mangopayWalletId } = await createWallet(mangopayId);
 
       if (mangopayId && mangopayWalletId) {
-        
+        const commonLink = Utils.getCommonLink(newDao.id);
+
         console.debug(`Sending admin email for CommonCreated to ${env.mail.adminMail}`);
         console.debug(`Sending user email for CommonCreated to ${userData.email}`);
 
@@ -102,7 +104,7 @@ exports.newDaoCreated = functions.firestore
         //   userId: userId,
         //   objectId: newDao.id,
         //   createdAt: new Date(),
-        //   type: NOTIFICATION_TYPES.CREATION_COMMON
+        //   type: EVENT_TYPES.CREATION_COMMON
         // });
 
         await Promise.all([
@@ -143,11 +145,22 @@ exports.newDaoCreated = functions.firestore
     } catch (e) {
       console.error(e);
 
-      await createEvent({
-        userId: userId,
-        objectId: newDao.id,
-        createdAt: new Date(),
-        type: NOTIFICATION_TYPES.CREATION_COMMON_FAILED
+      // Temporary Disable for the Event functionality
+      //
+      // await createEvent({
+      //   userId: userId,
+      //   objectId: newDao.id,
+      //   createdAt: new Date(),
+      //   type: EVENT_TYPES.CREATION_COMMON_FAILED
+      // });
+
+      await emailClient.sendTemplatedEmail({
+        to: env.mail.adminMail,
+        templateKey: 'adminWalletCreationFailed',
+        emailStubs: {
+          commonName: daoName,
+          commonId: newDao.id
+        }
       });
 
     }
