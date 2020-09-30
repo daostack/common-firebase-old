@@ -2,7 +2,7 @@ const functions = require('firebase-functions');
 const { updateDaoById } = require('../Dao');
 const env = require('@env');
 const { createLegalUser, createWallet } = require('../../mangopay/mangopay');
-const { createNotification } = require('../../db/notificationDbService');
+const { createEvent } = require('../../db/eventDbService');
 const { Utils, PROPOSAL_TYPE } = require('../../util/util');
 
 const emailClient = require('../../email');
@@ -88,7 +88,7 @@ exports.newDaoCreated = functions.firestore
         console.debug(`Sending admin email for CommonCreated to ${env.mail.adminMail}`);
         console.debug(`Sending user email for CommonCreated to ${userData.email}`);
 
-        await createNotification({
+        await createEvent({
           userId: userId,
           objectId: newDao.id,
           createdAt: new Date(),
@@ -100,7 +100,7 @@ exports.newDaoCreated = functions.firestore
     } catch (e) {
       console.error(e);
 
-      await createNotification({
+      await createEvent({
         userId: userId,
         objectId: newDao.id,
         createdAt: new Date(),

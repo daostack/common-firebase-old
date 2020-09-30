@@ -21,6 +21,10 @@ export interface INotificationModel {
 const processNotification = async (notification: INotificationModel) => {
 
     const currNotifyObj = notifyData[notification.eventType];
+
+    if (!currNotifyObj.data) {
+        throw Error(`Not found data method for notification on event type "${notification.eventType}".`);
+    }
     
     if (notification.userFilter) {
         const eventNotifyData = await currNotifyObj.data(notification.eventObjectId);

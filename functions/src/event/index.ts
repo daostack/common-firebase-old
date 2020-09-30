@@ -1,5 +1,8 @@
 import * as functions from 'firebase-functions';
 import { notifyData } from '../notification/notification'
+import { createNotification } from '../db/notificationDbService';
+import { eventData } from './event'
+
 
 export enum EVENT_TYPES {
   //CREATION notifications
@@ -17,6 +20,7 @@ export enum EVENT_TYPES {
 }
 
 export interface IEventModel {
+    id: string,
     objectId: string,
     type: string,
     createdAt: string,
@@ -24,12 +28,20 @@ export interface IEventModel {
 
 const processEvent = async (event: IEventModel) => {
   
-  // Notification creation on event
+  // Create Notification object based on event
   if (event.type in notifyData) {
-    const currNotifyObj = notifyData[event.type];
-    
+    const currNotifyObj = eventData[event.type];
 
-    
+    const currEventObject = await currNotifyObj.eventObject(event.objectId);
+    const userFilter = await currNotifyObj.notifyUserFilter(currEventObject);
+
+    await createNotification({
+      eventId: event.id,
+      eventType: event.type,
+      eventObjectId: event.objectId,
+      userFilter,
+      createdAt: new Date(),
+    });
   }   
 }
 

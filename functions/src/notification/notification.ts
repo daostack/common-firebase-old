@@ -18,7 +18,7 @@ interface IEventData {
 }
 
 export const notifyData: Record<string, IEventData> = {
-  [EVENT_TYPES.CREATION_COMMON] : {
+  [EVENT_TYPES.CREATION_COMMON]: {
       data: async (objectId: string) => {
           return {
               commonData: (await getDaoById(objectId)).data()
