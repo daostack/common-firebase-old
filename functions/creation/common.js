@@ -48,6 +48,7 @@ const createCommonTransaction = async (req) => {
   const ipfsHash = await IpfsClient.addAndPinString(JSON.stringify(opts));
   console.log('ipfsHash ->', ipfsHash);
 
+  
   const daoFactoryInfo = arc.getContractInfoByName(
     'DAOFactoryInstance',
     ARC_VERSION
