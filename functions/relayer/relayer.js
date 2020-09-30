@@ -11,6 +11,8 @@ const options = { headers: { 'x-api-key': env.biconomy.apiKey, 'Content-Type': '
 module.exports = new class Relayer {
 
   handleAxiosError(error) {
+    console.error(error);
+
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
@@ -18,6 +20,7 @@ module.exports = new class Relayer {
     } else if (error.request) {
       // The request was made but no response was received
       console.error(error.request);
+
       return error.request;
     } 
 
