@@ -115,7 +115,7 @@ async function _updateDaoDb(dao) {
   }
 
   // Validate plugins
-  const plugins = await dao.plugins().first();
+  const plugins = await dao.plugins({}, { fetchPolicy: 'no-cache' }).first();
   const pluginValidation = _validateDaoPlugins(plugins);
 
   if (!pluginValidation.isValid) {
@@ -192,8 +192,10 @@ async function _updateDaoDb(dao) {
     }
   }
   await updateDao(dao.id, doc);
-  return { updatedDoc: doc };
 
+  return { 
+    updatedDoc: doc 
+  };
 }
 
 async function updateDaoById(daoId, customRetryOptions = {}) {
