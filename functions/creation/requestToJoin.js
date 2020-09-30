@@ -28,8 +28,20 @@ const createRequestToJoinTransaction = async (req) => {
       data
     } = req.body;
 
-    const uid = await Utils.verifyId(idToken);
-    const userData = await Utils.getUserById(uid);
+    let uid, userData;
+
+    if(env.environment === 'dev') {
+      if(!data) {
+        throw new Error('Cannot create a request to join without the needed data!')
+      }
+
+      userData = req.body.user;
+      userData.safeAddress = data.founderAddresses;
+    } else {
+      uid = await Utils.verifyId(idToken);
+      userData = await Utils.getUserById(uid);
+    }
+
     const IPFS_DATA_VERSION = env.graphql.ipfsDataVersion;
     const dao = arc.dao(daoId);
 

@@ -3,6 +3,7 @@ module.exports = {
     '**/?(*.)+(spec|test).ts'
   ],
   preset: 'ts-jest',
+  testTimeout: 30000,
   testEnvironment: 'node',
   coverageReporters: [
     'json-summary',
