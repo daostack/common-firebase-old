@@ -4,21 +4,6 @@ import { createNotification } from '../db/notificationDbService';
 import { eventData } from './event'
 
 
-export enum EVENT_TYPES {
-  //CREATION notifications
-  CREATION_COMMON = 'creationCommon',
-  CREATION_COMMON_FAILED = 'creationCommonFailed',
-  CREATION_PROPOSAL = 'creationProposal',
-  CREATION_REQUEST_TO_JOIN = 'creationReqToJoin',
-  //APPROVED notifications
-  APPROVED_REQUEST_TO_JOIN = 'approvedReqToJoin',
-  APPROVED_PROPOSAL = 'approvedProposal',
-  //REJECTED notifications
-  REJECTED_REQUEST_TO_JOIN = 'approvedReqToJoin',
-  REJECTED_PROPOSAL = 'rejectedProposal',
-  
-}
-
 export interface IEventModel {
     id: string,
     objectId: string,
