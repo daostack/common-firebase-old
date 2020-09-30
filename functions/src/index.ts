@@ -1,20 +1,8 @@
 require('module-alias/register');
 
-import * as admin from 'firebase-admin';
-import { databaseURL } from './settings';
 import { env } from '@env';
 import * as tests from './tests';
 import * as cron from './cron';
-
-// if(env.environment === 'dev') {
-//   admin.initializeApp();
-// } else {
-//   admin.initializeApp({
-//     credential: admin.credential.cert(require('@env/adminsdk-keys.json')),
-//     databaseURL: databaseURL
-//   });
-// }
-
 import * as relayer from './relayer';
 import * as graphql from './graphql';
 import * as graphqlTriggers from './graphql/util/triggers';
