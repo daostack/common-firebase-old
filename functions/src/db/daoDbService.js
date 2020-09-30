@@ -1,10 +1,8 @@
 const { mangopayClient } = require('../util/mangoPay');
-const admin = require('firebase-admin');
-const db = admin.firestore();
 const {env} = require('@env');
 const ethers = require('ethers');
 const abi = require('../relayer/util/abi.json');
-const { provider } = require('../settings');
+const { provider, db } = require('../settings');
 const COLLECTION_NAME = 'daos';
 
 async function updateDao(daoId, doc) {
@@ -61,7 +59,7 @@ const getTokenBalance = async (daoId) => {
     if (daoId) {
         let contract = new ethers.Contract(env.commonInfo.commonToken, abi.CommonToken, provider);
         const balance = await contract.balanceOf(daoId);
-        const balanceStr = ethers.utils.formatEther(balance);
+        const balanceStr = balance.toString();
         console.log('DAO Balance ->', balanceStr);
         return balanceStr;
     }

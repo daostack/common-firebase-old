@@ -3,12 +3,12 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-const { getPublicSettings } = require('./Settings');
+const { getPublicSettings } = require('./settings');
 
-const { updateDaos, updateDaoById } = require('./Dao');
-const { updateProposals, updateProposalById } = require('./Proposal');
-const { updateUsers } = require('./User');
-const { updateVotes } = require('./Vote');
+const { updateDaos, updateDaoById } = require('./dao');
+const { updateProposals, updateProposalById } = require('./proposal');
+const { updateUsers } = require('./user');
+const { updateVotes } = require('./vote');
 
 const { updateDAOBalance } = require('../db/daoDbService');
 
@@ -42,7 +42,6 @@ graphql.get('/update-daos', async (req, res) => {
       errorMessage: `Unable to update Daos!`
     }
   );
-
 });
 
 graphql.get('/update-dao-by-id', async (req, res) => {
@@ -102,6 +101,7 @@ graphql.get('/update-users', async (req, res) => {
     }
   );
 });
+
 graphql.get('/update-votes', async (req, res) => {
   responseExecutor(
     async () => {

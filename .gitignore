@@ -76,3 +76,5 @@ functions/node_modules/
 firestore/backup
 
 functions/env/env_config.json
+
+safe-contracts

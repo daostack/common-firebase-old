@@ -1,5 +1,4 @@
-const admin = require('firebase-admin');
-const db = admin.firestore();
+const { db } = require('../settings');
 
 const COLLECTION_NAME = 'proposals';
 

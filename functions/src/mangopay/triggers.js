@@ -22,7 +22,8 @@ exports.watchForExecutedProposals = functions.firestore
     if (
       data.executed !== previousData.executed &&
       data.executed === true &&
-      data.winningOutcome === 1 && data.description.preAuthId
+      data.winningOutcome === 1 
+      // && data.description.preAuthId
     ) {
       console.log(
         'Proposal EXECUTED and WINNING OUTCOME IS 1 -> INITIATING PAYMENT'
@@ -59,7 +60,7 @@ exports.watchForExecutedProposals = functions.firestore
             emailStubs: {
               name: userData.displayName,
               commonName: daoData.name,
-              commonLink: util.getCommonLink(daoData.id)
+              commonLink: Utils.getCommonLink(daoData.id)
             }
           }),
           emailClient.sendTemplatedEmail({
@@ -71,6 +72,7 @@ exports.watchForExecutedProposals = functions.firestore
           })
         ]);
 
+        console.log(`Minting ${amount} tokens to ${data.dao}`)
         await minterToken(data.dao, amount)
         await updateDAOBalance(data.dao);
         return change.after.ref.set(
@@ -165,9 +167,9 @@ exports.watchForExecutedProposals = functions.firestore
       } catch (e) {
         console.error('ERROR EXECUTING PRE AUTH PAYMENT', e);
 
-        const preAuthId = data.description.preAuthId;
+        // const preAuthId = data.description.preAuthId;
 
-        await sendPreauthorizationFailedEmail(preAuthId, e.message);
+        // await sendPreauthorizationFailedEmail(preAuthId, e.message);
 
         return change.after.ref.set({
           paymentStatus: 'failed',
@@ -180,7 +182,7 @@ exports.watchForExecutedProposals = functions.firestore
       data.executed === true &&
       data.winningOutcome === 0
     ) {
-      await cancelPreauthorizedPayment(data.description.preAuthId);
+       // await cancelPreauthorizedPayment(data.description.preAuthId);
     }
 
     if (
@@ -219,4 +221,5 @@ exports.watchForExecutedProposals = functions.firestore
         })
       ])
     }
+    return true
   });

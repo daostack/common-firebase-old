@@ -1,9 +1,9 @@
 const functions = require('firebase-functions');
-const { updateDaoById } = require('../Dao');
-const env = require('@env');
+const { updateDaoById } = require('../dao');
 const { createLegalUser, createWallet } = require('../../mangopay/mangopay');
 const { createEvent } = require('../../db/eventDbService');
 const { Utils, PROPOSAL_TYPE } = require('../../util/util');
+const { env } = require('@env');
 
 const emailClient = require('../../email');
 
@@ -16,6 +16,14 @@ exports.newProposalCreated = functions
     if(proposal.name === PROPOSAL_TYPE.Join) {
       const proposer = await Utils.getUserById(proposal.proposerId);
       const common = await Utils.getCommonById(proposal.dao);
+
+      if(!common) {
+        throw new Error(`
+          New proposal was created from user (${proposal.proposerId}) 
+          in common (${proposal.dao}), but the common was not found. 
+          Created proposal id is ${proposal.id}
+        `);
+      }
 
       await emailClient.sendTemplatedEmail({
         to: proposer.email,
@@ -88,12 +96,47 @@ exports.newDaoCreated = functions.firestore
         console.debug(`Sending admin email for CommonCreated to ${env.mail.adminMail}`);
         console.debug(`Sending user email for CommonCreated to ${userData.email}`);
 
-        await createEvent({
-          userId: userId,
-          objectId: newDao.id,
-          createdAt: new Date(),
-          type: NOTIFICATION_TYPES.CREATION_COMMON
-        });
+        // Temporary Disable for the Event functionality
+        //
+        // await createEvent({
+        //   userId: userId,
+        //   objectId: newDao.id,
+        //   createdAt: new Date(),
+        //   type: NOTIFICATION_TYPES.CREATION_COMMON
+        // });
+
+        await Promise.all([
+          emailClient.sendTemplatedEmail({
+            to: userData.email,
+            templateKey: 'userCommonCreated',
+            emailStubs: {
+              commonLink,
+              name: userData.displayName,
+              commonName: daoName
+            }
+          }),
+
+          emailClient.sendTemplatedEmail({
+            to: env.mail.adminMail,
+            templateKey: 'adminCommonCreated',
+            emailStubs: {
+              userId,
+              commonLink,
+              userName: userData.displayName,
+              userEmail: userData.email,
+              commonCreatedOn: new Date().toDateString(),
+              log: 'Successfully created common',
+              commonId: newDao.id,
+              commonName: newDao.name,
+              description: newDao.metadata.description,
+              about: newDao.metadata.byline,
+              paymentType: 'one-time',
+              minContribution: newDao.metadata.minimum
+            }
+          })
+        ]);
+
+        console.debug('Done sending emails for dao creation');
 
         return snap.ref.set({ mangopayId, mangopayWalletId }, { merge: true });
       }
