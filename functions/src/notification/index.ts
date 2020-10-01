@@ -31,7 +31,9 @@ const processNotification = async (notification: INotificationModel) => {
             }
 
             if (currNotifyObj.email) {
-                 await emailClient.sendTemplatedEmail(currNotifyObj.email(eventNotifyData))
+                const emailTemplate = currNotifyObj.email(eventNotifyData);
+                emailTemplate.to = userData.email;
+                await emailClient.sendTemplatedEmail(emailTemplate);
             }
 
         } );
