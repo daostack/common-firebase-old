@@ -51,8 +51,7 @@ exports.watchForReputationRedeemed = functions.firestore
     const previousData = change.before.data();
     if (
       data.type === PROPOSAL_TYPE.Join &&
-      previousData.join.reputationMinted === '0' &&
-      data.join.reputationMinted !== '0'
+      previousData.join.reputationMinted !== data.join.reputationMinted
     ) {
       console.log(
         'Join proposal reputationMinted changed from "0" Initiating DAO update'
