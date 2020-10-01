@@ -99,10 +99,6 @@ export default new class Notification implements INotification {
       },
     };
 
-    console.log("tokens -> ", tokens);
-    console.log("payload -> ", payload);
-    console.log("options -> ", options);
-
     // @question Ask about this rule "promise/always-return". It is kinda useless so we may disable it globally?
     // eslint-disable-next-line promise/always-return
     const messageSent: admin.messaging.MessagingDevicesResponse = await messaging.sendToDevice(tokens, payload, options);
