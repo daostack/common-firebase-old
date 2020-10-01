@@ -83,12 +83,16 @@ const createFundingProposalTransaction = async (req) => {
     console.log(e);
     console.log(daoId);
 
-    const catchPlugins = await dao
-      .plugins()
-      .pipe(first())
-      .toPromise();
+    // const catchPlugins = await dao
+    //   .plugins()
+    //   .pipe(first())
+    //   .toPromise();
 
-    console.log(catchPlugins.map((p) => p.coreState.name));
+    const funding = data.funding;
+    
+    if (!funding && funding !== 0) {
+      throw new CommonError('"funding" argument must be given');
+    }
 
     throw e;
   }

@@ -1,6 +1,6 @@
 {
   "name": "@common/functions",
-  "main": "index.js",
+  "main": "dist/index.js",
   "private": true,
   "version": "1.0.0",
   "description": "Cloud Functions for Common",
@@ -40,9 +40,8 @@
     "uuid": "^8.3.0"
   },
   "_moduleAliases": {
-    "@env": "./env",
-    "@settings": "./settings",
-    "@util": "./util"
-  },
-  "devDependencies": {}
+    "@env": "./src/env",
+    "@settings": "./src/settings",
+    "@util": "./src/util"
+  }
 }
