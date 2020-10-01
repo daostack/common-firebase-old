@@ -29,7 +29,7 @@ export const notifyData: Record<string, IEventData> = {
       email: ( {commonData} ) => {
           return {
               to: env.mail.adminMail,
-              templateKey: 'adminWalletCreationFailed',
+              templateKey: 'userCommonCreated',
               emailStubs: {
                   commonName: commonData.name,
                   commonId: commonData.id
@@ -54,15 +54,23 @@ export const notifyData: Record<string, IEventData> = {
                   commonId: commonData.id
               }
           }
+    },
+    notification: async ({ proposalData, commonData, userData }) => {
+      return {
+        title: 'A new funding proposal in your Common!',
+        body: `${userData.firstName} is asking for ${proposalData.fundingRequest.amount / 100} for their proposal in "${commonData.name}". See the proposal and vote.`,
+        image: commonData.metadata.image || ''
       }
+    },
   },
   [EVENT_TYPES.CREATION_PROPOSAL] : {
       // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       data: async (objectId: string) => {
+          const proposalData = (await getProposalById(objectId)).data();
           return {
-              proposalData: (await getProposalById(objectId)).data(),
-              commonData: (await getDaoById(objectId)).data(),
-              userData: (await getUserById(objectId)).data()
+              proposalData,
+              commonData: (await getDaoById(proposalData.dao)).data(),
+              userData: (await getUserById(proposalData.proposerId)).data()
           }
       },
       // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

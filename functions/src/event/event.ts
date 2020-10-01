@@ -42,7 +42,7 @@ export const eventData: Record<string, IEventData> = {
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: async (proposal: any): Promise<string[]> => {
             const proposalDao = (await getDaoById(proposal.dao)).data();
-            const userFilter = proposalDao.memberrs.map(member => {
+            const userFilter = proposalDao.members.map(member => {
                 return member.userId;
             });
             return userFilter;

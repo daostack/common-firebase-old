@@ -12,9 +12,9 @@ exports.newProposalCreated = functions
   .document('/proposals/{id}')
   .onCreate(async (snap) => {
     const proposal = snap.data();
-
+    
+    const proposer = await Utils.getUserById(proposal.proposerId);
     if(proposal.name === PROPOSAL_TYPE.Join) {
-      const proposer = await Utils.getUserById(proposal.proposerId);
       const common = await Utils.getCommonById(proposal.dao);
 
       if(!common) {
@@ -34,6 +34,15 @@ exports.newProposalCreated = functions
           commonName: common.metadata.name
         }
       })
+    }
+
+    if (proposal.type === PROPOSAL_TYPE.FundingRequest) {
+        await createEvent({
+          userId: proposer.uid,
+          objectId: proposal.id,
+          createdAt: new Date(),
+          type: EVENT_TYPES.CREATION_PROPOSAL
+        });
     }
   })
 
@@ -100,43 +109,43 @@ exports.newDaoCreated = functions.firestore
 
         // Temporary Disable for the Event functionality
         //
-        // await createEvent({
-        //   userId: userId,
-        //   objectId: newDao.id,
-        //   createdAt: new Date(),
-        //   type: EVENT_TYPES.CREATION_COMMON
-        // });
+        await createEvent({
+          userId: userId,
+          objectId: newDao.id,
+          createdAt: new Date(),
+          type: EVENT_TYPES.CREATION_COMMON
+        });
 
-        await Promise.all([
-          emailClient.sendTemplatedEmail({
-            to: userData.email,
-            templateKey: 'userCommonCreated',
-            emailStubs: {
-              commonLink,
-              name: userData.displayName,
-              commonName: daoName
-            }
-          }),
+        // await Promise.all([
+        //   emailClient.sendTemplatedEmail({
+        //     to: userData.email,
+        //     templateKey: 'userCommonCreated',
+        //     emailStubs: {
+        //       commonLink,
+        //       name: userData.displayName,
+        //       commonName: daoName
+        //     }
+        //   }),
 
-          emailClient.sendTemplatedEmail({
-            to: env.mail.adminMail,
-            templateKey: 'adminCommonCreated',
-            emailStubs: {
-              userId,
-              commonLink,
-              userName: userData.displayName,
-              userEmail: userData.email,
-              commonCreatedOn: new Date().toDateString(),
-              log: 'Successfully created common',
-              commonId: newDao.id,
-              commonName: newDao.name,
-              description: newDao.metadata.description,
-              about: newDao.metadata.byline,
-              paymentType: 'one-time',
-              minContribution: newDao.metadata.minimum
-            }
-          })
-        ]);
+        //   emailClient.sendTemplatedEmail({
+        //     to: env.mail.adminMail,
+        //     templateKey: 'adminCommonCreated',
+        //     emailStubs: {
+        //       userId,
+        //       commonLink,
+        //       userName: userData.displayName,
+        //       userEmail: userData.email,
+        //       commonCreatedOn: new Date().toDateString(),
+        //       log: 'Successfully created common',
+        //       commonId: newDao.id,
+        //       commonName: newDao.name,
+        //       description: newDao.metadata.description,
+        //       about: newDao.metadata.byline,
+        //       paymentType: 'one-time',
+        //       minContribution: newDao.metadata.minimum
+        //     }
+        //   })
+        // ]);
 
         console.debug('Done sending emails for dao creation');
 
@@ -147,12 +156,12 @@ exports.newDaoCreated = functions.firestore
 
       // Temporary Disable for the Event functionality
       //
-      // await createEvent({
-      //   userId: userId,
-      //   objectId: newDao.id,
-      //   createdAt: new Date(),
-      //   type: EVENT_TYPES.CREATION_COMMON_FAILED
-      // });
+      await createEvent({
+        userId: userId,
+        objectId: newDao.id,
+        createdAt: new Date(),
+        type: EVENT_TYPES.CREATION_COMMON_FAILED
+      });
 
       await emailClient.sendTemplatedEmail({
         to: env.mail.adminMail,

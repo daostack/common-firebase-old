@@ -12,7 +12,7 @@ export interface IEventModel {
 }
 
 const processEvent = async (event: IEventModel) => {
-  
+  console.log("Process EVENT : ", event);
   // Create Notification object based on event
   if (event.type in notifyData) {
     const currNotifyObj = eventData[event.type];
