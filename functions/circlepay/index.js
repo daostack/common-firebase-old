@@ -25,9 +25,7 @@ circlepay.use(cors({ origin: true }));
 circlepay.post('/create-card', async (req, res) => {
 	console.log('index /create-card');
 	responseExecutor(
-		async () => {
-			return await createCirclePayCard(req);
-		},
+		async () => (await createCirclePayCard(req)),
 		{
 			req,
 			res,
@@ -39,9 +37,7 @@ circlepay.post('/create-card', async (req, res) => {
 circlepay.get('/encryption', async (req, res) => {
 	console.log('index/encryption');
 	responseExecutor(
-	async () => {
-		return await encryption(); // create a file for this?
-	},
+	async () => (await encryption()), // create a file for this?
 	{
 		req,
 		res,

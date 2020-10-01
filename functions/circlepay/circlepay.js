@@ -32,13 +32,11 @@ const options = {
 			ipAddress
 		}
 	 */
-
 const createCard = async (cardData) => {
 	const response = await axios.post(`${circlePayApi}/cards`,
 		cardData,
 		options
 	);
-	console.log('response', response);
 	return response.data;
 }
 
