@@ -84,6 +84,14 @@ There are API endpoint for testing the functionality of the application. They ar
     
 ## Testing
 
+TLDR:
+```
+yarn use:dev
+docker-compsoe up -d // in one terminal
+yarn emulator // in another terinal
+yarn test // in yet another terminal
+```
+
 ### set up the environment
 
 The cloud functions are communicating with a variety of services. Some of them are mocked, others 
