@@ -44,7 +44,7 @@ exports.newProposalCreated = functions
     }
   })
 
-exports.watchForReputationRedeemed = functions.firestore
+exports.watchForNewMembers = functions.firestore
   .document('/proposals/{id}')
   .onUpdate(async (change) => {
     const data = change.after.data();
