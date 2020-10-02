@@ -12,18 +12,22 @@ const mangoPayApi = env.mangopay.apiUrl;
 const ipfsDataVersion = env.graphql.ipfsDataVersion;
 const ipfsProvider = env.graphql.ipfsProvider;
 
-if(env.environment === 'dev') {
-  admin.initializeApp();
-} else {
-  admin.initializeApp({
-    credential: admin.credential.cert(require('@env/adminsdk-keys.json')),
-    databaseURL: databaseURL
-  });
+
+let db;
+
+if(admin.apps.length === 0) {
+  if (env.environment === 'dev') {
+    admin.initializeApp();
+  } else {
+    admin.initializeApp({
+      credential: admin.credential.cert(require('@env/adminsdk-keys.json')),
+      databaseURL: databaseURL
+    });
+  }
+
+  db = admin.firestore();
+  db.settings({ ignoreUndefinedProperties: true});
 }
-
-const db = admin.firestore();
-
-db.settings({ ignoreUndefinedProperties: true})
 
 const retryOptions = {
     retries: 4, // The maximum amount of times to retry the operation. Default is 10.
@@ -53,7 +57,7 @@ const getArc = async () => {
 }
 
 Arc.prototype.fetchAllContracts = async function (useCache) {
-  
+
   if (useCache) {
     const contracts = await db.collection('arc').doc('contract').get();
     if (contracts.exists) {

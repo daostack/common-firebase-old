@@ -33,6 +33,7 @@
     "graphql-tag": "^2.11.0",
     "mangopay2-nodejs-sdk": "^1.13.0",
     "module-alias": "^2.2.2",
+    "moment": "^2.29.0",
     "node-fetch": "^2.6.0",
     "promise-retry": "^2.0.1",
     "rxjs": "^6.6.3",
@@ -40,8 +41,14 @@
     "uuid": "^8.3.0"
   },
   "_moduleAliases": {
-    "@env": "./src/env",
-    "@settings": "./src/settings",
-    "@util": "./src/util"
+    "@db": "./dist/db",
+    "@env": "./dist/env",
+    "@util": "./dist/util",
+    "@errors": "./dist/util/errors",
+    "@settings": "./dist/settings"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.8",
+    "@types/node": "^14.11.2"
   }
 }

@@ -4,7 +4,7 @@ import { env } from '@env';
 import * as tests from './tests';
 import * as cron from './cron';
 import * as relayer from './relayer';
-import * as graphql from './graphql';
+import * as graphql from './graphql/index';
 import graphqlTriggers from './graphql/util/triggers';
 import * as  mangopay from './mangopay';
 import mangopayTriggers from './mangopay/triggers';

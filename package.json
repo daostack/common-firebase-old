@@ -4,6 +4,7 @@
   "scripts": {
     "build:dev": "rimraf ./functions/dist/**/* && tsc -p tsconfig.json --watch",
     "dev": "concurrently -n \"Tests,Emulator,Compiler\" \"yarn test:watch\" \"yarn emulator\" \"nodemon\"",
+    "dev:start": "concurrently -n \"Emulator,Compiler\" \"yarn emulator\" \"nodemon\"",
     "lint": "eslint .",
     "clean": "find ./ -name '*.log' -delete",
     "logs": "firebase functions:log",
@@ -74,9 +75,11 @@
     "functions"
   ],
   "_moduleAliases": {
-    "@env": "./functions/src/env",
-    "@settings": "./functions/src/settings",
-    "@util": "./functions/src/util"
+    "@db": "./functions/dist/db",
+    "@env": "./functions/dist/env",
+    "@util": "./functions/dist/util",
+    "@errors": "./functions/dist/util/erros",
+    "@settings": "./functions/dist/settings"
   },
   "dependencies": {
     "shelljs": "^0.8.4"

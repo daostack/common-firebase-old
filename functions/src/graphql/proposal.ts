@@ -1,21 +1,30 @@
-const { findUserByAddress } = require('../db/userDbService');
-const { Vote } = require('@daostack/arc.js');
-const { getArc, retryOptions, ipfsDataVersion } = require('../settings')
-const promiseRetry = require('promise-retry');
-const { Utils } = require('../util/util');
-const { UnsupportedVersionError } = require('../util/errors');
-const { updateProposal } = require('../db/proposalDbService');
-const BN = require('bn.js');
+import BN from 'bn.js';
+import moment from 'moment';
+import express from 'express';
+import admin from 'firebase-admin';
+import promiseRetry from 'promise-retry';
+import { Vote } from '@daostack/arc.js';
+
+import { Utils } from '@util/util';
+import { ProposalCollection } from '@util';
+import { updateProposal } from '@db/proposalDbService';
+import { findUserByAddress } from '@db/userDbService';
+import { getArc, ipfsDataVersion, retryOptions } from '@settings';
+import { CommonError, UnsupportedVersionError } from '../util/errors';
+
+const db = admin.firestore();
 
 const parseVotes = (votesArr) => {
     return votesArr.map(({ coreState: { voter, outcome } }) => { return { voter, outcome } })
 }
 
-async function _updateProposalDb(proposal) {
+const _updateProposalDb = async (proposal) => {
     const arc = await getArc();
     const result = { updatedDoc: null, errorMsg: null };
     const s = proposal.coreState
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     const votes = await Vote.search(arc, { where: { proposal: s.id } }, { fetchPolicy: 'no-cache' }).first();
 
     // TODO: for optimization, consider looking for a new member not as part of this update process
@@ -98,7 +107,7 @@ async function _updateProposalDb(proposal) {
     return result;
 }
 
-async function updateProposalById(proposalId, customRetryOptions = {}, blockNumber) {
+export const  updateProposalById = async (proposalId, customRetryOptions = {}, blockNumber) => {
     const arc = await getArc();
     let currBlockNumber = null;
     if (blockNumber) {
@@ -108,12 +117,14 @@ async function updateProposalById(proposalId, customRetryOptions = {}, blockNumb
         }
     }
 
-    let proposal = await promiseRetry(
+    const proposal = await promiseRetry(
         async (retryFunc, number) => {
             console.log(`Try #${number} to get Proposal ${proposalId}`);
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             const proposals = await arc.proposals({ where: { id: proposalId } }, { fetchPolicy: 'no-cache' }).first()
 
-            let isBehindLatestBlock = true; // set initally to true and change only if the blockNumber is provided and checked
+            let isBehindLatestBlock = true; // set initially to true and change only if the blockNumber is provided and checked
             if (currBlockNumber) {
                 const latestBlockNumber = await Utils.getGraphLatestBlockNumber();
                 isBehindLatestBlock = currBlockNumber <= latestBlockNumber;
@@ -136,13 +147,15 @@ async function updateProposalById(proposalId, customRetryOptions = {}, blockNumb
     return updatedDoc;
 }
 
-async function updateProposals() {
+export const  updateProposals = async () =>  {
     const arc = await getArc();
     const allProposals = [];
     let currProposals = null;
     let skip = 0;
     
     do {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         // eslint-disable-next-line no-await-in-loop
         currProposals = await arc.proposals({ first: 1000, skip: skip * 1000 }, { fetchPolicy: 'no-cache' }).first();
         allProposals.push(...currProposals);
@@ -177,8 +190,62 @@ async function updateProposals() {
     };
 }
 
+export type ProposalState = 'Approved' | 'Rejected'  | 'New' | 'Countdown';
 
-module.exports = {
-    updateProposals,
-    updateProposalById
+const ProposalStage = {
+    ExpiredInQueue: 0,
+    Executed: 1,
+    Queued: 2,
+    PreBoosted: 3,
+    Boosted: 4,
+    QuietEndingPeriod: 5,
+};
+
+export const LaunchedStated = [
+    ProposalStage.Queued,
+    ProposalStage.PreBoosted,
+];
+
+export const CountdownStates = [
+    ProposalStage.Boosted,
+    ProposalStage.QuietEndingPeriod,
+];
+
+export const getProposalState = async (req: express.Request): Promise<ProposalState> => {
+    const { proposalId} = req.query;
+
+    const proposal = (await db.collection(ProposalCollection).doc(proposalId as string).get()).data();
+
+    if (!proposal) {
+        throw new CommonError (
+          `Cannot find proposal with id ${proposalId}`,
+          'Cannot find the requested proposal',
+          404
+        )
+    }
+
+    if(proposal.stage === ProposalStage.Executed) {
+        return proposal.winningOutcome === 1
+            ? 'Approved'
+            : 'Rejected';
+    }
+
+    if(
+      proposal.stage === ProposalStage.ExpiredInQueue ||
+      moment().isAfter(moment.unix(proposal.closingAt))
+    ) {
+        return 'Rejected';
+    }
+
+    if(LaunchedStated.includes(proposal.stage)) {
+        return 'New'
+    }
+
+    if(CountdownStates.includes(proposal.stage)) {
+        return 'Countdown';
+    }
+
+    console.error('Proposal state not caught', new CommonError(`Cannot determine proposal state (${JSON.stringify(proposal)})`))
+
+    return 'Rejected';
 };

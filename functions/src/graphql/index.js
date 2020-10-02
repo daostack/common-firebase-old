@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const { getPublicSettings } = require('./settings');
 
 const { updateDaos, updateDaoById } = require('./dao');
-const { updateProposals, updateProposalById } = require('./proposal');
+const { updateProposals, updateProposalById, getProposalState } = require('./proposal');
 const { updateUsers } = require('./user');
 const { updateVotes } = require('./vote');
 
@@ -138,6 +138,17 @@ graphql.get('/settings', async (req, res) => {
     successMessage: 'Setting successfully acquired!',
     errorMessage: 'An error occurred while trying to acquire the settingss'
   });
+});
+
+graphql.get('/proposal/state', async (req, res) => {
+  await responseExecutor(async () => ({
+    result: await getProposalState(req)
+  }), {
+    req,
+    res,
+    successMessage: 'Successfully retrieved state',
+    errorMessage: 'An error occurred while trying to retrieve state'
+  })
 });
 
 exports.graphql = functions.runWith(runtimeOptions).https.onRequest(graphql);
