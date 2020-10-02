@@ -141,6 +141,8 @@ exports.newDaoCreated = functions.firestore
         console.debug('Done sending emails for dao creation');
 
         return snap.ref.set({ mangopayId, mangopayWalletId }, { merge: true });
+      } else {
+        return true
       }
     } catch (e) {
       console.error(e);
@@ -162,6 +164,6 @@ exports.newDaoCreated = functions.firestore
           commonId: newDao.id
         }
       });
-
+      return true
     }
   });
