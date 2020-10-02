@@ -201,7 +201,7 @@ async function _updateDaoDb(dao) {
 async function updateDaoById(daoId, customRetryOptions = {}) {
   const arc = await getArc();
   if (!daoId) {
-    throwCommonError(`You must provide a daoId (current value is "${daoId}")`);
+    throw new CommonError(`You must provide a daoId (current value is "${daoId}")`);
   }
   daoId = daoId.toLowerCase();
   const dao = await promiseRetry(
@@ -226,7 +226,7 @@ async function updateDaoById(daoId, customRetryOptions = {}) {
   if (errorMsg) {
     console.error(`Dao update failed for id: ${dao.id}!`);
     console.error(errorMsg);
-    throwCommonError(errorMsg);
+    throw new CommonError(errorMsg);
   }
   console.log('UPDATED DAO WITH ID: ', daoId);
   console.log('----------------------------------------------------------');

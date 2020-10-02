@@ -104,7 +104,7 @@ async function updateProposalById(proposalId, customRetryOptions = {}, blockNumb
     if (blockNumber) {
         currBlockNumber = Number(blockNumber);
         if (Number.isNaN(currBlockNumber)) {
-            throwCommonError(`The blockNumber parameter should be a number between 0 and ${Number.MAX_SAFE_INTEGER}`);
+            throw new CommonError(`The blockNumber parameter should be a number between 0 and ${Number.MAX_SAFE_INTEGER}`);
         }
     }
 
