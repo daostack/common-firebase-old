@@ -134,22 +134,13 @@ async function updateProposalById(proposalId, customRetryOptions = {}, blockNumb
 
     // @notice The current implementation is a workaround a problem that actually needs to be solved
     if(updatedDoc.updatedDoc.votes.length !== Number(updatedDoc.votesFor) + Number(updatedDoc.votesAgainst)) {
-        // // If we retry this 10 times something must be wrong so there is no point in retrying any further
-        // if(currentTry >= 10) {
-        //     // @todo Once merged change this to be CommonError (the new one)
-        //     throw new Error(`Cannot fully update proposal with id (${proposalId})`);
-        // }
-        //
-        // await setTimeout(async () => {
-        //     await updateProposalById(proposalId, customRetryOptions, blockNumber, currentTry + 1);
-        // }, currentTry * 5000);
-        await promiseRetry(async (retryFunc, number) => {
-            const proposal = await updateProposalById(proposalId, customRetryOptions, blockNumber, currentTry + 1);
+        // If we retry this 10 times something must be wrong so there is no point in retrying any further
+        if(currentTry >= 10) {
+            // @todo Once merged change this to be CommonError (the new one)
+            throw new Error(`Cannot fully update proposal with id (${proposalId})`);
+        }
 
-            if(proposal.updatedDoc.votes.length !== Number(updatedDoc.votesFor) + Number(updatedDoc.votesAgainst)) {
-                retryFunc()
-            }
-        }, { ...retryOptions, ...customRetryOptions })
+        await updateProposalById(proposalId, customRetryOptions, blockNumber, currentTry + 1);
     }
 
     console.log("updated proposal", proposal.id);
