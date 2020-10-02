@@ -88,7 +88,20 @@ class Utils {
       const cardData = await cardRef.get().then(doc => doc.data());
       return cardData;
     } catch (err) {
-      throw new Error('Create an error for this');
+      throw new Error('cardById TODO make an error for this');
+    }
+  }
+
+  async getCardByProposalId(proposalId) {
+    try {
+      console.log('proposalId', proposalId);
+      const cardRef = await admin.firestore().collection('cards')
+        .where('proposalId', '==', proposalId)
+        .get();
+      const cardData = cardRef.docs.map(doc => doc.data())[0];
+      return cardData;
+    } catch (err) {
+       throw new Error('cardByProposal TODO make an error for this');
     }
   }
 
