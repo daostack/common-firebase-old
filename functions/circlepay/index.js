@@ -5,6 +5,8 @@ const circlepay = express();
 const { env } = require('@env');
 const cors = require('cors');
 const {createCirclePayCard} = require('./createCirclePayCard'); 
+const {createPayment} = require('./createPayment'); 
+const {createFundingProposal} = require('./createFundingProposal');
 const { responseExecutor } = require('../util/responseExecutor');
 const {encryption} = require('./circlepay');
 
@@ -37,7 +39,7 @@ circlepay.post('/create-card', async (req, res) => {
 circlepay.get('/encryption', async (req, res) => {
 	console.log('index/encryption');
 	responseExecutor(
-	async () => (await encryption()), // create a file for this?
+	async () => (await encryption()),
 	{
 		req,
 		res,
@@ -45,5 +47,30 @@ circlepay.get('/encryption', async (req, res) => {
 		errorMessage: `Unable to generate PCI encryption key!`
 	})
 })
+
+circlepay.post('/create-a-payment', async (req, res) => {
+	console.log('index/create-a-payment');
+	responseExecutor(
+	async () => (await createPayment(req)),
+	{
+		req,
+		res,
+		successMessage: `Payment was successful`,
+		errorMessage: `Unable to process payment!`
+	})
+});
+
+circlepay.post('/create-funding-proposal', async (req, res) => {
+	console.log('index/create-funding-proposal');
+	responseExecutor(
+	async () => (await createFundingProposal(req)),
+	{
+		req,
+		res,
+		successMessage: `Funding proposal creation was successful`,
+		errorMessage: `Unable to create funding proposal!`
+	})
+	return;
+});
 
 exports.circlepay = functions.runWith(runtimeOptions).https.onRequest(circlepay);

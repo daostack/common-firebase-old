@@ -45,7 +45,16 @@ const encryption = async () => {
 	return response.data;
 }
 
+const createAPayment = async (paymentData) => {
+	const response = await axios.post(`${circlePayApi}/payments`,
+		paymentData,
+		options
+	);
+	return response;
+}
+
 module.exports = {
 	createCard,
-	encryption
+	encryption,
+	createAPayment
 }

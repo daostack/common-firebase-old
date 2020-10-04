@@ -1,40 +1,29 @@
 const functions = require('firebase-functions');
 const { Utils } = require('../util/util');
+const { createPayment } = require('./createPayment');
 
-// not tested yet
+// tested but without adding payment to db yet
 exports.watchForExecutedProposals = functions.firestore
 	.document('/proposal/{id}')
   .onUpdate(async (change) => {
-    const data = change.after.data();
-    const previousData = change.before.data();
+    const proposal = change.after.data();
+    const previousProposal = change.before.data();
 
-    if (data.executed !== previousData.executed
-      && data.executed === true
-      && data.winningOutcome === 1) {
+    if (proposal.executed !== previousProposal.executed
+      && proposal.executed === true
+      && proposal.winningOutcome === 1) {
 
       console.log(
         'Proposal EXECUTED and WINNING OUTCOME IS 1 -> INITIATING PAYMENT'
       );
 
-        const cardId = await Utils.getCardByProposalId(data.id);
-        /*
-        data needed for payment
-        idempotencyKey // (also in frontend) use commonId for generating this? consider uuid-by-string,
-        metadata: {
-          email of user // get by userId (from proposal data.proposer)
-          sessionId
-          ipAddress
-        }
-        amount: {
-          amount
-          currency
-        }
-        verification: cvv || none
-        source: {
-          id // cardId
-          type: card
-        }
-         */
-        }
+        const {data} = await createPayment({
+          proposerId: proposal.proposerId,
+          funding: proposal.description.funding,
+        });
+
+        // update database with response payment
+      }
     }
-  });
+  }
+});

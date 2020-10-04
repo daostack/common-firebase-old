@@ -1,8 +1,8 @@
 const { db } = require('../settings.js');
 
-const updateCard = async (doc) => (
+const updateCard = async (cardId, doc) => (
 	await db.collection('cards')
-    .doc(doc.id)
+    .doc(cardId)
     .set(
         doc,
         {
@@ -10,6 +10,21 @@ const updateCard = async (doc) => (
         }
     )
 )
+
+const updateProposalList = async (cardId, proposals) => {  
+  await db.collection('cards')
+  .doc(cardId)
+  .set({
+    proposals
+  },{
+    merge: true
+  });
+  return proposals;
+}
+
+
+
 module.exports = {
-    updateCard
+    updateCard,
+    updateProposalList
 };

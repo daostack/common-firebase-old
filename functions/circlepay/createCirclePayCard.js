@@ -1,18 +1,17 @@
 const { Utils } = require('../util/util');
 const { createCard } = require('./circlepay');
-const { db } = require('../settings.js');
 const { updateCard } = require('../db/cardDbService');
 
 const _updateCard = async (userId, cardId, proposalId, id) => {
 	const doc = {
 		id, //should be the hash of the proposalId and cardId, TO_ASK use a hashing library? 
 		userId,
-		proposalId,
+		proposals: [proposalId],
 		cardId,
 		creationData: new Date(),
 		payments: [],
 	};
-  await updateCard(doc);
+  await updateCard(id, doc);
 }
 
 const createCirclePayCard = async (req) => {
@@ -24,11 +23,12 @@ const createCirclePayCard = async (req) => {
   const tempIdString = data.id + cardData.proposalId; //until making id the hash of these two strings
   const cardById = await Utils.getCardById(tempIdString);
 
-	if (!cardById)
+	(!cardById)
 	{
 		await _updateCard(uid, data.id, cardData.proposalId, tempIdString)
 		result = 'CirclePay card created.'
 	}
+  // if card exists, add proposal to proposalId array?
 
 	return `${result} circleCardId --> ${tempIdString}`;
 }

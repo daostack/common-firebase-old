@@ -105,6 +105,18 @@ class Utils {
     }
   }
 
+  async getCardByUserId(userId) {
+    try {
+      const cardRef = await admin.firestore().collection('cards')
+        .where('userId', '==', userId)
+        .get();
+      const cardData = cardRef.docs.map(doc => doc.data())[0];
+      return cardData;
+    } catch (err) {
+       throw new Error('getCardByUserId TODO make an error for this');
+    }
+  }
+
   getTransactionEvents(interf, receipt) {
     const txEvents = {};
     const abiEvents = Object.values(interf.events);
