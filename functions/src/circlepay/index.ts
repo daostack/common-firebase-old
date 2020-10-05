@@ -4,11 +4,11 @@ import { createPayment } from './createPayment';
 import { createFundingProposal } from  './createFundingProposal';
 import { encryption } from './circlepay';
 const functions = require('firebase-functions');
-const express = require('express');
-const bodyParser = require('body-parser');
-const circlepay = express();
-const cors = require('cors');
-const { responseExecutor } = require('../util/responseExecutor');
+import express from 'express';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import { responseExecutor } from '../util/responseExecutor';
+export const circlepay = express();
 
 const runtimeOptions = {
   timeoutSeconds: 540,
@@ -52,7 +52,7 @@ circlepay.get('/encryption', async (req, res) => {
 circlepay.post('/create-a-payment', async (req, res) => {
 	console.log('index/create-a-payment');
 	responseExecutor(
-	async () => (await createPayment(req)),
+	async () => (await createPayment(req.body)),
 	{
 		req,
 		res,
@@ -73,5 +73,7 @@ circlepay.post('/create-funding-proposal', async (req, res) => {
 	})
 	return;
 });
+
+
 
 exports.circlepay = functions.runWith(runtimeOptions).https.onRequest(circlepay);

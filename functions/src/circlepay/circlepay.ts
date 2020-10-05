@@ -1,6 +1,6 @@
-const { env } = require('@env');
-const { circlePayApi } = require('../settings');
-const axios = require('axios');
+import { env } from '@env';
+import { circlePayApi } from '../settings';
+import axios from 'axios';
 
 const options = {
 	headers: {
@@ -10,29 +10,8 @@ const options = {
 	},
 };
 
-	/*
-	cardData requirements:
-		idempotencyKey,
-		encryptedData: {
-			number //card number
-			cvv
-		},
-		billingDetails: {
-			name
-			city
-			country
-			line1 //of address
-			postalCode
-		},
-		expMonth,
-		expYear,
-		metadata: {
-			email,
-			sessionId,
-			ipAddress
-		}
-	 */
-export const createCard = async (cardData) => {
+// is having object enough here?
+export const createCard = async (cardData: object) : Promise<any> => {
 	const response = await axios.post(`${circlePayApi}/cards`,
 		cardData,
 		options
@@ -40,12 +19,12 @@ export const createCard = async (cardData) => {
 	return response.data;
 }
 
-export const encryption = async () => {
+export const encryption = async () : Promise<any> => {
 	const response = await axios.get(`${circlePayApi}/encryption/public`, options);
 	return response.data;
 }
 
-export const createAPayment = async (paymentData) => {
+export const createAPayment = async (paymentData: object) : Promise<any> => {
 	const response = await axios.post(`${circlePayApi}/payments`,
 		paymentData,
 		options

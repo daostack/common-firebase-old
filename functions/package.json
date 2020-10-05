@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "description": "Cloud Functions for Common",
   "engines": {
-    "node": "12"
+    "node": "10"
   },
   "dependencies": {
     "@daostack/arc.js": "2.0.0-experimental.53",

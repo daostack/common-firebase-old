@@ -1,8 +1,7 @@
 const functions = require('firebase-functions');
-const { Utils } = require('../util/util');
 import { createPayment } from './createPayment';
 
-// tested but without adding payment to db yet
+// needs to be tested on local db
 exports.watchForExecutedProposals = functions.firestore
 	.document('/proposals/{id}')
   .onUpdate(async (change) => {
@@ -21,6 +20,8 @@ exports.watchForExecutedProposals = functions.firestore
           proposerId: proposal.proposerId,
           funding: proposal.description.funding,
         });
+
+        console.log('data', data)
 
         // update database with response payment
       }

@@ -1,64 +1,71 @@
 import { Utils } from '../util/util';
 import { createAPayment } from './circlepay';
+import { updateCard } from '../db/cardDb';
+import { updatePayment } from '../db/paymentDb';
+import ethers from 'ethers';
+import v4 from 'uuid';
 
-export const createPayment = async (req) => {
+interface IPaymentResp {
+  id: string,
+  type: string,
+  source: {id: string, type: string},
+  amount: {amount: string, currency: string},
+  status: string,
+  refunds: string[],
+  createDate: string,
+  updateDate: string,
+}
 
-  let {proposerId, funding} = req.body;
+const _updatePayment = async (paymentResponse: IPaymentResp) : Promise<any> => {
+  const doc = {
+    id: paymentResponse.id,
+    type: paymentResponse.type,
+    source: paymentResponse.source,
+    amount: paymentResponse.amount,
+    status: paymentResponse.status, // need to see when&how updating status
+    refunds: paymentResponse.refunds,
+    creationDate: paymentResponse.createDate,
+    updateDate: paymentResponse.updateDate
+  };
+  await updatePayment(paymentResponse.id, doc);
+}
 
+interface IRequest {
+    proposerId: string,
+    funding: number,
+}
+
+export const createPayment = async (req: IRequest) : Promise<any> => {
+  let result = 'Could not process payment.';
+  const {proposerId, funding} = req;
   const cardData = await Utils.getCardByUserId(proposerId)
-  console.log('cardData', cardData);
   const user = await Utils.getUserById(proposerId);
 
     const paymentData = {
-      idempotencyKey: '13a19be3-2f23-4626-aab7-ac217f09abd3', //(also in frontend) use commonId for generating this? consider uuid-by-string,
+      idempotencyKey: v4(),
       metadata: {
         email: user.email, 
-        sessionId: 'todoHashedSessionId', // hash what though? what hashing func?
+        sessionId: ethers.utils.id(proposerId).substring(0,50),
         ipAddress: '127.0.0.1',
       },
       amount: {
-        amount: `${funding}`,
+        amount: `${funding}`, // disable create proposal when baklance is 0 in frontend?
         currency: 'USD',
       },
       verification: 'none',
       source: {
-        id: cardData.cardId,
+        id: '587dcee0-7a03-4900-9c08-bd81d6e98f69', //cardData.cardId,
         type: 'card'
       },
     }
-    
-    //const response = await createAPayment(paymentData);
+  
+    const {data: data} = await createAPayment(paymentData);
+    if (data) {
+      _updatePayment(data);
+      cardData.payments.push(data.id);
+      await updateCard(cardData.id, cardData);
+      result = 'Payment created. Status: Pending.';
+    }
 
-            /*
-        response structure
-        data = {
-          "id": "c82f14b8-77be-4919-82f5-6b4b04613dba",
-          "type": "payment",
-          "merchantId": "fd8417cb-34c0-4a56-9d52-d4245c02cd38", // paid for 
-          "merchantWalletId": "1000032538",
-          "source": {
-            "id": "587dcee0-7a03-4900-9c08-bd81d6e98f69",
-            "type": "card"
-          },
-          "description": "Merchant Payment",
-          "amount": {
-            "amount": "1.00",
-            "currency": "USD"
-          },
-          "status": "pending",
-          "refunds": [],
-          "createDate": "2020-10-04T11:26:37.796Z",
-          "updateDate": "2020-10-04T11:26:37.796Z",
-          "metadata": {
-            "phoneNumber": "+19176263819",
-            "email": "moore@daostack.io"
-          }
-        }
-        ===
-        @Qs:
-        add payment response to 'payments' attribute in cards
-        have a payment collection?
-        await updateCard(cardId, response)
-         */
-
+    return result;
 }
