@@ -1,8 +1,8 @@
-const { Utils } = require('../util/util');
+import { Utils } from '../util/util';
 const { db } = require('../settings.js');
 const { updateProposalList } = require('../db/cardDbService');
 
-const createFundingProposal = async (req) => {
+export const createFundingProposal = async (req) => {
 	let result = 'Proposal already exists.';
 	const {idToken, proposalId} = req.body;
 	const uid = await Utils.verifyId(idToken);
@@ -14,5 +14,3 @@ const createFundingProposal = async (req) => {
 	}
 	return `${result} proposalId --> ${proposalId}`;
 }
-
-module.exports = {createFundingProposal};

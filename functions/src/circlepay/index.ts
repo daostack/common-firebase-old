@@ -1,19 +1,20 @@
+import { env } from '@env';
+import {createCirclePayCard} from './createCirclePayCard';
+import { createPayment } from './createPayment';
+import { createFundingProposal } from  './createFundingProposal';
+import { encryption } from './circlepay';
 const functions = require('firebase-functions');
 const express = require('express');
 const bodyParser = require('body-parser');
 const circlepay = express();
-const { env } = require('@env');
 const cors = require('cors');
-const {createCirclePayCard} = require('./createCirclePayCard'); 
-const {createPayment} = require('./createPayment'); 
-const {createFundingProposal} = require('./createFundingProposal');
 const { responseExecutor } = require('../util/responseExecutor');
-const {encryption} = require('./circlepay');
 
 const runtimeOptions = {
   timeoutSeconds: 540,
 };
 
+circlepay.set('trust proxy',true); 
 circlepay.use(bodyParser.json());
 circlepay.use(
   bodyParser.urlencoded({

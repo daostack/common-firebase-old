@@ -1,11 +1,12 @@
-const { Utils } = require('../util/util');
-const { createAPayment } = require('./circlepay');
+import { Utils } from '../util/util';
+import { createAPayment } from './circlepay';
 
-const createPayment = async (req) => {
+export const createPayment = async (req) => {
 
   let {proposerId, funding} = req.body;
 
   const cardData = await Utils.getCardByUserId(proposerId)
+  console.log('cardData', cardData);
   const user = await Utils.getUserById(proposerId);
 
     const paymentData = {
@@ -14,20 +15,19 @@ const createPayment = async (req) => {
         email: user.email, 
         sessionId: 'todoHashedSessionId', // hash what though? what hashing func?
         ipAddress: '127.0.0.1',
-        // phone number?
       },
       amount: {
-        amount: `${funding}`, // CANNOT BE 0! but also common balance is 0, cant have funding > 0
-        currency: 'USD', // ?
+        amount: `${funding}`,
+        currency: 'USD',
       },
-      verification: 'none', // none, since we have no access to cvv anymore (?)
+      verification: 'none',
       source: {
         id: cardData.cardId,
         type: 'card'
       },
     }
-
-    /*const response = */ await createAPayment(paymentData);
+    
+    //const response = await createAPayment(paymentData);
 
             /*
         response structure
@@ -62,5 +62,3 @@ const createPayment = async (req) => {
          */
 
 }
-
-module.exports = {createPayment};

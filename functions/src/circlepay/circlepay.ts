@@ -32,7 +32,7 @@ const options = {
 			ipAddress
 		}
 	 */
-const createCard = async (cardData) => {
+export const createCard = async (cardData) => {
 	const response = await axios.post(`${circlePayApi}/cards`,
 		cardData,
 		options
@@ -40,21 +40,15 @@ const createCard = async (cardData) => {
 	return response.data;
 }
 
-const encryption = async () => {
+export const encryption = async () => {
 	const response = await axios.get(`${circlePayApi}/encryption/public`, options);
 	return response.data;
 }
 
-const createAPayment = async (paymentData) => {
+export const createAPayment = async (paymentData) => {
 	const response = await axios.post(`${circlePayApi}/payments`,
 		paymentData,
 		options
 	);
 	return response;
-}
-
-module.exports = {
-	createCard,
-	encryption,
-	createAPayment
 }
