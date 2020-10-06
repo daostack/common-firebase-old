@@ -115,6 +115,7 @@ exports.daoUpdated = functions.firestore
 
 exports.newDaoCreated = functions.firestore
   .document('/daos/{id}')
+  // eslint-disable-next-line consistent-return
   .onCreate(async (snap) => {
     let newDao = snap.data();
 
@@ -151,7 +152,6 @@ exports.newDaoCreated = functions.firestore
         createdAt: new Date(),
         type: EVENT_TYPES.CREATION_COMMON_FAILED
       });
-      
     }
   });
 

@@ -50,14 +50,13 @@ interface IResponseExecutorPayload {
   req: express.Request;
   res: express.Response;
   successMessage: string;
-  errorMessage: string;
 }
 
 interface IResponseExecutor {
   (action: IResponseExecutorAction, payload: IResponseExecutorPayload): Promise<void>
 }
 
-export const responseExecutor: IResponseExecutor = async (action, { req, res, successMessage, errorMessage }): Promise<void> => {
+export const responseExecutor: IResponseExecutor = async (action, { req, res, successMessage }): Promise<void> => {
   try {
     let actionResult = await action();
 
@@ -82,7 +81,7 @@ interface IResponseCreateExecutor {
   (action: IResponseExecutorAction, payload: IResponseExecutorPayload, retried: boolean): Promise<void>
 }
 
-export const responseCreateExecutor: IResponseCreateExecutor = async (action, { req, res, successMessage, errorMessage }, retried = false): Promise<void> => {
+export const responseCreateExecutor: IResponseCreateExecutor = async (action, { req, res, successMessage }, retried = false): Promise<void> => {
   const arc = await getArc();
 
   try {
