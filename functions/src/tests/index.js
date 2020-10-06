@@ -1,3 +1,5 @@
+import { responseExecutor } from '@functions/util/responseExecutor';
+
 const app = require('express')();
 const functions = require('firebase-functions');
 const { CommonError } = require('../util/errors');
@@ -59,7 +61,16 @@ app.get('/ping', (req, res) => {
 });
 
 app.get('/throw', (req, res) => {
-  throw new CommonError(req.query.message, req.query.userMessage, req.query.statusCode);
+  responseExecutor(
+    async () => {
+      return await updateProposals();
+    }, {
+      req,
+      res,
+      successMessage: `Updated proposals!`,
+      errorMessage: `Unable to update Proposals!`
+    }
+  );
 });
 
 exports.tests = functions
