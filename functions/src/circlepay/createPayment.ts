@@ -46,7 +46,7 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
       metadata: {
         email: user.email, 
         sessionId: ethers.utils.id(proposerId).substring(0,50),
-        ipAddress: '127.0.0.1',
+        ipAddress: '127.0.0.1', // request has no ip, fix this
       },
       amount: {
         amount: `${funding}`, // disable create proposal when baklance is 0 in frontend?

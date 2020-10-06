@@ -10,9 +10,31 @@ const options = {
 	},
 };
 
-// is having object enough here?
-export const createCard = async (cardData: object) : Promise<any> => {
-	const response = await axios.post(`${circlePayApi}/cards`,
+export interface ICardData {
+	billingDetails: {
+	name: string,
+	city: string,
+	country: string,
+	line1: string,
+	postalCode: string,
+	district: string,
+	},
+  expMonth: number,
+  expYear: number,
+  metadata: {
+    email: string,
+    ipAddress: string,
+    sessionId: string,
+  },
+  keyId: string,
+  encryptedData: string,
+  proposalId: string,
+  idempotencyKey: string,
+}
+
+export const createCard = async (cardData: ICardData) : Promise<any> => {
+	console.log('createCard\n', cardData)
+  const response = await axios.post(`${circlePayApi}/cards`,
 		cardData,
 		options
 	);
@@ -24,7 +46,25 @@ export const encryption = async () : Promise<any> => {
 	return response.data;
 }
 
-export const createAPayment = async (paymentData: object) : Promise<any> => {
+interface IPayment {
+  idempotencyKey: string,
+  metadata: {
+    email: string, 
+    sessionId: string,
+    ipAddress: string,
+  },
+  amount: {
+    amount: string,
+    currency: string,
+  },
+  verification: string,
+  source: {
+    id: string,
+    type: string
+  },
+}
+
+export const createAPayment = async (paymentData: IPayment) : Promise<any> => {
 	const response = await axios.post(`${circlePayApi}/payments`,
 		paymentData,
 		options

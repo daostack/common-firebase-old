@@ -11,7 +11,7 @@ import mangopayTriggers from './mangopay/triggers';
 import * as notification from './notification';
 import * as event from './event';
 import * as create from './creation';
-const circlepay = require('./circlepay');
+import * as circlepay from './circlepay';
 import * as circlepayTriggers from './circlepay/triggers';
 
 // Add the __tests__ endpoints only if enabled

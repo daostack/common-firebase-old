@@ -1,9 +1,8 @@
-import { env } from '@env';
 import {createCirclePayCard} from './createCirclePayCard';
 import { createPayment } from './createPayment';
 import { createFundingProposal } from  './createFundingProposal';
 import { encryption } from './circlepay';
-const functions = require('firebase-functions');
+import * as functions from 'firebase-functions';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
@@ -26,7 +25,6 @@ circlepay.use(express.urlencoded({ extended: true })); // to support URL-encoded
 circlepay.use(cors({ origin: true }));
 
 circlepay.post('/create-card', async (req, res) => {
-	console.log('index /create-card');
 	responseExecutor(
 		async () => (await createCirclePayCard(req)),
 		{

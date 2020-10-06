@@ -1,7 +1,7 @@
 import { Utils } from '../util/util';
 import { createCard } from './circlepay';
 import { updateCard } from '../db/cardDb';
-import ethers from 'ethers';
+import {ethers} from 'ethers';
 import v4 from 'uuid';
 
 const _updateCard = async (userId: string, cardId: string, proposalId: string, id: string) : Promise<any> => {
@@ -16,10 +16,21 @@ const _updateCard = async (userId: string, cardId: string, proposalId: string, i
   await updateCard(id, doc);
 }
 
+// try to use ICardData from ./circlepay
 interface IRequest {
   headers: {host?: string},
   body: {
     idToken: string,
+    billingDetails: {
+      name: string,
+      city: string,
+      country: string,
+      line1: string,
+      postalCode: string,
+      district: string,
+    },
+    expMonth: number,
+    expYear: number,
     idempotencyKey: string,
     proposalId: string,
     metadata: {
@@ -27,13 +38,15 @@ interface IRequest {
       ipAddress: string,
       sessionId: string,
     }
+    keyId: string,
+    encryptedData: string,
   }
 }
 
 export const createCirclePayCard = async (req: IRequest) : Promise<any> => {
   let result = 'Card already exists in CirclePay.';
   const {idToken, ...cardData} = req.body;
-  cardData.metadata.ipAddress = req.headers.host; //this returns localhost at this point
+  cardData.metadata.ipAddress = '127.0.0.1',//req.headers.host; //this returns localhost at this point
   cardData.metadata.sessionId = ethers.utils.id(cardData.proposalId).substring(0,50);
   cardData.idempotencyKey = v4();
   const uid = await Utils.verifyId(idToken);
@@ -41,7 +54,7 @@ export const createCirclePayCard = async (req: IRequest) : Promise<any> => {
   const id = ethers.utils.id(cardData.metadata.email);
   const cardById = await Utils.getCardById(id);
 
-  if(!cardById)
+ if(!cardById)
   {
     await _updateCard(uid, data.id, cardData.proposalId, id)
     result = 'CirclePay card created.'

@@ -1,4 +1,4 @@
-const functions = require('firebase-functions');
+import * as functions from 'firebase-functions';
 import { createPayment } from './createPayment';
 
 // needs to be tested on local db
@@ -7,7 +7,6 @@ exports.watchForExecutedProposals = functions.firestore
   .onUpdate(async (change) => {
     const proposal = change.after.data();
     const previousProposal = change.before.data();
-    console.log('currProposal===========\n', proposal)
     if (proposal.executed !== previousProposal.executed
       && proposal.executed === true
       && proposal.winningOutcome === 1) {
@@ -17,6 +16,7 @@ exports.watchForExecutedProposals = functions.firestore
       );
 
         const data = await createPayment({
+          // add ip address here
           proposerId: proposal.proposerId,
           funding: proposal.description.funding,
         });
