@@ -18,6 +18,7 @@ exports.watchForExecutedProposals = functions.firestore
         const data = await createPayment({
           // add ip address here
           proposerId: proposal.proposerId,
+          proposalId: proposal.proposalId,
           funding: proposal.description.funding,
         });
 

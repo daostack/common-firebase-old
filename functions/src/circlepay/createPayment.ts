@@ -2,7 +2,7 @@ import { Utils } from '../util/util';
 import { createAPayment } from './circlepay';
 import { updateCard } from '../db/cardDb';
 import { updatePayment } from '../db/paymentDb';
-import ethers from 'ethers';
+import {ethers} from 'ethers';
 import v4 from 'uuid';
 
 interface IPaymentResp {
@@ -16,10 +16,11 @@ interface IPaymentResp {
   updateDate: string,
 }
 
-const _updatePayment = async (paymentResponse: IPaymentResp) : Promise<any> => {
+const _updatePayment = async (paymentResponse: IPaymentResp, proposalId: string) : Promise<any> => {
   const doc = {
     id: paymentResponse.id,
     type: paymentResponse.type,
+    proposalId,
     source: paymentResponse.source,
     amount: paymentResponse.amount,
     status: paymentResponse.status, // need to see when&how updating status
@@ -32,17 +33,19 @@ const _updatePayment = async (paymentResponse: IPaymentResp) : Promise<any> => {
 
 interface IRequest {
     proposerId: string,
+    proposalId: string,
     funding: number,
 }
 
 export const createPayment = async (req: IRequest) : Promise<any> => {
   let result = 'Could not process payment.';
-  const {proposerId, funding} = req;
+  const {proposerId, proposalId, funding} = req;
   const cardData = await Utils.getCardByUserId(proposerId)
   const user = await Utils.getUserById(proposerId);
 
     const paymentData = {
       idempotencyKey: v4(),
+      proposalId,
       metadata: {
         email: user.email, 
         sessionId: ethers.utils.id(proposerId).substring(0,50),
@@ -54,14 +57,14 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
       },
       verification: 'none',
       source: {
-        id: '587dcee0-7a03-4900-9c08-bd81d6e98f69', //cardData.cardId,
+        id: cardData.cardId,
         type: 'card'
       },
     }
   
     const {data: data} = await createAPayment(paymentData);
     if (data) {
-      _updatePayment(data);
+      _updatePayment(data, proposalId);
       cardData.payments.push(data.id);
       await updateCard(cardData.id, cardData);
       result = 'Payment created. Status: Pending.';
