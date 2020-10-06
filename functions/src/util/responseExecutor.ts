@@ -9,7 +9,7 @@ interface IErrorResponse {
   errorId?: string;
   errorCode?: string;
   errorMessage?: string;
-  request?: express.Request;
+  request?: any;
   data?: any;
 }
 
@@ -17,10 +17,13 @@ const createErrorResponse = (res: express.Response, req: express.Request, error:
   const errorResponse: IErrorResponse = {
     error: error.message,
     errorId: error.errorId,
-    errorCode: error.errorCode || `${error.statusCode}`,
+    errorCode: error.errorCode,
     errorMessage: error.userMessage,
-    // The request object causes circular structure error. Maybe only some fields of it?
-    // request: req,
+    request: {
+      body: req.body,
+      query: req.query,
+      headers: req.headers
+    },
     data: error.data
   };
 
@@ -33,8 +36,6 @@ const createErrorResponse = (res: express.Response, req: express.Request, error:
     errorResponse,
     error
   );
-
-  console.log(statusCode);
 
   res
     .status(statusCode)
@@ -59,11 +60,15 @@ interface IResponseExecutor {
 export const responseExecutor: IResponseExecutor = async (action, { req, res, successMessage, errorMessage }): Promise<void> => {
   try {
     let actionResult = await action();
+
     console.log(`ActionResult --> ${actionResult}`);
+
     if (!actionResult) {
       actionResult = {};
     }
-    res.status(StatusCodes.Ok)
+
+    res
+      .status(StatusCodes.Ok)
       .json({
         message: successMessage,
         ...actionResult

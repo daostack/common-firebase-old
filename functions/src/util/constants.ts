@@ -5,3 +5,9 @@ export const StatusCodes = {
 
   Ok: 200
 }
+
+export const ErrorCodes = {
+  NotFound: 'NotFound',
+
+  GenericError: 'GenericError'
+}

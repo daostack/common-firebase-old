@@ -1,11 +1,12 @@
 const admin = require('firebase-admin');
-const { provider } = require('../settings')
-// const { Error } = require('./error').default;
 const fetch = require('node-fetch');
-const { env } = require('../env');
-const ethers = require('ethers');
-const ABI = require('../relayer/util/abi.json');
 const gql = require('graphql-tag');
+const ethers = require('ethers');
+
+const ABI = require('../relayer/util/abi.json');
+const { CommonError } = require('./errors');
+const { provider } = require('../settings');
+const { env } = require('../env');
 
 // That was imported from './error', but was not
 // there so I don't know what is it
@@ -41,8 +42,7 @@ class Utils {
     } catch (error) {
       console.error(error);
 
-      // @todo Move to CommonError (the file cannot find the CommonError export!?!?!)
-      throw new Error(CFError.invalidIdToken)
+      throw new CommonError(CFError.invalidIdToken)
     }
   }
   
@@ -51,8 +51,7 @@ class Utils {
       const decodedToken = await admin.auth().verifyIdToken(idToken)
       return await this.getUserById(decodedToken.uid);
     } catch (error) {
-      // @todo Move to CommonError (the file cannot find the CommonError export!?!?!)
-      throw new Error(CFError.invalidIdToken)
+      throw new CommonError(CFError.invalidIdToken)
     }
   }
 
@@ -70,8 +69,7 @@ class Utils {
       const userData = await userRef.get().then(doc => { return doc.data() })
       return userData
     } catch (err) {
-      // @todo Move to CommonError (the file cannot find the CommonError export!?!?!)
-      throw new Error(CFError.emptyUserData)
+      throw new CommonError(CFError.emptyUserData)
     }
   }
 
@@ -81,8 +79,7 @@ class Utils {
       const userData = await userRef.get().then(doc => { return doc.data() })
       return userData
     } catch (err) {
-      // @todo Move to CommonError (the file cannot find the CommonError export!?!?!)
-      throw new Error(CFError.emptyUserData)
+      throw new CommonError(CFError.emptyUserData)
     }
   }
 
@@ -128,8 +125,7 @@ class Utils {
       const blockNumber = graphData.data.indexingStatusForCurrentVersion.chains[0].latestBlock.number;
       return Number(blockNumber);
     } catch(error) {
-      // @todo Move to CommonError (the file cannot find the CommonError export!?!?!)
-      throw new Error(`Error trying to fetch latest blocknumber from ${env.graphql.graphApiUrl}: ${error}`)
+      throw new CommonError(`Error trying to fetch latest blocknumber from ${env.graphql.graphApiUrl}: ${error}`)
     }
   }
 
