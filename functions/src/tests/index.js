@@ -1,8 +1,8 @@
-import { responseExecutor } from '@functions/util/responseExecutor';
 
 const app = require('express')();
 const functions = require('firebase-functions');
 const { CommonError } = require('../util/errors');
+const { responseExecutor } =  require('../util/responseExecutor');
 
 const {
   testEmailSending,
@@ -61,9 +61,15 @@ app.get('/ping', (req, res) => {
 });
 
 app.get('/throw', (req, res) => {
-  responseExecutor(
+  const result = responseExecutor(
     async () => {
-      return await updateProposals();
+      throw new CommonError('This is bad', 'Bad indeed', {
+        errorCode: 'SmtBadHapnd',
+        statusCode: req.query.statusCode || 500,
+        payload: {
+          hey: 'there'
+        },
+      });
     }, {
       req,
       res,

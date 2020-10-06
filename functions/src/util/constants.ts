@@ -3,5 +3,5 @@ export const StatusCodes = {
 
   NotFound: 404,
 
-  Success: 200
+  Ok: 200
 }

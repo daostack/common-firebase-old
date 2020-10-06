@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
 
-
 interface IErrorData {
   statusCode?: number;
   errorCode?: string;
@@ -10,13 +9,21 @@ interface IErrorData {
   [key: string]: any;
 }
 
-class CommonError extends Error {
+export interface ICommonError {
+  message: string;
+  errorId: string;
+  errorCode: string;
+  userMessage: string;
+  statusCode: number;
+  data: any;
+}
+
+export class CommonError extends Error implements ICommonError {
   public errorId: string;
   public errorCode: string;
   public userMessage: string;
   public statusCode: number;
   public data: any;
-
 
   /**
    * Create new common error
@@ -44,5 +51,3 @@ class CommonError extends Error {
     Error.captureStackTrace(this, this.constructor);
   }
 }
-
-module.exports = CommonError;

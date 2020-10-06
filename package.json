@@ -10,7 +10,7 @@
     "logs": "firebase functions:log",
     "serve": "firebase serve --only functions",
     "shell": "firebase functions:shell",
-    "start": "yarn emulator",
+    "start": "yarn compile && yarn emulator",
     "deploy": "./env/env.sh -check && firebase deploy --only functions",
     "deploy:relayer": "./env/env.sh -check && firebase deploy --only functions:relayer",
     "deploy:notification": "./env/env.sh -check  && firebase deploy --only functions:notification",

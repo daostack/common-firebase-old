@@ -1,8 +1,8 @@
 import express from 'express';
 
-import CommonError from './errors';
 import { getArc } from '../settings';
 import { StatusCodes } from './constants';
+import { ICommonError } from './errors/CommonError';
 
 interface IErrorResponse {
   error: string;
@@ -13,13 +13,14 @@ interface IErrorResponse {
   data?: any;
 }
 
-const createErrorResponse = (res: express.Response, req: express.Request, error: typeof CommonError): void => {
+const createErrorResponse = (res: express.Response, req: express.Request, error: ICommonError): void => {
   const errorResponse: IErrorResponse = {
     error: error.message,
     errorId: error.errorId,
-    errorCode: error.errorCode || error.statusCode,
+    errorCode: error.errorCode || `${error.statusCode}`,
     errorMessage: error.userMessage,
-    request: req,
+    // The request object causes circular structure error. Maybe only some fields of it?
+    // request: req,
     data: error.data
   };
 
@@ -33,9 +34,11 @@ const createErrorResponse = (res: express.Response, req: express.Request, error:
     error
   );
 
+  console.log(statusCode);
+
   res
     .status(statusCode)
-    .json(errorResponse);
+    .send(errorResponse);
 };
 
 interface IResponseExecutorAction {
@@ -60,7 +63,7 @@ export const responseExecutor: IResponseExecutor = async (action, { req, res, su
     if (!actionResult) {
       actionResult = {};
     }
-    res.status(HTTP_STATUS_CODE.OK)
+    res.status(StatusCodes.Ok)
       .json({
         message: successMessage,
         ...actionResult
@@ -87,7 +90,7 @@ export const responseCreateExecutor: IResponseCreateExecutor = async (action, { 
     }
 
     res
-      .status(HTTP_STATUS_CODE.OK)
+      .status(StatusCodes.Ok)
       .json({
         message: successMessage,
         ...actionResult
@@ -112,6 +115,6 @@ export const responseCreateExecutor: IResponseCreateExecutor = async (action, { 
       return;
     }
 
-    createErrorResponse(req, res, e);
+    createErrorResponse(res, req, e);
   }
 };
