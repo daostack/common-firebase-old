@@ -53,7 +53,7 @@ app.get('/sendPreauthFailedEmails', async (req, res) => {
 });
 
 app.get('/backup', async (req, res) => {
-  res.send(await require('@util/backup').backup())
+  res.send(await require('../util/backup').backup())
 })
 
 app.get('/ping', (req, res) => {

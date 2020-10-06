@@ -1,7 +1,7 @@
 import supertest from 'supertest';
 
-import { runTest } from '@helpers/runTest';
-import { env } from '@env';
+import { runTest } from '../helpers/runTest';
+import { env } from '../helpers/env';
 
 import "@functions";
 

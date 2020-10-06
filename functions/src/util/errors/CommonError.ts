@@ -48,7 +48,7 @@ export class CommonError extends Error implements ICommonError {
     this.userMessage = userMessage;
     this.statusCode = data.statusCode;
     this.errorCode = data.errorCode;
-
+    
     this.data = data.payload;
   }
 }

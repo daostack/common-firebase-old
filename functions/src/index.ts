@@ -1,6 +1,4 @@
-require('module-alias/register');
-
-import { env } from '@env';
+import { env } from './env';
 import { tests } from './tests';
 import * as cron from './cron';
 import * as relayer from './relayer';
