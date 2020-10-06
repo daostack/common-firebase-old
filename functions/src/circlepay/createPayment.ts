@@ -40,9 +40,11 @@ interface IRequest {
 export const createPayment = async (req: IRequest) : Promise<any> => {
   let result = 'Could not process payment.';
   const {proposerId, proposalId, funding} = req;
-  const cardData = await Utils.getCardByUserId(proposerId)
-  const user = await Utils.getUserById(proposerId);
+  const cardData = await Utils.getCardByProposalId(proposalId)
 
+  // if proposal is associeated with a card
+  if (cardData) {
+    const user = await Utils.getUserById(proposerId);
     const paymentData = {
       idempotencyKey: v4(),
       proposalId,
@@ -52,7 +54,7 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
         ipAddress: '127.0.0.1', // request has no ip, fix this
       },
       amount: {
-        amount: `${funding}`, // disable create proposal when baklance is 0 in frontend?
+        amount: `${funding}`, // disable create proposal when balance is 0 in frontend?
         currency: 'USD',
       },
       verification: 'none',
@@ -61,14 +63,14 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
         type: 'card'
       },
     }
-  
-    const {data: data} = await createAPayment(paymentData);
+    // an error that needs attention: functions: Error: socket hang up
+    const {data} = await createAPayment(paymentData);
     if (data) {
-      _updatePayment(data, proposalId);
-      cardData.payments.push(data.id);
+      _updatePayment(data.data, proposalId);
+      cardData.payments.push(data.data.id);
       await updateCard(cardData.id, cardData);
-      result = 'Payment created. Status: Pending.';
+      result = `Payment created. PaymentdId: ${data.data.id}`;
     }
-
-    return result;
+  }
+  console.log(`Create Payment --> ${result}`);
 }

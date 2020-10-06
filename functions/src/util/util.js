@@ -92,19 +92,6 @@ class Utils {
     }
   }
 
-  async getCardByProposalId(proposalId) {
-    try {
-      console.log('proposalId', proposalId);
-      const cardRef = await admin.firestore().collection('cards')
-        .where('proposalId', '==', proposalId)
-        .get();
-      const cardData = cardRef.docs.map(doc => doc.data())[0];
-      return cardData;
-    } catch (err) {
-       throw new Error('cardByProposal TODO make an error for this');
-    }
-  }
-
   async getCardByUserId(userId) {
     try {
       const cardRef = await admin.firestore().collection('cards')
@@ -114,6 +101,18 @@ class Utils {
       return cardData;
     } catch (err) {
        throw new Error('getCardByUserId TODO make an error for this');
+    }
+  }
+
+  async getCardByProposalId(proposalId) {
+    try {
+      const cardRef = await admin.firestore().collection('cards')
+        .where('proposals', 'array-contains', proposalId)
+        .get();
+      const cardData = cardRef.docs.map(doc => doc.data())[0];
+      return cardData;
+    } catch (err) {
+       throw new Error('getCardByProposalId TODO make an error for this');
     }
   }
 

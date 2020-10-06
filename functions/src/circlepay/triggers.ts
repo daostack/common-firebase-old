@@ -15,16 +15,18 @@ exports.watchForExecutedProposals = functions.firestore
         'Proposal EXECUTED and WINNING OUTCOME IS 1 -> INITIATING PAYMENT'
       );
 
-        const data = await createPayment({
-          // add ip address here
+      const funding = proposal.type === 'Join'
+        ? proposal.description.funding
+        : (proposal.fundingRequest.amount !== 0 // temporary check, for funding requests that have 0 funding -> fix on frontend
+            ? proposal.fundingRequest.amount
+            : 1);
+        
+        await createPayment({
+          //add ip address
           proposerId: proposal.proposerId,
-          proposalId: proposal.proposalId,
-          funding: proposal.description.funding,
+          proposalId: proposal.id,
+          funding
         });
-
-        console.log('data', data)
-
-        // update database with response payment
       }
     },
 );

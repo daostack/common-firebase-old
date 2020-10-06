@@ -33,7 +33,6 @@ export interface ICardData {
 }
 
 export const createCard = async (cardData: ICardData) : Promise<any> => {
-	console.log('createCard\n', cardData)
   const response = await axios.post(`${circlePayApi}/cards`,
 		cardData,
 		options
