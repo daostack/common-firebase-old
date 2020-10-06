@@ -37,17 +37,18 @@ export class CommonError extends Error implements ICommonError {
     userMessage = 'Something bad happened',
     data: IErrorData = {}
   ) {
-    super(message);
+    const errorId = uuidv4();
+    super(`${message} (${errorId})`);
+    Error.captureStackTrace(this, this.constructor);
 
-    this.errorId = uuidv4();
+    this.errorId = errorId;
+
     this.name = this.constructor.name;
 
     this.userMessage = userMessage;
-
     this.statusCode = data.statusCode;
     this.errorCode = data.errorCode;
-    this.data = data.payload;
 
-    Error.captureStackTrace(this, this.constructor);
+    this.data = data.payload;
   }
 }
