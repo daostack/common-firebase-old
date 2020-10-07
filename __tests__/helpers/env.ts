@@ -1,5 +1,5 @@
 // const merge = require('deepmerge');
-import * as merge from 'deepmerge';
+import merge from 'deepmerge';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore

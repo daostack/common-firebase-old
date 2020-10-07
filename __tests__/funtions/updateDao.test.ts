@@ -1,8 +1,8 @@
 import supertest from 'supertest';
 
-import { runTest } from '@helpers/runTest';
+import { runTest } from '../helpers/runTest';
 
-import "@functions";
+import "../../functions/dist";
 
 
 runTest((funcs) => {
