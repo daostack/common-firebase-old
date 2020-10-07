@@ -16,9 +16,10 @@ exports.backup = () => {
   const databaseName = client.databasePath(projectId, '(default)');
 
   const timestamp = dateformat(Date.now(), 'isoDateTime');
-  const bucket = process.env.GCLOUD_PROJECT === 'common-staging-50741'
+
+  const bucket = projectId === 'common-staging-50741'
     ? `gs://common-staging-50741.appspot.com/backup/${timestamp}`
-    : projectId.env.GCLOUD_PROJECT === 'common-daostack'
+    : projectId === 'common-daostack'
   && `gs://common-daostack.appspot.com/backup/${timestamp}`;
 
   if (!bucket) {
