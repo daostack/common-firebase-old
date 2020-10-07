@@ -112,8 +112,7 @@ export const responseCreateExecutor: IResponseCreateExecutor = async (action, { 
       await responseCreateExecutor(action, {
         req,
         res,
-        successMessage,
-        errorMessage
+        successMessage
       }, true);
 
       return;
