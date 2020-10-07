@@ -3,7 +3,7 @@ const dateformat = require('dateformat');
 
 const client = new firestore.v1.FirestoreAdminClient();
 
-const { CommonError } = require('./error');
+const { CommonError } = require('./errors');
 
 /**
  * Util for creating a firestore backup for the current
