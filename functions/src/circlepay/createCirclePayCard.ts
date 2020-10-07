@@ -44,7 +44,7 @@ interface IRequest {
 }
 
 export const createCirclePayCard = async (req: IRequest) : Promise<any> => {
-  let result = 'Card already exists in CirclePay.';
+  let result = 'Updated existing card.';
   const {idToken, ...cardData} = req.body;
   cardData.metadata.ipAddress = '127.0.0.1',//req.headers.host; //this returns localhost at this point
   cardData.metadata.sessionId = ethers.utils.id(cardData.proposalId).substring(0,50);
@@ -57,11 +57,12 @@ export const createCirclePayCard = async (req: IRequest) : Promise<any> => {
  if(!cardById)
   {
     await _updateCard(uid, data.id, cardData.proposalId, id)
-    result = 'CirclePay card created.'
-  }/* else {
-  update card with new requestToJoin proposal
-  }*/
-  // if card exists, add proposal to list of proposal
+    result = 'CirclePay card created.';
+  } else {
+    cardById.proposals.push(req.body.proposalId)
+    await updateCard(id, cardById);
+
+  }
 
   return `${result} circleCardId --> ${id}`;
   }

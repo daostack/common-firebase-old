@@ -1,9 +1,10 @@
 import { Utils } from '../util/util';
 import { createAPayment } from './circlepay';
 import { updateCard } from '../db/cardDb';
-import { updatePayment } from '../db/paymentDb';
+import { updatePayment, /*pollPaymentStatus*/ } from '../db/paymentDb';
 import {ethers} from 'ethers';
 import v4 from 'uuid';
+//import promiseRetry from 'promise-retry';
 
 interface IPaymentResp {
   id: string,
@@ -63,14 +64,16 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
         type: 'card'
       },
     }
-    // an error that needs attention: functions: Error: socket hang up
+    // an error that needs attention: functions: Error: socket hang up, use promiseRetry
     const {data} = await createAPayment(paymentData);
+
     if (data) {
       _updatePayment(data.data, proposalId);
       cardData.payments.push(data.data.id);
       await updateCard(cardData.id, cardData);
       result = `Payment created. PaymentdId: ${data.data.id}`;
     }
+    //pollPaymentStatus(data.data.id);// doesn't seem right to call here
   }
   return `Create Payment: ${result}`;
 }
