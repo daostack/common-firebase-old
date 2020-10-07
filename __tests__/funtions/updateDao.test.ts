@@ -2,7 +2,7 @@ import supertest from 'supertest';
 
 import { runTest } from '../helpers/runTest';
 
-import "../../functions/dist";
+import "../../functions/src";
 
 
 runTest((funcs) => {
@@ -16,7 +16,7 @@ runTest((funcs) => {
       expect(res.status).toBe(500);
 
       expect(res.body.error).not.toBe(null);
-      expect(res.body.error.commonMessage).toBe('Unable to update Dao with id undefined!');
+      expect(res.body).toMatchSnapshot();
     });
   });
 });
