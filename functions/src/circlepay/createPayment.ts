@@ -72,5 +72,5 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
       result = `Payment created. PaymentdId: ${data.data.id}`;
     }
   }
-  console.log(`Create Payment --> ${result}`);
+  return `Create Payment: ${result}`;
 }

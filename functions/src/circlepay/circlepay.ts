@@ -70,3 +70,14 @@ export const createAPayment = async (paymentData: IPayment) : Promise<any> => {
 	);
 	return response;
 }
+
+export const getPayment = async(paymentId: string) : Promise<any> => {
+  const response = await axios.get(`${circlePayApi}/payments/${paymentId}`, options);
+  return response;
+}
+
+
+
+
+
+

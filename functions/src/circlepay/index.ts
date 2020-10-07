@@ -1,6 +1,5 @@
 import {createCirclePayCard} from './createCirclePayCard';
 import { createPayment } from './createPayment';
-import { createFundingProposal } from  './createFundingProposal';
 import { encryption } from './circlepay';
 import * as functions from 'firebase-functions';
 import express from 'express';
@@ -58,20 +57,5 @@ circlepay.post('/create-a-payment', async (req, res) => {
 		errorMessage: `Unable to process payment!`
 	})
 });
-
-circlepay.post('/create-funding-proposal', async (req, res) => {
-	console.log('index/create-funding-proposal');
-	responseExecutor(
-	async () => (await createFundingProposal(req)),
-	{
-		req,
-		res,
-		successMessage: `Funding proposal creation was successful`,
-		errorMessage: `Unable to create funding proposal!`
-	})
-	return;
-});
-
-
 
 exports.circlepay = functions.runWith(runtimeOptions).https.onRequest(circlepay);
