@@ -1,10 +1,9 @@
 import { Utils } from '../util/util';
 import { createAPayment } from './circlepay';
 import { updateCard } from '../db/cardDb';
-import { updatePayment, /*pollPaymentStatus*/ } from '../db/paymentDb';
+import { updatePayment, pollPaymentStatus } from '../db/paymentDb';
 import {ethers} from 'ethers';
 import v4 from 'uuid';
-//import promiseRetry from 'promise-retry';
 
 interface IPaymentResp {
   id: string,
@@ -24,7 +23,7 @@ const _updatePayment = async (paymentResponse: IPaymentResp, proposalId: string)
     proposalId,
     source: paymentResponse.source,
     amount: paymentResponse.amount,
-    status: paymentResponse.status, // need to see when&how updating status
+    status: paymentResponse.status,
     refunds: paymentResponse.refunds,
     creationDate: paymentResponse.createDate,
     updateDate: paymentResponse.updateDate
@@ -33,14 +32,15 @@ const _updatePayment = async (paymentResponse: IPaymentResp, proposalId: string)
 }
 
 interface IRequest {
-    proposerId: string,
-    proposalId: string,
-    funding: number,
+  ipAddress: string,
+  proposerId: string,
+  proposalId: string,
+  funding: number,
 }
 
 export const createPayment = async (req: IRequest) : Promise<any> => {
   let result = 'Could not process payment.';
-  const {proposerId, proposalId, funding} = req;
+  const {proposerId, proposalId, funding, ipAddress} = req;
   const cardData = await Utils.getCardByProposalId(proposalId)
 
   // if proposal is associeated with a card
@@ -52,10 +52,10 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
       metadata: {
         email: user.email, 
         sessionId: ethers.utils.id(proposerId).substring(0,50),
-        ipAddress: '127.0.0.1', // request has no ip, fix this
+        ipAddress,
       },
       amount: {
-        amount: `${funding}`, // disable create proposal when balance is 0 in frontend?
+        amount: `${funding}`,
         currency: 'USD',
       },
       verification: 'none',
@@ -73,7 +73,7 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
       await updateCard(cardData.id, cardData);
       result = `Payment created. PaymentdId: ${data.data.id}`;
     }
-    //pollPaymentStatus(data.data.id);// doesn't seem right to call here
+    pollPaymentStatus(data.data.id);
   }
   return `Create Payment: ${result}`;
 }

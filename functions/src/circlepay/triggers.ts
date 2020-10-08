@@ -18,7 +18,7 @@ exports.watchForExecutedProposals = functions.firestore
       );
         
         await createPayment({
-          //add ip address
+          ipAddress: '127.0.0.1', //get ip from somewhere //public ip? 
           proposerId: proposal.proposerId,
           proposalId: proposal.id,
           funding: proposal.description.funding

@@ -14,35 +14,28 @@ const polling = async ({validate, interval, paymentId}) => {
     if (validate(data)) {
       return resolve(data);
     } else if (data.status === 'failed') {
-      return reject({err: new Error('Exceeded max attempts'), payment: data});
+      return reject({err: new Error('Payment failed'), payment: data});
     } else {
-      setTimeout(executePoll, interval * 5, resolve, reject);
+      setTimeout(executePoll, interval * 2, resolve, reject);
     }
   };
 
   return new Promise(executePoll);
 }
 
-/*
-call this when?
-if we call it right after payment was created,
-and the user closes the app before payment status was updated,
-then this polling function will never run again,
-so we need to also call it when function is loaded?
- */
 export const pollPaymentStatus = async (paymentId) => (
 	polling({
       validate: (payment) => payment.status === 'confirmed',
-      interval: 1000,
+      interval: 10000,
       paymentId
     })
       .then(async (payment) => {
         await updatePayment(payment.id, payment);
         console.log(payment.id);
       })
-      .catch(async ({err, payment}) => {
+      .catch(async ({error, payment}) => {
         await updatePayment(payment.id, payment);
-        console.error('error', err);
+        console.error('Polling error', error);
       })
 );
 
