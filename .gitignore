@@ -65,6 +65,7 @@ node_modules/
 # dotenv environment variables file
 .env
 env_secrets.json
+env_config.json
 adminsdk-keys.json
 
 .idea
@@ -73,7 +74,9 @@ functions/dist
 
 functions/node_modules/
 .DS_Store
+
 firestore/backup
+firestore/data
 
 functions/env/env_config.json
 functions/src/env/env_config.json

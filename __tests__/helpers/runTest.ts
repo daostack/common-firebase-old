@@ -4,7 +4,7 @@ import firebaseFunctionsTests from 'firebase-functions-test';
 import { FeaturesList } from 'firebase-functions-test/lib/features';
 
 const test = firebaseFunctionsTests({
-  projectId: "common-tests"
+  projectId: "common-staging-50741"
 });
 
 export const runTest = (testsFunc: (functions: any , test: FeaturesList) => any): void => {
