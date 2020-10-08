@@ -88,20 +88,20 @@ runTest((funcs, test) => {
       const contractInstance = await contract.deployed();
       // Call the verifyHash function
       // const transactionResult = await contract.execTransaction(toAddress, '0', encodedData,  0, 0, 0, 0, zeroAddress, zeroAddress, getSignatureBytes(privateKey, messageHash));
-      const transactionResult = await contractInstance.execTransaction(
-        toAddress,
-        0,
-        encodedData,
-        0,
-        0,
-        0,
-        0,
-        zeroAddress,
-        zeroAddress,
-        flatSig
-          .replace(/1b$/, '1f')
-          .replace(/1c$/, '20')
-      );
+      // const transactionResult = await contractInstance.execTransaction(
+      //   toAddress,
+      //   0,
+      //   encodedData,
+      //   0,
+      //   0,
+      //   0,
+      //   0,
+      //   zeroAddress,
+      //   zeroAddress,
+      //   flatSig
+      //     .replace(/1b$/, '1f')
+      //     .replace(/1c$/, '20')
+      // );
 
       // const createCommonRes = await create
       //   .post('/createCommonTransaction')
@@ -121,8 +121,10 @@ runTest((funcs, test) => {
           signedData: flatSig
         });
 
-      console.log(res2);
-      expect(res2).toMatchSnapshot();
+      // console.log(res2);
+      console.log(res2)
+      expect(res2.status).toEqual(200)
+      // expect(res2).toMatchSnapshot();
     });
   });
 });

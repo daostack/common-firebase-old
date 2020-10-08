@@ -18,7 +18,7 @@ const createCommonTransaction = async (req) => {
 
   if (env.environment === 'dev') {
     if (!data) {
-      throw new CommonError('Cannot create a common without the needed data!');
+      throw new CommonError('The "data" param should be passed in the request');
     }
 
     userData = req.body.user;
@@ -94,7 +94,8 @@ const createCommonTransaction = async (req) => {
 
 const createCommon = async (req) => {
   const { encodedData, signedData, idToken, toAddress } = req.body;
-  const reqest = {
+  console.log("idToken -->", idToken)
+  const request = {
     body: {
       to: toAddress,
       value: '0',
@@ -103,6 +104,8 @@ const createCommon = async (req) => {
       idToken: idToken
     }
   };
+  const response = await execTransaction(request);
+  console.log('response  ->', response);
 
   const ARC_VERSION = env.commonInfo.arcVersion;
   const arc = await getArc();
@@ -116,14 +119,10 @@ const createCommon = async (req) => {
     DAOFactoryABI
   );
 
-  const response = await execTransaction(reqest);
-  console.log('response  ->', response);
   const receipt = await provider.waitForTransaction(response.txHash);
   const events = Utils.getTransactionEvents(daoFactoryContract.interface, receipt);
   const newOrgEvent = events.NewOrg;
   const daoId = newOrgEvent._avatar;
-
-  console.log('We are here');
 
   await updateDaoById(daoId, { retries: 6 });
   return { daoId };
