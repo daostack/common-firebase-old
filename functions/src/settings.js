@@ -63,7 +63,7 @@ Arc.prototype.fetchAllContracts = async function (useCache) {
     }
   }
 
-  console.log('Fetching contratInfos from the graph');
+  console.log('Fetching contractInfos from the graph');
   let allContractInfos = [];
   let contractInfos = null;
   let skip = 0;

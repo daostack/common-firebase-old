@@ -103,7 +103,7 @@ TLDR:
 ```
 yarn use:dev
 yarn build:dev
-docker-compsoe up -d // in one terminal
+docker-compose up  // in one terminal
 yarn emulator // in another terinal
 yarn test // in yet another terminal
 ```
