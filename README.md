@@ -103,8 +103,8 @@ TLDR:
 ```
 yarn use:dev
 yarn build:dev
-docker-compose up  // in one terminal
-yarn emulator // in another terinal
+docker-compose up  // in another terminal
+firebase emulators:start // in another terminal
 yarn test // in yet another terminal
 ```
 
