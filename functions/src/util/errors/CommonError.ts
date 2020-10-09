@@ -11,6 +11,7 @@ interface IErrorData {
 }
 
 export interface ICommonError {
+  name: string;
   message: string;
   errorId: string;
   errorCode: string;
@@ -24,6 +25,7 @@ export class CommonError extends Error implements ICommonError {
   public errorCode: string;
   public userMessage: string;
   public statusCode: number;
+  public name: string;
   public data: any;
 
   /**
@@ -44,7 +46,7 @@ export class CommonError extends Error implements ICommonError {
 
     this.errorId = errorId;
 
-    this.name = this.constructor.name;
+    this.name = "Common Error";
 
     this.userMessage = userMessage;
     this.statusCode = data.statusCode;

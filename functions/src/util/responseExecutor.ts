@@ -7,6 +7,7 @@ import { ICommonError } from './errors/CommonError';
 interface IErrorResponse {
   error: string;
   errorId?: string;
+  errorName?: string;
   errorCode?: string;
   errorMessage?: string;
   request?: any;
@@ -16,6 +17,7 @@ interface IErrorResponse {
 const createErrorResponse = (res: express.Response, req: express.Request, error: ICommonError): void => {
   const errorResponse: IErrorResponse = {
     error: error.message,
+    errorName: error.name,
     errorId: error.errorId,
     errorCode: error.errorCode,
     errorMessage: error.userMessage,
