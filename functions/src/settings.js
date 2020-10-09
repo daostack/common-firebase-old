@@ -17,9 +17,7 @@ if(env.environment === 'dev') {
   admin.initializeApp();
 } else {
   admin.initializeApp({
-    credential: admin.credential.cert(
-      JSON.stringify(require('./env/adminsdk-keys.json'))
-    ),
+    credential: admin.credential.cert('./env/adminsdk-keys.json'),
     databaseURL: databaseURL
   });
 }
