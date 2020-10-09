@@ -1,6 +1,6 @@
 // const Utils = require('../util/util');
 const { IpfsClient, provider, getArc } = require('../settings');
-const { env } = require('@env');
+const { env } = require('../env');
 const DAOFactoryABI = require('@daostack/common-factory/abis/DAOFactory');
 const { CommonError } = require('../util/errors');
 const { getForgeOrgData } = require('@daostack/common-factory');
@@ -21,7 +21,7 @@ const createCommonTransaction = async (req) => {
       throw new CommonError('The "data" param should be passed in the request');
     }
 
-    userData = req.body.user;
+    userData = req.body.user || {};
     userData.safeAddress = data.founderAddresses;
   } else {
     uid = await Utils.verifyId(idToken);

@@ -35,38 +35,42 @@ runTest((funcs, test) => {
   };
 
   describe('Common creation', () => {
-    it('should be fail creating common transaction without the id token provided', async () => {
-      const res = await create.post('/createCommonTransaction');
+    // it('should be fail creating common transaction without the id token provided', async () => {
+    //   const res = await create.post('/createCommonTransaction');
 
-      expect(res.ok).toBeFalsy();
-      expect(res.status).toBe(500);
+    //   expect(res.ok).toBeFalsy();
+    //   expect(res.status).toBe(500);
 
-      expect(res.body.error).not.toBe(null);
-      expect(res.body.error.commonMessage).toMatchSnapshot();
-    });
+    //   expect(res.body.error).not.toBe(null);
+    //   expect(res.body.error.commonMessage).toMatchSnapshot();
+    // });
 
-    it('should successfully create common creation transaction with all the needed data present', async () => {
-      const res = await create
-        .post('/createCommonTransaction')
-        .send({
-          idToken,
-          data,
-          user: auth.exampleUserRecord()
-        });
+    // it('should successfully create common creation transaction with all the needed data present', async () => {
+    //   const user = auth.exampleUserRecord();
+
+    //   const res = await create
+    //     .post('/createCommonTransaction')
+    //     .send({
+    //       idToken,
+    //       data,
+    //       user
+    //     });
 
 
-      expect(res.status).toBe(200);
+    //   expect(res.status).toBe(200);
 
-      expect(res.body.message).toMatchSnapshot();
-    });
+    //   expect(res.body.message).toMatchSnapshot();
+    // });
 
     it('should successfully create common creation', async () => {
+      const user = await auth.exampleUserRecord();
+
       const res = await create
         .post('/createCommonTransaction')
         .send({
           idToken,
           data,
-          user: auth.exampleUserRecord()
+          user
         });
 
       expect(res.status).toBe(200);
@@ -115,6 +119,7 @@ runTest((funcs, test) => {
       const res2 = await create
         .post('/createCommon')
         .send({
+          user,
           idToken,
           toAddress,
           encodedData,
@@ -122,18 +127,8 @@ runTest((funcs, test) => {
         });
 
       // console.log(res2);
-      console.log(res2)
       expect(res2.status).toEqual(200)
       // expect(res2).toMatchSnapshot();
     });
   });
 });
-
-// const in3Common = require('in3-common');
-// const ethUtil = require('ethereumjs-util');
-//
-// const getSignatureBytes = (pk, msgHash) => {
-//   const s = ethUtil.ecsign(in3Common.util.toBuffer(msgHash, 32), in3Common.util.toBuffer(pk, 32))
-//
-//   return in3Common.util.toHex(s.r) + in3Common.util.toHex(s.s).substr(2) + in3Common.util.toHex(s.v).substr(2)
-// }

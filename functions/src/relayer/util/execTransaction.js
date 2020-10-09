@@ -1,11 +1,26 @@
 const { Utils } = require('../../util/util');
 const Relayer = require('../relayer');
 const { CommonError } = require('../../util/errors');
+const { env } = require('../../env');
 
 const execTransaction = async req => {
   const { to, value, data, signature, idToken } = req.body;
-  const uid = await Utils.verifyId(idToken);
-  const userData = await Utils.getUserById(uid);
+
+  let uid, userData;
+
+  if (env.environment === 'dev') {
+    if (!data) {
+      throw new CommonError('The "data" param should be passed in the request');
+    }
+
+    userData = req.body.user || {};
+    userData.safeAddress = data.founderAddresses;
+    userData.ethereumAddress = data.founderAddresses;
+  } else {
+    uid = await Utils.verifyId(idToken);
+    userData = await Utils.getUserById(uid);
+  }
+  
   const safeAddress = userData.safeAddress
   const ethereumAddress = userData.ethereumAddress
   await Relayer.addAddressToWhitelist([to]);
