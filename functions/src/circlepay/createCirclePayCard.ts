@@ -46,7 +46,7 @@ interface IRequest {
 export const createCirclePayCard = async (req: IRequest) : Promise<any> => {
   let result = 'Updated existing card.';
   const {idToken, ...cardData} = req.body;
-  cardData.metadata.ipAddress = '127.0.0.1',//req.headers.host; //this returns localhost at this point
+  cardData.metadata.ipAddress = req.headers.host.includes('localhost') ? '127.0.0.1' : req.headers.host; //ip must be like xxx.xxx.xxx.xxx, and not a text
   cardData.metadata.sessionId = ethers.utils.id(cardData.proposalId).substring(0,50);
   cardData.idempotencyKey = v4();
   const uid = await Utils.verifyId(idToken);
@@ -61,7 +61,6 @@ export const createCirclePayCard = async (req: IRequest) : Promise<any> => {
   } else {
     cardById.proposals.push(req.body.proposalId)
     await updateCard(id, cardById);
-
   }
 
   return `${result} circleCardId --> ${id}`;

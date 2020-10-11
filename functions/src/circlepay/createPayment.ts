@@ -74,6 +74,7 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
       result = `Payment created. PaymentdId: ${data.data.id}`;
     }
     pollPaymentStatus(data.data.id);
-  }
+  } 
+  // else if proposal is not associated with card?
   return `Create Payment: ${result}`;
 }

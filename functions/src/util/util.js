@@ -88,7 +88,7 @@ class Utils {
       const cardData = await cardRef.get().then(doc => doc.data());
       return cardData;
     } catch (err) {
-      throw new Error('cardById TODO make an error for this');
+      throw new CommonError(CFError.emptyUserData)
     }
   }
 
@@ -100,7 +100,8 @@ class Utils {
       const cardData = cardRef.docs.map(doc => doc.data())[0];
       return cardData;
     } catch (err) {
-       throw new Error('getCardByUserId TODO make an error for this');
+      console.log('err', err)
+       throw new CommonError(CFError.emptyUserData)
     }
   }
 
@@ -112,7 +113,7 @@ class Utils {
       const cardData = cardRef.docs.map(doc => doc.data())[0];
       return cardData;
     } catch (err) {
-       throw new Error('getCardByProposalId TODO make an error for this');
+       throw CommonError(CFError.emptyUserData)
     }
   }
 

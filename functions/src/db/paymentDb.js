@@ -17,7 +17,7 @@ const polling = async ({validate, interval, paymentId}) => {
     } else if (data.status === 'failed') {
       return reject({err: new Error('Payment failed'), payment: data});
     } else {
-      setTimeout(executePoll, interval * 2, resolve, reject);
+      return setTimeout(executePoll, interval * 2, resolve, reject);
     }
   };
 
@@ -35,8 +35,9 @@ const pollPaymentStatus = async (paymentId) => (
         return await updatePayment(payment.id, payment);
       })
       .catch(async ({error, payment}) => {
-        await updatePayment(payment.id, payment);
-        console.error('Polling error', error);
+      	console.error('Polling error', error);
+      	// burn user's rep
+        return await updatePayment(payment.id, payment);
       })
 );
 
