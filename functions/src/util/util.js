@@ -117,6 +117,18 @@ class Utils {
     }
   }
 
+  async getPaymentById(paymentId) {
+    try {
+      const paymentRef = await admin.firestore().collection('payments')
+        .where('id', '==', paymentId)
+        .get();
+      const paymentData = paymentRef.docs.map(doc => doc.data())[0];
+      return paymentData;
+    } catch (err) {
+       throw CommonError(CFError.emptyUserData)
+    }
+  }
+
   getTransactionEvents(interf, receipt) {
     const txEvents = {};
     const abiEvents = Object.values(interf.events);

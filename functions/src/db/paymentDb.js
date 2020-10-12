@@ -1,6 +1,8 @@
 const { db } = require('../settings.js');
 const COLLECTION_NAME = 'payments';
 const { getPayment } = require('../circlepay/circlepay');
+import { Utils } from '../util/util';
+
 
 
 const polling = async ({validate, interval, paymentId}) => {
@@ -24,22 +26,27 @@ const polling = async ({validate, interval, paymentId}) => {
   return new Promise(executePoll);
 }
 
-const pollPaymentStatus = async (paymentId) => (
+const pollPaymentStatus = async (paymentData) => (
 	polling({
       validate: (payment) => payment.status === 'confirmed',
       interval: 10000,
-      paymentId
+      paymentId: paymentData.id
     })
-      .then(async (payment) => {
-        console.log(payment.id);
-        return await updatePayment(payment.id, payment);
+      .then(async (payment) => {  
+        return await updateStatus(paymentData.id, 'confirmed');
       })
       .catch(async ({error, payment}) => {
       	console.error('Polling error', error);
       	// burn user's rep
-        return await updatePayment(payment.id, payment);
+        return await updateStatus(paymentData.id, 'failed');
       })
 );
+
+const updateStatus = async(paymentId, status) => {
+  let currentPayment = await Utils.getPaymentById(paymentId);
+  currentPayment.status = status;
+  updatePayment(paymentId, currentPayment);
+}
 
 const updatePayment = async (paymentId, doc) => (
   await db.collection(COLLECTION_NAME)
