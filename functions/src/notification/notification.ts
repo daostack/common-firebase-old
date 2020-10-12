@@ -34,8 +34,9 @@ export const notifyData: Record<string, IEventData> = {
           {
             templateKey: 'userCommonCreated',
             emailStubs: {
-                commonName: commonData.name,
-                commonId: commonData.id
+              name: userData.displayName,
+              commonName: commonData.name,
+              commonLink: Utils.getCommonLink(commonData.id)
             }
           },
           {
