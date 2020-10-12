@@ -26,7 +26,7 @@ const polling = async ({validate, interval, paymentId}) => {
   return new Promise(executePoll);
 }
 
-const pollPaymentStatus = async (paymentData) => (
+export const pollPaymentStatus = async (paymentData) => (
 	polling({
       validate: (payment) => payment.status === 'confirmed',
       interval: 10000,
@@ -48,7 +48,7 @@ const updateStatus = async(paymentId, status) => {
   updatePayment(paymentId, currentPayment);
 }
 
-const updatePayment = async (paymentId, doc) => (
+export const updatePayment = async (paymentId, doc) => (
   await db.collection(COLLECTION_NAME)
     .doc(paymentId)
     .set(
@@ -58,8 +58,3 @@ const updatePayment = async (paymentId, doc) => (
         }
     )
 )
-
-module.exports = { 
-  pollPaymentStatus,
-  updatePayment
-}

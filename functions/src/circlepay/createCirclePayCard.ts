@@ -4,12 +4,11 @@ import { updateCard } from '../db/cardDb';
 import {ethers} from 'ethers';
 import v4 from 'uuid';
 
-const _updateCard = async (userId: string, cardId: string, proposalId: string, id: string) : Promise<any> => {
+const _updateCard = async (userId: string, id: string, proposalId: string) : Promise<any> => {
 	const doc = {
 		id,
 		userId,
 		proposals: [proposalId],
-		cardId,
 		creationData: new Date(),
 		payments: [],
 	};
@@ -44,26 +43,18 @@ interface IRequest {
 }
 
 export const createCirclePayCard = async (req: IRequest) : Promise<any> => {
-  let result = 'Updated existing card.';
+  let result = 'Unable to create card.';
   const {idToken, ...cardData} = req.body;
   cardData.metadata.ipAddress = req.headers.host.includes('localhost') ? '127.0.0.1' : req.headers.host; //ip must be like xxx.xxx.xxx.xxx, and not a text
   cardData.metadata.sessionId = ethers.utils.id(cardData.proposalId).substring(0,50);
   cardData.idempotencyKey = v4();
   const uid = await Utils.verifyId(idToken);
   const {data} = await createCard(cardData);
-  const id = ethers.utils.id(cardData.metadata.email);
-  const cardById = await Utils.getCardById(id);
 
- if(!cardById)
-  {
-    await _updateCard(uid, data.id, cardData.proposalId, id)
-    result = 'CirclePay card created.';
-  } else {
-    cardById.proposals.push(req.body.proposalId)
-    await updateCard(id, cardById);
-  }
+  await _updateCard(uid, data.id, cardData.proposalId)
+  result = 'CirclePay card created.';
 
-  return `${result} circleCardId --> ${id}`;
+  return `${result} circleCardId --> ${data.id}`;
   }
 
 module.exports = {createCirclePayCard};
