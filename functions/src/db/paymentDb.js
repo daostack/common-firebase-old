@@ -1,9 +1,7 @@
 const { db } = require('../settings.js');
 const COLLECTION_NAME = 'payments';
 const { getPayment } = require('../circlepay/circlepay');
-import { Utils } from '../util/util';
-
-
+const { Utils } = require('../util/util');
 
 const polling = async ({validate, interval, paymentId}) => {
 	console.log('start polling');
@@ -26,7 +24,7 @@ const polling = async ({validate, interval, paymentId}) => {
   return new Promise(executePoll);
 }
 
-export const pollPaymentStatus = async (paymentData) => (
+const pollPaymentStatus = async (paymentData) => (
 	polling({
       validate: (payment) => payment.status === 'confirmed',
       interval: 10000,
@@ -48,7 +46,7 @@ const updateStatus = async(paymentId, status) => {
   updatePayment(paymentId, currentPayment);
 }
 
-export const updatePayment = async (paymentId, doc) => (
+const updatePayment = async (paymentId, doc) => (
   await db.collection(COLLECTION_NAME)
     .doc(paymentId)
     .set(
@@ -58,3 +56,8 @@ export const updatePayment = async (paymentId, doc) => (
         }
     )
 )
+
+module.exports = {
+  updatePayment,
+  pollPaymentStatus
+}
