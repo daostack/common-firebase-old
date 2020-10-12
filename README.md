@@ -41,8 +41,8 @@ To run the firebase functions for the api you can run the following commands to:
 
 **2. Backup staging database on local project.**
 
--  `yarn data:backup`  - Execute in order to store locally the current database stage from the environment that you use.
--  `yarn data:update`  - Execute every time when you want to sync your local database with the databse on the current environment.
+-  `yarn data:backup`  - Makes a backup from the data on staging or production, and saves it in the cloud
+-  `yarn data:update`  - sync your local database with the latest backup
 
 **3. Start firebase emulator with local clouldfunctions and firestore. The firestore will be loaded with the latest backup version which you have locally.**
 
@@ -63,21 +63,12 @@ yarn deploy:production
 ```
 
 ### Development
-To run a pubsub function you will need to have firebase-tools installed, run
-```
-npm i -g firebase-tools
-```
-Then run the following command to create a shell
-```
-firebase functions:shell
-```
-you can then call the API functions
 
+Make sure you have the right local data.... (todo)
 ```
-graphql.graphql.get('update-daos')
-graphql.graphql.get('update-proposals')
-graphql.graphql.get('update-proposal-by-id')
+yarn start
 ```
+
 
 ### Top up the relayer
 To top up the relayer send xDAI or rinkeby to this address ```0x86FC3E21B2897641BCa28404e06f37E9157E12b3```
