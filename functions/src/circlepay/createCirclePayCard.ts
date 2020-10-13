@@ -2,7 +2,7 @@ import { Utils } from '../util/util';
 import { createCard } from './circlepay';
 import { updateCard } from '../db/cardDb';
 import {ethers} from 'ethers';
-import v4 from 'uuid';
+import { v4 } from 'uuid';
 
 const _updateCard = async (userId: string, id: string, proposalId: string) : Promise<any> => {
 	const doc = {
