@@ -1,4 +1,4 @@
-import { env } from '@env';
+import { env } from '../env';
 import { circlePayApi } from '../settings';
 import axios from 'axios';
 
