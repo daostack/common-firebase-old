@@ -149,8 +149,6 @@ const getTemplatedEmail = (templateKey, payload) => {
  * @param { string | string[] | 'admin' } to
  */
 const sendTemplatedEmail = async ({ templateKey, emailStubs, subjectStubs, to }) => {
-  console.log('Template email begin sending');
-
   to === 'admin' && (to = env.mail.adminMail);
 
   const { template, subject } = getTemplatedEmail(templateKey, { emailStubs, subjectStubs });
@@ -159,6 +157,8 @@ const sendTemplatedEmail = async ({ templateKey, emailStubs, subjectStubs, to })
     const emailPromises = [];
 
     to.forEach((emailTo) => {
+      console.log(`Sending ${templateKey} to ${emailTo}.`)
+
       emailPromises.push(mailer.sendMail({
         to: emailTo,
         subject,
@@ -168,6 +168,8 @@ const sendTemplatedEmail = async ({ templateKey, emailStubs, subjectStubs, to })
 
     await Promise.all(emailPromises);
   } else {
+    console.log(`Sending ${templateKey} to ${to}.`)
+
     await mailer.sendMail(
       to,
       subject,

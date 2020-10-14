@@ -88,8 +88,9 @@ export const notifyData: Record<string, IEventData> = {
         }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ( { commonData, userData } ) => {
+    email: ({ commonData, userData } ) => {
         return {
+          to: userData.email,
           templateKey: 'requestToJoinSubmitted',
           emailStubs: {
             name: userData.displayName,
