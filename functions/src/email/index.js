@@ -91,7 +91,7 @@ const getTemplatedEmail = (templateKey, payload) => {
         isNullOrUndefined(globalDefaultStubs[stub])
       )
     ) {
-      throw new CommonError(`Required stub ${stub} was not provided for email template`);
+      throw new CommonError(`Required stub ${stub} was not provided for ${templateKey} template`);
     }
 
     // If there is a default value for the stub and has not been replaced add it here

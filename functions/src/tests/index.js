@@ -62,6 +62,20 @@ app.get('/throw', (req, res) => {
   throw new CommonError(req.query.message, req.query.userMessage, req.query.statusCode);
 });
 
+app.post('/create/event/commonCreation', async (req, res) => {
+  const { createEvent } = require('../db/eventDbService');
+  const { userId, daoId } = req.query;
+
+  await createEvent({
+    userId: userId,
+    objectId: daoId,
+    createdAt: new Date(),
+    type: 'creationCommon'
+  });
+
+  res.send('Email sent!')
+})
+
 exports.tests = functions
   .runWith(runtimeOptions)
   .https.onRequest(app);
