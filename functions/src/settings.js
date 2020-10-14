@@ -14,11 +14,13 @@ const ipfsProvider = env.graphql.ipfsProvider;
 const ARC_VERSION = env.commonInfo.arcVersion;
 const circlePayApi = env.circlepay.apiUrl;
 
+const adminKeys = require('./env/adminsdk-keys.json');
+
 if(env.environment === 'dev') {
   admin.initializeApp();
 } else {
   admin.initializeApp({
-    credential: admin.credential.cert('./env/adminsdk-keys.json'),
+    credential: admin.credential.cert(adminKeys),
     databaseURL: databaseURL
   });
 }
