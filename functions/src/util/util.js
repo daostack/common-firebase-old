@@ -83,6 +83,53 @@ class Utils {
     }
   }
 
+  async getCardById(cardId) {
+    try {
+      const cardRef = admin.firestore().collection('cards').doc(cardId);
+      const cardData = await cardRef.get().then(doc => doc.data());
+      return cardData;
+    } catch (err) {
+      throw new CommonError(CFError.emptyUserData)
+    }
+  }
+
+  async getCardByUserId(userId) {
+    try {
+      const cardRef = await admin.firestore().collection('cards')
+        .where('userId', '==', userId)
+        .get();
+      const cardData = cardRef.docs.map(doc => doc.data())[0];
+      return cardData;
+    } catch (err) {
+      console.log('err', err)
+       throw new CommonError(CFError.emptyUserData)
+    }
+  }
+
+  async getCardByProposalId(proposalId) {
+    try {
+      const cardRef = await admin.firestore().collection('cards')
+        .where('proposals', 'array-contains', proposalId)
+        .get();
+      const cardData = cardRef.docs.map(doc => doc.data())[0];
+      return cardData;
+    } catch (err) {
+       throw CommonError(CFError.emptyUserData)
+    }
+  }
+
+  async getPaymentById(paymentId) {
+    try {
+      const paymentRef = await admin.firestore().collection('payments')
+        .where('id', '==', paymentId)
+        .get();
+      const paymentData = paymentRef.docs.map(doc => doc.data())[0];
+      return paymentData;
+    } catch (err) {
+       throw CommonError(CFError.emptyUserData)
+    }
+  }
+
   getTransactionEvents(interf, receipt) {
     const txEvents = {};
     const abiEvents = Object.values(interf.events);
