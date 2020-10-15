@@ -61,12 +61,8 @@ export const createCirclePayCard = async (req: IRequest): Promise<ICardCreatedPa
   cardData.metadata.sessionId = v4(); //ethers.utils.id(cardData.proposalId).substring(0,50);
   cardData.idempotencyKey = v4();
 
-  // const { data } = await createCard(cardData);
-
-  const data = {
-    id: 'testID'
-  };
-
+  const { data } = await createCard(cardData);
+  
   await _updateCard(uid, data.id, cardData.proposalId);
 
   return {
