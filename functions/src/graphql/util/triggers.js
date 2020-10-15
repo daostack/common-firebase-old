@@ -4,7 +4,7 @@ const { createLegalUser, createWallet } = require('../../mangopay/mangopay');
 const { createEvent } = require('../../db/eventDbService');
 const { Utils, PROPOSAL_TYPE, DAO_REGISTERED } = require('../../util/util');
 const { CommonError } = require('../../util/errors');
-const { env } = require('@env');
+const { env } = require('../../env');
 const { EVENT_TYPES } = require('../../event/event');
 const emailClient = require('../../email');
 const { getDiscussionById } = require('../../db/discussionDbService');
@@ -115,6 +115,7 @@ exports.daoUpdated = functions.firestore
 
 exports.newDaoCreated = functions.firestore
   .document('/daos/{id}')
+  // eslint-disable-next-line consistent-return
   .onCreate(async (snap) => {
     let newDao = snap.data();
 
@@ -151,7 +152,6 @@ exports.newDaoCreated = functions.firestore
         createdAt: new Date(),
         type: EVENT_TYPES.CREATION_COMMON_FAILED
       });
-      
     }
   });
 

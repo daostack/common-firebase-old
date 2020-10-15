@@ -1,5 +1,5 @@
 const { IpfsClient, provider } = require('../settings');
-const { env } = require('@env');
+const { env } = require('../env');
 const { Utils } = require('../util/util');
 const { getArc, PROPOSAL_TYPE } = require('../settings');
 const { cancelPreauthorizedPayment } = require('../mangopay/mangopay');

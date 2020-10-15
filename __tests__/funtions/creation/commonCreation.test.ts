@@ -1,7 +1,7 @@
 import supertest from 'supertest';
 
-import '@functions';
-import { runTest } from '@helpers/runTest';
+import '../../../functions/src';
+import { runTest } from '../../helpers/runTest';
 
 runTest((funcs, test) => {
   const create = supertest(funcs.create);
@@ -46,7 +46,7 @@ runTest((funcs, test) => {
 
       expect(res.status).toBe(200);
 
-      expect(res.body.message).toMatchSnapshot();
+      expect(res.body).toMatchSnapshot();
     });
   });
 });

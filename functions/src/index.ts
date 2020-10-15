@@ -1,7 +1,5 @@
-require('module-alias/register');
-
-import { env } from '@env';
-import * as tests from './tests';
+import { env } from './env';
+import { tests } from './tests';
 import * as cron from './cron';
 import * as relayer from './relayer';
 import * as graphql from './graphql';
@@ -16,7 +14,7 @@ import * as circlepayTriggers from './circlepay/triggers';
 
 // Add the __tests__ endpoints only if enabled
 if(env.tests.enabled) {
-  exports.tests = tests.tests;
+  exports.tests = tests;
 }
 
 exports.relayer = relayer.relayer;
