@@ -1,6 +1,6 @@
 import admin from 'firebase-admin';
 import { EVENT_TYPES } from "../event/event";
-import { env } from '@env';
+import { env } from '../env';
 import { getDaoById } from '../db/daoDbService';
 import { getProposalById } from '../db/proposalDbService';
 import { getUserById } from '../db/userDbService';
@@ -89,7 +89,6 @@ export const notifyData: Record<string, IEventData> = {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     email: ({ commonData, userData } ) => {
         return {
-          to: userData.email,
           templateKey: 'requestToJoinSubmitted',
           emailStubs: {
             name: userData.displayName,
