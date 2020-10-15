@@ -110,6 +110,32 @@ export const assignCard = async (req: express.Request): Promise<void> => {
   });
 };
 
+/**
+ * The raw version of assignCard();
+ * Please not that here we do not validate anything, so use with caution
+ *
+ * @param cardId - the id of the card that we want to assign
+ * @param proposalId - the id of the proposal that we want to assign to
+ *
+ * @return { Promise }
+ */
+export const assignCardToProposal = async (cardId: string, proposalId: string): Promise<void> => {
+  const card = (await cardDb.getCardRef(cardId).get()).data();
+
+  if (card.proposals.lenght > 0) {
+    // @todo Instead of throwing error should I just allow assignment
+    //  of more than one proposal to card?
+    throw new CommonError(`
+       Cannot assign card (${cardId}) to proposal because
+       the card is already assigned!
+    `);
+  }
+
+  await cardDb.updateCard(cardId, {
+    proposals: [proposalId]
+  });
+};
+
 export default {
   createCirclePayCard,
   assignCard
