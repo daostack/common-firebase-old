@@ -126,12 +126,8 @@ const createRequestToJoin = async (req) => {
   const {
     idToken,
     createProposalTx, // This is the signed transaction to create the proposal.
-    preAuthId,
-    cardData
+    preAuthId
   } = req.body;
-
-  console.log(cardData);
-
   const uid = await Utils.verifyId(idToken);
   const userData = await Utils.getUserById(uid);
   const safeAddress = userData.safeAddress;
