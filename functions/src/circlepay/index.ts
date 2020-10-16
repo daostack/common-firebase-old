@@ -24,37 +24,34 @@ circlepay.use(express.urlencoded({ extended: true })); // to support URL-encoded
 circlepay.use(cors({ origin: true }));
 
 circlepay.post('/create-card', async (req, res) => {
-	responseExecutor(
+	await responseExecutor(
 		async () => (await createCirclePayCard(req)),
 		{
 			req,
 			res,
-			successMessage: `CirclePay card created!`,
-			errorMessage: `Unable to create CirclePay card!`
+			successMessage: `CirclePay card created!`
 		})
 });
 
 circlepay.get('/encryption', async (req, res) => {
 	console.log('index/encryption');
-	responseExecutor(
+	await responseExecutor(
 	async () => (await encryption()),
 	{
 		req,
 		res,
-		successMessage: `PCI encryption key generated!`,
-		errorMessage: `Unable to generate PCI encryption key!`
+		successMessage: `PCI encryption key generated!`
 	})
 })
 
 circlepay.post('/create-a-payment', async (req, res) => {
 	console.log('index/create-a-payment');
-	responseExecutor(
+	await responseExecutor(
 	async () => (await createPayment(req.body)),
 	{
 		req,
 		res,
-		successMessage: `Payment was successful`,
-		errorMessage: `Unable to process payment!`
+		successMessage: `Payment was successful`
 	})
 });
 

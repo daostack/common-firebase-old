@@ -3,7 +3,7 @@ import { ErrorCodes } from '../constants';
 
 interface IErrorData {
   statusCode?: number;
-  errorCode?:  string;
+  errorCode?: string;
 
   payload?: any;
 

@@ -34,8 +34,9 @@ export const notifyData: Record<string, IEventData> = {
           {
             templateKey: 'userCommonCreated',
             emailStubs: {
-                commonName: commonData.name,
-                commonId: commonData.id
+              name: userData.displayName,
+              commonName: commonData.name,
+              commonLink: Utils.getCommonLink(commonData.id)
             }
           },
           {
@@ -87,8 +88,9 @@ export const notifyData: Record<string, IEventData> = {
         }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ( { commonData, userData } ) => {
+    email: ({ commonData, userData } ) => {
         return {
+          to: userData.email,
           templateKey: 'requestToJoinSubmitted',
           emailStubs: {
             name: userData.displayName,
