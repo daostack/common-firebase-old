@@ -4,7 +4,7 @@ import { DocumentReference } from '@google-cloud/firestore';
 // @todo Move to constants
 const COLLECTION_NAME = 'cards';
 
-export const updateCard = async (cardId, doc) => (
+export const updateCard = async (cardId: string, doc: any): Promise<any> => (
   await db.collection(COLLECTION_NAME)
     .doc(cardId)
     .set(
