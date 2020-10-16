@@ -1,4 +1,4 @@
-import { assignCardToProposal } from '../circlepay/createCirclePayCard';
+import { assignCardToProposal, createCirclePayCard } from '../circlepay/createCirclePayCard';
 
 const Relayer = require('./relayer');
 const { Utils } = require('../util/util');
@@ -16,13 +16,20 @@ const createRequestToJoin = async (req, res) => {
     idToken,
     createProposalTx, // This is the signed transacxtion to create the proposal.
     preAuthId,
-    cardId
+    cardData
   } = req.body;
 
   const uid = await Utils.verifyId(idToken);
   const userData = await Utils.getUserById(uid);
   const safeAddress = userData.safeAddress;
   const ethereumAddress = userData.ethereumAddress;
+
+  // --- Create card
+  // @todo Extract the create card method to not depend on express request
+  const { cardId } = await createCirclePayCard({
+    ...req,
+    body: cardData
+  });
 
   console.log('--- Add white list ---', createProposalTx.to);
 
