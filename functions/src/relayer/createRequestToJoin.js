@@ -24,8 +24,6 @@ const createRequestToJoin = async (req, res) => {
   const safeAddress = userData.safeAddress;
   const ethereumAddress = userData.ethereumAddress;
 
-  console.log(cardData);
-
   // --- Create card
   // @todo Extract the create card method to not depend on express request
   const { cardId } = await createCirclePayCard({
