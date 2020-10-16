@@ -12,7 +12,7 @@ runTest((funcs, test) => {
     name: 'Test Common',
     founderAddresses: '0xEAe13cD0b3586C09AFe762F933dA190D614628b6',
     tokenDist: [0],
-    repDist: [0],
+    repDist: [1000],
     minFeeToJoin: 100,
     fundingGoal: 1000,
     fundingGoalDeadline: new Date().getTime() + 3000,
