@@ -42,7 +42,6 @@ const createCommonTransaction = async (req) => {
     fundingToken: COMMONTOKENADDRESS,
     VERSION: IPFS_DATA_VERSION // just some alphanumberic marker  that is useful for understanding what our data is shaped like
   };
-  console.log(defaultOptions)
   const opts = { ...defaultOptions, ...data };
   console.log('saving data on ipfs');
   const ipfsHash = await IpfsClient.addAndPinString(opts);
@@ -119,13 +118,11 @@ const createCommon = async (req) => {
   );
 
   const response = await execTransaction(reqest);
-  console.log('response  ->', response);
+  // console.log('response  ->', response);
   const receipt = await provider.waitForTransaction(response.txHash);
   const events = Utils.getTransactionEvents(daoFactoryContract.interface, receipt);
   const newOrgEvent = events.NewOrg;
   const daoId = newOrgEvent._avatar;
-
-  console.log('We are here');
 
   await updateDaoById(daoId, { retries: 6 });
   return { daoId };
