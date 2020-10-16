@@ -63,9 +63,6 @@ const createRequestToJoin = async (req, res) => {
 
   console.log('tx mined', receipt);
 
-  // await arc.fetchContractInfos();
-  // const JoinABI = arc.getABI("Join", env.graphql.arcVersion)
-
   const interf = new ethers.utils.Interface(abi.Join);
   const events = Utils.getTransactionEvents(interf, receipt);
 
