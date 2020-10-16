@@ -1,6 +1,6 @@
 const {ethers, Contract} = require('ethers');
 const { Arc } = require('@daostack/arc.js');
-const { env } = require('@env');
+const { env } = require('./env');
 const IPFSApiClient = require('./util/IPFSClient')
 const gql = require('graphql-tag');
 const admin = require('firebase-admin');
@@ -14,11 +14,13 @@ const ipfsProvider = env.graphql.ipfsProvider;
 const ARC_VERSION = env.commonInfo.arcVersion;
 const circlePayApi = env.circlepay.apiUrl;
 
+const adminKeys = require('./env/adminsdk-keys.json');
+
 if(env.environment === 'dev') {
   admin.initializeApp();
 } else {
   admin.initializeApp({
-    credential: admin.credential.cert(require('@env/adminsdk-keys.json')),
+    credential: admin.credential.cert(adminKeys),
     databaseURL: databaseURL
   });
 }

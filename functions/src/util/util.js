@@ -1,11 +1,12 @@
 const admin = require('firebase-admin');
-const { provider } = require('../settings')
-const { CommonError } = require('./errors')
 const fetch = require('node-fetch');
-const { env } = require('@env');
-const ethers = require('ethers');
-const ABI = require('../relayer/util/abi.json');
 const gql = require('graphql-tag');
+const ethers = require('ethers');
+
+const ABI = require('../relayer/util/abi.json');
+const { CommonError } = require('./errors');
+const { provider } = require('../settings');
+const { env } = require('../env');
 
 // That was imported from './error', but was not
 // there so I don't know what is it

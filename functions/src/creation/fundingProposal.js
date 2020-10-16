@@ -1,5 +1,5 @@
 // const Utils = require('../util/util');
-const { env } = require('@env');
+const { env } = require('../env');
 const { Utils } = require('../util/util');
 const { IpfsClient, provider, getArc, PROPOSAL_TYPE } = require('../settings');
 const { updateProposalById } = require('../graphql/proposal');

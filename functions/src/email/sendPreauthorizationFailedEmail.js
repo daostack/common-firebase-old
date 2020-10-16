@@ -1,6 +1,6 @@
 const emailClient = require('./index');
 const { db } = require('../settings.js');
-const { env } = require('@env');
+const { env } = require('../env');
 
 const { CommonError } = require('../util/errors');
 

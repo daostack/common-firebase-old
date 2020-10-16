@@ -32,19 +32,17 @@ circlepay.post('/create-card', async (req, res) => {
     {
       req,
       res,
-      successMessage: `CirclePay card created!`,
-      errorMessage: `Unable to create CirclePay card!`
+      successMessage: `CirclePay card created!`
     });
 });
 
 circlepay.post('/assign-card', async (req, res) => {
   await responseExecutor(
     async () => (await assignCard(req)), {
-      req,
-      res,
-      successMessage: `CirclePay card assigned successfully!`,
-      errorMessage: '@todo Delete after merge!'
-    });
+    req,
+    res,
+    successMessage: `CirclePay card assigned successfully!`
+  });
 });
 
 circlepay.get('/encryption', async (req, res) => {
@@ -54,8 +52,7 @@ circlepay.get('/encryption', async (req, res) => {
     {
       req,
       res,
-      successMessage: `PCI encryption key generated!`,
-      errorMessage: `Unable to generate PCI encryption key!`
+      successMessage: `PCI encryption key generated!`
     });
 });
 
@@ -66,9 +63,11 @@ circlepay.post('/create-a-payment', async (req, res) => {
     {
       req,
       res,
-      successMessage: `Payment was successful`,
-      errorMessage: `Unable to process payment!`
+      successMessage: `Payment was successful`
     });
 });
 
-exports.circlepay = functions.runWith(runtimeOptions).https.onRequest(circlepay);
+exports.circlepay = functions
+  .runWith(runtimeOptions)
+  .https
+  .onRequest(circlepay);

@@ -1,6 +1,6 @@
 // const Utils = require('../util/util');
 const { IpfsClient, provider, getArc } = require('../settings');
-const { env } = require('@env');
+const { env } = require('../env');
 const DAOFactoryABI = require('@daostack/common-factory/abis/DAOFactory');
 const { CommonError } = require('../util/errors');
 const { getForgeOrgData } = require('@daostack/common-factory');

@@ -1,5 +1,7 @@
 {
-  "include": ["functions/src/**/*"],
+  "include": [
+    "functions/src/**/*"
+  ],
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
 

@@ -32,16 +32,10 @@
     "graphql": "^15.0.0",
     "graphql-tag": "^2.11.0",
     "mangopay2-nodejs-sdk": "^1.13.0",
-    "module-alias": "^2.2.2",
     "node-fetch": "^2.6.0",
     "promise-retry": "^2.0.1",
     "rxjs": "^6.6.3",
     "subscriptions-transport-ws": "^0.9.16",
     "uuid": "^8.3.0"
-  },
-  "_moduleAliases": {
-    "@env": "./src/env",
-    "@settings": "./src/settings",
-    "@util": "./src/util"
   }
 }

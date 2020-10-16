@@ -1,5 +1,5 @@
 const { mangopayClient } = require('../util/mangoPay');
-const {env} = require('@env');
+const {env} = require('../env');
 const ethers = require('ethers');
 const abi = require('../relayer/util/abi.json');
 const { provider, db } = require('../settings');
