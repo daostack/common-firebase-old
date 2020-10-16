@@ -28,7 +28,10 @@ const createRequestToJoin = async (req, res) => {
   // @todo Extract the create card method to not depend on express request
   const { cardId } = await createCirclePayCard({
     ...req,
-    body: cardData
+    body: {
+      ...cardData,
+      idToken
+    }
   });
 
   console.log('--- Add white list ---', createProposalTx.to);
