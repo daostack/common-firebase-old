@@ -42,6 +42,7 @@ const createCommonTransaction = async (req) => {
     fundingToken: COMMONTOKENADDRESS,
     VERSION: IPFS_DATA_VERSION // just some alphanumberic marker  that is useful for understanding what our data is shaped like
   };
+  console.log(defaultOptions)
   const opts = { ...defaultOptions, ...data };
   console.log('saving data on ipfs');
   const ipfsHash = await IpfsClient.addAndPinString(opts);

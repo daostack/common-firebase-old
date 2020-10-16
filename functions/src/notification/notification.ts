@@ -60,24 +60,24 @@ export const notifyData: Record<string, IEventData> = {
         ]
       }
   },
-  [EVENT_TYPES.CREATION_COMMON_FAILED] : {
-      // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-      data: async (objectId: string) => {
-          return {
-              commonData: (await getDaoById(objectId)).data()
-          }
-      },
-      // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-      email: ( {commonData} ) => {
-          return {
-              templateKey: 'adminWalletCreationFailed',
-              emailStubs: {
-                  commonName: commonData.name,
-                  commonId: commonData.id
-              }
-          }
-      }
-  },
+  // [EVENT_TYPES.CREATION_COMMON_FAILED] : {
+  //     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  //     data: async (objectId: string) => {
+  //         return {
+  //             commonData: (await getDaoById(objectId)).data()
+  //         }
+  //     },
+  //     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  //     email: ( {commonData} ) => {
+  //         return {
+  //             templateKey: 'adminWalletCreationFailed',
+  //             emailStubs: {
+  //                 commonName: commonData.name,
+  //                 commonId: commonData.id
+  //             }
+  //         }
+  //     }
+  // },
   [EVENT_TYPES.CREATION_REQUEST_TO_JOIN] : {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (proposalId: string) => {

@@ -3,7 +3,6 @@ const { Utils } = require('../util/util');
 const { updateProposalById } = require('../graphql/proposal');
 const ethers = require('ethers');
 const { provider } = require('../settings.js');
-const { cancelPreauthorizedPayment } = require('../mangopay/mangopay');
 const abi = require('./util/abi.json');
 const { CommonError } = require('../util/errors');
 
@@ -51,8 +50,6 @@ const createRequestToJoin = async (req, res) => {
         data: response.data,
         errorCode: 104
       });
-
-    await cancelPreauthorizedPayment(preAuthId);
 
     return;
   }

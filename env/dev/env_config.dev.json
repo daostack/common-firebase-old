@@ -27,7 +27,7 @@
   },
   "commonInfo": {
     "commonToken": "0xdff3e43710d39d2ba5dda7a8d959ed22cc905b01",
-    "memberReputation": 1000,
+    "memberReputation": 0,
     "arcVersion": "0.1.2-rc.6"
   },
   "biconomy": {
@@ -38,11 +38,6 @@
     "create2Proxy": "",
     "proxyFactory": "",
     "masterCopy": ""
-  },
-  "mangopay": {
-    "apiUrl": "",
-    "clientId": "",
-    "daoStackWalletId": ""
   },
   "mail": {
     "sender": "dev@common.io",
