@@ -1,3 +1,5 @@
+import { assignCardToProposal, createCirclePayCard } from '../circlepay/createCirclePayCard';
+
 const Relayer = require('./relayer');
 const { Utils } = require('../util/util');
 const { updateProposalById } = require('../graphql/proposal');
@@ -13,13 +15,24 @@ const createRequestToJoin = async (req, res) => {
   const {
     idToken,
     createProposalTx, // This is the signed transacxtion to create the proposal.
-    preAuthId
+    preAuthId,
+    cardData
   } = req.body;
 
   const uid = await Utils.verifyId(idToken);
   const userData = await Utils.getUserById(uid);
   const safeAddress = userData.safeAddress;
   const ethereumAddress = userData.ethereumAddress;
+
+  // --- Create card
+  // @todo Extract the create card method to not depend on express request
+  const { cardId } = await createCirclePayCard({
+    ...req,
+    body: {
+      ...cardData,
+      idToken
+    }
+  });
 
   console.log('--- Add white list ---', createProposalTx.to);
 
@@ -96,7 +109,7 @@ const createRequestToJoin = async (req, res) => {
       .status(500)
       .send({
         txHash: response.data.txHash,
-        error: 'Transation was mined, but no proposalId was found in the JoinInProposal event'
+        error: 'Transaction was mined, but no proposalId was found in the JoinInProposal event'
       });
 
     console.error(
@@ -108,6 +121,8 @@ const createRequestToJoin = async (req, res) => {
   }
 
   await updateProposalById(proposalId, { retries: 8 });
+
+  await assignCardToProposal(cardId, proposalId);
 
   // TODO: add error handling wrapper
   res.send({
