@@ -36,7 +36,6 @@ export const eventData: Record<string, IEventData> = {
         notifyUserFilter: (common: any): string[] => {
             return [common.members[0].userId];
         }
-        
     },
     [EVENT_TYPES.CREATION_PROPOSAL]: {
         eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
