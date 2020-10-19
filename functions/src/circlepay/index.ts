@@ -1,30 +1,17 @@
 import * as functions from 'firebase-functions';
-import bodyParser from 'body-parser';
-import express from 'express';
-import cors from 'cors';
 
 import { responseExecutor } from '../util/responseExecutor';
+import { commonApp, commonRouter } from '../util/commonApp';
 
 import { createCirclePayCard, assignCard } from './createCirclePayCard';
 import { createPayment } from './createPayment';
 import { encryption } from './circlepay';
 
-export const circlepay = express();
-
 const runtimeOptions = {
   timeoutSeconds: 540
 };
 
-circlepay.set('trust proxy', true);
-circlepay.use(bodyParser.json());
-circlepay.use(
-  bodyParser.urlencoded({
-    extended: true
-  })
-);
-circlepay.use(express.json()); // to support JSON-encoded bodies
-circlepay.use(express.urlencoded({ extended: true })); // to support URL-encoded bodies
-circlepay.use(cors({ origin: true }));
+const circlepay = commonRouter();
 
 circlepay.post('/create-card', async (req, res) => {
   responseExecutor(
@@ -70,4 +57,4 @@ circlepay.post('/create-a-payment', async (req, res) => {
 exports.circlepay = functions
   .runWith(runtimeOptions)
   .https
-  .onRequest(circlepay);
+  .onRequest(commonApp(circlepay));
