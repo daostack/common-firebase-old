@@ -2,7 +2,7 @@ import express from 'express';
 
 import { getArc } from '../settings';
 import { StatusCodes } from './constants';
-import { ICommonError } from './errors/CommonError';
+import { CommonError, ICommonError } from './errors/CommonError';
 
 interface IErrorResponse {
   error: string;
@@ -15,33 +15,41 @@ interface IErrorResponse {
 }
 
 const createErrorResponse = (res: express.Response, req: express.Request, error: ICommonError): void => {
-  const errorResponse: IErrorResponse = {
-    error: error.message,
-    errorName: error.name,
-    errorId: error.errorId,
-    errorCode: error.errorCode,
-    errorMessage: error.userMessage,
-    request: {
-      body: req.body,
-      query: req.query,
-      headers: req.headers
-    },
-    data: error.data
-  };
+  if(error instanceof CommonError) {
+    const errorResponse: IErrorResponse = {
+      error: error.message,
+      errorName: error.name,
+      errorId: error.errorId,
+      errorCode: error.errorCode,
+      errorMessage: error.userMessage,
+      request: {
+        body: req.body,
+        query: req.query,
+        headers: req.headers
+      },
+      data: error.data
+    };
 
-  const statusCode =
-    error.statusCode ||
-    StatusCodes.InternalServerError;
+    const statusCode =
+      error.statusCode ||
+      StatusCodes.InternalServerError;
 
-  console.error(
-    `Creating error response with message '${error.message}' for error (${error.errorId || 'No id available'})`,
-    errorResponse,
-    error
-  );
+    console.error(
+      `Creating error response with message '${error.message}' for error (${error.errorId || 'No id available'})`,
+      errorResponse,
+      error
+    );
 
-  res
-    .status(statusCode)
-    .send(errorResponse);
+    res
+      .status(statusCode)
+      .send(errorResponse);
+  } else {
+    res
+      .status(StatusCodes.InternalServerError)
+      .send(error?.message || error || 'Something bad happened');
+
+    throw (error);
+  }
 };
 
 interface IResponseExecutorAction {
