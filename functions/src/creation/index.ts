@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 
-import { commonApp } from '../util/commonApp';
+import { commonApp, commonRouter } from '../util/commonApp';
 import { responseCreateExecutor, responseExecutor } from '../util/responseExecutor';
 import { createCommon, createCommonTransaction } from './common';
 import { createFundingProposal, createFundingProposalTransaction } from './fundingProposal';
@@ -12,9 +12,9 @@ const runtimeOptions = {
   timeoutSeconds: 540, // Maximum time 9 mins
 }
 
-const createApp = commonApp();
+const router = commonRouter();
 
-createApp.post('/createCommonTransaction', async (req, res) => {
+router.post('/createCommonTransaction', async (req, res) => {
   await responseCreateExecutor(
     async () => {
       return await createCommonTransaction(req)
@@ -27,7 +27,7 @@ createApp.post('/createCommonTransaction', async (req, res) => {
   );
 })
 
-createApp.post('/createCommon', async (req, res) => {
+router.post('/createCommon', async (req, res) => {
   await responseExecutor(
     async () => {
       return await createCommon(req);
@@ -40,7 +40,7 @@ createApp.post('/createCommon', async (req, res) => {
   );
 })
 
-createApp.post('/createRequestToJoinTransaction', async (req, res) => {
+router.post('/createRequestToJoinTransaction', async (req, res) => {
   await responseCreateExecutor(
     async () => {
       return await createRequestToJoinTransaction(req);
@@ -53,7 +53,7 @@ createApp.post('/createRequestToJoinTransaction', async (req, res) => {
   );
 })
 
-createApp.post('/createRequestToJoin', async (req, res) => {
+router.post('/createRequestToJoin', async (req, res) => {
   await responseExecutor(
     async () => {
       return await createRequestToJoin(req);
@@ -66,7 +66,7 @@ createApp.post('/createRequestToJoin', async (req, res) => {
   );
 })
 
-  createApp.post('/createFundingProposalTransaction', async (req, res) => {
+  router.post('/createFundingProposalTransaction', async (req, res) => {
     await responseCreateExecutor(
       async () => {
         return await createFundingProposalTransaction(req);
@@ -79,7 +79,7 @@ createApp.post('/createRequestToJoin', async (req, res) => {
     );
 })
   
-  createApp.post('/createFundingProposal', async (req, res) => {
+  router.post('/createFundingProposal', async (req, res) => {
     await responseExecutor(
       async () => {
         return await createFundingProposal(req);
@@ -92,7 +92,7 @@ createApp.post('/createRequestToJoin', async (req, res) => {
     );
 })
 
-  createApp.post('/createVoteProposalTransaction', async (req, res) => {
+  router.post('/createVoteProposalTransaction', async (req, res) => {
     await responseCreateExecutor(
       async () => {
         return await createVoteProposalTransaction(req);
@@ -105,7 +105,7 @@ createApp.post('/createRequestToJoin', async (req, res) => {
     );
   })
   
-  createApp.post('/votePropoal', async (req, res) => {
+  router.post('/votePropoal', async (req, res) => {
     await responseExecutor(
       async () => {
         return await voteProposal(req);
@@ -120,4 +120,4 @@ createApp.post('/createRequestToJoin', async (req, res) => {
 
 export const create = functions
   .runWith(runtimeOptions)
-  .https.onRequest(createApp);
+  .https.onRequest(commonApp(router));
