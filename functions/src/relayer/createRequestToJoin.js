@@ -1,5 +1,4 @@
-import { assignCardToProposal, createCirclePayCard } from '../circlepay/createCirclePayCard';
-
+const { assignCardToProposal, createCirclePayCard } = require('../circlepay/createCirclePayCard');
 const Relayer = require('./relayer');
 const { Utils } = require('../util/util');
 const { updateProposalById } = require('../graphql/proposal');
