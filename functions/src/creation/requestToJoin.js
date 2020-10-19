@@ -2,7 +2,6 @@ const { IpfsClient, provider } = require('../settings');
 const { env } = require('../env');
 const { Utils } = require('../util/util');
 const { getArc, PROPOSAL_TYPE } = require('../settings');
-const { cancelPreauthorizedPayment } = require('../mangopay/mangopay');
 const { updateProposalById } = require('../graphql/proposal');
 const { first } = require('rxjs/operators');
 const Relayer = require('../relayer/relayer');
@@ -159,8 +158,6 @@ const createRequestToJoin = async (req) => {
     console.error('Request to join failed, tx rejected in Relayer');
     console.error(response.data);
     console.error('Request to join failed, Transaction failed in relayer');
-
-    await cancelPreauthorizedPayment(preAuthId);
 
     throw new CommonError('Request to join failed, Transaction failed in relayer');
   }
