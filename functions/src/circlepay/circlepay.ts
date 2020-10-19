@@ -1,6 +1,10 @@
+import axios from 'axios';
+
+
 import { env } from '../env';
 import { circlePayApi } from '../settings';
-import axios from 'axios';
+import { externalRequestExecutor } from '../util';
+import { ErrorCodes } from '../util/constants';
 
 const options = {
 	headers: {
@@ -33,15 +37,29 @@ export interface ICardData {
 }
 
 export const createCard = async (cardData: ICardData) : Promise<any> => {
-  const response = await axios.post(`${circlePayApi}/cards`,
-		cardData,
-		options
-	);
+  const response = await externalRequestExecutor(async () => {
+    return await axios.post(`${circlePayApi}/cards`,
+      cardData,
+      options
+    )
+  }, {
+    errorCode: ErrorCodes.CirclePayError,
+    userMessage: 'Call to CirclePay failed. Please try again later and if the issue persist contact us.'
+  });
+
 	return response.data;
 }
 
 export const encryption = async () : Promise<any> => {
-	const response = await axios.get(`${circlePayApi}/encryption/public`, options);
+	// const response = await axios.get(`${circlePayApi}/encryption/public`, options);
+
+  const response = await externalRequestExecutor(async () => {
+    return await axios.get(`${circlePayApi}/encryption/public`, options);
+  }, {
+    errorCode: ErrorCodes.CirclePayError,
+    userMessage: 'Call to CirclePay failed. Please try again later and if the issue persist contact us.'
+  });
+
 	return response.data;
 }
 
@@ -64,16 +82,24 @@ interface IPayment {
 }
 
 export const createAPayment = async (paymentData: IPayment) : Promise<any> => {
-	const response = await axios.post(`${circlePayApi}/payments`,
-		paymentData,
-		options
-	);
-	return response;
+  return await externalRequestExecutor(async () => {
+    return await axios.post(`${circlePayApi}/payments`,
+      paymentData,
+      options
+    );
+  }, {
+    errorCode: ErrorCodes.CirclePayError,
+    userMessage: 'Call to CirclePay failed. Please try again later and if the issue persist contact us.'
+  });
 }
 
 export const getPayment = async(paymentId: string) : Promise<any> => {
-  const response = await axios.get(`${circlePayApi}/payments/${paymentId}`, options);
-  return response;
+  return await externalRequestExecutor(async () => {
+    return await axios.get(`${circlePayApi}/payments/${paymentId}`, options)
+  }, {
+    errorCode: ErrorCodes.CirclePayError,
+    userMessage: 'Call to CirclePay failed. Please try again later and if the issue persist contact us.'
+  });
 }
 
 

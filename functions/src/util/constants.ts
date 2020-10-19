@@ -9,5 +9,8 @@ export const StatusCodes = {
 export const ErrorCodes = {
   NotFound: 'NotFound',
 
-  GenericError: 'GenericError'
+  GenericError: 'GenericError',
+
+  // ---- External providers errors
+  CirclePayError: 'External.CirclePayError'
 }
