@@ -88,7 +88,7 @@ export const responseExecutor: IResponseExecutor = async (action, { req, res, su
 };
 
 interface IResponseCreateExecutor {
-  (action: IResponseExecutorAction, payload: IResponseExecutorPayload, retried: boolean): Promise<void>
+  (action: IResponseExecutorAction, payload: IResponseExecutorPayload, retried?: boolean): Promise<void>
 }
 
 export const responseCreateExecutor: IResponseCreateExecutor = async (action, { req, res, successMessage }, retried = false): Promise<void> => {
