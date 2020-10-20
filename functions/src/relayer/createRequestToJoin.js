@@ -47,7 +47,7 @@ const createRequestToJoin = async (req, res) => {
     createProposalTx.signature
   );
 
-  console.log('--- Relayer response ---', response);
+  // console.log('--- Relayer response ---', response);
 
   if (response.status !== 200) {
     console.error(
@@ -66,11 +66,12 @@ const createRequestToJoin = async (req, res) => {
     return;
   }
 
-  console.log('wait for tx to mined');
+  console.log('waiting for tx to be mined');
 
   const receipt = await provider.waitForTransaction(response.data.txHash);
 
-  console.log('tx mined', receipt);
+  // console.log('tx mined', receipt);
+  console.log(`tx was mined`)
 
   // await arc.fetchContractInfos();
   // const JoinABI = arc.getABI("Join", env.graphql.arcVersion)

@@ -160,7 +160,7 @@ const createRequestToJoin = async (req) => {
     throw new CommonError('Request to join failed, Transaction failed in relayer');
   }
 
-  console.log('wait for tx to mined');
+  console.log('waiting for tx to be mined');
 
   const receipt = await provider.waitForTransaction(response.data.txHash);
 
