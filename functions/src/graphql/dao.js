@@ -193,8 +193,8 @@ async function _updateDaoDb(dao) {
   }
   await updateDao(dao.id, doc);
 
-  return { 
-    updatedDoc: doc 
+  return {
+    updatedDoc: doc
   };
 }
 
@@ -205,34 +205,38 @@ async function updateDaoById(daoId, customRetryOptions = {}) {
   }
   daoId = daoId.toLowerCase();
 
-  const res =  await promiseRetry(
+  const res = await promiseRetry(
     async (retryFunc, number) => {
-      console.log(`Try #${number} to get Dao...`);
-      const currDaosResult = await arc.daos({ where: { id: daoId } }, { fetchPolicy: 'no-cache' }).first();
+      try {
+        console.log(`Try #${number} to get Dao...`);
+        const currDaosResult = await arc.daos({ where: { id: daoId } }, { fetchPolicy: 'no-cache' }).first();
 
-      if(number > 7) {
-        console.warn('Cannot get dao after a lot of retries. Current result: ', currDaosResult);
+        if (number > 7) {
+          console.warn('Cannot get dao after a lot of retries. Current result: ', currDaosResult);
+        }
+
+        if (currDaosResult.length === 0) {
+          console.log(arc);
+          retryFunc(`We could not find a dao with id "${daoId}" in the graph at ${arc.graphqlHttpProvider}.`);
+        }
+        if (!currDaosResult[0].coreState.metadata) {
+          retryFunc(`The dao with id "${daoId}" has no metadata`);
+        }
+
+        const dao = currDaosResult[0];
+
+        // @todo: _updateDaoDb should throw en error, not return error messages
+        const { updatedDoc, errorMsg } = await _updateDaoDb(dao);
+
+        if (errorMsg) {
+          throw new CommonError(errorMsg);
+        }
+
+        console.log('UPDATED DAO WITH ID: ', daoId);
+        return updatedDoc;
+      } catch (e) {
+        retryFunc(e.message || e);
       }
-
-      if (currDaosResult.length === 0) {
-        console.log(arc);
-        retryFunc(`We could not find a dao with id "${daoId}" in the graph at ${arc.graphqlHttpProvider}.`);
-      }
-      if (!currDaosResult[0].coreState.metadata) {
-        retryFunc(`The dao with id "${daoId}" has no metadata`);
-      }
-
-      const dao = currDaosResult[0];
-
-      // @todo: _updateDaoDb should throw en error, not return error messages
-      const { updatedDoc, errorMsg } = await _updateDaoDb(dao);
-
-      if (errorMsg) {
-        throw new CommonError(errorMsg);
-      }
-
-      console.log('UPDATED DAO WITH ID: ', daoId);
-      return updatedDoc;
     },
     { ...retryOptions, ...customRetryOptions }
   );
