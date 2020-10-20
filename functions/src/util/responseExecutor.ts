@@ -34,6 +34,8 @@ export const responseExecutor: IResponseExecutor = async (action, { res, next, s
         message: successMessage,
         ...actionResult
       });
+
+    return next();
   } catch (e) {
     return next(e);
   }
@@ -49,8 +51,6 @@ export const responseCreateExecutor: IResponseCreateExecutor = async (action, { 
   try {
     let actionResult = await action();
 
-    console.log(actionResult);
-
     if (!actionResult) {
       actionResult = {};
     }
@@ -61,6 +61,8 @@ export const responseCreateExecutor: IResponseCreateExecutor = async (action, { 
         message: successMessage,
         ...actionResult
       });
+
+    return next();
   } catch (e) {
     if (e.message.match('^No contract with address') && !retried) {
 
@@ -78,7 +80,7 @@ export const responseCreateExecutor: IResponseCreateExecutor = async (action, { 
         successMessage
       }, true);
 
-      return;
+      return next();
     }
 
     return next(e);
