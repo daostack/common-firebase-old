@@ -112,7 +112,6 @@ async function _updateDaoDb(dao) {
   if (!validation.isValid) {
     console.log(`Dao state validation failed for id: ${dao.id}!`);
     console.log("DAO GRAPH OBJ: ", dao)
-    console.log("PLUGIN MISMATCHING: ", plugins);
     return { errorMsg: validation.errorMsg };
   }
 
@@ -121,8 +120,9 @@ async function _updateDaoDb(dao) {
   const pluginValidation = _validateDaoPlugins(plugins);
 
   if (!pluginValidation.isValid) {
-
     console.log(`Dao plugins validation failed for id: ${dao.id}!`);
+    console.log("PLUGIN MISMATCHING: ", plugins);
+    console.log("DAO GRAPH OBJ: ", dao)
     return { errorMsg: pluginValidation.errorMsg };
   }
 
