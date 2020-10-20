@@ -208,7 +208,8 @@ async function updateDaoById(daoId, customRetryOptions = {}) {
   const res = await promiseRetry(
     async (retryFunc, number) => {
       try {
-        console.log(`Try #${number} to get Dao...`);
+        console.log(`Try #${number} to get Dao ${daoId}...`);
+
         const currDaosResult = await arc.daos({ where: { id: daoId } }, { fetchPolicy: 'no-cache' }).first();
 
         if (number > 7) {
