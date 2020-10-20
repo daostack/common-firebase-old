@@ -2,7 +2,6 @@ import express from 'express';
 
 import { getArc } from '../settings';
 import { StatusCodes } from './constants';
-import { CommonError, ICommonError } from './errors/CommonError';
 
 interface IResponseExecutorAction {
   (): any;
@@ -19,7 +18,7 @@ interface IResponseExecutor {
   (action: IResponseExecutorAction, payload: IResponseExecutorPayload): Promise<void>
 }
 
-export const responseExecutor: IResponseExecutor = async (action, { req, res, next, successMessage }): Promise<void> => {
+export const responseExecutor: IResponseExecutor = async (action, { res, next, successMessage }): Promise<void> => {
   try {
     let actionResult = await action();
 
