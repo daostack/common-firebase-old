@@ -35,7 +35,7 @@ export const responseExecutor: IResponseExecutor = async (action, { res, next, s
         ...actionResult
       });
   } catch (e) {
-    next(e);
+    return next(e);
   }
 };
 
@@ -81,6 +81,6 @@ export const responseCreateExecutor: IResponseCreateExecutor = async (action, { 
       return;
     }
 
-    next(e);
+    return next(e);
   }
 };

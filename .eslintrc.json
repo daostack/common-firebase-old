@@ -77,6 +77,8 @@
     "no-catch-shadow": 1,
     // Disallow identifiers from shadowing restricted names
     "no-shadow-restricted-names": 2,
+    // Enforce return statements in callbacks of array methods
+    "callback-return": 2,
     // Require error handling in callbacks
     "handle-callback-err": 2,
     // Warn against string concatenation with __dirname and __filename
