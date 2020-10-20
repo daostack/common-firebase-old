@@ -126,6 +126,6 @@ router.post('/votePropoal', async (req, res, next) => {
   );
 });
 
-export const create = functions
+export const createApp = functions
   .runWith(runtimeOptions)
   .https.onRequest(commonApp(router));
