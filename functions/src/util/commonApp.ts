@@ -9,7 +9,6 @@ export const commonRouter = express.Router;
 export const commonApp = (router: express.Router): express.Application => {
   const app = express();
 
-
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({
     extended: true
@@ -26,6 +25,7 @@ export const commonApp = (router: express.Router): express.Application => {
   }));
 
   app.use(router);
+
   app.use(errorHandling);
 
   return app;

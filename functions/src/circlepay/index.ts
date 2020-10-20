@@ -13,48 +13,51 @@ const runtimeOptions = {
 
 const circlepay = commonRouter();
 
-circlepay.post('/create-card', async (req, res) => {
-  responseExecutor(
+circlepay.post('/create-card', async (req, res, next) => {
+  await responseExecutor(
     async () => (await createCirclePayCard(req)),
     {
       req,
       res,
+      next,
       successMessage: `CirclePay card created!`
     });
 });
 
-circlepay.post('/assign-card', async (req, res) => {
+circlepay.post('/assign-card', async (req, res, next) => {
   await responseExecutor(
     async () => (await assignCard(req)), {
-    req,
-    res,
-    successMessage: `CirclePay card assigned successfully!`
-  });
+      req,
+      res,
+      next,
+      successMessage: `CirclePay card assigned successfully!`
+    });
 });
 
-circlepay.get('/encryption', async (req, res) => {
+circlepay.get('/encryption', async (req, res, next) => {
   console.log('index/encryption');
-  responseExecutor(
+  await responseExecutor(
     async () => (await encryption()),
     {
       req,
       res,
+      next,
       successMessage: `PCI encryption key generated!`
     });
 });
 
-circlepay.post('/create-a-payment', async (req, res) => {
+circlepay.post('/create-a-payment', async (req, res, next) => {
   console.log('index/create-a-payment');
-  responseExecutor(
+  await responseExecutor(
     async () => (await createPayment(req.body)),
     {
       req,
       res,
+      next,
       successMessage: `Payment was successful`
-    });
+    })
 });
 
-exports.circlepay = functions
+export const circlepayApp = functions
   .runWith(runtimeOptions)
-  .https
-  .onRequest(commonApp(circlepay));
+  .https.onRequest(commonApp(circlepay));

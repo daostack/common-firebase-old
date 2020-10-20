@@ -1,23 +1,23 @@
 import express from 'express';
 
 import { CommonError } from '../util/errors';
-import { ErrorCodes, StatusCodes } from '../util/constants';
+import { createErrorResponse } from '../util/createErrorResponse';
+import { ICommonError } from '../util/errors/CommonError';
 
 export const errorHandling = (err: Error, req: express.Request, res: express.Response, next: express.NextFunction): void => {
-  res.status(StatusCodes.InternalServerError);
+  if (!(err instanceof CommonError)) {
+    console.error('Error that is not CommonError occurred. Raw error: ', err);
 
-  if (err instanceof CommonError) {
-    if(err.statusCode) {
-      res.status(err.statusCode);
-    }
-
-    throw (err);
+    createErrorResponse(req, res, new CommonError(
+      err.message || err as unknown as string || 'Something bad happened',
+      null,
+      {
+        payload: err
+      }
+    ));
+  } else {
+    createErrorResponse(req, res, err as ICommonError);
   }
 
-  console.error('Error that is not CommonError occurred', err);
-
-  throw new CommonError(err.message, null, {
-    errorCode: ErrorCodes.UncaughtError,
-    payload: JSON.stringify(err)
-  });
+  next();
 };

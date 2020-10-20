@@ -15,104 +15,118 @@ const runtimeOptions = {
   timeoutSeconds: 540 // Maximum time 9 mins
 };
 
-const graphql = commonRouter();
+const graphqlRouter = commonRouter();
 
-graphql.get('/update-daos', async (req, res) => {
-  responseExecutor(
+graphqlRouter.get('/update-daos', async (req, res, next) => {
+  await responseExecutor(
     async () => {
       return await updateDaos();
     }, {
       req,
       res,
+      next,
       successMessage: `Updated DAOs successfully!`
     }
   );
 });
 
-graphql.get('/update-dao-by-id', async (req, res) => {
+graphqlRouter.get('/update-dao-by-id', async (req, res, next) => {
   const { daoId, retries } = req.query;
-  responseExecutor(
+  await responseExecutor(
     async () => {
-      return await updateDaoById(daoId, { retries: retries || 0 });
+      console.log('hey');
+
+      const res = await updateDaoById(daoId, { retries: retries || 0 });
+      console.log('there');
+
+      return res;
     }, {
       req,
       res,
+      next,
       successMessage: `Updated dao with id ${daoId}!`
     }
   );
 });
 
-graphql.get('/update-proposals', async (req, res) => {
-  responseExecutor(
+graphqlRouter.get('/update-proposals', async (req, res, next) => {
+  await responseExecutor(
     async () => {
       return await updateProposals();
     }, {
       req,
       res,
+      next,
       successMessage: `Updated proposals!`
     }
   );
 });
 
-graphql.get('/update-proposal-by-id', async (req, res) => {
+graphqlRouter.get('/update-proposal-by-id', async (req, res, next) => {
   const { proposalId, retries, blockNumber } = req.query;
 
-  responseExecutor(
+  await responseExecutor(
     async () => {
       return await updateProposalById(proposalId, { retries: retries || 0 }, blockNumber);
     }, {
       req,
       res,
+      next,
       successMessage: `Updated proposal ${proposalId}!`
     }
   );
 });
 
-graphql.get('/update-users', async (req, res) => {
-  responseExecutor(
+graphqlRouter.get('/update-users', async (req, res, next) => {
+  await responseExecutor(
     async () => {
       return await updateUsers();
     }, {
       req,
       res,
+      next,
       successMessage: `Updated users successfully!`
     }
   );
 });
 
-graphql.get('/update-votes', async (req, res) => {
-  responseExecutor(
+graphqlRouter.get('/update-votes', async (req, res, next) => {
+  await responseExecutor(
     async () => {
       return await updateVotes();
     }, {
       req,
       res,
+      next,
       successMessage: `Updated votes successfully!`
     }
   );
 });
 
-graphql.get('/update-dao-balance', async (req, res) => {
+graphqlRouter.get('/update-dao-balance', async (req, res, next) => {
   const { daoId } = req.query;
 
-  responseExecutor(
+  await responseExecutor(
     async () => {
       return await updateDAOBalance(daoId);
     }, {
       req,
       res,
+      next,
       successMessage: `Updated balance of Common at ${daoId}!`
     }
   );
 });
 
-graphql.get('/settings', async (req, res) => {
+graphqlRouter.get('/settings', async (req, res, next) => {
   await responseExecutor(() => getPublicSettings(req), {
     req,
     res,
+    next,
     successMessage: 'Setting successfully acquired!'
   });
 });
 
-exports.graphql = functions.runWith(runtimeOptions)
-  .https.onRequest(commonApp(graphql));
+export const graphqlApp = functions
+  .runWith(runtimeOptions)
+  .https.onRequest(commonApp(graphqlRouter));
