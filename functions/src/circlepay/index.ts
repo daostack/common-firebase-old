@@ -27,7 +27,7 @@ circlepay.use(express.urlencoded({ extended: true })); // to support URL-encoded
 circlepay.use(cors({ origin: true }));
 
 circlepay.post('/create-card', async (req, res) => {
-  responseExecutor(
+  await responseExecutor(
     async () => (await createCirclePayCard(req)),
     {
       req,
@@ -47,7 +47,7 @@ circlepay.post('/assign-card', async (req, res) => {
 
 circlepay.get('/encryption', async (req, res) => {
   console.log('index/encryption');
-  responseExecutor(
+  await responseExecutor(
     async () => (await encryption()),
     {
       req,
@@ -58,7 +58,7 @@ circlepay.get('/encryption', async (req, res) => {
 
 circlepay.post('/create-a-payment', async (req, res) => {
   console.log('index/create-a-payment');
-  responseExecutor(
+  await responseExecutor(
     async () => (await createPayment(req.body)),
     {
       req,

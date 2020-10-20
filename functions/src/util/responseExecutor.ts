@@ -47,8 +47,6 @@ const createErrorResponse = (res: express.Response, req: express.Request, error:
     res
       .status(StatusCodes.InternalServerError)
       .send(error?.message || error || 'Something bad happened');
-
-    throw (error);
   }
 };
 
