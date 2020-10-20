@@ -8,7 +8,6 @@ const graphHttpLink = env.graphql.graphqlHttpProvider;
 const graphwsLink = env.graphql.graphqlWsProvider;
 const databaseURL = env.firebase.databaseURL;
 const jsonRpcProvider = env.blockchain.jsonRpcProvider;
-const mangoPayApi = env.mangopay.apiUrl;
 const ipfsDataVersion = env.graphql.ipfsDataVersion;
 const ipfsProvider = env.graphql.ipfsProvider;
 const ARC_VERSION = env.commonInfo.arcVersion;
@@ -131,7 +130,6 @@ module.exports = {
     graphHttpLink,
     databaseURL,
     jsonRpcProvider,
-    mangoPayApi,
     provider,
     retryOptions,
     ipfsDataVersion,
