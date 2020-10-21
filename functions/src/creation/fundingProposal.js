@@ -178,7 +178,7 @@ const createFundingProposal = async (req) => {
   };
 
   const response = await execTransaction(reqest2);
-  console.log('response -->', response);
+  // console.log('response -->', response);
 
   const ARC_VERSION = env.commonInfo.arcVersion;
   const abi = arc.getABI({ abiName: 'FundingRequest', version: ARC_VERSION });
