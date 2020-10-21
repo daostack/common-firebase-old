@@ -9,11 +9,7 @@ import { EVENT_TYPES } from './event';
 export const totalRaisedTriggerHandler = async (doc: QueryDocumentSnapshot<IEventModel>): Promise<void> => {
   const data = doc.data();
 
-  if(
-    data.type === EVENT_TYPES.APPROVED_REQUEST_TO_JOIN,
-    // @notice For testing purposes only! If I've committed it hit me up :D
-    data.type === EVENT_TYPES.CREATION_REQUEST_TO_JOIN
-  ) {
+  if(data.type === EVENT_TYPES.APPROVED_REQUEST_TO_JOIN) {
     const proposal = (await db.collection(Collections.Proposals)
       .doc(data.objectId)
       .get())
@@ -26,7 +22,7 @@ export const totalRaisedTriggerHandler = async (doc: QueryDocumentSnapshot<IEven
 
     common.metadata.totalRaised =
       common.metadata.totalRaised || 0 +
-      proposal.description.funding;
+      proposal.description.fundung;
 
     await db.collection(Collections.Commons)
       .doc(proposal.dao)
