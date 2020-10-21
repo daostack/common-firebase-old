@@ -70,7 +70,7 @@ export const responseExecutor: IResponseExecutor = async (action, { req, res, su
   try {
     let actionResult = await action();
 
-    console.log(`ActionResult --> ${actionResult}`);
+    // console.log(`ActionResult --> ${actionResult}`);
 
     if (!actionResult) {
       actionResult = {};

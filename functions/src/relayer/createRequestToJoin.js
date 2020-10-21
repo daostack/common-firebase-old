@@ -34,8 +34,7 @@ const createRequestToJoin = async (req, res) => {
 
   console.log('--- Add white list ---', createProposalTx.to);
 
-  const repw1 = await Relayer.addAddressToWhitelist([ createProposalTx.to ]);
-
+  await Relayer.addAddressToWhitelist([ createProposalTx.to ]);
   // console.log('Add white list Success', repw1);
 
   const response = await Relayer.execTransaction(

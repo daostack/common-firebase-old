@@ -76,7 +76,6 @@ const createVoteProposalTransaction = async (req) => {
 const voteProposal = async (req) => {
   console.log(`voteProposal started`)
   const { encodedData, signedData, idToken, toAddress, proposalId } = req.body;
-  console.log(1)
   const request = {
     body: {
       to: toAddress,
@@ -87,7 +86,6 @@ const voteProposal = async (req) => {
     }
   };
   const response = await execTransaction(request);
-  console.log(2)
   const receipt = await provider.waitForTransaction(response.txHash);
   console.log(`call updateProposalById`)
   await updateProposalById(proposalId, { retries: 8 }, receipt.blockNumber);
