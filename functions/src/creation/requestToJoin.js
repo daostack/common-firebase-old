@@ -116,7 +116,6 @@ const createRequestToJoinTransaction = async (req) => {
   console.log('Encoding transaction');
   const encodedData = contract.interface.functions[method].encode(args);
   const safeTxHash = await Utils.createSafeTransactionHash(userData.safeAddress, contract.address, '0', encodedData);
-  console.log('safeTxHash -->', safeTxHash);
   return { encodedData, safeTxHash, toAddress: contract.address };
 };
 
