@@ -44,6 +44,8 @@ const createErrorResponse = (res: express.Response, req: express.Request, error:
       .status(statusCode)
       .send(errorResponse);
   } else {
+    console.log(error)
+    console.log(error.message)
     res
       .status(StatusCodes.InternalServerError)
       .send(error?.message || error || 'Something bad happened');
@@ -68,7 +70,7 @@ export const responseExecutor: IResponseExecutor = async (action, { req, res, su
   try {
     let actionResult = await action();
 
-    console.log(`ActionResult --> ${actionResult}`);
+    // console.log(`ActionResult --> ${actionResult}`);
 
     if (!actionResult) {
       actionResult = {};
@@ -81,6 +83,7 @@ export const responseExecutor: IResponseExecutor = async (action, { req, res, su
         ...actionResult
       });
   } catch (e) {
+    console.error(`Error occurred in response`, e)
     createErrorResponse(res, req, e);
   }
 };
