@@ -83,7 +83,7 @@ export const responseExecutor: IResponseExecutor = async (action, { req, res, su
         ...actionResult
       });
   } catch (e) {
-    console.log(e)
+    console.error(`Error occurred in response`, e)
     createErrorResponse(res, req, e);
   }
 };
