@@ -1,5 +1,6 @@
 import { CommonError } from '../../util/errors';
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const validateBlockNumber = (blockNumber: any) : number | null => {
     let currBlockNumber: number | any = null;
     if (blockNumber) {
