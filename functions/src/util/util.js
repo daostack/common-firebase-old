@@ -101,8 +101,9 @@ class Utils {
       const cardData = cardRef.docs.map(doc => doc.data())[0];
       return cardData;
     } catch (err) {
-      console.log('err', err)
-       throw new CommonError(CFError.emptyUserData)
+      console.error('err', err);
+
+      throw new CommonError(CFError.emptyUserData)
     }
   }
 
@@ -201,7 +202,6 @@ class Utils {
       );
       return myTxHash;
     } catch (err) {
-      console.log(err);
       throw (err);
     }
   }
