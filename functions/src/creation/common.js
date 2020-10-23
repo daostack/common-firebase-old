@@ -126,7 +126,7 @@ const createCommon = async (req) => {
   const newOrgEvent = events.NewOrg;
   const daoId = newOrgEvent._avatar;
 
-  await updateDaoById(daoId, { retries: 6 });
+  await updateDaoById(daoId, { retries: 8 });
   return { daoId };
 };
 
