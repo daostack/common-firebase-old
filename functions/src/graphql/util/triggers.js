@@ -43,7 +43,7 @@ exports.newProposalCreated = functions
         });
     }
   })
-
+// is this being triggered by bot?
 exports.watchForNewMembers = functions.firestore
   .document('/proposals/{id}')
   .onUpdate(async (change) => {

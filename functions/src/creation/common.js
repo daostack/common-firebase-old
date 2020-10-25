@@ -31,7 +31,7 @@ const createCommonTransaction = async (req) => {
 
   const REP_DIST = [1000]; 
   // TODO: we want to change this and set it to 0, and mint the repution when the proposalis accepted (and the payment succeeded)
-  const MEMBER_REPUTATION = 1000;
+  const MEMBER_REPUTATION = 0; // 1000;
   const COMMONTOKENADDRESS = env.commonInfo.commonToken;
   const IPFS_DATA_VERSION = env.graphql.ipfsDataVersion;
   const ARC_VERSION = env.commonInfo.arcVersion;

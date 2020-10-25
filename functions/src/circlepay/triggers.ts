@@ -21,7 +21,8 @@ exports.watchForExecutedProposals = functions.firestore
           ipAddress: '127.0.0.1', //@question use public-ip lib here?? 
           proposerId: proposal.proposerId,
           proposalId: proposal.id,
-          funding: proposal.description.funding
+          funding: proposal.description.funding,
+          dao: proposal.dao
         });
       }
     }

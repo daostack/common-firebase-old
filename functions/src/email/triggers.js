@@ -10,7 +10,7 @@ exports.watchForExecutedProposals = functions.firestore
   .onUpdate(async (change) => {
     const data = change.after.data();
     const previousData = change.before.data();
-
+    // do we want to send an email before reputation minted?
     if (
       data.executed !== previousData.executed &&
       data.executed === true &&
@@ -18,7 +18,7 @@ exports.watchForExecutedProposals = functions.firestore
       // && data.description.preAuthId
     ) {
       console.log(
-        'Proposal EXECUTED and WINNING OUTCOME IS 1 -> INITIATING PAYMENT'
+        'Proposal EXECUTED and WINNING OUTCOME IS 1 -> SENDING EMAIL'
       );
       const userData = await Utils.getUserById(data.proposerId);
       let daoData = await Utils.getCommonById(data.dao);
@@ -43,7 +43,8 @@ exports.watchForExecutedProposals = functions.firestore
           })
         ]);
 
-        console.log(`Minting ${amount} tokens to ${data.dao}`)
+        // should this be here?
+        /*console.log(`Minting ${amount} tokens to ${data.dao}`)
         await minterToken(data.dao, amount)
         await updateDAOBalance(data.dao);
         return change.after.ref.set(
@@ -51,15 +52,15 @@ exports.watchForExecutedProposals = functions.firestore
             paymentStatus: 'paid',
           },
           { merge: true }
-        );
+        );*/
 
       } catch (e) {
-
-        return change.after.ref.set({
+        console.log(e)
+        /*return change.after.ref.set({
           paymentStatus: 'failed',
         }, {
           merge: true
-        });
+        });*/
       }
     } else if (
       data.executed !== previousData.executed &&

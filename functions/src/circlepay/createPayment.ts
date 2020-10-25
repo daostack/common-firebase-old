@@ -36,6 +36,7 @@ interface IRequest {
   proposerId: string,
   proposalId: string,
   funding: number,
+  dao: string,
 }
 
 export const createPayment = async (req: IRequest) : Promise<any> => {
@@ -73,7 +74,7 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
       await updateCard(cardData.id, cardData);
       result = `Payment created. PaymentdId: ${data.data.id}`;
     }
-    pollPaymentStatus(data.data);
+    pollPaymentStatus(data.data, req.dao);
   } 
   // else if proposal is not associated with card?
   return `Create Payment: ${result}`;
