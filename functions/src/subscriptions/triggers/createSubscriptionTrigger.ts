@@ -15,7 +15,6 @@ functions.firestore
     const event = snap.data() as IEventModel;
 
     if (event.type === EVENT_TYPES.APPROVED_REQUEST_TO_JOIN) {
-      // @todo Move the collection to constant
       const proposal = (await db.collection(Collections.Proposals)
         .doc(event.objectId)
         .get()).data() as IProposalEntity;
@@ -40,7 +39,6 @@ functions.firestore
           );
         }
 
-        // First subscription
         const subscription: Omit<ISubscriptionEntity, 'id'> = {
           paymentIds: [],
           proposalId: proposal.id,

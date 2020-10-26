@@ -21,4 +21,5 @@ export const Collections = {
   Commons: 'daos',
   Event: 'event',
   Subscriptions: 'subscriptions',
+  Cards: 'cards'
 }

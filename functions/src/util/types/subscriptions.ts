@@ -14,11 +14,5 @@ export interface ISubscriptionEntity {
   amount: number;
 }
 
-// export interface ISubscriptionPaymentMethod {
-//
-// }
-//
-// export type SubscriptionsPaymentMethodStatus = 'Active' | 'Inactive';
 
-export type SubscriptionStatus = 'Active' | 'CanceledByUser' | 'CanceledByPaymentFailure' | 'PaymentFailed';
-export type SubscriptionPaymentStatus = '';
+export type SubscriptionStatus = 'Active' | 'CanceledByUser' | 'CanceledByPaymentFailure' | 'PaymentFailed' | 'PaymentPending';

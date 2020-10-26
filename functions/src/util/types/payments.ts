@@ -1,7 +1,9 @@
 export interface IPaymentEntity {
   id: string;
-
-  status: IPaymentStatus;
+s
+  type: PaymentType;
+  status: PaymentStatus;
 }
 
-export type IPaymentStatus = 'pending' | 'confirmed' | string;
+export type PaymentStatus = 'pending' | 'confirmed' | string;
+export type PaymentType = 'OneTimePayment' | 'SubscriptionPayment';

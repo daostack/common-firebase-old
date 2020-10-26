@@ -4,6 +4,8 @@ import { QuerySnapshot } from '@google-cloud/firestore';
 import { Collections } from '../../util/constants';
 import { ISubscriptionEntity } from '../../util/types';
 
+import { subscriptionService } from './index';
+
 const db = admin.firestore();
 
 export const chargeSubscriptions = async (): Promise<void> => {
@@ -17,5 +19,12 @@ export const chargeSubscriptions = async (): Promise<void> => {
     const subscriptionEntity = subscriptionDueToday.data() as ISubscriptionEntity;
 
     console.info(`Charging subscription (${subscriptionEntity.id}) with $${subscriptionEntity.amount}`);
+    console.trace(`Charging subscription`, subscriptionEntity);
+
+    // eslint-disable-next-line no-await-in-loop
+    await subscriptionService.chargeSubscription(subscriptionEntity);
+
+    console.info(`Charged subscription (${subscriptionEntity.id}) with $${subscriptionEntity.amount}`);
+    console.trace(`Charged subscription`, subscriptionEntity);
   }
 };
