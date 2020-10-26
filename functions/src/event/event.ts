@@ -77,6 +77,20 @@ export const eventData: Record<string, IEventData> = {
         notifyUserFilter: async (proposal: any): Promise<string[]> => {
             return [proposal.proposerId];
         }
+    },
+    [EVENT_TYPES.REJECTED_REQUEST_TO_JOIN]: {
+        eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+        notifyUserFilter: async (proposal: any): Promise<string[]> => {
+            return [proposal.proposerId];
+        }
+    },
+    [EVENT_TYPES.REJECTED_PROPOSAL]: {
+        eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+        notifyUserFilter: async (proposal: any): Promise<string[]> => {
+            return [proposal.proposerId];
+        }
     }
     
 }
