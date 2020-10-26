@@ -20,6 +20,14 @@ export enum EVENT_TYPES {
     REJECTED_PROPOSAL = 'rejectedProposal',
     //COMMON 
     COMMON_WHITELISTED = 'commonWhitelisted',
+
+    // --- Subscriptions
+    SubscriptionCreated = 'SubscriptionCreated',
+    SubscriptionPaymentCreated = 'SubscriptionPaymentCreated',
+    SubscriptionPaymentFailed = 'SubscriptionPaymentFailed',
+    SubscriptionCanceledByUser = 'SubscriptionCanceledByUser',
+    SubscriptionCanceledByPaymentFailure = 'SubscriptionCanceledByPaymentFailure'
+
 }
 
 export const eventData: Record<string, IEventData> = {

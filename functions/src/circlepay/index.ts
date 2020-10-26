@@ -4,7 +4,7 @@ import { responseExecutor } from '../util/responseExecutor';
 import { commonApp, commonRouter } from '../util/commonApp';
 
 import { createCirclePayCard, assignCard } from './createCirclePayCard';
-import { createPayment } from './createPayment';
+import { createPaymentWeb } from './createPaymentWeb';
 import { encryption } from './circlepay';
 
 const runtimeOptions = {
@@ -49,7 +49,7 @@ circlepay.get('/encryption', async (req, res, next) => {
 circlepay.post('/create-a-payment', async (req, res, next) => {
   console.log('index/create-a-payment');
   await responseExecutor(
-    async () => (await createPayment(req.body)),
+    async () => (await createPaymentWeb(req.body)),
     {
       req,
       res,

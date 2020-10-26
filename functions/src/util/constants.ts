@@ -15,3 +15,10 @@ export const ErrorCodes = {
   // ---- External providers errors
   CirclePayError: 'External.CirclePayError'
 }
+
+export const Collections = {
+  Proposals: 'proposals',
+  Commons: 'daos',
+  Event: 'event',
+  Subscriptions: 'subscriptions',
+}

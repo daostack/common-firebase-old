@@ -1,11 +1,10 @@
-
 const admin = require('firebase-admin');
 const db = admin.firestore();
 
-const COLLECTION_NAME = 'event';
+const {Collections} = require('../util/constants');
 
 async function createEvent(doc) {
-    return await db.collection(COLLECTION_NAME).add(doc);
+    return await db.collection(Collections.Event).add(doc);
 }
 
 module.exports = {
