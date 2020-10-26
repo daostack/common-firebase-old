@@ -8,6 +8,10 @@ import { Utils } from '../util/util';
 
 const messaging = admin.messaging();
 
+export enum NOTIFICATION_TYPES {
+  CREATION_MESSAGE = 'creationMessage',
+}
+
 export interface INotification {
   send: any
 }
@@ -197,6 +201,24 @@ export const notifyData: Record<string, IEventData> = {
         return {
             title: `Bad news, your request to join "${commonData.name}" was rejected.`,
             body: `Don't give up, there are plenty of other Commons you can join.`,
+            image: commonData.metadata.image || ''
+        }
+    },
+  },
+  [NOTIFICATION_TYPES.CREATION_MESSAGE]: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    data: async (objectId: string) => {
+        const proposalData = (await getProposalById(objectId)).data();
+        return { 
+          commonData : (await getDaoById(proposalData.dao)).data()
+        }
+    },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    notification: async ( {commonData} ) => {
+      console.log('commonData', commonData)
+        return {
+            title: `New message!`,
+            body: `A common member sent a message in "${commonData.name}"`,
             image: commonData.metadata.image || ''
         }
     },

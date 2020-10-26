@@ -10,6 +10,7 @@ import * as create from './creation';
 import * as circlepay from './circlepay';
 import * as circlepayTriggers from './circlepay/triggers';
 import * as emailTriggers from './email/triggers';
+import * as messageTriggers from './discussions/triggers';
 
 // Add the __tests__ endpoints only if enabled
 if(env.tests.enabled) {
@@ -25,5 +26,6 @@ exports.eventSub = event;
 exports.circlepay = circlepay.circlepay;
 exports.circlepayTriggers = circlepayTriggers;
 exports.emailTriggers = emailTriggers
+exports.messageTriggers = messageTriggers;
 
 exports.cronJobs = cron.crons;
