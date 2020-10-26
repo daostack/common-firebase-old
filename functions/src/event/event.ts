@@ -16,7 +16,7 @@ export enum EVENT_TYPES {
     APPROVED_REQUEST_TO_JOIN = 'approvedReqToJoin',
     APPROVED_PROPOSAL = 'approvedProposal',
     //REJECTED notifications
-    REJECTED_REQUEST_TO_JOIN = 'approvedReqToJoin',
+    REJECTED_REQUEST_TO_JOIN = 'rejectedReqToJoin',
     REJECTED_PROPOSAL = 'rejectedProposal',
     //COMMON 
     COMMON_WHITELISTED = 'commonWhitelisted',
