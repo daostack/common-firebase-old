@@ -4,6 +4,7 @@ import { chargeSubscriptions } from './service/chargeSubscriptions';
 import { cancelSubscription } from './service/cancelSubscription';
 import { findSubscriptionById } from './service/findSubscriptionById';
 import { updateSubscription } from './service/updateSubscription';
+import { createSubscription } from './service/createSubscription';
 
 export const subscriptionService = {
   chargeSubscription,
@@ -14,5 +15,7 @@ export const subscriptionService = {
 
   findSubscriptionById,
 
-  updateSubscription
+  updateSubscription,
+
+  createSubscription
 };

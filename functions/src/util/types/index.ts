@@ -27,6 +27,9 @@ export interface ICommonMetadata {
 }
 
 export interface ICommonEntity {
+  id: string;
+  name: string;
+
   members: ICommonMember[];
 
   metadata: ICommonMetadata;
@@ -57,5 +60,5 @@ export interface IEventEntity {
   type: EVENT_TYPES;
 }
 
-export * from './subscriptions';
+export * from '../../subscriptions/types';
 export * from './payments';

@@ -12,11 +12,20 @@ export interface ISubscriptionEntity {
   status: SubscriptionStatus;
 
   amount: number;
+
+  metadata: ISubscriptionMetadata;
 }
 
 export interface ISubscriptionPayment {
   paymentId: string;
   paymentStatus: SubscriptionPaymentStatus;
+}
+
+export interface ISubscriptionMetadata {
+  common: {
+    name: string;
+    id: string;
+  }
 }
 
 

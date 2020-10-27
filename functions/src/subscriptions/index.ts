@@ -6,6 +6,9 @@ import { runtimeOptions } from '../util/constants';
 import { CommonError } from '../util/errors';
 
 import { cancelSubscription } from './service/cancelSubscription';
+import { getProposalById } from '../db/proposalDbService';
+import { createSubscription } from './service/createSubscription';
+import { IProposalEntity } from '../util/types';
 
 const router = commonRouter();
 
@@ -25,6 +28,14 @@ router.post('/cancel', async (req, res, next) => {
     next,
     successMessage: `Subscription successfully canceled`
   });
+});
+
+router.post('/test', async (req, res) => {
+  res.send(
+    await createSubscription(
+      (await getProposalById(req.query.proposalId)).data() as IProposalEntity
+    )
+  );
 });
 
 export const subscriptionsApp = functions
