@@ -5,6 +5,7 @@ import { getDaoById } from '../db/daoDbService';
 import { getProposalById } from '../db/proposalDbService';
 import { getUserById } from '../db/userDbService';
 import { Utils } from '../util/util';
+import { getDiscussionMessageById } from '../db/discussionMessagesDb'; 
 
 const messaging = admin.messaging();
 
@@ -207,21 +208,21 @@ export const notifyData: Record<string, IEventData> = {
   },
   [NOTIFICATION_TYPES.CREATION_MESSAGE]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    data: async (objectId: string) => {
-        const proposalData = (await getProposalById(objectId)).data();
+    data: async (messageId: string) => {
+        const message = (await getDiscussionMessageById(messageId)).data();
         return { 
-          commonData : (await getDaoById(proposalData.dao)).data()
+          sender: (await getUserById(message.ownerId)).data(),
+          commonData : (await getDaoById(message.commonId)).data()
         }
-    },
+      },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    notification: async ( {commonData} ) => {
-      console.log('commonData', commonData)
-        return {
-            title: `New message!`,
-            body: `A common member sent a message in "${commonData.name}"`,
-            image: commonData.metadata.image || ''
-        }
-    },
+    notification: async ( {sender, commonData} ) => (
+      {
+          title: `New message!`,
+          body: `${sender.displayName} commented in "${commonData.name}"`,
+          image: commonData.metadata.image || ''
+      }
+    ),
   }
   // TODO: We don't have defined notification for the rejected funding proposal. Ask if we need that.
   //

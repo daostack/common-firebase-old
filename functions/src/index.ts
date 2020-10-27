@@ -10,7 +10,7 @@ import * as create from './creation';
 import * as circlepay from './circlepay';
 import * as circlepayTriggers from './circlepay/triggers';
 import * as emailTriggers from './email/triggers';
-import * as messageTriggers from './discussions/triggers';
+import * as messageTriggers from './discussionMessage/triggers';
 
 // Add the __tests__ endpoints only if enabled
 if(env.tests.enabled) {
