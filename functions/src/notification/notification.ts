@@ -256,7 +256,7 @@ export default new class Notification implements INotification {
       notification: {
         title,
         body,
-        icon: image
+        image
       },
     };
 
@@ -275,7 +275,7 @@ export default new class Notification implements INotification {
       notification: {
         title,
         body,
-        icon: image
+        image
       },
     } as admin.messaging.Message;
     
