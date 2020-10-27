@@ -200,32 +200,42 @@ async function updateDaoById(daoId, customRetryOptions = {}) {
     throw new CommonError(`You must provide a daoId (current value is "${daoId}")`);
   }
   daoId = daoId.toLowerCase();
-  const dao = await promiseRetry(
+
+  const res =  await promiseRetry(
     async (retryFunc, number) => {
-      console.log(`Try #${number} to get Dao...`);
+      console.log(`Try #${number} to get Dao ${daoId}...`);
       const currDaosResult = await arc.daos({ where: { id: daoId } }, { fetchPolicy: 'no-cache' }).first();
 
+      if(number > 7) {
+        console.warn('Cannot get dao after a lot of retries. Current result: ', currDaosResult);
+      }
+
       if (currDaosResult.length === 0) {
+        console.log(`retrying because we did not find a dao ${daoId}`)
         retryFunc(`We could not find a dao with id "${daoId}" in the graph at ${arc.graphqlHttpProvider}.`);
       }
       if (!currDaosResult[0].coreState.metadata) {
+        console.log(`retrying because the dao ${daoId} has no metadata`)
         retryFunc(`The dao with id "${daoId}" has no metadata`);
       }
-      return currDaosResult[0];
+
+      const dao = currDaosResult[0];
+
+      // @todo: _updateDaoDb should throw en error, not return error messages
+      const { updatedDoc, errorMsg } = await _updateDaoDb(dao);
+
+      if (errorMsg) {
+        console.log(`retrying because of error: ${errorMsg}`)
+        retryFunc(errorMsg)
+      }
+
+      console.log('UPDATED DAO WITH ID: ', daoId);
+      return updatedDoc;
     },
     { ...retryOptions, ...customRetryOptions }
   );
 
-  // TODO: _updateDaoDb should throw en error, not ereturn error messages
-  const { updatedDoc, errorMsg } = await _updateDaoDb(dao);
-  if (errorMsg) {
-    console.error(`Dao update failed for id: ${dao.id}!`);
-    console.error(errorMsg);
-    throw new CommonError(errorMsg);
-  }
-  console.log('UPDATED DAO WITH ID: ', daoId);
-  console.log('----------------------------------------------------------');
-  return updatedDoc;
+  return res;
 }
 
 module.exports = {

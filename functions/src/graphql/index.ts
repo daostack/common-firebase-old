@@ -3,6 +3,7 @@ import * as functions from 'firebase-functions';
 import { updateDAOBalance } from '../db/daoDbService';
 import { commonApp, commonRouter } from '../util/commonApp';
 import { responseExecutor } from '../util/responseExecutor';
+import { fetchAllContracts } from '../settings';
 
 import { updateDaoById, updateDaos } from './dao';
 import { updateProposalById, updateProposals } from './proposal';
@@ -126,6 +127,16 @@ graphqlRouter.get('/settings', async (req, res, next) => {
     successMessage: 'Setting successfully acquired!'
   });
 });
+
+graphqlRouter.get('/fetch-contractinfos', async (req, res, next) => {
+  await responseExecutor(() =>  fetchAllContracts(false), {
+    req,
+    res,
+    next,
+    successMessage: 'Setting successfully acquired!',
+  });
+});
+
 
 export const graphqlApp = functions
   .runWith(runtimeOptions)

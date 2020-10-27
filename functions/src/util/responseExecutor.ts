@@ -22,7 +22,7 @@ export const responseExecutor: IResponseExecutor = async (action, { res, next, s
   try {
     let actionResult = await action();
 
-    console.log(`ActionResult --> ${actionResult}`);
+    // console.log(`ActionResult --> ${actionResult}`);
 
     if (!actionResult) {
       actionResult = {};

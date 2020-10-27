@@ -304,10 +304,10 @@
     subscriptions-transport-ws "^0.9.16"
     ws "^6.2.1"
 
-"@daostack/common-factory@1.3.8":
-  version "1.3.8"
-  resolved "https://registry.yarnpkg.com/@daostack/common-factory/-/common-factory-1.3.8.tgz#9c931ce8a2a26a6e7b321d2b002c94f5f3a1437f"
-  integrity sha512-Wqk/jZvDBlKozkPDneR9cDOZoKaxhOn9gvRGTg4rEndNIHYqsPRaFkaUMD9QJiFCATL144TczjHYYSAm6odDRA==
+"@daostack/common-factory@1.3.9":
+  version "1.3.9"
+  resolved "https://registry.yarnpkg.com/@daostack/common-factory/-/common-factory-1.3.9.tgz#ec52944ee54b90b1edfbc41371f5962171ab46d0"
+  integrity sha512-Zr9CgR53m75KWZ7qeJ9AtIjyewWhCu3VjeWtXgdWpcnARsIvXGwnc2m23EQ6a4vOK2Wj35dfCoKH2sR46XoV3g==
   dependencies:
     ethers "^4.0.46"
 

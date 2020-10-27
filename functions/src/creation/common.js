@@ -47,7 +47,9 @@ const createCommonTransaction = async (req) => {
   const opts = { ...defaultOptions, ...data };
   console.log('saving data on ipfs');
   const ipfsHash = await IpfsClient.addAndPinString(opts);
-  console.log('ipfsHash ->', ipfsHash);
+  if (!ipfsHash) {
+    throw CommonError("IPFS hash is empty - something went wrong calling addAndPintString")
+  }
 
   const arc = await getArc();
 
@@ -126,7 +128,7 @@ const createCommon = async (req) => {
   const newOrgEvent = events.NewOrg;
   const daoId = newOrgEvent._avatar;
 
-  await updateDaoById(daoId, { retries: 6 });
+  await updateDaoById(daoId, { retries: 8 });
   return { daoId };
 };
 

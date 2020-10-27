@@ -34,9 +34,8 @@ const createRequestToJoin = async (req, res) => {
 
   console.log('--- Add white list ---', createProposalTx.to);
 
-  const repw1 = await Relayer.addAddressToWhitelist([ createProposalTx.to ]);
-
-  console.log('Add white list Success', repw1);
+  await Relayer.addAddressToWhitelist([ createProposalTx.to ]);
+  // console.log('Add white list Success', repw1);
 
   const response = await Relayer.execTransaction(
     safeAddress,
@@ -47,7 +46,7 @@ const createRequestToJoin = async (req, res) => {
     createProposalTx.signature
   );
 
-  console.log('--- Relayer response ---', response);
+  // console.log('--- Relayer response ---', response);
 
   if (response.status !== 200) {
     console.error(
@@ -66,11 +65,12 @@ const createRequestToJoin = async (req, res) => {
     return;
   }
 
-  console.log('wait for tx to mined');
+  console.log('waiting for tx to be mined');
 
   const receipt = await provider.waitForTransaction(response.data.txHash);
 
-  console.log('tx mined', receipt);
+  // console.log('tx mined', receipt);
+  console.log(`tx was mined`)
 
   // await arc.fetchContractInfos();
   // const JoinABI = arc.getABI("Join", env.graphql.arcVersion)
