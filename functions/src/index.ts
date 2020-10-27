@@ -11,6 +11,7 @@ import { createApp } from './creation';
 import { graphqlApp } from './graphql';
 import { relayerApp } from './relayer';
 import { circlepayApp } from './circlepay';
+import { subscriptionsApp } from './subscriptions';
 
 // Add the __tests__ endpoints only if enabled
 if(env.tests.enabled) {
@@ -22,13 +23,14 @@ exports.create = createApp;
 exports.relayer = relayerApp;
 exports.graphql = graphqlApp;
 exports.circlepay = circlepayApp;
+exports.subscriptions = subscriptionsApp;
 
 
 // --- Triggers and Subscriptions
-exports.graphqlSubs = graphqlTriggers;
-exports.notificationSub = notification;
 exports.eventSub = event;
-exports.circlepayTriggers = circlepayTriggers;
+exports.graphqlSubs = graphqlTriggers;
 exports.emailTriggers = emailTriggers
+exports.notificationSub = notification;
+exports.circlepayTriggers = circlepayTriggers;
 
 exports.cronJobs = cron.crons;

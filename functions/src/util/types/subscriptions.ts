@@ -5,7 +5,7 @@ export interface ISubscriptionEntity {
   userId: string;
   proposalId: string;
 
-  paymentIds: string[];
+  payments: ISubscriptionPayment[];
 
   dueDate: Date;
 
@@ -14,5 +14,11 @@ export interface ISubscriptionEntity {
   amount: number;
 }
 
+export interface ISubscriptionPayment {
+  paymentId: string;
+  paymentStatus: SubscriptionPaymentStatus;
+}
 
-export type SubscriptionStatus = 'Active' | 'CanceledByUser' | 'CanceledByPaymentFailure' | 'PaymentFailed' | 'PaymentPending';
+
+export type SubscriptionPaymentStatus = 'Pending' | 'Successful' | 'Declined';
+export type SubscriptionStatus = 'Active' | 'CanceledByUser' | 'CanceledByPaymentFailure' | 'PaymentFailed';

@@ -1,8 +1,11 @@
-import { ISubscriptionEntity } from '../../util/types';
 import admin from 'firebase-admin';
-import { Collections } from '../../util/constants';
-import { circlePayService } from '../../circlepay/service';
+
+import { ISubscriptionEntity, ISubscriptionPayment } from '../../util/types';
 import { CommonError } from '../../util/errors';
+
+import { subscriptionService } from '../subscriptionService';
+import { createEvent } from '../../db/eventDbService';
+import { EVENT_TYPES } from '../../event/event';
 
 const db = admin.firestore();
 
@@ -13,11 +16,10 @@ const db = admin.firestore();
  * @param subscriptionId - the id of the subscription, that we want to charge
  */
 export const chargeSubscriptionById = async (subscriptionId: string): Promise<void> => {
-  const subscription = (await db.collection(Collections.Subscriptions)
-    .doc(subscriptionId)
-    .get()).data() as ISubscriptionEntity;
-
-  await chargeSubscription(subscription);
+  await chargeSubscription(
+    await subscriptionService
+      .findSubscriptionById(subscriptionId)
+  );
 }
 
 /**
@@ -39,17 +41,37 @@ export const chargeSubscription = async (subscription: ISubscriptionEntity): Pro
       );
     }
 
-    const {payment} = await circlePayService.createPayment({
-      type: 'SubscriptionPayment'
+    // const {payment} = await circlePayService.createSubscriptionPayment({
+    //   type: 'SubscriptionPayment'
+    // });
+
+    // @todo Create payment
+
+    const payment: ISubscriptionPayment = {
+      paymentId: 'TestSubscriptionPayment',
+      paymentStatus: 'Pending'
+    }
+
+    subscription.payments.push(payment);
+
+    await subscriptionService.updateSubscription(subscription);
+
+    await createEvent({
+      userId: subscription.userId,
+      objectId: subscription.id,
+      createdAt: new Date(),
+      type: EVENT_TYPES.SubscriptionPaymentCreated
     });
-
-    subscription.paymentIds.push(payment.id);
-    subscription.status = 'PaymentPending';
-
-    await db.collection(Collections.Subscriptions)
-      .doc(subscription.id)
-      .update(subscription);
   } catch (e) {
-    // @todo Do something other than crying?
+    console.error(new CommonError(`
+      Payment for subscription (${subscription.id}) has failed!
+    `));
+
+    await createEvent({
+      userId: subscription.userId,
+      objectId: subscription.id,
+      createdAt: new Date(),
+      type: EVENT_TYPES.SubscriptionPaymentFailed
+    });
   }
 };

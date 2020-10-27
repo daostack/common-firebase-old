@@ -4,7 +4,7 @@ import { QuerySnapshot } from '@google-cloud/firestore';
 import { Collections } from '../../util/constants';
 import { ISubscriptionEntity } from '../../util/types';
 
-import { subscriptionService } from './index';
+import { subscriptionService } from '../subscriptionService';
 
 const db = admin.firestore();
 

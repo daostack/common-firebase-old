@@ -4,7 +4,7 @@ export const StatusCodes = {
   NotFound: 404,
 
   Ok: 200
-}
+};
 
 export const ErrorCodes = {
   NotFound: 'NotFound',
@@ -14,12 +14,16 @@ export const ErrorCodes = {
 
   // ---- External providers errors
   CirclePayError: 'External.CirclePayError'
-}
+};
 
 export const Collections = {
+  Subscriptions: 'subscriptions',
   Proposals: 'proposals',
   Commons: 'daos',
   Event: 'event',
-  Subscriptions: 'subscriptions',
   Cards: 'cards'
-}
+};
+
+export const runtimeOptions = {
+  timeoutSeconds: 540
+};

@@ -1,35 +1,37 @@
+import { EVENT_TYPES } from '../../event/event';
+
 export type valueOf<T> = T[keyof T];
+export type Nullable<T> = T | null | undefined;
 
 export interface IProposalEntity {
-    id: string;
+  id: string;
 
-    proposerId: string;
+  proposerId: string;
 
-    dao: string;
+  dao: string;
 
-    description: {
-      funding: number;
-    }
+  description: {
+    funding: number;
+  }
 
-
-    [key: string]: any;
+  [key: string]: any;
 }
 
 export interface ICommonMember {
-    address: string;
-    userId: string;
+  address: string;
+  userId: string;
 }
 
 export interface ICommonMetadata {
-    contribution: 'monthly' | 'one-time';
+  contribution: 'monthly' | 'one-time';
 }
 
 export interface ICommonEntity {
-    members: ICommonMember[];
+  members: ICommonMember[];
 
-    metadata: ICommonMetadata;
+  metadata: ICommonMetadata;
 
-    [key: string]: any;
+  [key: string]: any;
 }
 
 export interface ICardEntity {
@@ -43,7 +45,17 @@ export interface ICardEntity {
   proposals: string[];
 
   [key: string]: any;
-};
+}
 
-export * from  './subscriptions';
-export * from  './payments';
+export interface IEventEntity {
+  id: string;
+
+  userId: string;
+  objectId: string;
+
+  createdAt: Date;
+  type: EVENT_TYPES;
+}
+
+export * from './subscriptions';
+export * from './payments';

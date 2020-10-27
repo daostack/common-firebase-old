@@ -1,0 +1,32 @@
+import * as functions from 'firebase-functions';
+
+import { commonApp, commonRouter } from '../util/commonApp';
+import { responseExecutor } from '../util/responseExecutor';
+import { runtimeOptions } from '../util/constants';
+import { CommonError } from '../util/errors';
+
+import { cancelSubscription } from './service/cancelSubscription';
+
+const router = commonRouter();
+
+router.post('/cancel', async (req, res, next) => {
+  await responseExecutor(async () => {
+    const {subscriptionId} = req.query;
+
+    if (!subscriptionId) {
+      throw new CommonError('The subscription id is required, but not provided!');
+    }
+    // @todo Check if the currently logged in user is the creator of the subscription
+
+    await cancelSubscription(subscriptionId as string, 'CanceledByUser');
+  }, {
+    req,
+    res,
+    next,
+    successMessage: `Subscription successfully canceled`
+  });
+});
+
+export const subscriptionsApp = functions
+  .runWith(runtimeOptions)
+  .https.onRequest(commonApp(router));

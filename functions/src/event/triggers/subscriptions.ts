@@ -10,7 +10,7 @@ import * as functions from 'firebase-functions';
 import {createEvent} from '../../db/eventDbService';
 import {Collections} from '../../util/constants';
 import {ISubscriptionEntity} from '../../util/types';
-import {EVENT_TYPES} from '../../event/event';
+import {EVENT_TYPES} from '../event';
 
 functions.firestore
   .document(`/${Collections.Subscriptions}/{id}`)

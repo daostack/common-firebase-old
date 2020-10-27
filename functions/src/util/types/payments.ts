@@ -1,6 +1,6 @@
 export interface IPaymentEntity {
   id: string;
-s
+
   type: PaymentType;
   status: PaymentStatus;
 }

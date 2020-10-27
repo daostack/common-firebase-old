@@ -40,7 +40,7 @@ functions.firestore
         }
 
         const subscription: Omit<ISubscriptionEntity, 'id'> = {
-          paymentIds: [],
+          payments: [],
           proposalId: proposal.id,
           userId: proposal.proposerId,
           cardId: card.id,
