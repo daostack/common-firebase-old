@@ -20,12 +20,12 @@ export const totalRaisedTriggerHandler = async (doc: QueryDocumentSnapshot<IEven
       .get())
     .data();
 
-    common.metadata.totalRaised =
-      common.metadata.totalRaised || 0 +
-      proposal.description.fundung;
-
     await db.collection(Collections.Commons)
       .doc(proposal.dao)
-      .update(common);
+      .set({
+        metadata: {
+          totalRaised: (common.metadata.totalRaised || 0) + proposal.description.fundung
+        }
+      });
   }
 };
