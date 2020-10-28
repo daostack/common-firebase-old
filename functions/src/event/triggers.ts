@@ -24,7 +24,7 @@ export const totalRaisedTriggerHandler = async (doc: QueryDocumentSnapshot<IEven
       .doc(proposal.dao)
       .set({
         metadata: {
-          totalRaised: (common.metadata.totalRaised || 0) + proposal.description.fundung
+          totalRaised: (common.metadata.totalRaised || 0) + proposal.description.funding
         }
       });
   }
