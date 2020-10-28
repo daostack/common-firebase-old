@@ -1,12 +1,12 @@
-const { db } = require('../settings.js');
+import { db } from '../settings';
 const COLLECTION_NAME = 'discussionMessage';
 
-async function getDiscussionMessageById(discussionMessageId) {
+export const getDiscussionMessageById = async (discussionMessageId: string): Promise<any> => {
     return await db.collection(COLLECTION_NAME)
         .doc(discussionMessageId)
         .get();
 }
 
-module.exports = {
+export default {
     getDiscussionMessageById
 };
