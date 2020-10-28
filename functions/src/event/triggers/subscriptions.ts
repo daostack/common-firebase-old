@@ -21,6 +21,6 @@ functions.firestore
       userId: subscription.userId,
       objectId: subscription.id,
       createdAt: new Date(),
-      type: EVENT_TYPES.SubscriptionCreated
+      type: EVENT_TYPES.SUBSCRIPTION_CREATED
     });
   });

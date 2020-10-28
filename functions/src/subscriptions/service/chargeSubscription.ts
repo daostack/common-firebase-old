@@ -60,7 +60,7 @@ export const chargeSubscription = async (subscription: ISubscriptionEntity): Pro
       userId: subscription.userId,
       objectId: subscription.id,
       createdAt: new Date(),
-      type: EVENT_TYPES.SubscriptionPaymentCreated
+      type: EVENT_TYPES.SUBSCRIPTION_PAYMENT_CREATED
     });
   } catch (e) {
     console.error(new CommonError(`
@@ -71,7 +71,7 @@ export const chargeSubscription = async (subscription: ISubscriptionEntity): Pro
       userId: subscription.userId,
       objectId: subscription.id,
       createdAt: new Date(),
-      type: EVENT_TYPES.SubscriptionPaymentFailed
+      type: EVENT_TYPES.SUBSCRIPTION_PAYMENT_FAILED
     });
   }
 };

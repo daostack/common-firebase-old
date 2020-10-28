@@ -3,6 +3,13 @@ import { EVENT_TYPES } from '../../event/event';
 export type valueOf<T> = T[keyof T];
 export type Nullable<T> = T | null | undefined;
 
+/**
+ * In the entities bellow there is `[key: string]: any;` that
+ * allows us to use anything on that entity if not typed. Maybe it
+ * is a good idea to add it, because it will force us to write the type
+ * definitions for everything we use?
+ */
+
 export interface IProposalEntity {
   id: string;
 
@@ -43,6 +50,7 @@ export interface ICardEntity {
   creationData: Date;
 
   userId: string;
+  cardId: string;
 
   payments: string[];
   proposals: string[];
@@ -58,6 +66,17 @@ export interface IEventEntity {
 
   createdAt: Date;
   type: EVENT_TYPES;
+}
+
+export interface IUserEntity {
+  id: string;
+
+  email: string;
+
+  safeAddress: string;
+  ethereumAddress: string;
+
+  [key: string]: any;
 }
 
 export * from '../../subscriptions/types';

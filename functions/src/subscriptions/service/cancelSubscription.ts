@@ -22,7 +22,7 @@ export const cancelSubscription = async (subscriptionId: string, cancellationRea
     objectId: subscription.id,
     createdAt: new Date(),
     type: cancellationReason === 'CanceledByPaymentFailure'
-      ? EVENT_TYPES.SubscriptionCanceledByPaymentFailure
-      : EVENT_TYPES.SubscriptionCanceledByUser
+      ? EVENT_TYPES.SUBSCRIPTION_CANCELED_BY_PAYMENT_FAILURE
+      : EVENT_TYPES.SUBSCRIPTION_CANCELED_BY_USER
   });
 };

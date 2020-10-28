@@ -6,6 +6,7 @@ import { commonApp, commonRouter } from '../util/commonApp';
 import { createCirclePayCard, assignCard } from './createCirclePayCard';
 import { createPaymentWeb } from './createPaymentWeb';
 import { encryption } from './circlepay';
+import { createPayment } from './createSubscriptionPayment';
 
 const runtimeOptions = {
   timeoutSeconds: 540
@@ -50,6 +51,21 @@ circlepay.post('/create-a-payment', async (req, res, next) => {
   console.log('index/create-a-payment');
   await responseExecutor(
     async () => (await createPaymentWeb(req.body)),
+    {
+      req,
+      res,
+      next,
+      successMessage: `Payment was successful`
+    })
+});
+
+circlepay.post('/test', async (req, res, next) => {
+  console.log('index/create-a-payment');
+  await responseExecutor(
+    async () => (await createPayment(
+      '587dcee0-7a03-4900-9c08-bd81d6e98f690x114f8b20d67f3b1d1b18544cb539fe90bcefa6754822233b76a462a30842106f',
+      Number(req.query.amount)
+    )),
     {
       req,
       res,

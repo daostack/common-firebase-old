@@ -22,11 +22,11 @@ export enum EVENT_TYPES {
     COMMON_WHITELISTED = 'commonWhitelisted',
 
     // --- Subscriptions
-    SubscriptionCreated = 'SubscriptionCreated',
-    SubscriptionPaymentCreated = 'SubscriptionPaymentCreated',
-    SubscriptionPaymentFailed = 'SubscriptionPaymentFailed',
-    SubscriptionCanceledByUser = 'SubscriptionCanceledByUser',
-    SubscriptionCanceledByPaymentFailure = 'SubscriptionCanceledByPaymentFailure'
+    SUBSCRIPTION_CREATED = 'subscriptionCreated',
+    SUBSCRIPTION_PAYMENT_CREATED = 'subscriptionPaymentCreated',
+    SUBSCRIPTION_PAYMENT_FAILED = 'subscriptionPaymentFailed',
+    SUBSCRIPTION_CANCELED_BY_USER = 'subscriptionCanceledByUser',
+    SUBSCRIPTION_CANCELED_BY_PAYMENT_FAILURE = 'subscriptionCanceledByPaymentFailure'
 
 }
 
