@@ -1,9 +1,15 @@
+import { CirclePaymentStatus } from './index';
+
 export interface IPaymentEntity {
   id: string;
 
   type: PaymentType;
-  status: PaymentStatus;
+  status: CirclePaymentStatus;
+
+  proposalId?: string;
+  subscriptionId?: string;
+
+  [key: string]: any;
 }
 
-export type PaymentStatus = 'pending' | 'confirmed' | string;
 export type PaymentType = 'OneTimePayment' | 'SubscriptionPayment';

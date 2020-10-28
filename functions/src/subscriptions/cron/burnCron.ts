@@ -5,6 +5,7 @@ exports.backup = functions.pubsub
   .onRun(async () => {
     console.info(`Begging membership revoking for ${new Date().getDate()}`);
 
+    // @todo Revoke memberships
 
     console.info(`Memberships revoked successfully`)
   });

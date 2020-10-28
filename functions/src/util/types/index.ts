@@ -3,6 +3,8 @@ import { EVENT_TYPES } from '../../event/event';
 export type valueOf<T> = T[keyof T];
 export type Nullable<T> = T | null | undefined;
 
+export type CirclePaymentStatus = 'pending' | 'confirmed' | 'paid' | 'failed';
+
 /**
  * In the entities bellow there is `[key: string]: any;` that
  * allows us to use anything on that entity if not typed. Maybe it

@@ -2,7 +2,14 @@ import admin from 'firebase-admin';
 import axios from 'axios';
 import { v4 as uuid } from 'uuid';
 
-import { ICardEntity, IPaymentEntity, IUserEntity, Nullable } from '../util/types';
+import {
+  CirclePaymentStatus,
+  ICardEntity,
+  IPaymentEntity,
+  ISubscriptionEntity,
+  IUserEntity,
+  Nullable,
+} from '../util/types';
 import { subscriptionService } from '../subscriptions/subscriptionService';
 import { Collections, ErrorCodes } from '../util/constants';
 import { externalRequestExecutor } from '../util';
@@ -14,24 +21,58 @@ import { circlePayApiOptions } from './circlepay';
 
 const db = admin.firestore();
 
+interface ICirclePaymentResponse {
+  data: ICirclePaymentResponseData;
+}
+
+interface ICirclePaymentResponseData {
+  id: string
+  message: string;
+  source: {
+    id: string;
+    type: string;
+  }
+
+  amount: {
+    amount: string;
+    currency: string;
+  }
+
+  status: CirclePaymentStatus;
+
+  createDate: Date;
+  updateDate: Date;
+
+  refunds: any[];
+}
+
 /**
+ * Creates a payment for subscription and saves it.
  *
+ * @param subscriptionId - The id of the subscription that you want to charge
+ *
+ * @returns - the created payment
  */
 export const createSubscriptionPayment = async (subscriptionId: string): Promise<IPaymentEntity> => {
   const subscription = await subscriptionService.findSubscriptionById(subscriptionId);
 
-  const payment = await createPayment(subscription.cardId, subscription.amount);
+  const circleResponse = await makePayment(subscription.cardId, subscription.amount);
+  const paymentEntity = await saveSubscriptionPayment(subscription, circleResponse);
 
-  return payment;
+  // @todo Start some kind of task to check for the payment status in the background
+
+  return paymentEntity;
 };
 
 /**
- * Creates a payment on card.
+ * Creates a payment on card. This only charges the card in circle and does not create payment record!
  *
  * @param cardId - the id of the card entity that we will charge (not the cardId from circle)
  * @param amount - the amount that we want to charge in USD
+ *
+ * @returns - The response from circle
  */
-export const createPayment = async (cardId: string, amount: number): Promise<IPaymentEntity> => {
+const makePayment = async (cardId: string, amount: number): Promise<ICirclePaymentResponseData> => {
   const card = (await db.collection(Collections.Cards)
     .doc(cardId)
     .get()).data() as Nullable<ICardEntity>;
@@ -62,10 +103,10 @@ export const createPayment = async (cardId: string, amount: number): Promise<IPa
       id: card.cardId,
       type: 'card'
     }
-  }
+  };
 
-  const { data } = await externalRequestExecutor(async () => {
-    return (await axios.post(`${circlePayApi}/payments`,
+  const { data } = await externalRequestExecutor<ICirclePaymentResponse>(async () => {
+    return (await axios.post<ICirclePaymentResponse>(`${circlePayApi}/payments`,
       paymentData,
       circlePayApiOptions
     )).data;
@@ -74,29 +115,59 @@ export const createPayment = async (cardId: string, amount: number): Promise<IPa
     userMessage: 'Call to CirclePay failed. Please try again later and if the issue persist contact us.'
   });
 
-  //data = {
-  //     "message": "Payment was successful",
-  //     "id": "55609bdc-2b20-4962-8640-d69c6df46f7c",
-  //     "type": "payment",
-  //     "merchantId": "fd8417cb-34c0-4a56-9d52-d4245c02cd38",
-  //     "merchantWalletId": "1000032538",
-  //     "source": {
-  //         "id": "587dcee0-7a03-4900-9c08-bd81d6e98f69",
-  //         "type": "card"
-  //     },
-  //     "description": "Merchant Payment",
-  //     "amount": {
-  //         "amount": "1.00",
-  //         "currency": "USD"
-  //     },
-  //     "status": "pending",
-  //     "refunds": [],
-  //     "createDate": "2020-10-28T07:26:06.324Z",
-  //     "updateDate": "2020-10-28T07:26:06.324Z",
-  //     "metadata": {
-  //         "email": "moore3.14159@gmail.com"
-  //     }
-  //}
 
+  return data;
+};
 
+/**
+ *  Used for creating new payment and linking them to subscription or updating the status of existing one
+ *
+ * @param subscription - The subscription that the payment will (or already is) linked to
+ * @param circlePayment - The response from circle
+ *
+ * @returns - The created (or updated) payment entity
+ */
+const saveSubscriptionPayment = async (subscription: ISubscriptionEntity, circlePayment: ICirclePaymentResponseData): Promise<IPaymentEntity> => {
+  const payment: IPaymentEntity = {
+    id: circlePayment.id,
+    source: circlePayment.source,
+    amount: circlePayment.amount,
+    status: circlePayment.status,
+    refunds: circlePayment.refunds,
+    creationDate: circlePayment.createDate,
+    updateDate: circlePayment.updateDate,
+
+    type: 'SubscriptionPayment'
+  };
+
+  // I don't think that this will happen, but just in case
+  subscription.payments = subscription.payments || [];
+
+  // Add the current payment to the subscription payments
+  // making sure to not duplicate it (on status change)
+  const subscriptionPayments = subscription.payments
+    .filter(x => x.paymentId !== payment.id)
+    .push({
+      paymentId: payment.id,
+      paymentStatus: payment.status
+    });
+
+  console.log(payment.id, subscription.id);
+
+  // Update (or create) the payment and subscription
+  await db.collection(Collections.Payments)
+    .doc(payment.id)
+    .set(payment);
+
+  await db.collection(Collections.Subscriptions)
+    .doc(subscription.id)
+    .set({
+      ...subscription,
+      payments: subscriptionPayments
+    });
+
+  return {
+    ...payment,
+    payments: subscriptionPayments
+  }
 };

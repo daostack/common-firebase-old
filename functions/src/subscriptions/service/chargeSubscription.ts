@@ -49,7 +49,7 @@ export const chargeSubscription = async (subscription: ISubscriptionEntity): Pro
 
     const payment: ISubscriptionPayment = {
       paymentId: 'TestSubscriptionPayment',
-      paymentStatus: 'Pending'
+      paymentStatus: 'pending'
     }
 
     subscription.payments.push(payment);

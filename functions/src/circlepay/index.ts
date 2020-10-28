@@ -5,8 +5,12 @@ import { commonApp, commonRouter } from '../util/commonApp';
 
 import { createCirclePayCard, assignCard } from './createCirclePayCard';
 import { createPaymentWeb } from './createPaymentWeb';
-import { encryption } from './circlepay';
-import { createPayment } from './createSubscriptionPayment';
+import { circlePayApiOptions, encryption } from './circlepay';
+import { externalRequestExecutor } from '../util';
+import axios from 'axios';
+import { circlePayApi } from '../settings';
+import { ErrorCodes } from '../util/constants';
+import { createSubscriptionPayment } from './createSubscriptionPayment';
 
 const runtimeOptions = {
   timeoutSeconds: 540
@@ -60,12 +64,8 @@ circlepay.post('/create-a-payment', async (req, res, next) => {
 });
 
 circlepay.post('/test', async (req, res, next) => {
-  console.log('index/create-a-payment');
   await responseExecutor(
-    async () => (await createPayment(
-      '587dcee0-7a03-4900-9c08-bd81d6e98f690x114f8b20d67f3b1d1b18544cb539fe90bcefa6754822233b76a462a30842106f',
-      Number(req.query.amount)
-    )),
+    async () => (await createSubscriptionPayment(req.query.subscriptionId as string)),
     {
       req,
       res,
@@ -73,6 +73,31 @@ circlepay.post('/test', async (req, res, next) => {
       successMessage: `Payment was successful`
     })
 });
+
+import {parse, stringify} from 'flatted';
+
+circlepay.post('/notification/ping', async (req, res, next) => {
+  console.log(stringify(req.body));
+})
+
+circlepay.post('/notification/register', async (req, res, next) => {
+  await responseExecutor(() => {
+    return externalRequestExecutor(async () => {
+      return (await axios.post(`${circlePayApi}/notifications/subscriptions`, {
+          endpoint: 'https://8351633dc3db.ngrok.io/common-staging-50741/us-central1/circlepay/notification/ping'
+        }, circlePayApiOptions
+      ));
+    }, {
+      errorCode: ErrorCodes.CirclePayError,
+      userMessage: 'Call to CirclePay failed. Please try again later and if the issue persist contact us.'
+    });
+  }, {
+    req,
+    res,
+    next,
+    successMessage: 'Endpoint registered!'
+  })
+})
 
 export const circlepayApp = functions
   .runWith(runtimeOptions)

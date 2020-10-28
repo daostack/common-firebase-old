@@ -19,6 +19,7 @@ export const ErrorCodes = {
 export const Collections = {
   Subscriptions: 'subscriptions',
   Proposals: 'proposals',
+  Payments: 'payments',
   Commons: 'daos',
   Event: 'event',
   Cards: 'cards'

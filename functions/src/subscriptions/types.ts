@@ -1,3 +1,5 @@
+import { CirclePaymentStatus } from '../util/types';
+
 export interface ISubscriptionEntity {
   id: string;
 
@@ -18,7 +20,7 @@ export interface ISubscriptionEntity {
 
 export interface ISubscriptionPayment {
   paymentId: string;
-  paymentStatus: SubscriptionPaymentStatus;
+  paymentStatus: CirclePaymentStatus;
 }
 
 export interface ISubscriptionMetadata {
@@ -29,5 +31,4 @@ export interface ISubscriptionMetadata {
 }
 
 
-export type SubscriptionPaymentStatus = 'Pending' | 'Successful' | 'Declined';
 export type SubscriptionStatus = 'Active' | 'CanceledByUser' | 'CanceledByPaymentFailure' | 'PaymentFailed';
