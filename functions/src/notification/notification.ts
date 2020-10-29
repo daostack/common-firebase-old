@@ -112,7 +112,7 @@ export const notifyData: Record<string, IEventData> = {
           return {
               proposalData,
               commonData: (await getDaoById(proposalData.dao)).data(),
-              userData: (await getUserById(proposalData.proposerId)).data()
+              userData: (await getUserById(proposalData.proposerId)).data(),
           }
       },
       // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -120,7 +120,8 @@ export const notifyData: Record<string, IEventData> = {
           return {
               title: 'A new funding proposal in your Common!',
               body: `${userData.firstName} is asking for ${proposalData.fundingRequest.amount / 100} for their proposal in "${commonData.name}". See the proposal and vote.`,
-              image: commonData.metadata.image || ''
+              image: commonData.metadata.image || '',
+              path: `ProposalScreen/${proposalData.id}/${commonData.id}`,
           }
       },
       
@@ -210,17 +211,19 @@ export const notifyData: Record<string, IEventData> = {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (messageId: string) => {
         const message = (await getDiscussionMessageById(messageId)).data();
-        return { 
+        return {
+          message,
           sender: (await getUserById(message.ownerId)).data(),
           commonData : (await getDaoById(message.commonId)).data()
         }
       },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    notification: async ( {sender, commonData} ) => (
+    notification: async ( {message, sender, commonData} ) => (
       {
           title: `New message!`,
           body: `${sender.displayName} commented in "${commonData.name}"`,
-          image: commonData.metadata.image || ''
+          image: commonData.metadata.image || '',
+          path: `Discussions/${message.discussionId}/${commonData.id}`
       }
     ),
   }
@@ -247,16 +250,19 @@ export const notifyData: Record<string, IEventData> = {
 }
 
 export default new class Notification implements INotification {
-  async send(tokens, title, body, image = '', options = {
+  async send(tokens, title, body, image = '', path, options = {
     contentAvailable: true,
     mutable_content: true,
-    priority: 'high'
+    priority: 'high',
   }) {
     const payload = {
+      data: {
+        path
+      },
       notification: {
         title,
         body,
-        image
+        image,
       },
     };
 
@@ -266,16 +272,19 @@ export default new class Notification implements INotification {
     console.log('Send Success', messageSent);
   }
 
-  async sendToAllUsers(title: string, body: string, image = '') {
+  async sendToAllUsers(title: string, body: string, image = '', path: string) {
     const payload = {
       topic: "notification",
       android: {
         priority: 'high'
       },
+      data: {
+        path
+      },
       notification: {
         title,
         body,
-        image
+        image,
       },
     } as admin.messaging.Message;
     
