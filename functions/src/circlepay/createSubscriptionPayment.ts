@@ -12,8 +12,10 @@ import {
 } from '../util/types';
 import { subscriptionService } from '../subscriptions/subscriptionService';
 import { Collections, ErrorCodes } from '../util/constants';
+import { createEvent } from '../db/eventDbService';
 import { externalRequestExecutor } from '../util';
 import { CommonError } from '../util/errors';
+import { EVENT_TYPES } from '../event/event';
 import { circlePayApi } from '../settings';
 import { Utils } from '../util/util';
 
@@ -51,15 +53,31 @@ interface ICirclePaymentResponseData {
  *
  * @param subscriptionId - The id of the subscription that you want to charge
  *
+ * @throws { CommonError } - If there is pending payment
+ *
  * @returns - the created payment
  */
 export const createSubscriptionPayment = async (subscriptionId: string): Promise<IPaymentEntity> => {
   const subscription = await subscriptionService.findSubscriptionById(subscriptionId);
 
+  // Do not create more payments if there are any pending
+  // ones. This may happen, but should not
+  if(subscription.payments.some(payment => payment.paymentStatus === 'pending')) {
+    throw new CommonError(`
+      Trying to create payment for subscription (${subscriptionId}), but 
+      there are pending payments on that subscription!
+    `, null,)
+  }
+
   const circleResponse = await makePayment(subscription.cardId, subscription.amount);
   const result = await saveSubscriptionPayment(subscription, circleResponse);
 
-  // @todo Start some kind of task to check for the payment status in the background
+  await createEvent({
+    userId: subscription.userId,
+    objectId: result.payment.id,
+    createdAt: new Date(),
+    type: EVENT_TYPES.PAYMENT_CREATED
+  });
 
   return result.payment;
 };
@@ -69,6 +87,9 @@ export const createSubscriptionPayment = async (subscriptionId: string): Promise
  *
  * @param cardId - the id of the card entity that we will charge (not the cardId from circle)
  * @param amount - the amount that we want to charge in USD
+ *
+ * @throws { CommonError } - if there is no card found for the provided card ID
+ * @throws { CommonError } - if the request to circle fails
  *
  * @returns - The response from circle
  */
@@ -164,9 +185,10 @@ export const saveSubscriptionPayment = async (subscription: ISubscriptionEntity,
     .doc(payment.id)
     .set(payment);
 
-  await db.collection(Collections.Subscriptions)
-    .doc(subscription.id)
-    .set(subscription);
+  // await db.collection(Collections.Subscriptions)
+  //   .doc(subscription.id)
+  //   .set(subscription);
+  await subscriptionService.updateSubscription(subscription);
 
   return {
     payment,

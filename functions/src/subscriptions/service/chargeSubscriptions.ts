@@ -5,26 +5,45 @@ import { Collections } from '../../util/constants';
 import { ISubscriptionEntity } from '../../util/types';
 
 import { subscriptionService } from '../subscriptionService';
+import { CommonError } from '../../util/errors';
 
 const db = admin.firestore();
 
 export const chargeSubscriptions = async (): Promise<void> => {
   const subscriptionsDueToday = await db.collection(Collections.Subscriptions)
-    .where('dueDate', '>=', new Date().setHours(0,0,0,0))
+    // .where('dueDate', '>=', new Date().setHours(0,0,0,0))
     .where('dueDate', '<=', new Date().setHours(23,59,59,999))
-    .where('status', '==', 'Active')
+    .where('status', 'in', ['Active', 'PaymentFailed'])
     .get() as QuerySnapshot<ISubscriptionEntity>;
 
   for(const subscriptionDueToday of subscriptionsDueToday.docs) {
     const subscriptionEntity = subscriptionDueToday.data() as ISubscriptionEntity;
 
-    console.info(`Charging subscription (${subscriptionEntity.id}) with $${subscriptionEntity.amount}`);
-    console.trace(`Charging subscription`, subscriptionEntity);
+    if (subscriptionEntity.status === 'PaymentFailed') {
+      if (subscriptionEntity.paymentFailures.length >= 3) {
+        // eslint-disable-next-line no-await-in-loop
+        await subscriptionService.cancelSubscription(subscriptionEntity.id, 'CanceledByPaymentFailure');
+        // eslint-disable-next-line no-await-in-loop
+        await subscriptionService.revokeMembership(subscriptionEntity);
 
-    // eslint-disable-next-line no-await-in-loop
-    await subscriptionService.chargeSubscription(subscriptionEntity);
+        continue;
+      }
+    }
 
-    console.info(`Charged subscription (${subscriptionEntity.id}) with $${subscriptionEntity.amount}`);
-    console.trace(`Charged subscription`, subscriptionEntity);
+    if(subscriptionEntity.status === 'Active' || subscriptionEntity.status === 'PaymentFailed') {
+      console.info(`Charging subscription (${subscriptionEntity.id}) with $${subscriptionEntity.amount}`);
+      console.trace(`Charging subscription`, subscriptionEntity);
+
+      // eslint-disable-next-line no-await-in-loop
+      await subscriptionService.chargeSubscription(subscriptionEntity);
+
+      console.info(`Charged subscription (${subscriptionEntity.id}) with $${subscriptionEntity.amount}`);
+      console.trace(`Charged subscription`, subscriptionEntity);
+    } else {
+      console.error(new CommonError(`
+        Subscription (${subscriptionEntity.id}) with unsupported 
+        status (${subscriptionEntity.status}) was in the charge loop.
+      `))
+    }
   }
 };

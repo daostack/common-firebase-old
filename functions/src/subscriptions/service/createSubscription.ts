@@ -41,6 +41,7 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
     amount: proposal.description.funding / 100,
 
     status: 'Active',
+    revoked: false,
 
     metadata: {
       common: {

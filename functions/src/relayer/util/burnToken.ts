@@ -1,8 +1,3 @@
-// const { provider } = require('../../settings')
-// const ethers = require('ethers');
-// const { env } = require('../../env');
-// const abi = require('./abi.json');
-
 import ethers from 'ethers';
 
 import { provider } from '../../settings';
@@ -12,7 +7,7 @@ import abi from './abi.json';
 import { CommonError } from '../../util/errors';
 
 
-const minterToken = async (address, amount) => {
+export const burnToken = async (address): Promise<void> => {
   try {
     throw new CommonError(`Account with address ${address} should be burned, but I'm not comfortable with the function`);
 
@@ -20,7 +15,7 @@ const minterToken = async (address, amount) => {
     const minter = new ethers.Wallet(env.commonInfo.pk, provider);
     const contract = new ethers.Contract(env.commonInfo.commonToken, abi.CommonToken, minter);
 
-    const tx = await contract.burn(address, amount, {
+    const tx = await contract.burn(address, 0, {
       gasLimit: 10000000,
       gasPrice: 15000000000,
     });
@@ -38,5 +33,3 @@ const minterToken = async (address, amount) => {
     })
   }
 }
-
-module.exports = { minterToken };

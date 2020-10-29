@@ -16,11 +16,21 @@ export interface ISubscriptionEntity {
   amount: number;
 
   metadata: ISubscriptionMetadata;
+
+  paymentFailures?: ISubscriptionPayment[];
+
+  revoked: boolean;
 }
 
 export interface ISubscriptionPayment {
   paymentId: string;
   paymentStatus: CirclePaymentStatus;
+}
+
+export interface ISubscriptionPaymentFailure {
+ paymentId: string;
+
+ paymentFailedOn: Date;
 }
 
 export interface ISubscriptionMetadata {

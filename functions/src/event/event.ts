@@ -26,7 +26,16 @@ export enum EVENT_TYPES {
     SUBSCRIPTION_PAYMENT_CREATED = 'subscriptionPaymentCreated',
     SUBSCRIPTION_PAYMENT_FAILED = 'subscriptionPaymentFailed',
     SUBSCRIPTION_CANCELED_BY_USER = 'subscriptionCanceledByUser',
-    SUBSCRIPTION_CANCELED_BY_PAYMENT_FAILURE = 'subscriptionCanceledByPaymentFailure'
+    SUBSCRIPTION_CANCELED_BY_PAYMENT_FAILURE = 'subscriptionCanceledByPaymentFailure',
+
+    // --- Payment (only subscription payments are broadcasting events for now)
+    PAYMENT_CREATED = 'paymentCreated',
+    PAYMENT_CONFIRMED = 'paymentConfirmed',
+    PAYMENT_FAILED = 'paymentFailed',
+    PAYMENT_PAID = 'paymentPaid',
+
+    // --- Membership
+    MEMBERSHIP_REVOKED = 'membershipRevoked'
 
 }
 
