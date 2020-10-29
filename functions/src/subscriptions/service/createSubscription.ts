@@ -8,6 +8,10 @@ import { Collections } from '../../util/constants';
 import { ICardEntity, ICommonEntity, IProposalEntity, ISubscriptionEntity } from '../../util/types';
 
 export const createSubscription = async (proposal: IProposalEntity): Promise<ISubscriptionEntity> => {
+  if(!proposal || !proposal.id) {
+    throw new CommonError('Cannot create subscription without proposal')
+  }
+
   const card = (await Utils.getCardByProposalId(proposal.id)) as ICardEntity;
 
   if (!card) {

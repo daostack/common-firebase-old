@@ -8,7 +8,7 @@ import {
   IPaymentEntity,
   ISubscriptionEntity,
   IUserEntity,
-  Nullable,
+  Nullable
 } from '../util/types';
 import { subscriptionService } from '../subscriptions/subscriptionService';
 import { Collections, ErrorCodes } from '../util/constants';
@@ -26,8 +26,8 @@ interface ICirclePaymentResponse {
 }
 
 interface ICirclePaymentResponseData {
-  id: string
-  message: string;
+  id: string;
+
   source: {
     id: string;
     type: string;
@@ -57,11 +57,11 @@ export const createSubscriptionPayment = async (subscriptionId: string): Promise
   const subscription = await subscriptionService.findSubscriptionById(subscriptionId);
 
   const circleResponse = await makePayment(subscription.cardId, subscription.amount);
-  const paymentEntity = await saveSubscriptionPayment(subscription, circleResponse);
+  const result = await saveSubscriptionPayment(subscription, circleResponse);
 
   // @todo Start some kind of task to check for the payment status in the background
 
-  return paymentEntity;
+  return result.payment;
 };
 
 /**
@@ -105,7 +105,7 @@ const makePayment = async (cardId: string, amount: number): Promise<ICirclePayme
     }
   };
 
-  const { data } = await externalRequestExecutor<ICirclePaymentResponse>(async () => {
+  const {data} = await externalRequestExecutor<ICirclePaymentResponse>(async () => {
     return (await axios.post<ICirclePaymentResponse>(`${circlePayApi}/payments`,
       paymentData,
       circlePayApiOptions
@@ -125,34 +125,39 @@ const makePayment = async (cardId: string, amount: number): Promise<ICirclePayme
  * @param subscription - The subscription that the payment will (or already is) linked to
  * @param circlePayment - The response from circle
  *
- * @returns - The created (or updated) payment entity
+ * @returns - The created (or updated) payment and subscription entities
  */
-const saveSubscriptionPayment = async (subscription: ISubscriptionEntity, circlePayment: ICirclePaymentResponseData): Promise<IPaymentEntity> => {
+export const saveSubscriptionPayment = async (subscription: ISubscriptionEntity, circlePayment: ICirclePaymentResponseData): Promise<{
+  payment: IPaymentEntity,
+  subscription: ISubscriptionEntity
+}> => {
   const payment: IPaymentEntity = {
     id: circlePayment.id,
     source: circlePayment.source,
     amount: circlePayment.amount,
     status: circlePayment.status,
     refunds: circlePayment.refunds,
-    creationDate: circlePayment.createDate,
+    createDate: circlePayment.createDate,
     updateDate: circlePayment.updateDate,
+
+    subscriptionId: subscription.id,
 
     type: 'SubscriptionPayment'
   };
 
-  // I don't think that this will happen, but just in case
-  subscription.payments = subscription.payments || [];
+  const subscriptionPayments = (subscription.payments || [])
+    .filter(x => x.paymentId !== payment.id);
 
-  // Add the current payment to the subscription payments
-  // making sure to not duplicate it (on status change)
-  const subscriptionPayments = subscription.payments
-    .filter(x => x.paymentId !== payment.id)
+  subscriptionPayments
     .push({
       paymentId: payment.id,
       paymentStatus: payment.status
     });
 
-  console.log(payment.id, subscription.id);
+  subscription = {
+    ...subscription,
+    payments: subscriptionPayments
+  };
 
   // Update (or create) the payment and subscription
   await db.collection(Collections.Payments)
@@ -161,13 +166,10 @@ const saveSubscriptionPayment = async (subscription: ISubscriptionEntity, circle
 
   await db.collection(Collections.Subscriptions)
     .doc(subscription.id)
-    .set({
-      ...subscription,
-      payments: subscriptionPayments
-    });
+    .set(subscription);
 
   return {
-    ...payment,
-    payments: subscriptionPayments
-  }
+    payment,
+    subscription
+  };
 };

@@ -1,4 +1,5 @@
 import { EVENT_TYPES } from '../../event/event';
+import { IPaymentAmount, IPaymentRefund, IPaymentSource } from './payments';
 
 export type valueOf<T> = T[keyof T];
 export type Nullable<T> = T | null | undefined;
@@ -22,8 +23,6 @@ export interface IProposalEntity {
   description: {
     funding: number;
   }
-
-  [key: string]: any;
 }
 
 export interface ICommonMember {
@@ -42,8 +41,6 @@ export interface ICommonEntity {
   members: ICommonMember[];
 
   metadata: ICommonMetadata;
-
-  [key: string]: any;
 }
 
 export interface ICardEntity {
@@ -56,8 +53,6 @@ export interface ICardEntity {
 
   payments: string[];
   proposals: string[];
-
-  [key: string]: any;
 }
 
 export interface IEventEntity {
@@ -77,8 +72,27 @@ export interface IUserEntity {
 
   safeAddress: string;
   ethereumAddress: string;
+}
 
-  [key: string]: any;
+export interface ICircleNotification {
+  clientId: string;
+  notificationType: 'payments' | string;
+
+  payment: {
+    id: string;
+    merchantId: string;
+    merchantWalletId: string;
+
+    status: CirclePaymentStatus;
+
+    amount: IPaymentAmount;
+    source: IPaymentSource;
+
+    createDate: Date;
+    updateDate: Date;
+
+    refunds: IPaymentRefund[];
+  }
 }
 
 export * from '../../subscriptions/types';

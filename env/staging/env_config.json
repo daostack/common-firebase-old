@@ -36,5 +36,9 @@
   },
   "circlepay": {
     "apiUrl": "https://api-sandbox.circle.com/v1"
+  },
+  "hosts": {
+    "firebase": "",
+    "local": "https://1089bdcddaf6.ngrok.io"
   }
 }
