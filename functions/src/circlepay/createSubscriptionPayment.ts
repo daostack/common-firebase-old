@@ -20,6 +20,7 @@ import { circlePayApi } from '../settings';
 import { Utils } from '../util/util';
 
 import { circlePayApiOptions } from './circlepay';
+import { addPaymentToCard } from './addPaymentToCard';
 
 const db = admin.firestore();
 
@@ -58,6 +59,16 @@ interface ICirclePaymentResponseData {
  * @returns - the created payment
  */
 export const createSubscriptionPayment = async (subscription: ISubscriptionEntity): Promise<IPaymentEntity> => {
+  const card = (await db.collection(Collections.Cards)
+    .doc(subscription.cardId)
+    .get()).data() as Nullable<ICardEntity>;
+
+  if (!card) {
+    throw new CommonError(`
+      Cannot create payment, because there is no card with id ${subscription.cardId}
+    `);
+  }
+
   // Do not create more payments if there are any pending
   // ones. This may happen, but should not
   if (subscription.payments.some(payment => payment.paymentStatus === 'pending')) {
@@ -67,8 +78,10 @@ export const createSubscriptionPayment = async (subscription: ISubscriptionEntit
     `);
   }
 
-  const circleResponse = await makePayment(subscription.cardId, subscription.amount);
+  const circleResponse = await makePayment(card, subscription.amount);
   const result = await saveSubscriptionPayment(subscription, circleResponse);
+
+  await addPaymentToCard(card, result.payment);
 
   await createEvent({
     userId: subscription.userId,
@@ -91,17 +104,7 @@ export const createSubscriptionPayment = async (subscription: ISubscriptionEntit
  *
  * @returns - The response from circle
  */
-const makePayment = async (cardId: string, amount: number): Promise<ICirclePaymentResponseData> => {
-  const card = (await db.collection(Collections.Cards)
-    .doc(cardId)
-    .get()).data() as Nullable<ICardEntity>;
-
-  if (!card) {
-    throw new CommonError(`
-      Cannot create payment, because there is no card with id ${cardId}
-    `);
-  }
-
+const makePayment = async (card: ICardEntity, amount: number): Promise<ICirclePaymentResponseData> => {
   const user = (await Utils.getUserById(card.userId)) as IUserEntity;
 
   const paymentId = uuid();

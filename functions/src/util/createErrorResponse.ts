@@ -41,6 +41,8 @@ export const createErrorResponse = (req: express.Request, res: express.Response,
       for error (${error.errorId || 'No id available'})
     `);
 
+    console.error(error);
+
 
     res
       .status(statusCode)

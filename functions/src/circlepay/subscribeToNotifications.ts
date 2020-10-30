@@ -23,17 +23,25 @@ export const subscribeToNotifications = async (): Promise<void> => {
     userMessage: 'Call to CirclePay failed. Please try again later and if the issue persist contact us.'
   });
 
-  let endpoints = [
-    env.hosts.firebase,
-    env.hosts.local
-  ];
+  // let endpoints = [
+  //   env.hosts.firebase,
+  //   env.hosts.local
+  // ];
+
+  let endpoints = ['https://11184351a378.ngrok.io/common-staging-50741/us-central1/circlepay/notification/ping'];
 
   for (const sub of currentSubscriptions.data) {
     if (endpoints.some(endpoint => endpoint === sub.endpoint)) {
       endpoints = endpoints.filter(endpoint => endpoint === sub.endpoint);
     } else {
-      // eslint-disable-next-line no-await-in-loop
-      await unsubscribeFromNotification(sub.id);
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await unsubscribeFromNotification(sub.id);
+      } catch (e) {
+        console.error(`
+          Unable to unsubscribe from ${sub.id} for endpoint ${sub.endpoint}
+        `, e);
+      }
     }
   }
 

@@ -21,7 +21,9 @@ export const externalRequestExecutor = async <T = any,>(func: () => any, data: I
       data.message || `External service failed. ErrorCode: ${data.errorCode}`,
       data.userMessage || `A call to an external service failed. Please try again later`,
       {
-        ...data
+        ...data,
+        error: e,
+        errorString: JSON.stringify(e)
       }
     );
   }
