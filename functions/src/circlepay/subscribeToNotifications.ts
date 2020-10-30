@@ -1,12 +1,10 @@
 import axios from 'axios';
-import lodash from 'lodash';
 
 import { env } from '../env';
 import { circlePayApi } from '../settings';
 import { externalRequestExecutor } from '../util';
 import { circlePayApiOptions } from './circlepay';
 import { ErrorCodes } from '../util/constants';
-import notification from '../notification/notification';
 
 export const subscribeToNotifications = async (): Promise<void> => {
   const currentSubscriptions = await externalRequestExecutor<{

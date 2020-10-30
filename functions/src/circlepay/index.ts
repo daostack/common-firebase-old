@@ -7,7 +7,6 @@ import { commonApp, commonRouter } from '../util/commonApp';
 import { createCirclePayCard, assignCard } from './createCirclePayCard';
 import { createPaymentWeb } from './createPaymentWeb';
 import { encryption } from './circlepay';
-import { createSubscriptionPayment } from './createSubscriptionPayment';
 import { CommonError } from '../util/errors';
 import { handleNotification } from './handleNotification';
 import { ICircleNotification } from '../util/types';
@@ -17,7 +16,6 @@ const runtimeOptions = {
   timeoutSeconds: 540
 };
 
-const validator = /^arn:aws:sns:.*:908968368384:(sandbox|prod)_platform-notifications-topic$/;
 const circlepay = commonRouter();
 
 circlepay.post('/create-card', async (req, res, next) => {

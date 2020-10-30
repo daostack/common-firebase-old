@@ -7,7 +7,7 @@ import abi from './abi.json';
 import { CommonError } from '../../util/errors';
 
 
-export const burnToken = async (address): Promise<void> => {
+export const burnToken = async (address: string): Promise<void> => {
   try {
     throw new CommonError(`Account with address ${address} should be burned, but I'm not comfortable with the function`);
 
@@ -15,7 +15,7 @@ export const burnToken = async (address): Promise<void> => {
     const minter = new ethers.Wallet(env.commonInfo.pk, provider);
     const contract = new ethers.Contract(env.commonInfo.commonToken, abi.CommonToken, minter);
 
-    const tx = await contract.burn(address, 0, {
+    const tx = await contract.burn(address, {
       gasLimit: 10000000,
       gasPrice: 15000000000,
     });

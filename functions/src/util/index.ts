@@ -1,13 +1,16 @@
-export {externalRequestExecutor} from './externalRequestExecutor';
+export { externalRequestExecutor } from './externalRequestExecutor';
 
-export const addMonth = (date: Date) => {
+export const addMonth = (date: Date): Date => {
   if (date) {
-    let m, d = (date = new Date(+date)).getDate();
+    const d = (date = new Date(Number(date))).getDate();
 
     date.setMonth(date.getMonth() + 1, 1);
-    m = date.getMonth();
+    const m = date.getMonth();
+
     date.setDate(d);
-    if (date.getMonth() !== m) date.setDate(0);
+
+    if (date.getMonth() !== m)
+      date.setDate(0);
   }
 
   return date;

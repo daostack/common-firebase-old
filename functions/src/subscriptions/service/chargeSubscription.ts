@@ -1,14 +1,10 @@
-import admin from 'firebase-admin';
-
-import { ISubscriptionEntity, ISubscriptionPayment } from '../../util/types';
+import { ISubscriptionEntity } from '../../util/types';
 import { CommonError } from '../../util/errors';
 
 import { subscriptionService } from '../subscriptionService';
 import { createEvent } from '../../db/eventDbService';
 import { EVENT_TYPES } from '../../event/event';
 import { createSubscriptionPayment } from '../../circlepay/createSubscriptionPayment';
-
-const db = admin.firestore();
 
 /**
  * Charges one subscription (only if the due date is

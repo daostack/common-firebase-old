@@ -1,13 +1,12 @@
 import * as functions from 'firebase-functions';
 
-
-import {db} from '../../settings';
-import {IEventModel} from '../../event';
-import {EVENT_TYPES} from '../../event/event';
-import {ICardEntity, ICommonEntity, IProposalEntity, ISubscriptionEntity} from '../../util/types';
-import {Collections} from '../../util/constants';
-import {CommonError} from '../../util/errors';
+import { ICommonEntity, IProposalEntity } from '../../util/types';
 import { subscriptionService } from '../subscriptionService';
+import { Collections } from '../../util/constants';
+import { CommonError } from '../../util/errors';
+import { EVENT_TYPES } from '../../event/event';
+import { IEventModel } from '../../event';
+import { db } from '../../settings';
 
 export const createSubscriptionsTrigger = functions.firestore
   .document('/events/{id}')
