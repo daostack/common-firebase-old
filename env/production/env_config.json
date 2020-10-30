@@ -38,6 +38,6 @@
     "apiUrl": "https://api-sandbox.circle.com/v1"
   },
   "hosts": {
-    "firebase": "@todo"
+    "firebase": "https://us-central1-common-daostack.cloudfunctions.net"
   }
 }

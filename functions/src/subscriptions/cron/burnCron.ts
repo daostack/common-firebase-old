@@ -21,7 +21,7 @@ exports.backup = functions.pubsub
       .where('status', '==', 'CanceledByUser')
       .where('revoked', '==', false)
       .get() as QuerySnapshot<ISubscriptionEntity>;
-    
+
     for (const subscriptionSnap of subscriptions.docs) {
       const subscription = subscriptionSnap.data() as ISubscriptionEntity;
 

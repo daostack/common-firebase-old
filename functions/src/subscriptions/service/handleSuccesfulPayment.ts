@@ -11,6 +11,10 @@ const db = admin.firestore();
  * Clears the state of the subscription and updates the due date on payment success
  *
  * @param subscription - The subscription to update
+ *
+ * @throws { CommonError } - If there is no subscription passed (or is null/undefined)
+ * @throws { CommonError } - If the due date for the subscription is in the feature
+ *
  */
 export const handleSuccessfulPayment = async (subscription: ISubscriptionEntity): Promise<void> => {
   if (!subscription) {

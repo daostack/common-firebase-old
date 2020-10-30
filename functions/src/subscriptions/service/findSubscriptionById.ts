@@ -9,7 +9,12 @@ const db = admin.firestore();
 /**
  * Finds subscription with type safety (throws error if no subscription is found)
  *
- * @param subscriptionId - The id of the subscription we want tp find
+ * @param subscriptionId - The id of the subscription we want to find
+ *
+ * @throws { CommonError } - If the subscription ID is not provided
+ * @throws { CommonError } - If the subscription was not found
+ *
+ * @returns { ISubscriptionEntity } - The found subscription
  */
 export const findSubscriptionById = async (subscriptionId: Nullable<string>): Promise<ISubscriptionEntity> => {
   if (!subscriptionId) {

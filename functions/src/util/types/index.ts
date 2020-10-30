@@ -6,13 +6,6 @@ export type Nullable<T> = T | null | undefined;
 
 export type CirclePaymentStatus = 'pending' | 'confirmed' | 'paid' | 'failed';
 
-/**
- * In the entities bellow there is `[key: string]: any;` that
- * allows us to use anything on that entity if not typed. Maybe it
- * is a good idea to add it, because it will force us to write the type
- * definitions for everything we use?
- */
-
 export interface IProposalEntity {
   id: string;
 
@@ -70,7 +63,15 @@ export interface IUserEntity {
 
   email: string;
 
+  /**
+   * The address of the on-chain wallet
+   */
   safeAddress: string;
+
+  /**
+   * This is the address of the local wallet (which is the
+   * owner of the on-chain wallet, which is stored as safeAddress)
+   */
   ethereumAddress: string;
 }
 

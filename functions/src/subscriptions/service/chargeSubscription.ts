@@ -6,6 +6,7 @@ import { CommonError } from '../../util/errors';
 import { subscriptionService } from '../subscriptionService';
 import { createEvent } from '../../db/eventDbService';
 import { EVENT_TYPES } from '../../event/event';
+import { createSubscriptionPayment } from '../../circlepay/createSubscriptionPayment';
 
 const db = admin.firestore();
 
@@ -41,20 +42,7 @@ export const chargeSubscription = async (subscription: ISubscriptionEntity): Pro
       );
     }
 
-    // const {payment} = await circlePayService.createSubscriptionPayment({
-    //   type: 'SubscriptionPayment'
-    // });
-
-    // @todo Create payment
-
-    const payment: ISubscriptionPayment = {
-      paymentId: 'TestSubscriptionPayment',
-      paymentStatus: 'pending'
-    }
-
-    subscription.payments.push(payment);
-
-    await subscriptionService.updateSubscription(subscription);
+    await createSubscriptionPayment(subscription);
 
     await createEvent({
       userId: subscription.userId,

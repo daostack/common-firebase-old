@@ -7,6 +7,14 @@ import { CommonError } from '../../util/errors';
 import { Collections } from '../../util/constants';
 import { ICardEntity, ICommonEntity, IProposalEntity, ISubscriptionEntity } from '../../util/types';
 
+/**
+ * Creates subscription based on proposal
+ *
+ * @param proposal - The proposal for witch we want to create the subscription
+ *
+ * @throws { CommonError } - If the proposal is not provided
+ * @throws { CommonError } - If the card, assigned to the proposal, is not found
+ */
 export const createSubscription = async (proposal: IProposalEntity): Promise<ISubscriptionEntity> => {
   if(!proposal || !proposal.id) {
     throw new CommonError('Cannot create subscription without proposal')

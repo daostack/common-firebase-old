@@ -6,15 +6,12 @@ import { commonApp, commonRouter } from '../util/commonApp';
 
 import { createCirclePayCard, assignCard } from './createCirclePayCard';
 import { createPaymentWeb } from './createPaymentWeb';
-import { circlePayApiOptions, encryption } from './circlepay';
-import { externalRequestExecutor } from '../util';
-import axios from 'axios';
-import { circlePayApi } from '../settings';
-import { ErrorCodes } from '../util/constants';
+import { encryption } from './circlepay';
 import { createSubscriptionPayment } from './createSubscriptionPayment';
 import { CommonError } from '../util/errors';
 import { handleNotification } from './handleNotification';
 import { ICircleNotification } from '../util/types';
+import { subscribeToNotifications } from './subscribeToNotifications';
 
 const runtimeOptions = {
   timeoutSeconds: 540
@@ -68,17 +65,6 @@ circlepay.post('/create-a-payment', async (req, res, next) => {
     });
 });
 
-circlepay.post('/test/subscription', async (req, res, next) => {
-  await responseExecutor(
-    async () => (await createSubscriptionPayment(req.query.subscriptionId as string)),
-    {
-      req,
-      res,
-      next,
-      successMessage: `Payment was successful`
-    });
-});
-
 circlepay.post('/notification/ping', async (req, res, next) => {
   console.info('Received notification from Circle');
 
@@ -121,22 +107,12 @@ circlepay.post('/notification/ping', async (req, res, next) => {
 
 circlepay.post('/notification/register', async (req, res, next) => {
   await responseExecutor(async () => {
-
-
-    await externalRequestExecutor(async () => {
-      return (await axios.post(`${circlePayApi}/notifications/subscriptions`, {
-          endpoint: 'https://8351633dc3db.ngrok.io/common-staging-50741/us-central1/circlepay/notification/ping'
-        }, circlePayApiOptions
-      ));
-    }, {
-      errorCode: ErrorCodes.CirclePayError,
-      userMessage: 'Call to CirclePay failed. Please try again later and if the issue persist contact us.'
-    });
+    return await subscribeToNotifications();
   }, {
     req,
     res,
     next,
-    successMessage: 'Endpoint registered!'
+    successMessage: 'Endpoints registered!'
   });
 });
 

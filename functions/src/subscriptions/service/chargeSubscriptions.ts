@@ -9,6 +9,10 @@ import { CommonError } from '../../util/errors';
 
 const db = admin.firestore();
 
+/**
+ *  Charges all subscriptions that are due today. Only
+ *  to be used from the cron job!
+ */
 export const chargeSubscriptions = async (): Promise<void> => {
   const subscriptionsDueToday = await db.collection(Collections.Subscriptions)
     // .where('dueDate', '>=', new Date().setHours(0,0,0,0))

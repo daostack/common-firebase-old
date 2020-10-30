@@ -57,16 +57,14 @@ interface ICirclePaymentResponseData {
  *
  * @returns - the created payment
  */
-export const createSubscriptionPayment = async (subscriptionId: string): Promise<IPaymentEntity> => {
-  const subscription = await subscriptionService.findSubscriptionById(subscriptionId);
-
+export const createSubscriptionPayment = async (subscription: ISubscriptionEntity): Promise<IPaymentEntity> => {
   // Do not create more payments if there are any pending
   // ones. This may happen, but should not
-  if(subscription.payments.some(payment => payment.paymentStatus === 'pending')) {
+  if (subscription.payments.some(payment => payment.paymentStatus === 'pending')) {
     throw new CommonError(`
-      Trying to create payment for subscription (${subscriptionId}), but 
+      Trying to create payment for subscription (${subscription.id}), but 
       there are pending payments on that subscription!
-    `, null,)
+    `);
   }
 
   const circleResponse = await makePayment(subscription.cardId, subscription.amount);

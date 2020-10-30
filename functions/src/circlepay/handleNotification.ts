@@ -14,6 +14,10 @@ const db = admin.firestore();
  * Handles incoming CirclePay notification
  *
  * @param notification - the notification that we have received
+ *
+ * @throws { CommonError } - if the notification type is different than payment
+ * @throws { CommonError } - if the payment does not exists
+ * @throws { CommonError } - if the payment status is not one of the know ones
  */
 export const handleNotification = async (notification: ICircleNotification): Promise<void> => {
   if (notification.notificationType !== 'payments' || !notification.payment) {
@@ -77,7 +81,7 @@ export const handleNotification = async (notification: ICircleNotification): Pro
         await createPaymentEvent(EVENT_TYPES.PAYMENT_FAILED);
 
         // This is good place to retry the payment?
-        await subscriptionService.handleFailedPayment(subscription);
+        await subscriptionService.handleFailedPayment(subscription, updateRes.payment);
 
         break;
       default:
