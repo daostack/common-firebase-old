@@ -23,8 +23,11 @@ const _getVotes = async (arc, voteQuery, { blockNumber, customRetryOptions }) =>
         try {
           votes = await Vote.search(arc, voteQuery, { fetchPolicy: 'no-cache' }).first();
         } catch (err) {
-          console.log("Error Retry reason: ", err);
-          await retryFunc(`The current graph block "${blockNumber}" is still not indexed.`);
+          if (err.message.includes('has only indexed up to block number')) {
+            retryFunc(`The current graph block "${blockNumber}" is still not indexed.`);
+          } else {
+            throw err;
+          }
         }
 
         return votes;

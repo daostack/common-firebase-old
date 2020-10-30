@@ -113,8 +113,11 @@ const _getDaoPlugins = async (dao, { blockNumber, customRetryOptions }) => {
         try {
           plugins = await dao.plugins(daoPluginsQuery, { fetchPolicy: 'no-cache' }).first();
         } catch (err) {
-          console.log("Error Retry reason: ", err);
-          await retryFunc(`The current graph block "${blockNumber}" is still not indexed.`);
+          if (err.message.includes('has only indexed up to block number')) {
+            retryFunc(`The current graph block "${blockNumber}" is still not indexed.`);
+          } else {
+            throw err;
+          }
         }
 
         return plugins;
@@ -236,7 +239,7 @@ async function updateDaoById(daoId, customRetryOptions = {}, blockNumber) {
   if (currBlockNumber) {
     daoQuery.block = { number: currBlockNumber }
   }
-   
+
   const res =  await promiseRetry(
     async (retryFunc, number) => {
       console.log(`Try #${number} to get Dao ${daoId}...`);
@@ -244,14 +247,18 @@ async function updateDaoById(daoId, customRetryOptions = {}, blockNumber) {
       try {
         currDaosResult = await arc.daos(daoQuery, { fetchPolicy: 'no-cache' }).first();
       } catch (err) {
-        retryFunc(`We could not find a dao with id "${daoId}" in the graph at ${arc.graphqlHttpProvider}.`);
+        if (err.message.includes('has only indexed up to block number')) {
+          retryFunc(`The current graph block "${blockNumber}" is still not indexed.`);
+        } else {
+          throw err;
+        }
       }
 
       if(number > 7) {
         console.warn('Cannot get dao after a lot of retries. Current result: ', currDaosResult);
       }
 
-      if (currDaosResult.length === 0) {
+      if (!currBlockNumber && currDaosResult.length === 0) {
         console.log(`retrying because we did not find a dao ${daoId}`)
         retryFunc(`We could not find a dao with id "${daoId}" in the graph at ${arc.graphqlHttpProvider}.`);
       }
