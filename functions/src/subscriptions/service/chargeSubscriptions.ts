@@ -26,7 +26,7 @@ export const chargeSubscriptions = async (): Promise<void> => {
     if (subscriptionEntity.status === 'PaymentFailed') {
       if (subscriptionEntity.paymentFailures.length >= 3) {
         // eslint-disable-next-line no-await-in-loop
-        await subscriptionService.cancelSubscription(subscriptionEntity.id, 'CanceledByPaymentFailure');
+        await subscriptionService.cancelSubscription(subscriptionEntity, 'CanceledByPaymentFailure');
         // eslint-disable-next-line no-await-in-loop
         await subscriptionService.revokeMembership(subscriptionEntity);
 
