@@ -12,7 +12,6 @@ const { updateDao, getDaoById } = require('../db/daoDbService');
 const updateDaos = async () => {
   const arc = await getArc();
   console.log('UPDATE DAOS:');
-  console.log('----------------------------------------------------------');
 
   const allDaos = [];
   let currDaos = null;
@@ -47,7 +46,6 @@ const updateDaos = async () => {
     updatedDaos.push(msg);
 
     console.log(msg);
-    console.log('----------------------------------------------------------');
   }));
 
   return {
@@ -205,7 +203,6 @@ async function _updateDaoDb(dao, blockNumberInfo) {
           userId: null
         });
       } else {
-        // console.log(`User found with this address ${member.coreState.address}`);
         doc.members.push({
           address: member.coreState.address,
           userId: user.id

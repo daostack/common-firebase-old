@@ -47,7 +47,9 @@ const createCommonTransaction = async (req) => {
   const opts = { ...defaultOptions, ...data };
   console.log('saving data on ipfs');
   const ipfsHash = await IpfsClient.addAndPinString(opts);
-  console.log('ipfsHash ->', ipfsHash);
+  if (!ipfsHash) {
+    throw CommonError("IPFS hash is empty - something went wrong calling addAndPintString")
+  }
 
   const arc = await getArc();
 
@@ -120,7 +122,6 @@ const createCommon = async (req) => {
   );
 
   const response = await execTransaction(reqest);
-  // console.log('response  ->', response);
   const receipt = await provider.waitForTransaction(response.txHash);
   const events = Utils.getTransactionEvents(daoFactoryContract.interface, receipt);
   const newOrgEvent = events.NewOrg;
