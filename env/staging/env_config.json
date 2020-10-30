@@ -37,8 +37,8 @@
   "circlepay": {
     "apiUrl": "https://api-sandbox.circle.com/v1"
   },
-  "hosts": {
-    "firebase": "https://us-central1-common-staging-50741.cloudfunctions.net",
-    "local": "https://1089bdcddaf6.ngrok.io"
+  "endpoints": {
+    "base": "https://us-central1-common-staging-50741.cloudfunctions.net",
+    "notifications": "/notifications/ping"
   }
 }

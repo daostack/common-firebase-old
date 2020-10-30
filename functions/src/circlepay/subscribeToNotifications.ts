@@ -5,6 +5,7 @@ import { circlePayApi } from '../settings';
 import { externalRequestExecutor } from '../util';
 import { circlePayApiOptions } from './circlepay';
 import { ErrorCodes } from '../util/constants';
+import { IUserEntity } from '../util/types';
 
 export const subscribeToNotifications = async (): Promise<void> => {
   const currentSubscriptions = await externalRequestExecutor<{

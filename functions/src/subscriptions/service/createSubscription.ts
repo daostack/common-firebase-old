@@ -6,6 +6,8 @@ import { Utils } from '../../util/util';
 import { CommonError } from '../../util/errors';
 import { Collections } from '../../util/constants';
 import { ICardEntity, ICommonEntity, IProposalEntity, ISubscriptionEntity } from '../../util/types';
+import { createSubscriptionPayment } from '../../circlepay/createSubscriptionPayment';
+
 
 /**
  * Creates subscription based on proposal
@@ -62,6 +64,9 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
   await db.collection(Collections.Subscriptions)
     .doc(subscription.id)
     .set(subscription);
+
+  // Charge the subscription for the initial payment
+  await createSubscriptionPayment(subscription);
 
   return subscription;
 };

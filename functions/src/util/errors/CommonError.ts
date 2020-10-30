@@ -5,8 +5,6 @@ interface IErrorData {
   statusCode?: number;
   errorCode?: string;
 
-  payload?: any;
-
   [key: string]: any;
 }
 
@@ -52,6 +50,6 @@ export class CommonError extends Error implements ICommonError {
     this.errorCode = data.errorCode || ErrorCodes.GenericError;
     this.statusCode = data.statusCode || StatusCodes.InternalServerError;
 
-    this.data = data.payload;
+    this.data = data;
   }
 }

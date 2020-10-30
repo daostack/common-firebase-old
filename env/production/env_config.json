@@ -37,7 +37,8 @@
   "circlepay": {
     "apiUrl": "https://api-sandbox.circle.com/v1"
   },
-  "hosts": {
-    "firebase": "https://us-central1-common-daostack.cloudfunctions.net"
+  "endpoints": {
+    "base": "https://us-central1-common-daostack.cloudfunctions.net",
+    "notifications": "/notifications/ping"
   }
 }
