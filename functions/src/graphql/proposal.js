@@ -21,7 +21,7 @@ const _getVotes = async (arc, voteQuery, { blockNumber, customRetryOptions }) =>
       async (retryFunc, number) => {
         console.log(`Try #${number} find proposal votes for block with number ${blockNumber}`);
         try {
-          votes = await Vote.search(arc, voteQuery, { fetchPolicy: 'no-cache' }).first();
+          votes = await Vote.search(arc, voteQuery).first();
         } catch (err) {
           if (err.message.includes('has only indexed up to block number')) {
             retryFunc(`The current graph block "${blockNumber}" is still not indexed.`);
@@ -153,9 +153,7 @@ async function updateProposalById(proposalId, customRetryOptions = {}, blockNumb
       console.log(`Try #${number} to get proposal ${proposalId}`);
       let proposals = null;
       try {
-        proposals = await arc.proposals(proposalQuery, {
-          fetchPolicy: 'no-cache'
-        }).first();
+        proposals = await arc.proposals(proposalQuery, !proposalQuery.block ? { fetchPolicy: 'no-cache'} : null ).first();
       } catch (err) {
         console.log("Retry reason: ", err);
         await retryFunc(`We could not find a proposal with id "${proposalId}" in the graph${currBlockNumber ? ` for block ${currBlockNumber}` : '.'}`);
