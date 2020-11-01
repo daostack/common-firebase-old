@@ -121,7 +121,7 @@ export const notifyData: Record<string, IEventData> = {
               title: 'A new funding proposal in your Common!',
               body: `${userData.firstName} is asking for ${proposalData.fundingRequest.amount / 100} for their proposal in "${commonData.name}". See the proposal and vote.`,
               image: commonData.metadata.image || '',
-              path: `ProposalScreen/${proposalData.id}/${commonData.id}`,
+              path: `ProposalScreen/${commonData.id}/${proposalData.id}`,
           }
       },
       
@@ -149,7 +149,8 @@ export const notifyData: Record<string, IEventData> = {
         return {
             title: 'A new Common was just featured!',
             body: `A new Common was just featured: "${commonData.name}". You might want to check it out.`,
-            image: commonData.metadata.image || ''
+            image: commonData.metadata.image || '',
+            path: `CommonProfile/${commonData.id}`
         }
     },
     
@@ -168,7 +169,8 @@ export const notifyData: Record<string, IEventData> = {
         return {
             title: 'Your funding proposal was approved!',
             body: `A funding proposal for ${proposalData.fundingRequest.amount} was approved by "${commonData.name}".`,
-            image: commonData.metadata.image || ''
+            image: commonData.metadata.image || '',
+            path: `ProposalScreen/${commonData.id}/${proposalData.id}`,
         }
     },
   },
@@ -185,7 +187,8 @@ export const notifyData: Record<string, IEventData> = {
         return {
             title: 'Congrats!',
             body: `Your request to join "${commonData.name}" was accepted, you are now a member!`,
-            image: commonData.metadata.image || ''
+            image: commonData.metadata.image || '',
+            path: `CommonProfile/${commonData.id}`
         }
     },
   },
@@ -203,7 +206,8 @@ export const notifyData: Record<string, IEventData> = {
         return {
             title: `Bad news, your request to join "${commonData.name}" was rejected.`,
             body: `Don't give up, there are plenty of other Commons you can join.`,
-            image: commonData.metadata.image || ''
+            image: commonData.metadata.image || '',
+            path: `CommonProfile/${commonData.id}`
         }
     },
   },
@@ -223,7 +227,7 @@ export const notifyData: Record<string, IEventData> = {
           title: `New message!`,
           body: `${sender.displayName} commented in "${commonData.name}"`,
           image: commonData.metadata.image || '',
-          path: `Discussions/${message.discussionId}/${commonData.id}`
+          path: `Discussions/${commonData.id}/${message.discussionId}`
       }
     ),
   }
