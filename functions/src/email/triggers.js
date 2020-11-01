@@ -2,29 +2,34 @@ const functions = require('firebase-functions');
 const { updateDAOBalance } = require("../db/daoDbService");
 const { minterToken } = require('../relayer/util/minterToken')
 const { Utils } = require('../util/util');
+const { createEvent } = require('../db/eventDbService');
+const { EVENT_TYPES } = require('../event/event');
+
 
 const emailClient = require('.');
 
 exports.watchForExecutedProposals = functions.firestore
   .document('/proposals/{id}')
   .onUpdate(async (change) => {
-    const data = change.after.data();
-    const previousData = change.before.data();
+    const proposal = change.after.data();
+    const previousProposal = change.before.data();
+    console.log('proposal executed', proposal)
 
     if (
-      data.executed !== previousData.executed &&
-      data.executed === true &&
-      data.winningOutcome === 1 
+      proposal.executed !== previousProposal.executed &&
+      proposal.executed === true &&
+      proposal.winningOutcome === 1 &&
+      proposal.name === 'Join'
       // && data.description.preAuthId
     ) {
       console.log(
         'Proposal EXECUTED and WINNING OUTCOME IS 1 -> INITIATING PAYMENT'
       );
-      const userData = await Utils.getUserById(data.proposerId);
-      let daoData = await Utils.getCommonById(data.dao);
+      const userData = await Utils.getUserById(proposal.proposerId);
+      let daoData = await Utils.getCommonById(proposal.dao);
       try {
-        const amount = data.description.funding;
-        await Promise.all([
+        const amount = proposal.description.funding;
+        /*await Promise.all([
           emailClient.sendTemplatedEmail({
             to: userData.email,
             templateKey: "userJoinedSuccess",
@@ -38,14 +43,25 @@ exports.watchForExecutedProposals = functions.firestore
             to: 'admin',
             templateKey: 'adminPayInSuccess',
             emailStubs: {
-              proposalId: data.id
+              proposalId: proposal.id
             }
           })
-        ]);
+        ]);*/
 
-        console.log(`Minting ${amount} tokens to ${data.dao}`)
-        await minterToken(data.dao, amount)
-        await updateDAOBalance(data.dao);
+        // an even for APPROVED_REQUEST_TO_JOIN is also in graphql/util/triggers in watchForNewMembers
+        // do we really need both?
+        // in graphql triggers we look for minted reputation of members,
+        // here we're looking at voted or not
+        await createEvent({
+          userId: proposal.proposerId,
+          objectId: proposal.id,
+          createdAt: new Date(),
+          type: EVENT_TYPES.APPROVED_REQUEST_TO_JOIN
+        })
+
+        console.log(`Minting ${amount} tokens to ${proposal.dao}`)
+        await minterToken(proposal.dao, amount)
+        await updateDAOBalance(proposal.dao);
         return change.after.ref.set(
           {
             paymentStatus: 'paid',
@@ -62,30 +78,40 @@ exports.watchForExecutedProposals = functions.firestore
         });
       }
     } else if (
-      data.executed !== previousData.executed &&
-      data.executed === true &&
-      data.winningOutcome === 0
+      proposal.executed !== previousProposal.executed &&
+      proposal.executed === true &&
+      proposal.winningOutcome === 0
     ) {
        // await cancelPreauthorizedPayment(data.description.preAuthId);
     }
 
     if (
-      data.name === "FundingRequest" &&
-      data.executed !== previousData.executed &&
-      data.winningOutcome === 1 &&
-      Boolean(data.executed)
+      proposal.name === "FundingRequest" &&
+      proposal.executed !== previousProposal.executed &&
+      proposal.winningOutcome === 1 &&
+      Boolean(proposal.executed)
     ) {
-      const userData = await Utils.getUserById(data.proposerId);
-      let daoData = await Utils.getCommonById(data.dao);
+
+      const userData = await Utils.getUserById(proposal.proposerId);
+      let daoData = await Utils.getCommonById(proposal.dao);
 
       // Template fundingRequestAccepted (admin & user)
-      await Promise.all([
+      // we create the same even in graphql/util/triggers in watchForNewMembers
+      // we check for minted reputation
+      await createEvent({
+        userId: proposal.proposerId,
+        objectId: proposal.id,
+        createdAt: new Date(),
+        type: EVENT_TYPES.APPROVED_PROPOSAL
+      })
+
+      /*await Promise.all([
         emailClient.sendTemplatedEmail({
           to: userData.email,
           templateKey: 'userFundingRequestAccepted',
           emailStubs: {
             name: userData.displayName,
-            proposal: data.description.title
+            proposal: proposal.description.title
           }
         }),
         emailClient.sendTemplatedEmail({
@@ -99,15 +125,15 @@ exports.watchForExecutedProposals = functions.firestore
             commonBalance: daoData.balance,
             commonLink: Utils.getCommonLink(daoData.id),
             commonId: daoData.id,
-            proposalId: data.id,
-            paymentAmount: data.fundingRequest.amount,
-            submittedOn: new Date(data.createdAt * 1000).toDateString(),
-            passedOn: new Date(data.executedAt * 1000).toDateString(),
+            proposalId: proposal.id,
+            paymentAmount: proposal.fundingRequest.amount,
+            submittedOn: new Date(proposal.createdAt * 1000).toDateString(),
+            passedOn: new Date(proposal.executedAt * 1000).toDateString(),
             log: 'No additional information available',
             paymentId: 'Not available'
           }
         })
-      ])
+      ])*/
     }
 
     return true;
