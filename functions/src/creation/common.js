@@ -122,13 +122,12 @@ const createCommon = async (req) => {
   );
 
   const response = await execTransaction(reqest);
-  // console.log('response  ->', response);
   const receipt = await provider.waitForTransaction(response.txHash);
   const events = Utils.getTransactionEvents(daoFactoryContract.interface, receipt);
   const newOrgEvent = events.NewOrg;
   const daoId = newOrgEvent._avatar;
 
-  await updateDaoById(daoId, { retries: 8 });
+  await updateDaoById(daoId, { retries: 8 }, receipt.blockNumber);
   return { daoId };
 };
 

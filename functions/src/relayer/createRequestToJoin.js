@@ -8,8 +8,6 @@ const abi = require('./util/abi.json');
 const { CommonError } = require('../util/errors');
 
 const createRequestToJoin = async (req, res) => {
-  console.log('---requestToJoin---');
-
   const {
     idToken,
     createProposalTx, // This is the signed transacxtion to create the proposal.
@@ -116,7 +114,7 @@ const createRequestToJoin = async (req, res) => {
     return;
   }
 
-  await updateProposalById(proposalId, { retries: 8 });
+  await updateProposalById(proposalId, { retries: 8 }, receipt.blockNumber);
 
   await assignCardToProposal(cardId, proposalId);
 
