@@ -11,7 +11,10 @@ const { env } = require('../env');
 // That was imported from './error', but was not
 // there so I don't know what is it
 const CFError = {
-  invalidIdToken: 'invalidIdToken'
+  invalidIdToken: 'invalidIdToken',
+  emptyPaymentData: 'emptyPaymentData',
+  emptyCardData: 'emptyCardData',
+  emptyUserData: 'emptyUserData'
 }
 
 const QUERY_LATEST_BLOCK_NUMBER = `query {
@@ -89,7 +92,7 @@ class Utils {
       const cardData = await cardRef.get().then(doc => doc.data());
       return cardData;
     } catch (err) {
-      throw new CommonError(CFError.emptyUserData)
+      throw new CommonError(CFError.emptyCardData)
     }
   }
 
@@ -103,7 +106,7 @@ class Utils {
     } catch (err) {
       console.error('err', err);
 
-      throw new CommonError(CFError.emptyUserData)
+      throw new CommonError(CFError.emptyCardData)
     }
   }
 
@@ -115,19 +118,17 @@ class Utils {
       const cardData = cardRef.docs.map(doc => doc.data())[0];
       return cardData;
     } catch (err) {
-      throw CommonError(CFError.emptyUserData)
+      throw CommonError(CFError.emptyCardData)
     }
   }
 
   async getPaymentById(paymentId) {
     try {
-      const paymentRef = await admin.firestore().collection('payments')
-        .where('id', '==', paymentId)
-        .get();
+      const paymentRef = admin.firestore().collection('payments').doc(paymentId)
       const paymentData = paymentRef.docs.map(doc => doc.data())[0];
       return paymentData;
     } catch (err) {
-      throw CommonError(CFError.emptyUserData)
+      throw CommonError(CFError.emptyPaymentData)
     }
   }
 
