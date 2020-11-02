@@ -35,7 +35,7 @@ exports.watchForExecutedProposals = functions.firestore
           userId: proposal.proposerId,
           objectId: proposal.id,
           createdAt: new Date(),
-          type: EVENT_TYPES.APPROVED_REQUEST_TO_JOIN
+          type: EVENT_TYPES.APPROVED_REQUEST_TO_JOIN // your request was approved, but you're not a member yet
         })
 
         console.log(`Minting ${amount} tokens to ${proposal.dao}`)
@@ -74,14 +74,11 @@ exports.watchForExecutedProposals = functions.firestore
       const userData = await Utils.getUserById(proposal.proposerId);
       let daoData = await Utils.getCommonById(proposal.dao);
 
-      // Template fundingRequestAccepted (admin & user)
-      // we create the same even in graphql/util/triggers in watchForNewMembers
-      // we check for minted reputation
       await createEvent({
         userId: proposal.proposerId,
         objectId: proposal.id,
         createdAt: new Date(),
-        type: EVENT_TYPES.APPROVED_PROPOSAL
+        type: EVENT_TYPES.APPROVED_PROPOSAL // funding approved, but not processed yet
       })
     }
 

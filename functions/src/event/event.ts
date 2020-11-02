@@ -14,6 +14,7 @@ export enum EVENT_TYPES {
     CREATION_REQUEST_TO_JOIN = 'creationReqToJoin',
     //APPROVED notifications
     APPROVED_REQUEST_TO_JOIN = 'approvedReqToJoin',
+    NEW_MEMBER = 'newMember',
     APPROVED_PROPOSAL = 'approvedProposal',
     //REJECTED notifications
     REJECTED_REQUEST_TO_JOIN = 'rejectedReqToJoin',
@@ -72,6 +73,13 @@ export const eventData: Record<string, IEventData> = {
         }
     },
     [EVENT_TYPES.APPROVED_REQUEST_TO_JOIN]: {
+        eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+        notifyUserFilter: async (proposal: any): Promise<string[]> => {
+            return [proposal.proposerId];
+        }
+    },
+    [EVENT_TYPES.NEW_MEMBER]: {
         eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: async (proposal: any): Promise<string[]> => {

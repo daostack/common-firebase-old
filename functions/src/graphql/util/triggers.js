@@ -60,7 +60,7 @@ exports.watchForNewMembers = functions.firestore
         userId: data.proposerId,
         objectId: data.id,
         createdAt: new Date(),
-        type: EVENT_TYPES.APPROVED_REQUEST_TO_JOIN
+        type: EVENT_TYPES.NEW_MEMBER // you are a member now
       });
       
       try {
@@ -82,7 +82,7 @@ exports.watchForNewMembers = functions.firestore
         userId: data.proposerId,
         objectId: data.id,
         createdAt: new Date(),
-        type: EVENT_TYPES.APPROVED_PROPOSAL
+        type: EVENT_TYPES.APPROVED_PROPOSAL // funding actuall processed
       });
       
       try {
