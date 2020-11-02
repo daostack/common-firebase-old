@@ -5,7 +5,7 @@ import { circlePayApi } from '../settings';
 import { externalRequestExecutor } from '../util';
 import { ErrorCodes } from '../util/constants';
 
-export const circlePayApiOptions = {
+export const circlePayHeaders = {
 	headers: {
 		accept: 'application/json',
 		'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ export const createCard = async (cardData: ICardData) : Promise<any> => {
   const response = await externalRequestExecutor(async () => {
     return await axios.post(`${circlePayApi}/cards`,
       cardData,
-      circlePayApiOptions
+      circlePayHeaders
     )
   }, {
     errorCode: ErrorCodes.CirclePayError,
@@ -53,7 +53,7 @@ export const encryption = async () : Promise<any> => {
 	// const response = await axios.get(`${circlePayApi}/encryption/public`, options);
 
   const response = await externalRequestExecutor(async () => {
-    return await axios.get(`${circlePayApi}/encryption/public`, circlePayApiOptions);
+    return await axios.get(`${circlePayApi}/encryption/public`, circlePayHeaders);
   }, {
     errorCode: ErrorCodes.CirclePayError,
     userMessage: 'Call to CirclePay failed. Please try again later and if the issue persist contact us.'
@@ -84,7 +84,7 @@ export const createAPayment = async (paymentData: IPayment) : Promise<any> => {
   return await externalRequestExecutor(async () => {
     return await axios.post(`${circlePayApi}/payments`,
       paymentData,
-      circlePayApiOptions
+      circlePayHeaders
     );
   }, {
     errorCode: ErrorCodes.CirclePayError,
@@ -94,7 +94,7 @@ export const createAPayment = async (paymentData: IPayment) : Promise<any> => {
 
 export const getPayment = async(paymentId: string) : Promise<any> => {
   return await externalRequestExecutor(async () => {
-    return await axios.get(`${circlePayApi}/payments/${paymentId}`, circlePayApiOptions)
+    return await axios.get(`${circlePayApi}/payments/${paymentId}`, circlePayHeaders)
   }, {
     errorCode: ErrorCodes.CirclePayError,
     userMessage: 'Call to CirclePay failed. Please try again later and if the issue persist contact us.'

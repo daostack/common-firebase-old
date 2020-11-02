@@ -18,7 +18,7 @@ import { EVENT_TYPES } from '../event/event';
 import { circlePayApi } from '../settings';
 import { Utils } from '../util/util';
 
-import { circlePayApiOptions } from './circlepay';
+import { circlePayHeaders } from './circlepay';
 import { addPaymentToCard } from './addPaymentToCard';
 import { updateSubscription } from '../subscriptions/business';
 
@@ -130,7 +130,7 @@ const makePayment = async (card: ICardEntity, amount: number): Promise<ICirclePa
   const {data} = await externalRequestExecutor<ICirclePaymentResponse>(async () => {
     return (await axios.post<ICirclePaymentResponse>(`${circlePayApi}/payments`,
       paymentData,
-      circlePayApiOptions
+      circlePayHeaders
     )).data;
   }, {
     errorCode: ErrorCodes.CirclePayError,

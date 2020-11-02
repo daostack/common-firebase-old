@@ -3,7 +3,7 @@ import axios from 'axios';
 import { env } from '../env';
 import { circlePayApi } from '../settings';
 import { externalRequestExecutor } from '../util';
-import { circlePayApiOptions } from './circlepay';
+import { circlePayHeaders } from './circlepay';
 import { ErrorCodes } from '../util/constants';
 import { IUserEntity } from '../util/types';
 
@@ -18,7 +18,7 @@ export const subscribeToNotifications = async (): Promise<void> => {
       }[]
     }[];
   }>(async () => {
-    return (await axios.get(`${circlePayApi}/notifications/subscriptions`, circlePayApiOptions)).data;
+    return (await axios.get(`${circlePayApi}/notifications/subscriptions`, circlePayHeaders)).data;
   }, {
     errorCode: ErrorCodes.CirclePayError,
     userMessage: 'Call to CirclePay failed. Please try again later and if the issue persist contact us.'
@@ -56,7 +56,7 @@ export const subscribeToNotifications = async (): Promise<void> => {
 
 const unsubscribeFromNotification = async (notificationId: string): Promise<void> => {
   await externalRequestExecutor(async () => {
-    return (await axios.delete(`${circlePayApi}/notifications/${notificationId}`, circlePayApiOptions));
+    return (await axios.delete(`${circlePayApi}/notifications/${notificationId}`, circlePayHeaders));
   }, {
     errorCode: ErrorCodes.CirclePayError,
     userMessage: 'Something bad happened while trying to unsubscribe from notification'
@@ -67,7 +67,7 @@ const subscribeEndpoint = async (endpoint: string): Promise<void> => {
   await externalRequestExecutor(async () => {
     return (await axios.post(`${circlePayApi}/notifications/subscriptions`, {
       endpoint
-    }, circlePayApiOptions));
+    }, circlePayHeaders));
   }, {
     errorCode: ErrorCodes.CirclePayError,
     userMessage: 'Something bad happened while trying to unsubscribe from notification'
