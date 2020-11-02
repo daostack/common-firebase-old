@@ -4,6 +4,7 @@ const { minterToken } = require('../relayer/util/minterToken')
 const { Utils } = require('../util/util');
 const { createEvent } = require('../db/eventDbService');
 const { EVENT_TYPES } = require('../event/event');
+const { PROPOSAL_TYPE } = require('../util/util');
 
 
 const emailClient = require('.');
@@ -19,7 +20,7 @@ exports.watchForExecutedProposals = functions.firestore
       proposal.executed !== previousProposal.executed &&
       proposal.executed === true &&
       proposal.winningOutcome === 1 &&
-      proposal.name === 'Join'
+      proposal.name === PROPOSAL_TYPE.Join
       // && data.description.preAuthId
     ) {
       console.log(
@@ -29,29 +30,7 @@ exports.watchForExecutedProposals = functions.firestore
       let daoData = await Utils.getCommonById(proposal.dao);
       try {
         const amount = proposal.description.funding;
-        /*await Promise.all([
-          emailClient.sendTemplatedEmail({
-            to: userData.email,
-            templateKey: "userJoinedSuccess",
-            emailStubs: {
-              name: userData.displayName,
-              commonName: daoData.name,
-              commonLink: Utils.getCommonLink(daoData.id)
-            }
-          }),
-          emailClient.sendTemplatedEmail({
-            to: 'admin',
-            templateKey: 'adminPayInSuccess',
-            emailStubs: {
-              proposalId: proposal.id
-            }
-          })
-        ]);*/
 
-        // an even for APPROVED_REQUEST_TO_JOIN is also in graphql/util/triggers in watchForNewMembers
-        // do we really need both?
-        // in graphql triggers we look for minted reputation of members,
-        // here we're looking at voted or not
         await createEvent({
           userId: proposal.proposerId,
           objectId: proposal.id,
@@ -86,7 +65,7 @@ exports.watchForExecutedProposals = functions.firestore
     }
 
     if (
-      proposal.name === "FundingRequest" &&
+      proposal.name === PROPOSAL_TYPE.FundingRequest &&
       proposal.executed !== previousProposal.executed &&
       proposal.winningOutcome === 1 &&
       Boolean(proposal.executed)
@@ -104,36 +83,6 @@ exports.watchForExecutedProposals = functions.firestore
         createdAt: new Date(),
         type: EVENT_TYPES.APPROVED_PROPOSAL
       })
-
-      /*await Promise.all([
-        emailClient.sendTemplatedEmail({
-          to: userData.email,
-          templateKey: 'userFundingRequestAccepted',
-          emailStubs: {
-            name: userData.displayName,
-            proposal: proposal.description.title
-          }
-        }),
-        emailClient.sendTemplatedEmail({
-          to: 'admin',
-          templateKey: 'adminFundingRequestAccepted',
-          emailStubs: {
-            userId: userData.uid,
-            userFullName: userData.displayName,
-            userEmail: userData.email,
-            commonName: daoData.name,
-            commonBalance: daoData.balance,
-            commonLink: Utils.getCommonLink(daoData.id),
-            commonId: daoData.id,
-            proposalId: proposal.id,
-            paymentAmount: proposal.fundingRequest.amount,
-            submittedOn: new Date(proposal.createdAt * 1000).toDateString(),
-            passedOn: new Date(proposal.executedAt * 1000).toDateString(),
-            log: 'No additional information available',
-            paymentId: 'Not available'
-          }
-        })
-      ])*/
     }
 
     return true;
