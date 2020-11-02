@@ -13,7 +13,7 @@ const db = admin.firestore();
  * @param subscription - The subscription to update
  *
  * @throws { CommonError } - If there is no subscription passed (or is null/undefined)
- * @throws { CommonError } - If the due date for the subscription is in the feature
+ * @throws { CommonError } - If the due date for the subscription is in the future
  *
  */
 export const handleSuccessfulPayment = async (subscription: ISubscriptionEntity): Promise<void> => {
@@ -35,7 +35,7 @@ export const handleSuccessfulPayment = async (subscription: ISubscriptionEntity)
     subscription.dueDate = addMonth(subscription.dueDate);
   } else {
     throw new CommonError(
-      `Trying to update due date that is in the feature 
+      `Trying to update due date that is in the future 
       for subscription with id (${subscription.id})! 
     `);
   }

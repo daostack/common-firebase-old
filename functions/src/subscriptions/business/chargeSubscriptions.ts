@@ -18,11 +18,13 @@ const db = admin.firestore();
 export const chargeSubscriptions = async (): Promise<void> => {
   const subscriptionsDueToday = await db.collection(Collections.Subscriptions)
     // .where('dueDate', '>=', new Date().setHours(0,0,0,0))
-    .where('dueDate', '<=', new Date().setHours(23,59,59,999))
+    .where('dueDate', '<=', new Date().setHours(23, 59, 59, 999))
     .where('status', 'in', ['Active', 'PaymentFailed'])
     .get() as QuerySnapshot<ISubscriptionEntity>;
 
-  for(const subscriptionDueToday of subscriptionsDueToday.docs) {
+  const promiseArr: Promise<any>[] = [];
+
+  for (const subscriptionDueToday of subscriptionsDueToday.docs) {
     const subscriptionEntity = subscriptionDueToday.data() as ISubscriptionEntity;
 
     if (subscriptionEntity.status === 'PaymentFailed') {
@@ -36,20 +38,30 @@ export const chargeSubscriptions = async (): Promise<void> => {
       }
     }
 
-    if(subscriptionEntity.status === 'Active' || subscriptionEntity.status === 'PaymentFailed') {
-      console.info(`Charging subscription (${subscriptionEntity.id}) with $${subscriptionEntity.amount}`);
-      console.trace(`Charging subscription`, subscriptionEntity);
+    if (subscriptionEntity.status === 'Active' || subscriptionEntity.status === 'PaymentFailed') {
+      promiseArr.push((async () => {
+        console.info(`Charging subscription (${subscriptionEntity.id}) with $${subscriptionEntity.amount}`);
+        console.trace(`Charging subscription`, subscriptionEntity);
 
-      // eslint-disable-next-line no-await-in-loop
-      await chargeSubscription(subscriptionEntity);
+        // Add try/catch so that if one charge fails
+        // the others won't be canceled because of it
+        try {
+          await chargeSubscription(subscriptionEntity);
 
-      console.info(`Charged subscription (${subscriptionEntity.id}) with $${subscriptionEntity.amount}`);
-      console.trace(`Charged subscription`, subscriptionEntity);
+          console.info(`Charged subscription (${subscriptionEntity.id}) with $${subscriptionEntity.amount}`);
+          console.trace(`Charged subscription`, subscriptionEntity);
+        } catch (e) {
+          console.error('Error occurred while trying to charge subscription', e);
+        }
+      })());
     } else {
       console.error(new CommonError(`
         Subscription (${subscriptionEntity.id}) with unsupported 
         status (${subscriptionEntity.status}) was in the charge loop.
-      `))
+      `));
     }
+
   }
+
+  await Promise.all(promiseArr);
 };
