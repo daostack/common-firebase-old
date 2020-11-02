@@ -27,7 +27,7 @@ export class CommonError extends Error implements ICommonError {
   public data: any;
 
   /**
-   * Create new common error
+   * Creates new common error
    *
    * @param message - the error message (required)
    * @param userMessage - the error message that the user will see (optional)
