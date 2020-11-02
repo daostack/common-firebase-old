@@ -6,6 +6,7 @@ import { Collections } from '../../util/constants';
 import { ISubscriptionEntity } from '../types';
 import { CommonError } from '../../util/errors';
 import { revokeMembership } from '../business';
+import { CancellationReason } from '../business/cancelSubscription';
 
 const db = admin.firestore();
 
@@ -18,7 +19,7 @@ exports.backup = functions.pubsub
     // canceled by payment failure should already be revoked
     const subscriptions = await db.collection(Collections.Subscriptions)
       .where('dueDate', '<=', new Date().setHours(23, 59, 59, 999))
-      .where('status', '==', 'CanceledByUser')
+      .where('status', '==', CancellationReason.CanceledByUser)
       .where('revoked', '==', false)
       .get() as QuerySnapshot<ISubscriptionEntity>;
 

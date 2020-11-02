@@ -5,7 +5,7 @@ import { Collections } from '../../util/constants';
 import { ISubscriptionEntity } from '../../util/types';
 import { CommonError } from '../../util/errors';
 
-import { cancelSubscription } from './cancelSubscription';
+import { CancellationReason, cancelSubscription } from './cancelSubscription';
 import { revokeMembership } from './revokeMembership';
 import { chargeSubscription } from './chargeSubscription';
 
@@ -28,7 +28,7 @@ export const chargeSubscriptions = async (): Promise<void> => {
     if (subscriptionEntity.status === 'PaymentFailed') {
       if (subscriptionEntity.paymentFailures.length >= 3) {
         // eslint-disable-next-line no-await-in-loop
-        await cancelSubscription(subscriptionEntity, 'CanceledByPaymentFailure');
+        await cancelSubscription(subscriptionEntity, CancellationReason.CanceledByPaymentFailure);
         // eslint-disable-next-line no-await-in-loop
         await revokeMembership(subscriptionEntity);
 

@@ -6,6 +6,7 @@ import { runtimeOptions } from '../util/constants';
 import { CommonError } from '../util/errors';
 import { Utils } from '../util/util';
 import { cancelSubscription, findSubscriptionById } from './business';
+import { CancellationReason } from './business/cancelSubscription';
 
 const router = commonRouter();
 
@@ -28,7 +29,7 @@ router.post('/cancel', async (req, res, next) => {
       `);
     }
 
-    await cancelSubscription(subscription, 'CanceledByUser');
+    await cancelSubscription(subscription, CancellationReason.CanceledByUser);
   }, {
     req,
     res,
