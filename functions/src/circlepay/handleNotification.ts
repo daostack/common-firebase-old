@@ -6,7 +6,7 @@ import { createEvent } from '../db/eventDbService';
 import { Collections } from '../util/constants';
 import { EVENT_TYPES } from '../event/event';
 import { CommonError } from '../util/errors';
-import { findSubscriptionById, handleFailedPayment, handleSuccessfulPayment } from '../subscriptions/business';
+import { findSubscriptionById, handleFailedPayment, handleSuccessfulSubscriptionPayment } from '../subscriptions/business';
 
 const db = admin.firestore();
 
@@ -72,7 +72,7 @@ export const handleNotification = async (notification: ICircleNotification): Pro
 
         // This should be only done once
         if(paymentObj.status !== 'paid' && paymentObj.status !== 'confirmed') {
-          await handleSuccessfulPayment(subscription);
+          await handleSuccessfulSubscriptionPayment(subscription);
         }
 
         break;

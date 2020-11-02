@@ -16,6 +16,8 @@ const db = admin.firestore();
  *  to be used from the cron job!
  */
 export const chargeSubscriptions = async (): Promise<void> => {
+  console.info(`Beginning subscription charging for ${new Date().getDate()}`);
+
   const subscriptionsDueToday = await db.collection(Collections.Subscriptions)
     // .where('dueDate', '>=', new Date().setHours(0,0,0,0))
     .where('dueDate', '<=', new Date().setHours(23, 59, 59, 999))
@@ -64,4 +66,7 @@ export const chargeSubscriptions = async (): Promise<void> => {
   }
 
   await Promise.all(promiseArr);
+
+  console.info(`Subscriptions charged successfully`)
+
 };

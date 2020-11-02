@@ -56,4 +56,4 @@ export const revokeMemberships = async (): Promise<void> => {
   await Promise.all(promiseArr);
 
   console.info(`Memberships revoked successfully`);
-}
+};

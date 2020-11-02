@@ -14,9 +14,8 @@ const db = admin.firestore();
  *
  * @throws { CommonError } - If there is no subscription passed (or is null/undefined)
  * @throws { CommonError } - If the due date for the subscription is in the future
- *
  */
-export const handleSuccessfulPayment = async (subscription: ISubscriptionEntity): Promise<void> => {
+export const handleSuccessfulSubscriptionPayment = async (subscription: ISubscriptionEntity): Promise<void> => {
   if (!subscription) {
     throw new CommonError(`
       Cannot handle successful payment without providing subscription object!
