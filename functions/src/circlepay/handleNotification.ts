@@ -1,12 +1,12 @@
 import admin from 'firebase-admin';
 
-import { subscriptionService } from '../subscriptions/subscriptionService';
 import { ICircleNotification, IPaymentEntity } from '../util/types';
 import { saveSubscriptionPayment } from './createSubscriptionPayment';
 import { createEvent } from '../db/eventDbService';
 import { Collections } from '../util/constants';
 import { EVENT_TYPES } from '../event/event';
 import { CommonError } from '../util/errors';
+import { findSubscriptionById, handleFailedPayment, handleSuccessfulPayment } from '../subscriptions/business';
 
 const db = admin.firestore();
 
@@ -43,7 +43,7 @@ export const handleNotification = async (notification: ICircleNotification): Pro
   const paymentObj = paymentRef.data() as IPaymentEntity;
 
   if(paymentObj.type === 'SubscriptionPayment') {
-    const subscription = await subscriptionService.findSubscriptionById(paymentObj.subscriptionId);
+    const subscription = await findSubscriptionById(paymentObj.subscriptionId);
     const updateRes = await saveSubscriptionPayment(subscription, notification.payment);
 
     const createPaymentEvent = async (type: EVENT_TYPES): Promise<void> => {
@@ -72,7 +72,7 @@ export const handleNotification = async (notification: ICircleNotification): Pro
 
         // This should be only done once
         if(paymentObj.status !== 'paid' && paymentObj.status !== 'confirmed') {
-          await subscriptionService.handleSuccessfulPayment(subscription);
+          await handleSuccessfulPayment(subscription);
         }
 
         break;
@@ -81,7 +81,7 @@ export const handleNotification = async (notification: ICircleNotification): Pro
         await createPaymentEvent(EVENT_TYPES.PAYMENT_FAILED);
 
         // This is good place to retry the payment?
-        await subscriptionService.handleFailedPayment(subscription, updateRes.payment);
+        await handleFailedPayment(subscription, updateRes.payment);
 
         break;
       default:

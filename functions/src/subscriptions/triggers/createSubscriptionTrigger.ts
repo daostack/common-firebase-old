@@ -1,12 +1,12 @@
 import * as functions from 'firebase-functions';
 
 import { ICommonEntity, IProposalEntity } from '../../util/types';
-import { subscriptionService } from '../subscriptionService';
 import { Collections } from '../../util/constants';
 import { CommonError } from '../../util/errors';
 import { EVENT_TYPES } from '../../event/event';
 import { IEventModel } from '../../event';
 import { db } from '../../settings';
+import { createSubscription } from '../business';
 
 export const createSubscriptionsTrigger = functions.firestore
   .document('/events/{id}')
@@ -32,7 +32,7 @@ export const createSubscriptionsTrigger = functions.firestore
       }
 
       if (common.metadata.contribution === 'monthly') {
-        await subscriptionService.createSubscription(proposal);
+        await createSubscription(proposal);
       }
     }
   });

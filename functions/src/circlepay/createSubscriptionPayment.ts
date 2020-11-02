@@ -10,7 +10,6 @@ import {
   IUserEntity,
   Nullable
 } from '../util/types';
-import { subscriptionService } from '../subscriptions/subscriptionService';
 import { Collections, ErrorCodes } from '../util/constants';
 import { createEvent } from '../db/eventDbService';
 import { externalRequestExecutor } from '../util';
@@ -21,6 +20,7 @@ import { Utils } from '../util/util';
 
 import { circlePayApiOptions } from './circlepay';
 import { addPaymentToCard } from './addPaymentToCard';
+import { updateSubscription } from '../subscriptions/business';
 
 const db = admin.firestore();
 
@@ -189,7 +189,7 @@ export const saveSubscriptionPayment = async (subscription: ISubscriptionEntity,
   // await db.collection(Collections.Subscriptions)
   //   .doc(subscription.id)
   //   .set(subscription);
-  await subscriptionService.updateSubscription(subscription);
+  await updateSubscription(subscription);
 
   return {
     payment,

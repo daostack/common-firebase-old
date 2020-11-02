@@ -4,7 +4,8 @@ import { IUserEntity } from '../../util/types';
 import { Utils } from '../../util/util';
 import { EVENT_TYPES } from '../../event/event';
 import { createEvent } from '../../db/eventDbService';
-import { subscriptionService } from '../subscriptionService';
+
+import { updateSubscription } from './updateSubscription';
 
 export const revokeMembership = async (subscription: ISubscriptionEntity): Promise<void> => {
   const user = await Utils.getUserById(subscription.userId) as IUserEntity;
@@ -14,7 +15,7 @@ export const revokeMembership = async (subscription: ISubscriptionEntity): Promi
 
   subscription.revoked = true;
 
-  await subscriptionService.updateSubscription(subscription);
+  await updateSubscription(subscription);
 
   await createEvent({
     userId: subscription.userId,

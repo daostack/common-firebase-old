@@ -5,7 +5,7 @@ import admin from 'firebase-admin';
 import { Collections } from '../../util/constants';
 import { ISubscriptionEntity } from '../types';
 import { CommonError } from '../../util/errors';
-import { subscriptionService } from '../subscriptionService';
+import { revokeMembership } from '../business';
 
 const db = admin.firestore();
 
@@ -36,7 +36,7 @@ exports.backup = functions.pubsub
         console.info(`Revoking membership for subscription with id ${subscription.id}`);
 
         // eslint-disable-next-line no-await-in-loop
-        await subscriptionService.revokeMembership(subscription);
+        await revokeMembership(subscription);
 
         console.info(`Revoked membership ${subscription.id}`);
       }

@@ -3,9 +3,11 @@ import { QuerySnapshot } from '@google-cloud/firestore';
 
 import { Collections } from '../../util/constants';
 import { ISubscriptionEntity } from '../../util/types';
-
-import { subscriptionService } from '../subscriptionService';
 import { CommonError } from '../../util/errors';
+
+import { cancelSubscription } from './cancelSubscription';
+import { revokeMembership } from './revokeMembership';
+import { chargeSubscription } from './chargeSubscription';
 
 const db = admin.firestore();
 
@@ -26,9 +28,9 @@ export const chargeSubscriptions = async (): Promise<void> => {
     if (subscriptionEntity.status === 'PaymentFailed') {
       if (subscriptionEntity.paymentFailures.length >= 3) {
         // eslint-disable-next-line no-await-in-loop
-        await subscriptionService.cancelSubscription(subscriptionEntity, 'CanceledByPaymentFailure');
+        await cancelSubscription(subscriptionEntity, 'CanceledByPaymentFailure');
         // eslint-disable-next-line no-await-in-loop
-        await subscriptionService.revokeMembership(subscriptionEntity);
+        await revokeMembership(subscriptionEntity);
 
         continue;
       }
@@ -39,7 +41,7 @@ export const chargeSubscriptions = async (): Promise<void> => {
       console.trace(`Charging subscription`, subscriptionEntity);
 
       // eslint-disable-next-line no-await-in-loop
-      await subscriptionService.chargeSubscription(subscriptionEntity);
+      await chargeSubscription(subscriptionEntity);
 
       console.info(`Charged subscription (${subscriptionEntity.id}) with $${subscriptionEntity.amount}`);
       console.trace(`Charged subscription`, subscriptionEntity);

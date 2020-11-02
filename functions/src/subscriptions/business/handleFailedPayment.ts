@@ -1,7 +1,7 @@
 import { ISubscriptionEntity } from '../types';
 import { IPaymentEntity } from '../../util/types';
 import { CommonError } from '../../util/errors';
-import { subscriptionService } from '../subscriptionService';
+import { updateSubscription } from './updateSubscription';
 
 /**
  * Handles update for the subscription document on payment failure
@@ -29,5 +29,5 @@ export const handleFailedPayment = async (subscription: ISubscriptionEntity, pay
     `);
   }
 
-  await subscriptionService.updateSubscription(subscription);
+  await updateSubscription(subscription);
 };

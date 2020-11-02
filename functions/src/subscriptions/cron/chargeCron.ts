@@ -1,5 +1,5 @@
 import * as functions from 'firebase-functions';
-import { chargeSubscriptions } from '../service/chargeSubscriptions';
+import { chargeSubscriptions } from '../business/chargeSubscriptions';
 
 exports.backup = functions.pubsub
   .schedule('0 12 * * *') // => every day at 12:00

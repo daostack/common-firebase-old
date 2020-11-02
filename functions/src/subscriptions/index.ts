@@ -5,8 +5,7 @@ import { responseExecutor } from '../util/responseExecutor';
 import { runtimeOptions } from '../util/constants';
 import { CommonError } from '../util/errors';
 import { Utils } from '../util/util';
-
-import { subscriptionService } from './subscriptionService';
+import { cancelSubscription, findSubscriptionById } from './business';
 
 const router = commonRouter();
 
@@ -21,7 +20,7 @@ router.post('/cancel', async (req, res, next) => {
       throw new CommonError('The subscription id is required, but not provided!');
     }
 
-    const subscription = await subscriptionService.findSubscriptionById(subscriptionId as string);
+    const subscription = await findSubscriptionById(subscriptionId as string);
 
     if (subscription.userId !== userId) {
       throw new CommonError(`
@@ -29,7 +28,7 @@ router.post('/cancel', async (req, res, next) => {
       `);
     }
 
-    await subscriptionService.cancelSubscription(subscription, 'CanceledByUser');
+    await cancelSubscription(subscription, 'CanceledByUser');
   }, {
     req,
     res,
