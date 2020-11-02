@@ -8,12 +8,15 @@ import { IEventModel } from '../../event';
 import { db } from '../../settings';
 import { createSubscription } from '../business';
 
+/**
+ * This trigger is executed on all proposal approval and is used
+ * to create subscription for the approved proposals in commons, that
+ * use monthly payments
+ */
 export const createSubscriptionsTrigger = functions.firestore
   .document('/events/{id}')
   .onCreate(async (snap) => {
     const event = snap.data() as IEventModel;
-
-    console.log('Approved!!!!');
 
     if (event.type === EVENT_TYPES.APPROVED_REQUEST_TO_JOIN) {
       const proposal = (await db.collection(Collections.Proposals)

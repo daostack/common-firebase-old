@@ -12,7 +12,7 @@ import { createSubscriptionPayment } from '../../circlepay/createSubscriptionPay
 /**
  * Creates subscription based on proposal
  *
- * @param proposal - The proposal for witch we want to create the subscription
+ * @param proposal - The proposal for which we want to create the subscription
  *
  * @throws { CommonError } - If the proposal is not provided
  * @throws { CommonError } - If the card, assigned to the proposal, is not found
