@@ -10,7 +10,7 @@ import { updateSubscription } from './updateSubscription';
 export const revokeMembership = async (subscription: ISubscriptionEntity): Promise<void> => {
   const user = await Utils.getUserById(subscription.userId) as IUserEntity;
 
-  // @question Witch address should we use for burning the tokens (safe or etherium)?
+  // @question Witch address should we use for burning the tokens (safe or ethereum)?
   await burnToken(user.safeAddress);
 
   subscription.revoked = true;

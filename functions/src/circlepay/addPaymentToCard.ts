@@ -1,10 +1,6 @@
-import admin from 'firebase-admin';
-
 import { ICardEntity, IPaymentEntity } from '../util/types';
-import { Collections } from '../util/constants';
 import { CommonError } from '../util/errors';
-
-const db = admin.firestore();
+import { updateCard } from '../db/cardDb';
 
 /**
  * Links payment with a card
@@ -28,9 +24,11 @@ export const addPaymentToCard = async (card: ICardEntity, payment: IPaymentEntit
   if(!card.payments.some(paymentId => paymentId === payment.id)) {
     card.payments.push(payment.id);
 
-    await db.collection(Collections.Cards)
-      .doc(card.id)
-      .set(card);
+    // await db.collection(Collections.Cards)
+    //   .doc(card.id)
+    //   .set(card);
+
+    await updateCard(card.id, card);
   }
 
   return card;

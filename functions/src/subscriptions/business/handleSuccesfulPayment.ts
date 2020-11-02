@@ -4,6 +4,7 @@ import { ISubscriptionEntity } from '../types';
 import { addMonth } from '../../util';
 import { Collections } from '../../util/constants';
 import { CommonError } from '../../util/errors';
+import { updateSubscription } from './updateSubscription';
 
 const db = admin.firestore();
 
@@ -39,7 +40,8 @@ export const handleSuccessfulSubscriptionPayment = async (subscription: ISubscri
     `);
   }
 
-  await db.collection(Collections.Subscriptions)
-    .doc(subscription.id)
-    .set(subscription);
+  // await db.collection(Collections.Subscriptions)
+  //   .doc(subscription.id)
+  //   .set(subscription);
+  await updateSubscription(subscription);
 };

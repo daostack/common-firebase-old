@@ -7,6 +7,7 @@ import { CommonError } from '../../util/errors';
 import { Collections } from '../../util/constants';
 import { ICardEntity, ICommonEntity, IProposalEntity, ISubscriptionEntity } from '../../util/types';
 import { createSubscriptionPayment } from '../../circlepay/createSubscriptionPayment';
+import { getDaoById } from '../../db/daoDbService';
 
 
 /**
@@ -30,9 +31,11 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
     );
   }
 
-  const common = (await db.collection(Collections.Commons)
-    .doc(proposal.dao)
-    .get()).data() as ICommonEntity;
+  // const common = (await db.collection(Collections.Commons)
+  //   .doc(proposal.dao)
+  //   .get()).data() as ICommonEntity;
+
+  const common = (await getDaoById(proposal.dao)).data() as ICommonEntity;
 
   const subscription: ISubscriptionEntity = {
     id: v4(),

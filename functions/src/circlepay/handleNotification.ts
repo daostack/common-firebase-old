@@ -7,6 +7,7 @@ import { Collections } from '../util/constants';
 import { EVENT_TYPES } from '../event/event';
 import { CommonError } from '../util/errors';
 import { findSubscriptionById, handleFailedPayment, handleSuccessfulSubscriptionPayment } from '../subscriptions/business';
+import { getPaymentSnapshot } from '../db/paymentDb';
 
 const db = admin.firestore();
 
@@ -30,17 +31,15 @@ export const handleNotification = async (notification: ICircleNotification): Pro
     });
   }
 
-  const paymentRef = await db.collection(Collections.Payments)
-    .doc(notification.payment.id)
-    .get();
+  const paymentSnap = await getPaymentSnapshot(notification.payment.id)
 
-  if (!paymentRef.exists) {
+  if (!paymentSnap.exists) {
     throw new CommonError(`
       Cannot find payment with id ${notification.payment.id}
     `);
   }
 
-  const paymentObj = paymentRef.data() as IPaymentEntity;
+  const paymentObj = paymentSnap.data() as IPaymentEntity;
 
   if(paymentObj.type === 'SubscriptionPayment') {
     const subscription = await findSubscriptionById(paymentObj.subscriptionId);

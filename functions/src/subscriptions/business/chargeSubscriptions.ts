@@ -5,8 +5,6 @@ import { Collections } from '../../util/constants';
 import { ISubscriptionEntity } from '../../util/types';
 import { CommonError } from '../../util/errors';
 
-import { CancellationReason, cancelSubscription } from './cancelSubscription';
-import { revokeMembership } from './revokeMembership';
 import { chargeSubscription } from './chargeSubscription';
 
 const db = admin.firestore();
@@ -30,11 +28,11 @@ export const chargeSubscriptions = async (): Promise<void> => {
     const subscriptionEntity = subscriptionDueToday.data() as ISubscriptionEntity;
 
     if (subscriptionEntity.status === 'PaymentFailed') {
-      if (subscriptionEntity.paymentFailures.length >= 3) {
-        // eslint-disable-next-line no-await-in-loop
-        await cancelSubscription(subscriptionEntity, CancellationReason.CanceledByPaymentFailure);
-        // eslint-disable-next-line no-await-in-loop
-        await revokeMembership(subscriptionEntity);
+      if (subscriptionEntity.paymentFailures.length > 3) {
+        console.warn(`
+          Subscription (${subscriptionEntity.id}) with more than 
+          3 failed payment was tried to be charged!
+        `);
 
         continue;
       }
@@ -67,6 +65,6 @@ export const chargeSubscriptions = async (): Promise<void> => {
 
   await Promise.all(promiseArr);
 
-  console.info(`Subscriptions charged successfully`)
+  console.info(`Subscriptions charged successfully`);
 
 };

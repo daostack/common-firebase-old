@@ -1,5 +1,8 @@
 import { db } from '../settings';
 import { DocumentData, DocumentReference } from '@google-cloud/firestore';
+import { ICardEntity, Nullable } from '../util/types';
+import { Collections } from '../util/constants';
+import { CommonError } from '../util/errors';
 
 // @todo Move to constants
 const COLLECTION_NAME = 'cards';
@@ -23,6 +26,29 @@ export const updateCard = async (cardId: string, doc: DocumentData): Promise<any
 export const getCardRef = (cardId: string): DocumentReference => {
   return db.collection(COLLECTION_NAME).doc(cardId);
 };
+
+/**
+ * Returns card entity by the ID of the card
+ *
+ * @param cardId - The ID of the card, that we want to retrieve
+ *
+ * @throws { CommonError } - If the card for that ID is not found
+ *
+ * @returns - The card, if found
+ */
+export const getCardById = async (cardId: string): Promise<ICardEntity> => {
+  const card = (await db.collection(Collections.Cards)
+    .doc(cardId)
+    .get()).data() as Nullable<ICardEntity>;
+
+  if(!card) {
+    throw new CommonError(`Cannot find card with id ${cardId}`, null, {
+      statusCode: 404
+    });
+  }
+
+  return card;
+}
 
 
 export default {

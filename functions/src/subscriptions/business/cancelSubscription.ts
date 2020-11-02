@@ -3,6 +3,7 @@ import { EVENT_TYPES } from '../../event/event';
 import { ISubscriptionEntity } from '../types';
 
 import { updateSubscription } from './updateSubscription';
+import { revokeMembership } from './revokeMembership';
 
 export enum CancellationReason {
   CanceledByUser = 'CanceledByUser',
@@ -20,6 +21,11 @@ export const cancelSubscription = async (subscription: ISubscriptionEntity, canc
   subscription.status = cancellationReason;
 
   await updateSubscription(subscription);
+
+  // If the subscription is canceled by payment failure we shoukd
+  if(cancellationReason === CancellationReason.CanceledByPaymentFailure) {
+    await revokeMembership(subscription);
+  }
 
   await createEvent({
     userId: subscription.userId,

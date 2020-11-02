@@ -21,6 +21,8 @@ import { Utils } from '../util/util';
 import { circlePayHeaders } from './circlepay';
 import { addPaymentToCard } from './addPaymentToCard';
 import { updateSubscription } from '../subscriptions/business';
+import { getCardById } from '../db/cardDb';
+import { updatePayment } from '../db/paymentDb';
 
 const db = admin.firestore();
 
@@ -59,15 +61,7 @@ interface ICirclePaymentResponseData {
  * @returns - the created payment
  */
 export const createSubscriptionPayment = async (subscription: ISubscriptionEntity): Promise<IPaymentEntity> => {
-  const card = (await db.collection(Collections.Cards)
-    .doc(subscription.cardId)
-    .get()).data() as Nullable<ICardEntity>;
-
-  if (!card) {
-    throw new CommonError(`
-      Cannot create payment, because there is no card with id ${subscription.cardId}
-    `);
-  }
+  const card = await getCardById(subscription.cardId);
 
   // Do not create more payments if there are any pending
   // ones. This may happen, but should not
@@ -182,9 +176,10 @@ export const saveSubscriptionPayment = async (subscription: ISubscriptionEntity,
   };
 
   // Update (or create) the payment and subscription
-  await db.collection(Collections.Payments)
-    .doc(payment.id)
-    .set(payment);
+  // await db.collection(Collections.Payments)
+  //   .doc(payment.id)
+  //   .set(payment);
+  await updatePayment(payment.id, payment);
 
   // await db.collection(Collections.Subscriptions)
   //   .doc(subscription.id)
