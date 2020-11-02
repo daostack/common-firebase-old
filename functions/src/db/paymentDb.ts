@@ -33,7 +33,7 @@ const polling = async ({validate, interval, paymentId}) => {
   return new Promise(executePoll);
 };
 
-const pollPaymentStatus = async (paymentData) => (
+export const pollPaymentStatus = async (paymentData) => (
   polling({
     validate: (payment) => payment.status === 'confirmed',
     interval: 10000,
@@ -49,7 +49,7 @@ const pollPaymentStatus = async (paymentData) => (
     })
 );
 
-const updateStatus = async (paymentId, status) => {
+export const updateStatus = async (paymentId, status) => {
   const currentPayment = await Utils.getPaymentById(paymentId);
 
   currentPayment.status = status;
@@ -74,8 +74,3 @@ export const getPaymentSnapshot = async (paymentId: string): Promise<DocumentSna
     .doc(paymentId)
     .get() as unknown as DocumentSnapshot<IPaymentEntity>
 );
-
-module.exports = {
-  updatePayment,
-  pollPaymentStatus
-};
