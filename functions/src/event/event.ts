@@ -19,7 +19,6 @@ export enum EVENT_TYPES {
     REQUEST_TO_JOIN_EXECUTED = 'requestToJoinExecuted',// create notification
     FUNDING_REQUEST_EXECUTED = 'fundingRequestExecuted',
     //APPROVED notifications
-    NEW_MEMBER = 'newMember',
     APPROVED_PROPOSAL = 'approvedProposal',
     //REJECTED notifications
     REJECTED_REQUEST_TO_JOIN = 'rejectedReqToJoin',

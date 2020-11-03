@@ -8,7 +8,7 @@ const { PROPOSAL_TYPE } = require('../util/util');
 
 
 const emailClient = require('.');
-
+// this is being triggered twice and causes duplicate events to be created
 exports.watchForExecutedProposals = functions.firestore
   .document('/proposals/{id}')
   .onUpdate(async (change) => {
