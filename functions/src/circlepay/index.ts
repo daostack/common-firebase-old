@@ -46,18 +46,6 @@ circlepay.get('/encryption', async (req, res, next) => {
     });
 });
 
-circlepay.post('/create-a-payment', async (req, res, next) => {
-  console.log('index/create-a-payment');
-  await responseExecutor(
-    async () => (await createPayment(req.body)),
-    {
-      req,
-      res,
-      next,
-      successMessage: `Payment was successful`
-    })
-});
-
 export const circlepayApp = functions
   .runWith(runtimeOptions)
   .https.onRequest(commonApp(circlepay));
