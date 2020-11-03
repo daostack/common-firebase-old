@@ -12,8 +12,13 @@ export enum EVENT_TYPES {
     CREATION_COMMON_FAILED = 'creationCommonFailed',
     CREATION_PROPOSAL = 'creationProposal',
     CREATION_REQUEST_TO_JOIN = 'creationReqToJoin',
+    //ACCEPTED notifications
+    REQUEST_TO_JOIN__ACCEPTED = 'requestToJoinAccepted',
+    FUNDING_REQUEST_ACCEPTED = 'fundingRequestAccepted',
+    // EXECUTED notifications
+    REQUEST_TO_JOIN_EXECUTED = 'requestToJoinExecuted',// create notification
+    FUNDING_REQUEST_EXECUTED = 'fundingRequestExecuted',
     //APPROVED notifications
-    APPROVED_REQUEST_TO_JOIN = 'approvedReqToJoin',
     NEW_MEMBER = 'newMember',
     APPROVED_PROPOSAL = 'approvedProposal',
     //REJECTED notifications
@@ -65,21 +70,28 @@ export const eventData: Record<string, IEventData> = {
             return [dao.members[0].userId];
         }
     },
-    [EVENT_TYPES.APPROVED_PROPOSAL]: {
+    [EVENT_TYPES.FUNDING_REQUEST_ACCEPTED]: {
         eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: async (proposal: any): Promise<string[]> => {
             return [proposal.proposerId];
         }
     },
-    [EVENT_TYPES.APPROVED_REQUEST_TO_JOIN]: {
+    [EVENT_TYPES.REQUEST_TO_JOIN__ACCEPTED]: {
         eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: async (proposal: any): Promise<string[]> => {
             return [proposal.proposerId];
         }
     },
-    [EVENT_TYPES.NEW_MEMBER]: {
+    [EVENT_TYPES.REQUEST_TO_JOIN_EXECUTED]: {
+        eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+        notifyUserFilter: async (proposal: any): Promise<string[]> => {
+            return [proposal.proposerId];
+        }
+    },
+    [EVENT_TYPES.FUNDING_REQUEST_EXECUTED]: {
         eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: async (proposal: any): Promise<string[]> => {

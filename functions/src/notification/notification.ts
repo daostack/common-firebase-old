@@ -148,7 +148,7 @@ export const notifyData: Record<string, IEventData> = {
     },
     
   },
-  [EVENT_TYPES.APPROVED_PROPOSAL] : {
+  [EVENT_TYPES.FUNDING_REQUEST_ACCEPTED] : {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
         const proposalData = (await getProposalById(objectId)).data();
@@ -166,7 +166,7 @@ export const notifyData: Record<string, IEventData> = {
         }
     },
   },
-  [EVENT_TYPES.APPROVED_REQUEST_TO_JOIN]: {
+  [EVENT_TYPES.REQUEST_TO_JOIN__ACCEPTED]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
         const proposalData = (await getProposalById(objectId)).data();
@@ -178,7 +178,7 @@ export const notifyData: Record<string, IEventData> = {
     notification: async ( {commonData} ) => {
         return {
             title: 'Congrats!',
-            body: `Your request to join "${commonData.name}" was accepted, you are now a member!`,
+            body: `Your request to join "${commonData.name}" was accepted!`, //, you are now a member!`, // @question is the user really a member at this point, we need to wait for bot
             image: commonData.metadata.image || ''
         }
     },
@@ -200,7 +200,54 @@ export const notifyData: Record<string, IEventData> = {
             image: commonData.metadata.image || ''
         }
     },
-  }
+  },
+  [EVENT_TYPES.REQUEST_TO_JOIN_EXECUTED]: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    data: async (objectId: string) => {
+        const proposalData = (await getProposalById(objectId)).data();
+        return { 
+          commonData : (await getDaoById(proposalData.dao)).data()
+        }
+    },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    notification: async ( {commonData} ) => {
+        return {
+            title: 'Congrats!',
+            body: `You are now a member in common "${commonData.name}"!`,
+            image: commonData.metadata.image || ''
+        }
+    },
+  },
+  [EVENT_TYPES.FUNDING_REQUEST_EXECUTED] : {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    data: async (objectId: string) => {
+        const proposalData = (await getProposalById(objectId)).data();
+        return { 
+          proposalData,
+          commonData : (await getDaoById(proposalData.dao)).data()
+        }
+    },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    notification: async ( {proposalData , commonData} ) => {
+        return {
+            title: 'You got funding!',
+            body: `You got $${proposalData.fundingRequest.amount}, you can now proceed with your proposal for "${commonData.name}".`,
+            image: commonData.metadata.image || ''
+        }
+    },
+  },
+  /*
+      email: ( {commonData} ) => {
+      return {
+        templateKey: 'userCommonFeatured',
+        emailStubs: {
+            commonName: commonData.name,
+            commonId: commonData.id,
+            commonLink: Utils.getCommonLink(commonData.id)
+        }
+      }
+    },
+   */
   // TODO: We don't have defined notification for the rejected funding proposal. Ask if we need that.
   //
   // [EVENT_TYPES.REJECTED_PROPOSAL]: {

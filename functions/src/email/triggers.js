@@ -31,11 +31,11 @@ exports.watchForExecutedProposals = functions.firestore
       try {
         const amount = proposal.description.funding;
 
-        await createEvent({
+        await createEvent({// TODO should be an email later
           userId: proposal.proposerId,
           objectId: proposal.id,
           createdAt: new Date(),
-          type: EVENT_TYPES.APPROVED_REQUEST_TO_JOIN // your request was approved, but you're not a member yet
+          type: EVENT_TYPES.REQUEST_TO_JOIN__ACCEPTED // your request was approved, but you're not a member yet
         })
 
         console.log(`Minting ${amount} tokens to ${proposal.dao}`)
@@ -73,12 +73,12 @@ exports.watchForExecutedProposals = functions.firestore
 
       const userData = await Utils.getUserById(proposal.proposerId);
       let daoData = await Utils.getCommonById(proposal.dao);
-
-      await createEvent({
+      // THIS IS BEING CREATED TWICE IN DATABASE
+      await createEvent({ // TODO make this event an email after fix
         userId: proposal.proposerId,
         objectId: proposal.id,
         createdAt: new Date(),
-        type: EVENT_TYPES.APPROVED_PROPOSAL // funding approved, but not processed yet
+        type: EVENT_TYPES.FUNDING_REQUEST_ACCEPTED // funding approved, but not processed yet
       })
     }
 
