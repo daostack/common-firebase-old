@@ -4,7 +4,6 @@ import { responseExecutor } from '../util/responseExecutor';
 import { commonApp, commonRouter } from '../util/commonApp';
 
 import { createCirclePayCard, assignCard } from './createCirclePayCard';
-import { createPayment } from './createPayment';
 import { encryption } from './circlepay';
 
 const runtimeOptions = {
