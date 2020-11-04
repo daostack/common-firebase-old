@@ -148,40 +148,67 @@ export const notifyData: Record<string, IEventData> = {
     },
     
   },
+
   [EVENT_TYPES.FUNDING_REQUEST_ACCEPTED] : {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
         const proposalData = (await getProposalById(objectId)).data();
         return { 
           proposalData,
-          commonData : (await getDaoById(proposalData.dao)).data()
+          commonData : (await getDaoById(proposalData.dao)).data(),
+          userData: (await getUserById(proposalData.proposerId)).data()
         }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    notification: async ( {proposalData , commonData} ) => {
+    /*notification: async ( {proposalData , commonData} ) => {
         return {
             title: 'Your funding proposal was approved!',
-            body: `A funding proposal for ${proposalData.fundingRequest.amount} was approved by "${commonData.name}".`,
+            body: `A funding proposal for ${proposalData.fundingRequest.amount} was approved in "${commonData.name}".`,
             image: commonData.metadata.image || ''
         }
-    },
+    },*/
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    email: ({ commonData, userData } ) => {
+        return {
+          to: userData.email,
+          templateKey: 'userFundingRequestAccepted',
+          emailStubs: {
+            name: userData.displayName,
+            link: Utils.getCommonLink(commonData.id),
+            commonName: commonData.metadata.name
+          }
+        }
+      }
   },
   [EVENT_TYPES.REQUEST_TO_JOIN__ACCEPTED]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
         const proposalData = (await getProposalById(objectId)).data();
         return { 
-          commonData : (await getDaoById(proposalData.dao)).data()
+          commonData : (await getDaoById(proposalData.dao)).data(),
+          userData: (await getUserById(proposalData.proposerId)).data()
         }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    notification: async ( {commonData} ) => {
+    /*notification: async ( {commonData} ) => {
         return {
             title: 'Congrats!',
             body: `Your request to join "${commonData.name}" was accepted!`, //, you are now a member!`, // @question is the user really a member at this point, we need to wait for bot
             image: commonData.metadata.image || ''
         }
-    },
+    },*/
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    email: ({ commonData, userData } ) => {
+        return {
+          to: userData.email,
+          templateKey: 'userJoinedSuccess', // this should be userRequestToJoinAccepted (do we need this then?), joinedSuccess should be when requestToJoin executed (see graphql/triggers) 
+          emailStubs: {
+            name: userData.displayName,
+            link: Utils.getCommonLink(commonData.id),
+            commonName: commonData.metadata.name
+          }
+        }
+      }
   },
   
   [EVENT_TYPES.REJECTED_REQUEST_TO_JOIN]: {

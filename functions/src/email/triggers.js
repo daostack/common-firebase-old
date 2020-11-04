@@ -66,9 +66,10 @@ exports.watchForExecutedProposals = functions.firestore
 
     if (
       proposal.name === PROPOSAL_TYPE.FundingRequest &&
-      proposal.executed !== previousProposal.executed &&
+      /*proposal.executed !== previousProposal.executed &&
       proposal.winningOutcome === 1 &&
-      Boolean(proposal.executed)
+      Boolean(proposal.executed)*/
+      proposal.votesFor > previousProposal.votesFor
     ) {
 
       const userData = await Utils.getUserById(proposal.proposerId);

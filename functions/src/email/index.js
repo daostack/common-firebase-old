@@ -26,8 +26,10 @@ const templates = {
   userCommonCreated,
   userCommonFeatured,
   userFundingRequestAccepted,
+  //userFundingRequestSuccess, // for when funding request is executed
   userJoinedButFailedPayment,
-  userJoinedSuccess,
+  userJoinedSuccess, // this is for when requestToJoin executed
+  //userRequestToJoinAccepted // requestToJoin approved
   adminJoinedButPaymentFailed,
   adminPayInSuccess
 };
