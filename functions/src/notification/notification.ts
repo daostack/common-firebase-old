@@ -9,10 +9,6 @@ import { getDiscussionMessageById } from '../db/discussionMessagesDb';
 
 const messaging = admin.messaging();
 
-export enum NOTIFICATION_TYPES {
-  CREATION_MESSAGE = 'creationMessage',
-}
-
 export interface INotification {
   send: any
 }
@@ -211,7 +207,7 @@ export const notifyData: Record<string, IEventData> = {
         }
     },
   },
-  [NOTIFICATION_TYPES.CREATION_MESSAGE]: {
+  [EVENT_TYPES.MESSAGE_CREATED]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (messageId: string) => {
         const message = (await getDiscussionMessageById(messageId)).data();
