@@ -100,7 +100,7 @@ export const notifyData: Record<string, IEventData> = {
         }
     }
   },
-  [EVENT_TYPES.CREATION_PROPOSAL] : {
+  [EVENT_TYPES.FUNDING_REQUEST_CREATED] : {
       // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       data: async (objectId: string) => {
           const proposalData = (await getProposalById(objectId)).data();
@@ -313,8 +313,12 @@ export default new class Notification implements INotification {
 
     // @question Ask about this rule "promise/always-return". It is kinda useless so we may disable it globally?
     // eslint-disable-next-line promise/always-return
-    const messageSent: admin.messaging.MessagingDevicesResponse = await messaging.sendToDevice(tokens, payload, options);
-    console.log('Send Success', messageSent);
+    if (tokens) {
+      const messageSent: admin.messaging.MessagingDevicesResponse = await messaging.sendToDevice(tokens, payload, options);
+      console.log('Send Success', messageSent);
+    } else {
+      console.log('Send failure: Tokens undefined');
+    }
   }
 
   async sendToAllUsers(title: string, body: string, image = '') {

@@ -39,7 +39,7 @@ exports.newProposalCreated = functions
           userId: proposer.uid,
           objectId: proposal.id,
           createdAt: new Date(),
-          type: EVENT_TYPES.CREATION_PROPOSAL
+          type: EVENT_TYPES.FUNDING_REQUEST_CREATED
         });
     }
   })

@@ -10,7 +10,7 @@ export enum EVENT_TYPES {
     //CREATION notifications
     CREATION_COMMON = 'creationCommon',
     CREATION_COMMON_FAILED = 'creationCommonFailed',
-    CREATION_PROPOSAL = 'creationProposal',
+    FUNDING_REQUEST_CREATED = 'fundingRequestCreated',
     CREATION_REQUEST_TO_JOIN = 'creationReqToJoin',
     //ACCEPTED notifications
     REQUEST_TO_JOIN__ACCEPTED = 'requestToJoinAccepted',
@@ -42,7 +42,7 @@ export const eventData: Record<string, IEventData> = {
             return [common.members[0].userId];
         }
     },
-    [EVENT_TYPES.CREATION_PROPOSAL]: {
+    [EVENT_TYPES.FUNDING_REQUEST_CREATED]: {
         eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: async (proposal: any): Promise<string[]> => {
