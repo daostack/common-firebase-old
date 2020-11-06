@@ -8,7 +8,7 @@ const { PROPOSAL_TYPE } = require('../util/util');
 
 
 const emailClient = require('.');
-// this is being triggered twice and causes duplicate events to be created
+
 exports.watchForExecutedProposals = functions.firestore
   .document('/proposals/{id}')
   .onUpdate(async (change) => {
@@ -31,11 +31,11 @@ exports.watchForExecutedProposals = functions.firestore
       try {
         const amount = proposal.description.funding;
 
-        await createEvent({// TODO should be an email later
+        await createEvent({
           userId: proposal.proposerId,
           objectId: proposal.id,
           createdAt: new Date(),
-          type: EVENT_TYPES.REQUEST_TO_JOIN__ACCEPTED // your request was approved, but you're not a member yet
+          type: EVENT_TYPES.REQUEST_TO_JOIN__ACCEPTED 
         })
 
         console.log(`Minting ${amount} tokens to ${proposal.dao}`)
@@ -74,12 +74,11 @@ exports.watchForExecutedProposals = functions.firestore
 
       const userData = await Utils.getUserById(proposal.proposerId);
       let daoData = await Utils.getCommonById(proposal.dao);
-      // THIS IS BEING CREATED TWICE IN DATABASE
-      await createEvent({ // TODO make this event an email after fix
+      await createEvent({
         userId: proposal.proposerId,
         objectId: proposal.id,
         createdAt: new Date(),
-        type: EVENT_TYPES.FUNDING_REQUEST_ACCEPTED // funding approved, but not processed yet
+        type: EVENT_TYPES.FUNDING_REQUEST_ACCEPTED
       })
     }
 
