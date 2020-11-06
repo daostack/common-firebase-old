@@ -1,9 +1,9 @@
 const { db } = require('../settings.js');
 const COLLECTION_NAME = 'payments';
 
-const getPayout = async () => {
+async function getPayout() {
     const data = await db.collection(COLLECTION_NAME).get();
-    return data
+    return data.docs.map(doc => doc.data())
 
 }
 module.exports = {
