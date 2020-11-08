@@ -120,7 +120,7 @@ class Utils {
   async getPaymentById(paymentId) {
     const paymentRef = admin.firestore().collection('payments').doc(paymentId)
     if (!paymentRef.docs) {
-      throw new CommonError(CFError.emptyCardData, `Could not find payment with paymentId ${paymentId}.`);
+      throw new CommonError(CFError.emptyPaymentData, `Could not find payment with paymentId ${paymentId}.`);
     }
     const paymentData = paymentRef.docs.map(doc => doc.data())[0];
     return paymentData;
