@@ -125,15 +125,18 @@ export const notifyData: Record<string, IEventData> = {
   [EVENT_TYPES.COMMON_WHITELISTED] : {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
+      const commonData = (await getDaoById(objectId)).data();
         return { 
-          commonData : (await getDaoById(objectId)).data()
+          commonData,
+          userData: (await getUserById(commonData.members[0].userId)).data(),
         }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ( {commonData} ) => {
+    email: ( {commonData, userData} ) => {
       return {
         templateKey: 'userCommonFeatured',
         emailStubs: {
+            name: userData.displayName,
             commonName: commonData.name,
             commonId: commonData.id,
             commonLink: Utils.getCommonLink(commonData.id)
