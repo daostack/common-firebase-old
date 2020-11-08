@@ -1,5 +1,7 @@
 import { getDaoById } from '../db/daoDbService';
 import { getProposalById } from '../db/proposalDbService';
+import { getDiscussionMessageById } from '../db/discussionMessagesDb';
+import { getDiscussionById } from '../db/discussionDbService';
 
 interface IEventData {
     eventObject: (eventObjId: string) => any;
@@ -60,6 +62,15 @@ export const eventData: Record<string, IEventData> = {
             return [
               proposal.proposerId
             ];
+        }
+    },
+    [EVENT_TYPES.MESSAGE_CREATED]: {
+        eventObject: async (discussionMessageId: string): Promise<any> => (await getDiscussionMessageById(discussionMessageId)).data(),
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+        notifyUserFilter: async (discussionMessage: any): Promise<string[]> => {
+            const discussion = (await getDiscussionById(discussionMessage.discussionId)).data()
+            const common =(await getDaoById(discussion.commonId)).data();
+            return common.members.map(member => member.userId)
         }
     },
     [EVENT_TYPES.COMMON_WHITELISTED]: {
