@@ -14,7 +14,6 @@ exports.watchForExecutedProposals = functions.firestore
   .onUpdate(async (change) => {
     const proposal = change.after.data();
     const previousProposal = change.before.data();
-    console.log('proposal executed', proposal)
 
     if (
       proposal.executed !== previousProposal.executed &&
@@ -66,9 +65,6 @@ exports.watchForExecutedProposals = functions.firestore
 
     if (
       proposal.name === PROPOSAL_TYPE.FundingRequest &&
-      /*proposal.executed !== previousProposal.executed &&
-      proposal.winningOutcome === 1 &&
-      Boolean(proposal.executed)*/
       proposal.votesFor > previousProposal.votesFor
     ) {
 

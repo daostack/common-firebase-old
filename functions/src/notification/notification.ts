@@ -267,7 +267,6 @@ export const notifyData: Record<string, IEventData> = {
         }
     },
   },
-  },
   [EVENT_TYPES.MESSAGE_CREATED]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (messageId: string) => {

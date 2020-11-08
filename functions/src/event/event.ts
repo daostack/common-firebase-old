@@ -14,6 +14,7 @@ export enum EVENT_TYPES {
     CREATION_COMMON_FAILED = 'creationCommonFailed',
     FUNDING_REQUEST_CREATED = 'fundingRequestCreated',
     CREATION_REQUEST_TO_JOIN = 'creationReqToJoin',
+    MESSAGE_CREATED = 'messageCreated',
     //ACCEPTED notifications
     REQUEST_TO_JOIN__ACCEPTED = 'requestToJoinAccepted',
     FUNDING_REQUEST_ACCEPTED = 'fundingRequestAccepted',
