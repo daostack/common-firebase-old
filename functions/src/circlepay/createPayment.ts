@@ -60,7 +60,7 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
       },
       verification: 'none',
       source: {
-        id: cardData.cardId,
+        id: cardData.id,
         type: 'card'
       },
     }
