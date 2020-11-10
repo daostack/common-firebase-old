@@ -5,7 +5,7 @@ import graphqlTriggers from './graphql/util/triggers';
 import * as notification from './notification';
 import * as event from './event';
 import * as circlepayTriggers from './circlepay/triggers';
-import * as emailTriggers from './email/triggers';
+import emailTriggers from './email/triggers';
 import * as messageTriggers from './discussionMessage/triggers';
 
 import { createApp } from './creation';

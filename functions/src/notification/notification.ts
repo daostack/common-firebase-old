@@ -101,7 +101,7 @@ export const notifyData: Record<string, IEventData> = {
         }
     }
   },
-  [EVENT_TYPES.CREATION_PROPOSAL] : {
+  [EVENT_TYPES.FUNDING_REQUEST_CREATED] : {
       // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       data: async (objectId: string) => {
           const proposalData = (await getProposalById(objectId)).data();
@@ -125,15 +125,18 @@ export const notifyData: Record<string, IEventData> = {
   [EVENT_TYPES.COMMON_WHITELISTED] : {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
+      const commonData = (await getDaoById(objectId)).data();
         return { 
-          commonData : (await getDaoById(objectId)).data()
+          commonData,
+          userData: (await getUserById(commonData.members[0].userId)).data(),
         }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ( {commonData} ) => {
+    email: ( {commonData, userData} ) => {
       return {
         templateKey: 'userCommonFeatured',
         emailStubs: {
+            name: userData.displayName,
             commonName: commonData.name,
             commonId: commonData.id,
             commonLink: Utils.getCommonLink(commonData.id)
@@ -151,13 +154,15 @@ export const notifyData: Record<string, IEventData> = {
     },
     
   },
-  [EVENT_TYPES.APPROVED_PROPOSAL] : {
+
+  [EVENT_TYPES.FUNDING_REQUEST_ACCEPTED] : {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
         const proposalData = (await getProposalById(objectId)).data();
         return { 
           proposalData,
-          commonData : (await getDaoById(proposalData.dao)).data()
+          commonData : (await getDaoById(proposalData.dao)).data(),
+          userData: (await getUserById(proposalData.proposerId)).data()
         }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -169,26 +174,49 @@ export const notifyData: Record<string, IEventData> = {
             path: `ProposalScreen/${commonData.id}/${proposalData.id}`,
         }
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    email: ({ userData, proposalData } ) => {
+      return {
+        templateKey: 'userFundingRequestAccepted',
+        emailStubs: {
+          name: userData.displayName,
+          proposal: proposalData.description.title
+        }
+      }
+    }
   },
-  [EVENT_TYPES.APPROVED_REQUEST_TO_JOIN]: {
+  [EVENT_TYPES.REQUEST_TO_JOIN__ACCEPTED]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
         const proposalData = (await getProposalById(objectId)).data();
         return { 
-          commonData : (await getDaoById(proposalData.dao)).data()
+          proposalData,
+          commonData : (await getDaoById(proposalData.dao)).data(),
+          userData: (await getUserById(proposalData.proposerId)).data()
         }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     notification: async ( {commonData} ) => {
         return {
             title: 'Congrats!',
-            body: `Your request to join "${commonData.name}" was accepted, you are now a member!`,
+            body: `Your request to join "${commonData.name}" was accepted!`,
             image: commonData.metadata.image || '',
             path: `CommonProfile/${commonData.id}`
         }
     },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    email: ({ commonData, userData } ) => {
+      return {
+          templateKey: 'userJoinedSuccess', // userRequestToJoinAccepted?
+          emailStubs: {
+            name: userData.displayName,
+            commonLink: Utils.getCommonLink(commonData.id),
+            commonName: commonData.metadata.name
+          }
+        }
+     }
   },
-  
+
   [EVENT_TYPES.REJECTED_REQUEST_TO_JOIN]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
@@ -204,6 +232,41 @@ export const notifyData: Record<string, IEventData> = {
             body: `Don't give up, there are plenty of other Commons you can join.`,
             image: commonData.metadata.image || '',
             path: `CommonProfile/${commonData.id}`
+        }
+    },
+  },
+  [EVENT_TYPES.REQUEST_TO_JOIN_EXECUTED]: {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    data: async (objectId: string) => {
+        const proposalData = (await getProposalById(objectId)).data();
+        return { 
+          commonData : (await getDaoById(proposalData.dao)).data()
+        }
+    },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    notification: async ( {commonData} ) => {
+        return {
+            title: 'Congrats!',
+            body: `You are now a member in common "${commonData.name}"!`,
+            image: commonData.metadata.image || ''
+        }
+    },
+  },
+  [EVENT_TYPES.FUNDING_REQUEST_EXECUTED] : {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    data: async (objectId: string) => {
+        const proposalData = (await getProposalById(objectId)).data();
+        return { 
+          proposalData,
+          commonData : (await getDaoById(proposalData.dao)).data()
+        }
+    },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    notification: async ( {proposalData , commonData} ) => {
+        return {
+            title: 'You got funding!',
+            body: `You got $${proposalData.fundingRequest.amount}, you can now proceed with your proposal for "${commonData.name}".`,
+            image: commonData.metadata.image || ''
         }
     },
   },
@@ -268,8 +331,12 @@ export default new class Notification implements INotification {
 
     // @question Ask about this rule "promise/always-return". It is kinda useless so we may disable it globally?
     // eslint-disable-next-line promise/always-return
-    const messageSent: admin.messaging.MessagingDevicesResponse = await messaging.sendToDevice(tokens, payload, options);
-    console.log('Send Success', messageSent);
+    if (tokens) {
+      const messageSent: admin.messaging.MessagingDevicesResponse = await messaging.sendToDevice(tokens, payload, options);
+      console.log('Send Success', messageSent);
+    } else {
+      console.log('Send failure: Tokens undefined');
+    }
   }
 
   async sendToAllUsers(title: string, body: string, image = '', path: string) {
