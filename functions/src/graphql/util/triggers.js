@@ -39,7 +39,7 @@ exports.newProposalCreated = functions
           userId: proposer.uid,
           objectId: proposal.id,
           createdAt: new Date(),
-          type: EVENT_TYPES.CREATION_PROPOSAL
+          type: EVENT_TYPES.FUNDING_REQUEST_CREATED
         });
     }
   })
@@ -60,7 +60,7 @@ exports.watchForNewMembers = functions.firestore
         userId: data.proposerId,
         objectId: data.id,
         createdAt: new Date(),
-        type: EVENT_TYPES.APPROVED_REQUEST_TO_JOIN
+        type: EVENT_TYPES.REQUEST_TO_JOIN_EXECUTED // you are a member now
       });
       
       try {
@@ -82,7 +82,7 @@ exports.watchForNewMembers = functions.firestore
         userId: data.proposerId,
         objectId: data.id,
         createdAt: new Date(),
-        type: EVENT_TYPES.APPROVED_PROPOSAL
+        type: EVENT_TYPES.FUNDING_REQUEST_EXECUTED // funding actuall processed
       });
       
       try {

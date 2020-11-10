@@ -2,50 +2,44 @@ const functions = require('firebase-functions');
 const { updateDAOBalance } = require("../db/daoDbService");
 const { minterToken } = require('../relayer/util/minterToken')
 const { Utils } = require('../util/util');
+const { createEvent } = require('../db/eventDbService');
+const { EVENT_TYPES } = require('../event/event');
+const { PROPOSAL_TYPE } = require('../util/util');
+
 
 const emailClient = require('.');
 
 exports.watchForExecutedProposals = functions.firestore
   .document('/proposals/{id}')
   .onUpdate(async (change) => {
-    const data = change.after.data();
-    const previousData = change.before.data();
+    const proposal = change.after.data();
+    const previousProposal = change.before.data();
 
     if (
-      data.executed !== previousData.executed &&
-      data.executed === true &&
-      data.winningOutcome === 1 
+      proposal.executed !== previousProposal.executed &&
+      proposal.executed === true &&
+      proposal.winningOutcome === 1 &&
+      proposal.name === PROPOSAL_TYPE.Join
       // && data.description.preAuthId
     ) {
       console.log(
         'Proposal EXECUTED and WINNING OUTCOME IS 1 -> INITIATING PAYMENT'
       );
-      const userData = await Utils.getUserById(data.proposerId);
-      let daoData = await Utils.getCommonById(data.dao);
+      const userData = await Utils.getUserById(proposal.proposerId);
+      let daoData = await Utils.getCommonById(proposal.dao);
       try {
-        const amount = data.description.funding;
-        await Promise.all([
-          emailClient.sendTemplatedEmail({
-            to: userData.email,
-            templateKey: "userJoinedSuccess",
-            emailStubs: {
-              name: userData.displayName,
-              commonName: daoData.name,
-              commonLink: Utils.getCommonLink(daoData.id)
-            }
-          }),
-          emailClient.sendTemplatedEmail({
-            to: 'admin',
-            templateKey: 'adminPayInSuccess',
-            emailStubs: {
-              proposalId: data.id
-            }
-          })
-        ]);
+        const amount = proposal.description.funding;
 
-        console.log(`Minting ${amount} tokens to ${data.dao}`)
-        await minterToken(data.dao, amount)
-        await updateDAOBalance(data.dao);
+        await createEvent({
+          userId: proposal.proposerId,
+          objectId: proposal.id,
+          createdAt: new Date(),
+          type: EVENT_TYPES.REQUEST_TO_JOIN__ACCEPTED 
+        })
+
+        console.log(`Minting ${amount} tokens to ${proposal.dao}`)
+        await minterToken(proposal.dao, amount)
+        await updateDAOBalance(proposal.dao);
         return change.after.ref.set(
           {
             paymentStatus: 'paid',
@@ -62,52 +56,26 @@ exports.watchForExecutedProposals = functions.firestore
         });
       }
     } else if (
-      data.executed !== previousData.executed &&
-      data.executed === true &&
-      data.winningOutcome === 0
+      proposal.executed !== previousProposal.executed &&
+      proposal.executed === true &&
+      proposal.winningOutcome === 0
     ) {
        // await cancelPreauthorizedPayment(data.description.preAuthId);
     }
 
     if (
-      data.name === "FundingRequest" &&
-      data.executed !== previousData.executed &&
-      data.winningOutcome === 1 &&
-      Boolean(data.executed)
+      proposal.name === PROPOSAL_TYPE.FundingRequest &&
+      proposal.votesFor > previousProposal.votesFor
     ) {
-      const userData = await Utils.getUserById(data.proposerId);
-      let daoData = await Utils.getCommonById(data.dao);
 
-      // Template fundingRequestAccepted (admin & user)
-      await Promise.all([
-        emailClient.sendTemplatedEmail({
-          to: userData.email,
-          templateKey: 'userFundingRequestAccepted',
-          emailStubs: {
-            name: userData.displayName,
-            proposal: data.description.title
-          }
-        }),
-        emailClient.sendTemplatedEmail({
-          to: 'admin',
-          templateKey: 'adminFundingRequestAccepted',
-          emailStubs: {
-            userId: userData.uid,
-            userFullName: userData.displayName,
-            userEmail: userData.email,
-            commonName: daoData.name,
-            commonBalance: daoData.balance,
-            commonLink: Utils.getCommonLink(daoData.id),
-            commonId: daoData.id,
-            proposalId: data.id,
-            paymentAmount: data.fundingRequest.amount,
-            submittedOn: new Date(data.createdAt * 1000).toDateString(),
-            passedOn: new Date(data.executedAt * 1000).toDateString(),
-            log: 'No additional information available',
-            paymentId: 'Not available'
-          }
-        })
-      ])
+      const userData = await Utils.getUserById(proposal.proposerId);
+      let daoData = await Utils.getCommonById(proposal.dao);
+      await createEvent({
+        userId: proposal.proposerId,
+        objectId: proposal.id,
+        createdAt: new Date(),
+        type: EVENT_TYPES.FUNDING_REQUEST_ACCEPTED
+      })
     }
 
     return true;
