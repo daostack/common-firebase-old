@@ -28,6 +28,8 @@ export enum EVENT_TYPES {
     REJECTED_PROPOSAL = 'rejectedProposal',
     //COMMON 
     COMMON_WHITELISTED = 'commonWhitelisted',
+    //PAYMENT
+    PAYMENT_FAILED = 'paymentFailed',
 }
 
 export const eventData: Record<string, IEventData> = {
@@ -122,6 +124,12 @@ export const eventData: Record<string, IEventData> = {
         notifyUserFilter: async (proposal: any): Promise<string[]> => {
             return [proposal.proposerId];
         }
-    }
-    
+    },
+    [EVENT_TYPES.PAYMENT_FAILED]: {
+        eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+        notifyUserFilter: async (proposal: any): Promise<string[]> => {
+           return [proposal.proposerId];
+        }
+    } 
 }
