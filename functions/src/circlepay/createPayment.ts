@@ -55,7 +55,7 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
         ipAddress,
       },
       amount: {
-        amount: '5.01', //`${funding}`,
+        amount: `${funding}`,
         currency: 'USD',
       },
       verification: 'none',
