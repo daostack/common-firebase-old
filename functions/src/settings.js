@@ -15,6 +15,9 @@ const circlePayApi = env.circlepay.apiUrl;
 
 const adminKeys = require('./env/adminsdk-keys.json');
 
+const {SecretManagerServiceClient} = require('@google-cloud/secret-manager');
+const secretClient = new SecretManagerServiceClient();
+
 if(env.environment === 'dev') {
   admin.initializeApp();
 } else {
@@ -23,6 +26,13 @@ if(env.environment === 'dev') {
     databaseURL: databaseURL
   });
 }
+
+const getSecret = async (secretName) => {
+  console.log('env.secretManagerProject', env.secretManagerProject)
+  const secret = `projects/${env.secretManagerProject}/secrets/${secretName}/versions/latest`;
+  let [secretResult] = await secretClient.accessSecretVersion({name: secret})
+  return secretResult.payload.data.toString();
+};
 
 const db = admin.firestore();
 
@@ -149,4 +159,5 @@ module.exports = {
     db,
     getArc,
     circlePayApi,
+    getSecret,
 }
