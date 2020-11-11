@@ -3,7 +3,7 @@ import { createAPayment } from './circlepay';
 import { updateCard } from '../db/cardDb';
 import { updatePayment, pollPaymentStatus } from '../db/paymentDb';
 import {ethers} from 'ethers';
-import v4 from 'uuid'; // this library is gone from package.json, so throws error
+import {v4} from 'uuid';
 
 interface IPaymentResp {
   id: string,
