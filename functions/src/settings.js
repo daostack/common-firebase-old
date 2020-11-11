@@ -28,7 +28,6 @@ if(env.environment === 'dev') {
 }
 
 const getSecret = async (secretName) => {
-  console.log('env.secretManagerProject', env.secretManagerProject)
   const secret = `projects/${env.secretManagerProject}/secrets/${secretName}/versions/latest`;
   let [secretResult] = await secretClient.accessSecretVersion({name: secret})
   return secretResult.payload.data.toString();
