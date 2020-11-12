@@ -4,16 +4,17 @@ import { externalRequestExecutor } from '../util';
 import { ErrorCodes } from '../util/constants';
 const CIRCLEPAY_APIKEY = 'CIRCLEPAY_APIKEY';
 
-const getOptions = async () => {
-  const apiKey = await getSecret(CIRCLEPAY_APIKEY);
-  return {
-    headers: {
-      accept: 'application/json',
-     'Content-Type': 'application/json',
-      authorization: `Bearer ${apiKey}`
-    },
-  }
-}
+const getOptions = async () => (
+  getSecret(CIRCLEPAY_APIKEY).then((apiKey) => (
+    {
+      headers: {
+        accept: 'application/json',
+       'Content-Type': 'application/json',
+        authorization: `Bearer ${apiKey}`
+      }
+    })
+  )
+)
 
 export interface ICardData {
 	billingDetails: {
