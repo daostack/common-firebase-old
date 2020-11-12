@@ -25,18 +25,44 @@ const backofficeRouter = commonRouter();
 backofficeRouter.get('/payout', async (req, res, next) => {
   await responseExecutor(
     async () => {
-      let values = [];
+      let values = [[
+        'Proposal Id',
+        'Amount',
+        'Approval data',
+        'User UID',
+        'User email',
+        'First name',
+        'Last name',
+        'Common id',
+        'Common name',
+        'Payment id',
+        'Payment status',
+        'Payment amount',
+        'Fees',
+        'Payment creation date',
+        'Payment updated'
+      ]];
 
       const data = await getPayout();
 
       for (var key in data) {
           if (data.hasOwnProperty(key)) {
               let cells = []
-              cells.push(key)
-              console.log(data[key])
-              cells.push(data[key].proposerId)
               cells.push(data[key].id)
-              cells.push(data[key].executedAt)
+              cells.push(data[key].fundingRequest.amount)
+              cells.push(data[key].resolvedAt)
+              cells.push(data[key].proposerId)
+              cells.push(data[key].email)
+              cells.push(data[key].firstName)
+              cells.push(data[key].lastName)
+              cells.push('common id')
+              cells.push('common name')
+              cells.push('payment id')
+              cells.push('payment status')
+              cells.push('payment amount')
+              cells.push('fees')
+              cells.push('payment creation date')
+              cells.push('payment updated')
               values.push(cells)
           }
       }
@@ -48,7 +74,7 @@ backofficeRouter.get('/payout', async (req, res, next) => {
       await sheets.spreadsheets.values.update({
           auth: jwtClient,
           spreadsheetId: '1muC-dGhS_MOEZYKSTNyMthG1NHlo8-4mlb_K5ExD7QM',
-          range: 'Test!A2',  // update this range of cells
+          range: 'Test!A1',  // update this range of cells
           valueInputOption: 'RAW',
           requestBody: resource
       }, {})
