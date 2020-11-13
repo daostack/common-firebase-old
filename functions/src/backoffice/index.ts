@@ -48,21 +48,21 @@ backofficeRouter.get('/payout', async (req, res, next) => {
       for (var key in data) {
           if (data.hasOwnProperty(key)) {
               let cells = []
-              cells.push(data[key].id)
+              cells.push(data[key].proposalId)
               cells.push(data[key].fundingRequest.amount)
               cells.push(data[key].resolvedAt)
               cells.push(data[key].proposerId)
               cells.push(data[key].email)
               cells.push(data[key].firstName)
               cells.push(data[key].lastName)
-              cells.push('common id')
-              cells.push('common name')
-              cells.push('payment id')
-              cells.push('payment status')
-              cells.push('payment amount')
+              cells.push(data[key].daoId)
+              cells.push(data[key].name)
+              cells.push(data[key].paymentId)
+              cells.push(data[key].status)
+              cells.push(data[key].amount? `${data[key].amount.amount} ${data[key].amount.currency}` : '' )
               cells.push('fees')
-              cells.push('payment creation date')
-              cells.push('payment updated')
+              cells.push(data[key].creationDate)
+              cells.push(data[key].updateDate)
               values.push(cells)
           }
       }
