@@ -25,7 +25,7 @@ const backofficeRouter = commonRouter();
 backofficeRouter.get('/payout', async (req, res, next) => {
   await responseExecutor(
     async () => {
-      let values = [[
+      const values = [[
         'Proposal Id',
         'Amount',
         'Approval data',
@@ -45,9 +45,10 @@ backofficeRouter.get('/payout', async (req, res, next) => {
 
       const data = await getPayout();
 
-      for (var key in data) {
+      for (const key in data) {
+          // eslint-disable-next-line no-prototype-builtins
           if (data.hasOwnProperty(key)) {
-              let cells = []
+              const cells = []
               cells.push(data[key].proposalId)
               cells.push(data[key].fundingRequest.amount)
               cells.push(data[key].resolvedAt)
@@ -94,13 +95,13 @@ backofficeRouter.get('/balance', async (req, res, next) => {
     async () => {
       
       const data = await getBalance();
-      let values = [[
+      const values = [[
         'Account',
         'Available',
         'Unsettled',
       ]];
       for (let i = 0; i<data.available.length; i++){
-        let cells = []
+        const cells = []
         cells.push(i+1)
         if (data.available[i]) cells.push(parseFloat(data.available[i].amount)); else cells.push(0);
         if (data.unsettled[i]) cells.push(parseFloat(data.unsettled[i].amount)); else cells.push(0);
