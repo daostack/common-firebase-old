@@ -102,6 +102,15 @@ export const getPayment = async(paymentId: string) : Promise<any> => {
   });
 }
 
+export const getBalances = async() : Promise<any> => {
+  return await externalRequestExecutor(async () => {
+    return await axios.get(`${circlePayApi}/balances`, options)
+  }, {
+    errorCode: ErrorCodes.CirclePayError,
+    userMessage: 'Call to CirclePay failed. Please try again later and if the issue persist contact us.'
+  });
+}
+
 
 
 

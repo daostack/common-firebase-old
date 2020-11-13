@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 
 import { commonApp, commonRouter } from '../util/commonApp';
 import { responseExecutor } from '../util/responseExecutor';
-import { getPayout } from './backoffice';
+import { getPayout, getBalance } from './backoffice';
 import { google } from 'googleapis'
 import serviceAccount from '../env/adminsdk-keys.json';
 
@@ -74,7 +74,7 @@ backofficeRouter.get('/payout', async (req, res, next) => {
       await sheets.spreadsheets.values.update({
           auth: jwtClient,
           spreadsheetId: '1muC-dGhS_MOEZYKSTNyMthG1NHlo8-4mlb_K5ExD7QM',
-          range: 'Test!A1',  // update this range of cells
+          range: 'PAYOUT!A1',  // update this range of cells
           valueInputOption: 'RAW',
           requestBody: resource
       }, {})
@@ -85,6 +85,48 @@ backofficeRouter.get('/payout', async (req, res, next) => {
       res,
       next,
       successMessage: `Fetch PAYOUT succesfully!`
+    }
+  );
+});
+
+backofficeRouter.get('/balance', async (req, res, next) => {
+  await responseExecutor(
+    async () => {
+      
+      const data = await getBalance();
+      let values = [[
+        'Account',
+        'Available',
+        'Unsettled',
+      ]];
+      for (let i = 0; i<data.available.length; i++){
+        let cells = []
+        cells.push(i+1)
+        if (data.available[i]) cells.push(parseFloat(data.available[i].amount)); else cells.push(0);
+        if (data.unsettled[i]) cells.push(parseFloat(data.unsettled[i].amount)); else cells.push(0);
+        values.push(cells)
+      }
+
+      const resource = {
+        values,
+      };
+
+
+      await jwtAuthPromise
+      await sheets.spreadsheets.values.update({
+          auth: jwtClient,
+          spreadsheetId: '1muC-dGhS_MOEZYKSTNyMthG1NHlo8-4mlb_K5ExD7QM',
+          range: 'CIRCLE_BALANCES!A1',  // update this range of cells
+          valueInputOption: 'RAW',
+          requestBody: resource
+      }, {})
+
+      return data;
+    }, {
+      req,
+      res,
+      next,
+      successMessage: `Fetch BALANCE succesfully!`
     }
   );
 });

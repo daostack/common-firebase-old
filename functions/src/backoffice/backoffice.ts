@@ -1,5 +1,12 @@
 import { db } from '../settings.js'
+import { getBalances } from '../circlepay/circlepay';
 
+
+
+export async function getBalance() {
+    const {data: {data}} = await getBalances();
+    return data
+}
 export async function getPayout() {
     const COLLECTION_NAME = 'proposals';
 
