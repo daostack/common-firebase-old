@@ -16,12 +16,9 @@ export const authenticate: RequestHandler = async (req, res, next) => {
       // claims you added while creating the custom token and adds them
       // to the express request object so they are easily accessible
       // from everywhere
-      // req.user = await auth().verifyIdToken(req.headers.authorization);
-
-      req.user = { uid: 'H5ZkcKBX5eXXNyBiPaph8EHCiax3' };
+      req.user = await auth().verifyIdToken(req.headers.authorization);
 
       return next();
-
     } catch (error) {
       throw new CommonError('An error occurred while authenticating the user', {
         userMessage: 'An error occurred during the authentication. Please log out and sign in again!',
