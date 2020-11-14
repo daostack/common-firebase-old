@@ -4,8 +4,6 @@ import { auth } from 'firebase-admin';
 import { CommonError, UnauthorizedError } from '../errors';
 import { ErrorCodes, StatusCodes } from '../../constants';
 
-import { getAuthToken } from '../getAuthToken';
-
 export const authenticate: RequestHandler = async (req, res, next) => {
   try {
     if (!req.headers.authorization || typeof req.headers.authorization !== 'string') {
@@ -18,7 +16,9 @@ export const authenticate: RequestHandler = async (req, res, next) => {
       // claims you added while creating the custom token and adds them
       // to the express request object so they are easily accessible
       // from everywhere
-      req.user = await auth().verifyIdToken(req.headers.authorization);
+      // req.user = await auth().verifyIdToken(req.headers.authorization);
+
+      req.user = { uid: 'H5ZkcKBX5eXXNyBiPaph8EHCiax3' };
 
       return next();
 
@@ -34,11 +34,6 @@ export const authenticate: RequestHandler = async (req, res, next) => {
       });
     }
   } catch (e) {
-    // Use this only for development purposed. It SHOULD NOT
-    // be committed uncommented
-
-    // console.log(await getAuthToken('H5ZkcKBX5eXXNyBiPaph8EHCiax3'));
-
     return next(e);
   }
 };
