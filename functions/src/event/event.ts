@@ -1,7 +1,7 @@
-import { getDaoById } from '../db/daoDbService';
-import { getProposalById } from '../db/proposalDbService';
-import { getDiscussionMessageById } from '../db/discussionMessagesDb';
-import { getDiscussionById } from '../db/discussionDbService';
+import { getDaoById } from '../util/db/daoDbService';
+import { getProposalById } from '../util/db/proposalDbService';
+import { getDiscussionMessageById } from '../util/db/discussionMessagesDb';
+import { getDiscussionById } from '../util/db/discussionDbService';
 
 interface IEventData {
     eventObject: (eventObjId: string) => any;
@@ -12,20 +12,15 @@ export enum EVENT_TYPES {
     //CREATION notifications
     CREATION_COMMON = 'creationCommon',
     CREATION_COMMON_FAILED = 'creationCommonFailed',
-    FUNDING_REQUEST_CREATED = 'fundingRequestCreated',
-    CREATION_REQUEST_TO_JOIN = 'creationReqToJoin',
+    CREATION_PROPOSAL = 'creationProposal',
+    REQUEST_TO_JOIN_CREATED = 'creationReqToJoin',
     MESSAGE_CREATED = 'messageCreated',
-    //ACCEPTED notifications
-    REQUEST_TO_JOIN__ACCEPTED = 'requestToJoinAccepted',
-    FUNDING_REQUEST_ACCEPTED = 'fundingRequestAccepted',
-    // EXECUTED notifications
-    REQUEST_TO_JOIN_EXECUTED = 'requestToJoinExecuted',// create notification
-    FUNDING_REQUEST_EXECUTED = 'fundingRequestExecuted',
     //APPROVED notifications
-    APPROVED_PROPOSAL = 'approvedProposal',
+    REQUEST_TO_JOIN_ACCEPTED = 'approvedJoinRequest',
+    APPROVED_FUNDING_REQUEST = 'approvedFundingRequest',
     //REJECTED notifications
-    REJECTED_REQUEST_TO_JOIN = 'rejectedReqToJoin',
-    REJECTED_PROPOSAL = 'rejectedProposal',
+    REQUEST_TO_JOIN_REJECTED = 'rejectedJoinRequest',
+    REJECTED_FUNDING_REQUEST = 'rejectedFundingRequest',
     //COMMON 
     COMMON_WHITELISTED = 'commonWhitelisted',
     //PAYMENT
@@ -47,7 +42,7 @@ export const eventData: Record<string, IEventData> = {
             return [common.members[0].userId];
         }
     },
-    [EVENT_TYPES.FUNDING_REQUEST_CREATED]: {
+    [EVENT_TYPES.CREATION_PROPOSAL]: {
         eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: async (proposal: any): Promise<string[]> => {
@@ -58,7 +53,7 @@ export const eventData: Record<string, IEventData> = {
             return userFilter;
         }
     },
-    [EVENT_TYPES.CREATION_REQUEST_TO_JOIN]: {
+    [EVENT_TYPES.REQUEST_TO_JOIN_CREATED]: {
         eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: async (proposal: any): Promise<string[]> => {
@@ -83,42 +78,28 @@ export const eventData: Record<string, IEventData> = {
             return [dao.members[0].userId];
         }
     },
-    [EVENT_TYPES.FUNDING_REQUEST_ACCEPTED]: {
+    [EVENT_TYPES.APPROVED_FUNDING_REQUEST]: {
         eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: async (proposal: any): Promise<string[]> => {
             return [proposal.proposerId];
         }
     },
-    [EVENT_TYPES.REQUEST_TO_JOIN__ACCEPTED]: {
+    [EVENT_TYPES.REQUEST_TO_JOIN_ACCEPTED]: {
         eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: async (proposal: any): Promise<string[]> => {
             return [proposal.proposerId];
         }
     },
-    [EVENT_TYPES.REQUEST_TO_JOIN_EXECUTED]: {
+    [EVENT_TYPES.REJECTED_FUNDING_REQUEST]: {
         eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: async (proposal: any): Promise<string[]> => {
             return [proposal.proposerId];
         }
     },
-    [EVENT_TYPES.FUNDING_REQUEST_EXECUTED]: {
-        eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
-        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-        notifyUserFilter: async (proposal: any): Promise<string[]> => {
-            return [proposal.proposerId];
-        }
-    },
-    [EVENT_TYPES.REJECTED_REQUEST_TO_JOIN]: {
-        eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
-        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-        notifyUserFilter: async (proposal: any): Promise<string[]> => {
-            return [proposal.proposerId];
-        }
-    },
-    [EVENT_TYPES.REJECTED_PROPOSAL]: {
+    [EVENT_TYPES.REQUEST_TO_JOIN_REJECTED]: {
         eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: async (proposal: any): Promise<string[]> => {

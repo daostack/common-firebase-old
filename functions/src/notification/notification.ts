@@ -1,11 +1,11 @@
 import admin from 'firebase-admin';
 import { EVENT_TYPES } from "../event/event";
-import { env } from '../env';
-import { getDaoById } from '../db/daoDbService';
-import { getProposalById } from '../db/proposalDbService';
-import { getUserById } from '../db/userDbService';
+import { env } from '../constants';
+import { getDaoById } from '../util/db/daoDbService';
+import { getProposalById } from '../util/db/proposalDbService';
+import { getUserById } from '../util/db/userDbService';
 import { Utils } from '../util/util';
-import { getDiscussionMessageById } from '../db/discussionMessagesDb'; 
+import { getDiscussionMessageById } from '../util/db/discussionMessagesDb';
 
 const messaging = admin.messaging();
 
@@ -79,7 +79,7 @@ export const notifyData: Record<string, IEventData> = {
   //         }
   //     }
   // },
-  [EVENT_TYPES.CREATION_REQUEST_TO_JOIN] : {
+  [EVENT_TYPES.REQUEST_TO_JOIN_CREATED] : {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (proposalId: string) => {
         const proposalData = (await getProposalById(proposalId)).data();
@@ -101,7 +101,7 @@ export const notifyData: Record<string, IEventData> = {
         }
     }
   },
-  [EVENT_TYPES.FUNDING_REQUEST_CREATED] : {
+  [EVENT_TYPES.CREATION_PROPOSAL] : {
       // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       data: async (objectId: string) => {
           const proposalData = (await getProposalById(objectId)).data();
@@ -125,18 +125,15 @@ export const notifyData: Record<string, IEventData> = {
   [EVENT_TYPES.COMMON_WHITELISTED] : {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
-      const commonData = (await getDaoById(objectId)).data();
         return { 
-          commonData,
-          userData: (await getUserById(commonData.members[0].userId)).data(),
+          commonData : (await getDaoById(objectId)).data()
         }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ( {commonData, userData} ) => {
+    email: ( {commonData} ) => {
       return {
         templateKey: 'userCommonFeatured',
         emailStubs: {
-            name: userData.displayName,
             commonName: commonData.name,
             commonId: commonData.id,
             commonLink: Utils.getCommonLink(commonData.id)
@@ -154,15 +151,13 @@ export const notifyData: Record<string, IEventData> = {
     },
     
   },
-
-  [EVENT_TYPES.FUNDING_REQUEST_ACCEPTED] : {
+  [EVENT_TYPES.APPROVED_FUNDING_REQUEST] : {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
         const proposalData = (await getProposalById(objectId)).data();
         return { 
           proposalData,
-          commonData : (await getDaoById(proposalData.dao)).data(),
-          userData: (await getUserById(proposalData.proposerId)).data()
+          commonData : (await getDaoById(proposalData.dao)).data()
         }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -174,50 +169,27 @@ export const notifyData: Record<string, IEventData> = {
             path: `ProposalScreen/${commonData.id}/${proposalData.id}`,
         }
     },
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ({ userData, proposalData } ) => {
-      return {
-        templateKey: 'userFundingRequestAccepted',
-        emailStubs: {
-          name: userData.displayName,
-          proposal: proposalData.description.title
-        }
-      }
-    }
   },
-  [EVENT_TYPES.REQUEST_TO_JOIN__ACCEPTED]: {
+  [EVENT_TYPES.REQUEST_TO_JOIN_ACCEPTED]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
         const proposalData = (await getProposalById(objectId)).data();
         return { 
-          proposalData,
-          commonData : (await getDaoById(proposalData.dao)).data(),
-          userData: (await getUserById(proposalData.proposerId)).data()
+          commonData : (await getDaoById(proposalData.dao)).data()
         }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     notification: async ( {commonData} ) => {
         return {
             title: 'Congrats!',
-            body: `Your request to join "${commonData.name}" was accepted!`,
+            body: `Your request to join "${commonData.name}" was accepted, you are now a member!`,
             image: commonData.metadata.image || '',
             path: `CommonProfile/${commonData.id}`
         }
     },
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ({ commonData, userData } ) => {
-      return {
-          templateKey: 'userJoinedSuccess', // userRequestToJoinAccepted?
-          emailStubs: {
-            name: userData.displayName,
-            commonLink: Utils.getCommonLink(commonData.id),
-            commonName: commonData.metadata.name
-          }
-        }
-     }
   },
-
-  [EVENT_TYPES.REJECTED_REQUEST_TO_JOIN]: {
+  
+  [EVENT_TYPES.REQUEST_TO_JOIN_REJECTED]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
         const proposalData = (await getProposalById(objectId)).data();
@@ -232,41 +204,6 @@ export const notifyData: Record<string, IEventData> = {
             body: `Don't give up, there are plenty of other Commons you can join.`,
             image: commonData.metadata.image || '',
             path: `CommonProfile/${commonData.id}`
-        }
-    },
-  },
-  [EVENT_TYPES.REQUEST_TO_JOIN_EXECUTED]: {
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    data: async (objectId: string) => {
-        const proposalData = (await getProposalById(objectId)).data();
-        return { 
-          commonData : (await getDaoById(proposalData.dao)).data()
-        }
-    },
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    notification: async ( {commonData} ) => {
-        return {
-            title: 'Congrats!',
-            body: `You are now a member in common "${commonData.name}"!`,
-            image: commonData.metadata.image || ''
-        }
-    },
-  },
-  [EVENT_TYPES.FUNDING_REQUEST_EXECUTED] : {
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    data: async (objectId: string) => {
-        const proposalData = (await getProposalById(objectId)).data();
-        return { 
-          proposalData,
-          commonData : (await getDaoById(proposalData.dao)).data()
-        }
-    },
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    notification: async ( {proposalData , commonData} ) => {
-        return {
-            title: 'You got funding!',
-            body: `You got $${proposalData.fundingRequest.amount}, you can now proceed with your proposal for "${commonData.name}".`,
-            image: commonData.metadata.image || ''
         }
     },
   },
@@ -353,12 +290,8 @@ export default new class Notification implements INotification {
 
     // @question Ask about this rule "promise/always-return". It is kinda useless so we may disable it globally?
     // eslint-disable-next-line promise/always-return
-    if (tokens) {
-      const messageSent: admin.messaging.MessagingDevicesResponse = await messaging.sendToDevice(tokens, payload, options);
-      console.log('Send Success', messageSent);
-    } else {
-      console.log('Send failure: Tokens undefined');
-    }
+    const messageSent: admin.messaging.MessagingDevicesResponse = await messaging.sendToDevice(tokens, payload, options);
+    console.log('Send Success', messageSent);
   }
 
   async sendToAllUsers(title: string, body: string, image = '', path: string) {

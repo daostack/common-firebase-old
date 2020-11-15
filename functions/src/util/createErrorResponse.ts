@@ -1,7 +1,7 @@
 import express from 'express';
 
 import { CommonError, ICommonError } from './errors/CommonError';
-import { StatusCodes } from './constants';
+import { StatusCodes } from '../constants';
 
 export interface IErrorResponse {
   error: string;
@@ -50,7 +50,7 @@ export const createErrorResponse = (req: express.Request, res: express.Response,
       new CommonError(`
         The error passed to createErrorResponse was not of
         CommonError type. This should never happen!
-      `, null, {
+      `, {
         payload: error
       })
     );

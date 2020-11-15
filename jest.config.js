@@ -9,6 +9,9 @@ module.exports = {
     'text',
     'lcov'
   ],
+  setupFilesAfterEnv: [
+    '<rootDir>/__tests__/cleanup.ts'
+  ],
   "moduleNameMapper": {
     "^@root(.*)$": "<rootDir>/$1",
     "^@env(.*)$": "<rootDir>/functions/src/env/$1",

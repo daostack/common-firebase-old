@@ -1,5 +1,5 @@
 import * as functions from 'firebase-functions';
-import { createEvent }  from '../db/eventDbService';
+import { createEvent }  from '../util/db/eventDbService';
 import { EVENT_TYPES } from '../event/event';
 
 exports.watchForNewMessages = functions.firestore
@@ -10,7 +10,6 @@ exports.watchForNewMessages = functions.firestore
     await createEvent({
       userId: discussionMessage.ownerId,
       objectId: snap.id,
-      createdAt: new Date(),
       type: EVENT_TYPES.MESSAGE_CREATED
     })
 	})
