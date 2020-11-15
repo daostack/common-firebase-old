@@ -2,9 +2,7 @@
 const { db } = require('../../settings');
 const { getPayment } = require('../../circlepay/circlepay');
 const { Utils } = require('../util');
-const { getPayment } = require('../circlepay/circlepay');
-const { Utils } = require('../util/util');
-const { EVENT_TYPES } = require('../event/event');
+const { EVENT_TYPES } = require('../../event/event');
 const { createEvent } = require('../db/eventDbService');
 const COLLECTION_NAME = 'payments';
 
@@ -44,7 +42,6 @@ const pollPaymentStatus = async (paymentData, proposerId, proposalId) => (
         await createEvent({
           userId: proposerId,
           objectId: proposalId,
-          createdAt: new Date(),
           type: EVENT_TYPES.PAYMENT_FAILED
         })
         return await updateStatus(paymentData.id, 'failed'); //@question perhaps send circle error status as the status for db?

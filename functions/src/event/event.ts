@@ -25,6 +25,7 @@ export enum EVENT_TYPES {
     COMMON_WHITELISTED = 'commonWhitelisted',
     //PAYMENT
     PAYMENT_FAILED = 'paymentFailed',
+    VOTE_CREATED = 'voteCreated'
 }
 
 export const eventData: Record<string, IEventData> = {
