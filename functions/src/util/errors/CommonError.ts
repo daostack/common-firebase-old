@@ -1,7 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
-import { ErrorCodes, StatusCodes } from '../constants';
+
+import { ErrorCodes, StatusCodes } from '../../constants';
 
 interface IErrorData {
+  userMessage?: string;
   statusCode?: number;
   errorCode?: string;
 
@@ -18,6 +20,11 @@ export interface ICommonError {
   data: any;
 }
 
+/**
+ * The base error of the project. All other errors must be derived
+ * from the CommonError and in all cases, for witch we do
+ * no have custom error the CommonError must be used
+ */
 export class CommonError extends Error implements ICommonError {
   public errorId: string;
   public errorCode: string;
@@ -30,12 +37,10 @@ export class CommonError extends Error implements ICommonError {
    * Creates new common error
    *
    * @param message - the error message (required)
-   * @param userMessage - the error message that the user will see (optional)
    * @param data - more data, related to the error (optional)
    */
   constructor(
     message: string,
-    userMessage = 'Something bad happened',
     data: IErrorData = {}
   ) {
     const errorId = uuidv4();
@@ -46,9 +51,9 @@ export class CommonError extends Error implements ICommonError {
 
     this.name = "Common Error";
 
-    this.userMessage = userMessage;
     this.errorCode = data.errorCode || ErrorCodes.GenericError;
     this.statusCode = data.statusCode || StatusCodes.InternalServerError;
+    this.userMessage = data.userMessage || 'Something bad happened.';
 
     this.data = data;
   }

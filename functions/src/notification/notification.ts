@@ -1,11 +1,11 @@
 import admin from 'firebase-admin';
 import { EVENT_TYPES } from "../event/event";
-import { env } from '../env';
-import { getDaoById } from '../db/daoDbService';
-import { getProposalById } from '../db/proposalDbService';
-import { getUserById } from '../db/userDbService';
+import { env } from '../constants';
+import { getDaoById } from '../util/db/daoDbService';
+import { getProposalById } from '../util/db/proposalDbService';
+import { getUserById } from '../util/db/userDbService';
 import { Utils } from '../util/util';
-import { getDiscussionMessageById } from '../db/discussionMessagesDb'; 
+import { getDiscussionMessageById } from '../util/db/discussionMessagesDb';
 
 const messaging = admin.messaging();
 
@@ -79,7 +79,7 @@ export const notifyData: Record<string, IEventData> = {
   //         }
   //     }
   // },
-  [EVENT_TYPES.CREATION_REQUEST_TO_JOIN] : {
+  [EVENT_TYPES.REQUEST_TO_JOIN_CREATED] : {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (proposalId: string) => {
         const proposalData = (await getProposalById(proposalId)).data();
@@ -151,7 +151,7 @@ export const notifyData: Record<string, IEventData> = {
     },
     
   },
-  [EVENT_TYPES.APPROVED_PROPOSAL] : {
+  [EVENT_TYPES.APPROVED_FUNDING_REQUEST] : {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
         const proposalData = (await getProposalById(objectId)).data();
@@ -170,7 +170,7 @@ export const notifyData: Record<string, IEventData> = {
         }
     },
   },
-  [EVENT_TYPES.APPROVED_REQUEST_TO_JOIN]: {
+  [EVENT_TYPES.REQUEST_TO_JOIN_ACCEPTED]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
         const proposalData = (await getProposalById(objectId)).data();
@@ -189,7 +189,7 @@ export const notifyData: Record<string, IEventData> = {
     },
   },
   
-  [EVENT_TYPES.REJECTED_REQUEST_TO_JOIN]: {
+  [EVENT_TYPES.REQUEST_TO_JOIN_REJECTED]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
         const proposalData = (await getProposalById(objectId)).data();

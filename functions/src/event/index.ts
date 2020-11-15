@@ -1,15 +1,13 @@
 import * as functions from 'firebase-functions';
 import { notifyData } from '../notification/notification'
-import { createNotification } from '../db/notificationDbService';
-import { EVENT_TYPES, eventData } from './event';
-import { totalRaisedTriggerHandler } from './triggers';
-import { QueryDocumentSnapshot } from '@google-cloud/firestore';
+import { createNotification } from '../util/db/notificationDbService';
+import { eventData } from './event'
 
 
 export interface IEventModel {
     id: string,
     objectId: string,
-    type: EVENT_TYPES,
+    type: string,
     createdAt: string,
 }
 
@@ -35,7 +33,5 @@ exports.commonEventListener = functions
   .firestore
   .document('/event/{id}')
   .onCreate(async (snap) => {
-    await processEvent(snap.data() as IEventModel);
-
-    await totalRaisedTriggerHandler(snap as QueryDocumentSnapshot<IEventModel>);
-  });
+    await processEvent(snap.data() as IEventModel)
+  })
