@@ -70,7 +70,7 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
     if (data) {
       _updatePayment(data.data, proposalId);
       cardData.payments.push(data.data.id);
-      await updateCard(cardData.id, cardData);
+      await updateCard(cardData);
       result = `Payment created. PaymentdId: ${data.data.id}`;
     }
     pollPaymentStatus(data.data);

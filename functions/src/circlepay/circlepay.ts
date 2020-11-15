@@ -1,8 +1,7 @@
 import axios from 'axios';
-
 import { circlePayApi, getSecret } from '../settings';
 import { externalRequestExecutor } from '../util';
-import { ErrorCodes, env } from '../constants';
+import { ErrorCodes } from '../constants';
 
 const CIRCLEPAY_APIKEY = 'CIRCLEPAY_APIKEY';
 
@@ -36,7 +35,6 @@ export interface ICardData {
   },
   keyId: string,
   encryptedData: string,
-  proposalId: string,
   idempotencyKey: string,
 }
 

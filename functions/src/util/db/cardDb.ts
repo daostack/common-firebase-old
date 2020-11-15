@@ -1,12 +1,11 @@
 import { db } from '../../settings';
 import { DocumentData, DocumentReference } from '@google-cloud/firestore';
+import {Collections} from '../../constants/collections';
 
-// @todo Move to constants
-const COLLECTION_NAME = 'cards';
-
-export const updateCard = async (cardId: string, doc: DocumentData): Promise<any> => (
-  await db.collection(COLLECTION_NAME)
-    .doc(cardId)
+// using DocumentData seems a bit vague though
+export const updateCard = async (doc: DocumentData): Promise<any> => (
+  await db.collection(Collections.Cards)
+    .doc(doc.id)
     .set(
       doc,
       {
@@ -21,7 +20,7 @@ export const updateCard = async (cardId: string, doc: DocumentData): Promise<any
  * @param cardId - The ID of the card
  */
 export const getCardRef = (cardId: string): DocumentReference => {
-  return db.collection(COLLECTION_NAME).doc(cardId);
+  return db.collection(Collections.Cards).doc(cardId);
 };
 
 

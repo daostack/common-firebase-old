@@ -5,23 +5,6 @@ import cardDb, { updateCard } from '../util/db/cardDb';
 import { v4 } from 'uuid';
 import { CommonError } from '../util/errors';
 
-const _updateCard = async (userId: string, id: string, proposalId: string): Promise<any> => {
-  const doc = {
-    id,
-    userId,
-    proposals: [proposalId],
-    creationData: new Date(),
-    payments: []
-  };
-
-  if (proposalId) {
-    console.warn('Creating card without proposal ID');
-  }
-
-  await updateCard(id, doc);
-};
-
-// try to use ICardData from ./circlepay
 interface IRequest {
   headers: { host?: string },
   body: {
@@ -37,7 +20,6 @@ interface IRequest {
     expMonth: number,
     expYear: number,
     idempotencyKey: string,
-    proposalId: string,
     metadata: {
       email: string,
       ipAddress: string,
@@ -55,7 +37,7 @@ interface ICardCreatedPayload {
 export const createCirclePayCard = async (req: IRequest): Promise<ICardCreatedPayload> => {
   const { idToken, ...cardData } = req.body;
 
-  const uid = await Utils.verifyId(idToken);
+  const userId = await Utils.verifyId(idToken);
 
   cardData.metadata.ipAddress = req.headers['x-forwarded-for'] || '127.0.0.1';  //req.headers.host.includes('localhost') ? '127.0.0.1' : req.headers.host; //ip must be like xxx.xxx.xxx.xxx, and not a text
   cardData.metadata.sessionId = v4(); //ethers.utils.id(cardData.proposalId).substring(0,50);
@@ -63,7 +45,12 @@ export const createCirclePayCard = async (req: IRequest): Promise<ICardCreatedPa
 
   const { data } = await createCard(cardData);
   
-  await _updateCard(uid, data.id, cardData.proposalId);
+  await updateCard({
+      id: data.id,
+      userId,
+      creationData: new Date(),
+      payments: []
+  });
 
   return {
     cardId: data.id
@@ -105,7 +92,8 @@ export const assignCard = async (req: express.Request): Promise<void> => {
     Assigning card with id ${cardId} to proposal with id ${proposalId}
   `);
 
-  await cardDb.updateCard(cardId, {
+  await cardDb.updateCard({
+    id: cardId,
     proposals: [proposalId]
   });
 };
@@ -131,7 +119,8 @@ export const assignCardToProposal = async (cardId: string, proposalId: string): 
     `);
   }
 
-  await cardDb.updateCard(cardId, {
+  await cardDb.updateCard({
+    id: cardId,
     proposals: [proposalId]
   });
 };
