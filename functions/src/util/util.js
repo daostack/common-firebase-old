@@ -70,10 +70,10 @@ class Utils {
 
   async getCardById(cardId) {
     const cardRef = admin.firestore().collection('cards').doc(cardId);
-    if (!cardRef.docs) {
-      throw new CommonError(CFError.emptyCardData, `Could not find card with id ${cardId}.`)
-    }
     const cardData = await cardRef.get().then(doc => doc.data());
+    if (!cardData) {
+      throw new CommonError(`Could not find card with id ${cardId}.`)
+    }
     return cardData;
   }
 
@@ -82,7 +82,7 @@ class Utils {
       .where('userId', '==', userId)
       .get();
         if (cardRef.docs.length === 0) {
-          throw new CommonError(CFError.emptyCardData, `Could not find user with id ${userId} associated with a CirclePay card.`);
+          throw new CommonError(`Could not find user with id ${userId} associated with a CirclePay card.`);
         }
     const cardData = cardRef.docs.map(doc => doc.data())[0];
     return cardData;
@@ -98,8 +98,6 @@ class Utils {
     } catch (err) {
       throw new CommonError(CFError.emptyUserData)
     }
-    const cardData = cardRef.docs.map(doc => doc.data())[0];
-    return cardData;
   }
 
   async getPaymentById(paymentId) {
