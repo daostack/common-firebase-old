@@ -36,7 +36,7 @@ exports.watchForExecutedProposals = functions.firestore
           proposerId: proposal.proposerId,
           funding: proposal.join.funding,
         });
-        
+
         await addCommonMemberByProposalId(event.objectId);
       }
     }
