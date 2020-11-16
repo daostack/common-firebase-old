@@ -7,6 +7,7 @@ import { fundProposal } from '../business/fundProposal';
 import { createPayment } from '../../circlepay/createPayment';
 import { CommonError } from '../../util/errors';
 import { commonDb } from '../../common/database';
+import { proposalDb } from '../database';
 
 
 export const onProposalApproved = functions.firestore
