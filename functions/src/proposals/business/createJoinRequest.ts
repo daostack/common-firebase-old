@@ -12,6 +12,7 @@ import { IJoinRequestProposal, IProposalFile, IProposalLink } from '../proposalT
 import { fileValidationSchema, linkValidationSchema } from '../../util/schemas';
 import { proposalDb } from '../database';
 import { isCardOwner } from '../../circlepay/business/isCardOnwer';
+import { assignCardToProposal } from '../../circlepay/createCirclePayCard';
 
 const createRequestToJoinValidationSchema = yup.object({
   commonId: yup
@@ -60,11 +61,11 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
   const common = await commonDb.getCommon(payload.commonId);
 
   // Check if the card is owned by the user
-  // if(!(await isCardOwner(payload.proposerId, payload.cardId))) {
-  //   // Do not let them know if that card exists. It is just 'NotFound' even
-  //   // if it exists, but is not theirs
-  //   throw new NotFoundError(payload.cardId, 'card');
-  // }
+  if(!(await isCardOwner(payload.proposerId, payload.cardId))) {
+    // Do not let them know if that card exists. It is just 'NotFound' even
+    // if it exists, but is not theirs
+    throw new NotFoundError(payload.cardId, 'card');
+  }
 
 
   // Check if the user is already member of that common
@@ -80,7 +81,7 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
   // Check if the request is funded with less than required amount
   if (common.metadata.minFeeToJoin > payload.funding) {
     throw new CommonError('The funding cannot be less than the minimum required funding', {
-      userMessage: `Your join request cannot be created, because the min fee to join is ${common.metadata.minFeeToJoin}, but you provided ${payload.funding}`,
+      userMessage: `Your join request cannot be created, because the min fee to join is $${(common.metadata.minFeeToJoin / 100).toFixed(2)}, but you provided $${(payload.funding / 100).toFixed(2)}`,
       statusCode: StatusCodes.BadRequest,
 
       payload
@@ -123,7 +124,10 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
 
     countdownPeriod: env.durations.join.countdownPeriod,
     quietEndingPeriod: env.durations.join.quietEndingPeriod
-  });
+  }) as IJoinRequestProposal;
+
+  // Link the card to the proposal
+  await assignCardToProposal(joinRequest.join.cardId, joinRequest.id);
 
   // @todo Create event
 
