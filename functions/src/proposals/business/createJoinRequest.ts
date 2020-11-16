@@ -81,7 +81,7 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
   // Check if the request is funded with less than required amount
   if (common.metadata.minFeeToJoin > payload.funding) {
     throw new CommonError('The funding cannot be less than the minimum required funding', {
-      userMessage: `Your join request cannot be created, because the min fee to join is ${common.metadata.minFeeToJoin}, but you provided ${payload.funding}`,
+      userMessage: `Your join request cannot be created, because the min fee to join is $${(common.metadata.minFeeToJoin / 100).toFixed(2)}, but you provided $${(payload.funding / 100).toFixed(2)}`,
       statusCode: StatusCodes.BadRequest,
 
       payload

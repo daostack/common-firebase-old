@@ -7,6 +7,7 @@ import { addCommonMemberByProposalId } from '../../common/business/addCommonMemb
 import { fundProposal } from '../business/fundProposal';
 import { createPayment } from '../../circlepay/createPayment';
 import { CommonError } from '../../util/errors';
+import { commonDb } from '../../common/database';
 
 
 export const onProposalApproved = functions.firestore
@@ -20,6 +21,7 @@ export const onProposalApproved = functions.firestore
         await fundProposal(event.objectId);
       }
 
+      // @refactor
       if (event.type === EVENT_TYPES.REQUEST_TO_JOIN_ACCEPTED) {
         console.info('Join request was approved. Adding new members to common');
 
@@ -37,6 +39,19 @@ export const onProposalApproved = functions.firestore
           funding: proposal.join.funding,
         });
 
+        if(proposal.join.fundingType === 'monthly') {
+          // @todo Create subscription
+        }
+
+        // Update common funding info
+        const common = await commonDb.getCommon(proposal.commonId);
+
+        common.raised += proposal.join.funding;
+        common.balance += proposal.join.funding;
+
+        await commonDb.updateCommon(common);
+
+        // Add member to the common
         await addCommonMemberByProposalId(event.objectId);
       }
     }
