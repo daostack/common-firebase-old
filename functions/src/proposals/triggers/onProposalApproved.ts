@@ -2,7 +2,6 @@ import * as functions from 'firebase-functions';
 import { Collections } from '../../constants';
 import { IEventEntity } from '../../event/type';
 import { EVENT_TYPES } from '../../event/event';
-import { proposalDb } from '../database';
 import { addCommonMemberByProposalId } from '../../common/business/addCommonMember';
 import { fundProposal } from '../business/fundProposal';
 
