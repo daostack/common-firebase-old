@@ -7,7 +7,8 @@ import { EVENT_TYPES } from '../../event/event';
 import { processVote } from '../business/votes/processVotes';
 import { voteDb } from '../database';
 
-exports.watchForVoteCreated = functions.firestore
+// @deprecated
+export const onVoteCreated = functions.firestore
   .document(`/${Collections.Event}/{id}`)
   .onCreate(async (eventSnap) => {
     const event = eventSnap.data() as IEventEntity;

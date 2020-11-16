@@ -9,7 +9,7 @@ import { createPayment } from '../../circlepay/createPayment';
 import { CommonError } from '../../util/errors';
 
 
-exports.watchForExecutedProposals = functions.firestore
+export const onProposalApproved = functions.firestore
   .document(`/${Collections.Event}/{id}`)
   .onCreate(async (eventSnap) => {
       const event = eventSnap.data() as IEventEntity;
