@@ -1,12 +1,12 @@
-// @ts-ignore
-const { db } = require('../../settings');
-const { getPayment } = require('../../circlepay/circlepay');
-const { Utils } = require('../util');
-const { EVENT_TYPES } = require('../../event/event');
-const { createEvent } = require('../db/eventDbService');
-const COLLECTION_NAME = 'payments';
+import { db } from '../../settings';
+import { getPayment } from '../../circlepay/circlepay';
+import { Utils } from '../util';
+import { EVENT_TYPES } from '../../event/event';
+import { createEvent } from '../db/eventDbService';
+import {Collections} from '../../constants';
+import { DocumentData } from '@google-cloud/firestore';
 
-const polling = async ({validate, interval, paymentId}) => {
+const polling = async ({validate, interval, paymentId}) : Promise<any> => {
 	console.log('start polling');
 	let attempts = 0;
 	
@@ -27,7 +27,18 @@ const polling = async ({validate, interval, paymentId}) => {
   return new Promise(executePoll);
 }
 
-const pollPaymentStatus = async (paymentData, proposerId, proposalId) => (
+export interface IPaymentResp {
+  id: string,
+  type: string,
+  source: {id: string, type: string},
+  amount: {amount: string, currency: string},
+  status: string,
+  refunds: string[],
+  createDate: string,
+  updateDate: string,
+}
+
+export const pollPaymentStatus = async (paymentData: IPaymentResp, proposerId: string, proposalId: string) : Promise<any> => (
 	polling({
       validate: (payment) => payment.status === 'confirmed',
       interval: 10000,
@@ -37,7 +48,7 @@ const pollPaymentStatus = async (paymentData, proposerId, proposalId) => (
         return await updateStatus(payment, 'confirmed');
       })
       .catch(async ({err,payment}) => {
-      	console.error('Polling error', err);
+          console.error('Polling error', err);
         // we are creating an event, but not using the error message from circle (e.g. card_invalid)
         await createEvent({
           userId: proposerId,
@@ -49,7 +60,7 @@ const pollPaymentStatus = async (paymentData, proposerId, proposalId) => (
 );
 
 const updateStatus = async(payment, status) => {
-  let currentPayment = await Utils.getPaymentById(payment.id);
+  const currentPayment = await Utils.getPaymentById(payment.id);
   currentPayment.status = status;
   currentPayment.fee = payment.fees
     ? Number(payment.fees.amount) * 100
@@ -57,8 +68,8 @@ const updateStatus = async(payment, status) => {
   updatePayment(payment.id, currentPayment);
 }
 
-const updatePayment = async (paymentId, doc) => (
-  await db.collection(COLLECTION_NAME)
+export const updatePayment = async (paymentId: string, doc: DocumentData) : Promise<any> => (
+  await db.collection(Collections.Payments)
     .doc(paymentId)
     .set(
         doc,
@@ -68,7 +79,7 @@ const updatePayment = async (paymentId, doc) => (
     )
 )
 
-module.exports = {
+export default {
   updatePayment,
   pollPaymentStatus
 }
