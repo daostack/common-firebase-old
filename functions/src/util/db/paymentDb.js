@@ -45,7 +45,7 @@ const pollPaymentStatus = async (paymentData) => (
 const updateStatus = async(payment, status) => {
   let currentPayment = await Utils.getPaymentById(payment.id);
   currentPayment.status = status;
-  currentPayment.fees = payment.fees
+  currentPayment.fee = payment.fees
     ? Number(payment.fees.amount) * 100
     : 0;
   updatePayment(payment.id, currentPayment);
