@@ -14,6 +14,8 @@ export interface IErrorResponse {
 }
 
 export const createErrorResponse = (req: express.Request, res: express.Response, error: ICommonError): void => {
+  console.info(`Error occurred at ${req.path}`);
+
   // Here `error instanceof CommonError` does not work for some
   // strange reason so for now we can assume that if the error
   // has errorId it is CommonError
