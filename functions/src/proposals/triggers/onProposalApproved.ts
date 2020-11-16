@@ -7,7 +7,7 @@ import { addCommonMemberByProposalId } from '../../common/business/addCommonMemb
 import { fundProposal } from '../business/fundProposal';
 
 
-exports.watchForExecutedProposals = functions.firestore
+export const onProposalApproved = functions.firestore
   .document(`/${Collections.Event}/{id}`)
   .onCreate(async (eventSnap) => {
       const event = eventSnap.data() as IEventEntity;
