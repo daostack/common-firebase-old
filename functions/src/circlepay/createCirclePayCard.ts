@@ -53,16 +53,19 @@ interface ICardCreatedPayload {
 }
 
 export const createCirclePayCard = async (req: IRequest): Promise<ICardCreatedPayload> => {
-  const { idToken, ...cardData } = req.body;
+  const {idToken, ...cardData} = req.body;
 
   const uid = await Utils.verifyId(idToken);
 
-  cardData.metadata.ipAddress = req.headers['x-forwarded-for'] || '127.0.0.1';  //req.headers.host.includes('localhost') ? '127.0.0.1' : req.headers.host; //ip must be like xxx.xxx.xxx.xxx, and not a text
+  cardData.metadata.ipAddress = req.headers['x-forwarded-for'] || '127.0.0.1';  //req.headers.host.includes('localhost')
+                                                                                // ? '127.0.0.1' : req.headers.host;
+                                                                                // //ip must be like xxx.xxx.xxx.xxx,
+                                                                                // and not a text
   cardData.metadata.sessionId = v4(); //ethers.utils.id(cardData.proposalId).substring(0,50);
   cardData.idempotencyKey = v4();
 
-  const { data } = await createCard(cardData);
-  
+  const {data} = await createCard(cardData);
+
   await _updateCard(uid, data.id, cardData.proposalId);
 
   return {
@@ -78,7 +81,7 @@ export const createCirclePayCard = async (req: IRequest): Promise<ICardCreatedPa
  * @return Promise
  */
 export const assignCard = async (req: express.Request): Promise<void> => {
-  const { idToken, cardId, proposalId } = req.body;
+  const {idToken, cardId, proposalId} = req.body;
 
   const userId = await Utils.verifyId(idToken);
   const card = (await cardDb.getCardRef(cardId).get()).data();
@@ -122,17 +125,17 @@ export const assignCard = async (req: express.Request): Promise<void> => {
 export const assignCardToProposal = async (cardId: string, proposalId: string): Promise<void> => {
   const card = (await cardDb.getCardRef(cardId).get()).data();
 
-  if (card.proposals.lenght > 0) {
-    // @todo Instead of throwing error should I just allow assignment
-    //  of more than one proposal to card?
-    throw new CommonError(`
-       Cannot assign card (${cardId}) to proposal because
-       the card is already assigned!
-    `);
+  if (card.proposals.some(x => x === proposalId)) {
+    // The proposal is already assigned to
+    // that card so just return
+    return;
   }
 
   await cardDb.updateCard(cardId, {
-    proposals: [proposalId]
+    proposals: [
+      ...card.proposals,
+      proposalId
+    ]
   });
 };
 
