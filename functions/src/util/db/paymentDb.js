@@ -2,7 +2,8 @@
 const { db } = require('../../settings');
 const { getPayment } = require('../../circlepay/circlepay');
 const { Utils } = require('../util');
-
+const { EVENT_TYPES } = require('../../event/event');
+const { createEvent } = require('../db/eventDbService');
 const COLLECTION_NAME = 'payments';
 
 const polling = async ({validate, interval, paymentId}) => {
@@ -26,7 +27,7 @@ const polling = async ({validate, interval, paymentId}) => {
   return new Promise(executePoll);
 }
 
-const pollPaymentStatus = async (paymentData) => (
+const pollPaymentStatus = async (paymentData, proposerId, proposalId) => (
 	polling({
       validate: (payment) => payment.status === 'confirmed',
       interval: 10000,
@@ -35,10 +36,15 @@ const pollPaymentStatus = async (paymentData) => (
       .then(async (payment) => {
         return await updateStatus(payment, 'confirmed');
       })
-      .catch(async ({err, payment}) => {
+      .catch(async ({err,payment}) => {
       	console.error('Polling error', err);
-      	// burn user's rep
-        return await updateStatus(payment, 'failed');
+        // we are creating an event, but not using the error message from circle (e.g. card_invalid)
+        await createEvent({
+          userId: proposerId,
+          objectId: proposalId,
+          type: EVENT_TYPES.PAYMENT_FAILED
+        })
+        return await updateStatus(payment, 'failed'); //@question perhaps send circle error status as the status for db?
       })
 );
 
