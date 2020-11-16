@@ -2,6 +2,7 @@ import { Utils } from '../util/util';
 import { createCard } from './circlepay';
 import { updateCard } from '../util/db/cardDb';
 import { v4 } from 'uuid';
+import axios from 'axios';
 
 const _updateCard = async (userId: string, id: string, proposalId: string): Promise<any> => {
   const doc = {
@@ -65,6 +66,17 @@ export const createCirclePayCard = async (req: IRequest): Promise<ICardCreatedPa
 
   return {
     cardId: data.id
+  };
+};
+
+interface ITestIpPayload {
+  ip: string;
+}
+
+export const testIP = async (): Promise<ITestIpPayload> => {
+  const response = await axios.get('https://api.ipify.org?format=json');
+  return {
+    ip: response.data
   };
 };
 
