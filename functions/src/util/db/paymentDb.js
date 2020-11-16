@@ -32,20 +32,23 @@ const pollPaymentStatus = async (paymentData) => (
       interval: 10000,
       paymentId: paymentData.id
     })
-      .then(async (payment) => {  
-        return await updateStatus(paymentData.id, 'confirmed');
+      .then(async (payment) => {
+        return await updateStatus(payment, 'confirmed');
       })
-      .catch(async (error) => {
-      	console.error('Polling error', error);
+      .catch(async ({err, payment}) => {
+      	console.error('Polling error', err);
       	// burn user's rep
-        return await updateStatus(paymentData.id, 'failed');
+        return await updateStatus(payment, 'failed');
       })
 );
 
-const updateStatus = async(paymentId, status) => {
-  let currentPayment = await Utils.getPaymentById(paymentId);
+const updateStatus = async(payment, status) => {
+  let currentPayment = await Utils.getPaymentById(payment.id);
   currentPayment.status = status;
-  updatePayment(paymentId, currentPayment);
+  currentPayment.fees = payment.fees
+    ? Number(payment.fees.amount) * 100
+    : 0;
+  updatePayment(payment.id, currentPayment);
 }
 
 const updatePayment = async (paymentId, doc) => (
