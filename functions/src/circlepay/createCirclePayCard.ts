@@ -35,20 +35,18 @@ interface ICardCreatedPayload {
 }
 
 export const createCirclePayCard = async (req: IRequest): Promise<ICardCreatedPayload> => {
-  const { idToken, ...cardData } = req.body;
+  const { ...cardData } = req.body;
 
-  const userId = await Utils.verifyId(idToken);
-
-  cardData.metadata.ipAddress = req.headers['x-forwarded-for'] || '127.0.0.1';  //req.headers.host.includes('localhost') ? '127.0.0.1' : req.headers.host; //ip must be like xxx.xxx.xxx.xxx, and not a text
-  cardData.metadata.sessionId = v4(); //ethers.utils.id(cardData.proposalId).substring(0,50);
+  cardData.metadata.ipAddress = req.headers['x-forwarded-for'] || '127.0.0.1';
+  cardData.metadata.sessionId = v4();
   cardData.idempotencyKey = v4();
 
   const { data } = await createCard(cardData);
   
   await updateCard({
       id: data.id,
-      userId,
-      creationData: new Date(),
+      userId: req.user.uid,
+      creationDate: new Date(),
       payments: []
   });
 
