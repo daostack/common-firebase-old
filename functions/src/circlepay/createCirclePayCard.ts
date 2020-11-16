@@ -24,7 +24,6 @@ const _updateCard = async (userId: string, id: string, proposalId: string): Prom
 interface IRequest {
   headers: { host?: string },
   body: {
-    idToken: string,
     billingDetails: {
       name: string,
       city: string,
@@ -45,10 +44,9 @@ interface IRequest {
     keyId: string,
     encryptedData: string,
   };
-
-  user?: {
+  user: {
     uid: string;
-  };
+  }
 }
 
 interface ICardCreatedPayload {
@@ -56,15 +54,9 @@ interface ICardCreatedPayload {
 }
 
 export const createCirclePayCard = async (req: IRequest): Promise<ICardCreatedPayload> => {
-  const { idToken, ...cardData } = req.body;
+  const cardData = req.body;
 
-  let uid: string;
-
-  if(req.user.uid) {
-    uid = req.user.uid;
-  } else {
-    uid = await Utils.verifyId(idToken);
-  }
+  const uid: string = req.user.uid;
 
   cardData.metadata.ipAddress = req.headers['x-forwarded-for'] || '127.0.0.1';  //req.headers.host.includes('localhost') ? '127.0.0.1' : req.headers.host; //ip must be like xxx.xxx.xxx.xxx, and not a text
   cardData.metadata.sessionId = v4(); //ethers.utils.id(cardData.proposalId).substring(0,50);
