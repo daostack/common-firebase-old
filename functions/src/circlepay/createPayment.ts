@@ -4,6 +4,7 @@ import { updateCard } from '../util/db/cardDb';
 import { updatePayment, pollPaymentStatus, IPaymentResp } from '../util/db/paymentDb';
 import {ethers} from 'ethers';
 import {v4} from 'uuid';
+import { NotFoundError } from '../util/errors/NotFoundError';
 
 const _updatePayment = async (paymentResponse: IPaymentResp, proposalId: string) : Promise<any> => {
   const doc = {
@@ -53,7 +54,7 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
         type: 'card'
       },
     }
-    // an error that needs attention: functions: Error: socket hang up, use promiseRetry
+
     const {data} = await createAPayment(paymentData);
 
     if (data) {
@@ -63,7 +64,10 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
       result = `Payment created. PaymentdId: ${data.data.id}`;
     }
     pollPaymentStatus(data.data, proposerId, proposalId);
+  } else {
+     // the error message will say: cannot find card with identified ${proposalId},
+     // should I make a CardError class, or use this NotFoundError?
+    throw new NotFoundError(proposalId, 'card');
   } 
-  // else if proposal is not associated with card?
   return `Create Payment: ${result}`;
 }
