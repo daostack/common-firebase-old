@@ -3,7 +3,7 @@ import * as functions from 'firebase-functions';
 import { responseExecutor } from '../util/responseExecutor';
 import { commonApp, commonRouter } from '../util/commonApp';
 
-import { createCirclePayCard, assignCard } from './createCirclePayCard';
+import { createCirclePayCard, testIP } from './createCirclePayCard';
 import { encryption } from './circlepay';
 
 const runtimeOptions = {
@@ -23,16 +23,6 @@ circlepay.post('/create-card', async (req, res, next) => {
     });
 });
 
-circlepay.post('/assign-card', async (req, res, next) => {
-  await responseExecutor(
-    async () => (await assignCard(req)), {
-      req,
-      res,
-      next,
-      successMessage: `CirclePay card assigned successfully!`
-    });
-});
-
 circlepay.get('/encryption', async (req, res, next) => {
   console.log('index/encryption');
   await responseExecutor(
@@ -42,6 +32,17 @@ circlepay.get('/encryption', async (req, res, next) => {
       res,
       next,
       successMessage: `PCI encryption key generated!`
+    });
+});
+
+circlepay.get('/testIP', async (req, res, next) => {
+  await responseExecutor(
+    async () => (await testIP()),
+    {
+      req,
+      res,
+      next,
+      successMessage: `Test Ip generated`
     });
 });
 

@@ -1,20 +1,9 @@
 import { Utils } from '../util/util';
 import { createAPayment } from './circlepay';
 import { updateCard } from '../util/db/cardDb';
-import { updatePayment, pollPaymentStatus } from '../util/db/paymentDb';
+import { updatePayment, pollPaymentStatus, IPaymentResp } from '../util/db/paymentDb';
 import {ethers} from 'ethers';
 import {v4} from 'uuid';
-
-interface IPaymentResp {
-  id: string,
-  type: string,
-  source: {id: string, type: string},
-  amount: {amount: string, currency: string},
-  status: string,
-  refunds: string[],
-  createDate: string,
-  updateDate: string,
-}
 
 const _updatePayment = async (paymentResponse: IPaymentResp, proposalId: string) : Promise<any> => {
   const doc = {
@@ -73,7 +62,7 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
       await updateCard(cardData);
       result = `Payment created. PaymentdId: ${data.data.id}`;
     }
-    pollPaymentStatus(data.data);
+    pollPaymentStatus(data.data, proposerId, proposalId);
   } 
   // else if proposal is not associated with card?
   return `Create Payment: ${result}`;
