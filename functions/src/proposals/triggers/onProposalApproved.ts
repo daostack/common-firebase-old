@@ -15,7 +15,7 @@ export const onProposalApproved = functions.firestore
   .onCreate(async (eventSnap) => {
       const event = eventSnap.data() as IEventEntity;
 
-      if (event.type === EVENT_TYPES.APPROVED_FUNDING_REQUEST) {
+      if (event.type === EVENT_TYPES.FUNDING_REQUEST_ACCEPTED) {
         console.info('Funding request was approved. Crunching some numbers');
 
         await fundProposal(event.objectId);
@@ -25,7 +25,7 @@ export const onProposalApproved = functions.firestore
       if (event.type === EVENT_TYPES.REQUEST_TO_JOIN_ACCEPTED) {
         console.info('Join request was approved. Adding new members to common');
 
-        // @todo Create payment
+        // Create payment
         const proposal = await proposalDb.getProposal(event.objectId);
 
         if (proposal.type !== 'join') {

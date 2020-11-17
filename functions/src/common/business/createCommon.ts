@@ -5,6 +5,8 @@ import { commonLinkValidationScheme, commonRuleValidationSchema } from '../../ut
 
 import { commonDb } from '../database';
 import { ICommonEntity, ICommonLink, ICommonRule } from '../types';
+import { createEvent } from '../../util/db/eventDbService';
+import { EVENT_TYPES } from '../../event/event';
 
 // The validation schema for creating commons (and creating typings by inferring them)
 const createCommonDataValidationScheme = yup.object({
@@ -109,7 +111,12 @@ export const createCommon = async (payload: CreateCommonPayload): Promise<ICommo
     register: 'na'
   });
 
-  // @todo Create CommonCreatedEvent :D
+  // Broadcast the common created event
+  await createEvent({
+    userId,
+    objectId: common.id,
+    type: EVENT_TYPES.COMMON_CREATED
+  });
 
   return common;
-}
+};

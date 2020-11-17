@@ -10,6 +10,8 @@ import { commonDb } from '../../common/database';
 
 import { proposalDb } from '../database';
 import { IFundingRequestProposal, IProposalFile, IProposalLink } from '../proposalTypes';
+import { createEvent } from '../../util/db/eventDbService';
+import { EVENT_TYPES } from '../../event/event';
 
 const createFundingProposalValidationSchema = yup.object({
   commonId: yup
@@ -90,7 +92,12 @@ export const createFundingRequest = async (payload: CreateFundingProposalPayload
     quietEndingPeriod: env.durations.funding.quietEndingPeriod
   });
 
-  // @todo Broadcast the event
+  // Emit funding request created event
+  await createEvent({
+    userId: payload.proposerId,
+    objectId: fundingProposal.id,
+    type: EVENT_TYPES.FUNDING_REQUEST_CREATED
+  })
 
   // Return the payload
   return fundingProposal as IFundingRequestProposal;

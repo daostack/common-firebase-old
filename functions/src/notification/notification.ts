@@ -20,7 +20,7 @@ interface IEventData {
 }
 
 export const notifyData: Record<string, IEventData> = {
-  [EVENT_TYPES.CREATION_COMMON]: {
+  [EVENT_TYPES.COMMON_CREATED]: {
       // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       data: async (objectId: string) => {
           const commonData = (await getDaoById(objectId)).data();
@@ -151,7 +151,7 @@ export const notifyData: Record<string, IEventData> = {
     },
     
   },
-  [EVENT_TYPES.APPROVED_FUNDING_REQUEST] : {
+  [EVENT_TYPES.FUNDING_REQUEST_ACCEPTED] : {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
         const proposalData = (await getProposalById(objectId)).data();

@@ -46,7 +46,8 @@ interface IBaseProposalEntity extends IBaseEntity {
   countdownPeriod: number;
 
   /**
-   * @todo No idea what that is. Find out :D
+   * This is the period at the end of the voting in which if
+   * vote flip occurs the countdown period will be extended
    */
   quietEndingPeriod: number;
 

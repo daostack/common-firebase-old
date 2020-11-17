@@ -13,6 +13,8 @@ import { fileValidationSchema, linkValidationSchema } from '../../util/schemas';
 import { proposalDb } from '../database';
 import { isCardOwner } from '../../circlepay/business/isCardOnwer';
 import { assignCardToProposal } from '../../circlepay/createCirclePayCard';
+import { createEvent } from '../../util/db/eventDbService';
+import { EVENT_TYPES } from '../../event/event';
 
 const createRequestToJoinValidationSchema = yup.object({
   commonId: yup
@@ -61,7 +63,7 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
   const common = await commonDb.getCommon(payload.commonId);
 
   // Check if the card is owned by the user
-  if(!(await isCardOwner(payload.proposerId, payload.cardId))) {
+  if (!(await isCardOwner(payload.proposerId, payload.cardId))) {
     // Do not let them know if that card exists. It is just 'NotFound' even
     // if it exists, but is not theirs
     throw new NotFoundError(payload.cardId, 'card');
@@ -119,7 +121,7 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
     join: {
       cardId: payload.cardId,
       funding: payload.funding,
-      fundingType: common.metadata.contributionType,
+      fundingType: common.metadata.contributionType
     },
 
     countdownPeriod: env.durations.join.countdownPeriod,
@@ -129,7 +131,12 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
   // Link the card to the proposal
   await assignCardToProposal(joinRequest.join.cardId, joinRequest.id);
 
-  // @todo Create event
+  // Create event
+  await createEvent({
+    userId: payload.proposerId,
+    objectId: joinRequest.id,
+    type: EVENT_TYPES.REQUEST_TO_JOIN_CREATED
+  });
 
   return joinRequest as IJoinRequestProposal;
 };
