@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions';
+
 import { Collections } from '../../constants';
 import { IEventEntity } from '../../event/type';
 import { EVENT_TYPES } from '../../event/event';
@@ -12,7 +13,7 @@ import { proposalDb } from '../database';
 
 export const onProposalApproved = functions.firestore
   .document(`/${Collections.Event}/{id}`)
-  .onCreate(async (eventSnap) => {
+  .onCreate(async (eventSnap, context) => {
       const event = eventSnap.data() as IEventEntity;
 
       if (event.type === EVENT_TYPES.FUNDING_REQUEST_ACCEPTED) {
@@ -37,6 +38,7 @@ export const onProposalApproved = functions.firestore
           proposalId: proposal.id,
           proposerId: proposal.proposerId,
           funding: proposal.join.funding,
+          sessionId: context.eventId
         });
 
         if(proposal.join.fundingType === 'monthly') {

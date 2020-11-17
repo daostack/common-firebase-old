@@ -27,6 +27,7 @@ export const createErrorResponse = (req: express.Request, res: express.Response,
       errorCode: error.errorCode,
       errorMessage: error.userMessage,
       request: {
+        id: req.sessionId,
         body: req.body,
         query: req.query,
         headers: req.headers
@@ -38,9 +39,10 @@ export const createErrorResponse = (req: express.Request, res: express.Response,
       error.statusCode ||
       StatusCodes.InternalServerError;
 
-    console.log(`
+    console.info(`
       Creating error response with message '${error.message}' 
       for error (${error.errorId || 'No id available'})
+      occurred in request ${req.sessionId}
     `);
 
 
