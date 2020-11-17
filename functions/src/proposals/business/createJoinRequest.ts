@@ -15,6 +15,7 @@ import { isCardOwner } from '../../circlepay/business/isCardOnwer';
 import { assignCardToProposal } from '../../circlepay/createCirclePayCard';
 import { createEvent } from '../../util/db/eventDbService';
 import { EVENT_TYPES } from '../../event/event';
+import { isTest } from '../../util/environment';
 
 const createRequestToJoinValidationSchema = yup.object({
   commonId: yup
@@ -62,8 +63,9 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
   // Acquire the required data
   const common = await commonDb.getCommon(payload.commonId);
 
-  // Check if the card is owned by the user
-  if (!(await isCardOwner(payload.proposerId, payload.cardId))) {
+  // @todo Make it work without difference for running in test mode (tests are needed for circlepay)
+  // Check if the card is owned by the user (only if not in tests)
+  if (!isTest && !(await isCardOwner(payload.proposerId, payload.cardId))) {
     // Do not let them know if that card exists. It is just 'NotFound' even
     // if it exists, but is not theirs
     throw new NotFoundError(payload.cardId, 'card');
@@ -128,8 +130,11 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
     quietEndingPeriod: env.durations.join.quietEndingPeriod
   }) as IJoinRequestProposal;
 
+  // @todo Make it work without difference for running in test mode (tests are needed for circlepay)
   // Link the card to the proposal
-  await assignCardToProposal(joinRequest.join.cardId, joinRequest.id);
+  if(!isTest) {
+    await assignCardToProposal(joinRequest.join.cardId, joinRequest.id);
+  }
 
   // Create event
   await createEvent({

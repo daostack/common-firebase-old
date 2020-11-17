@@ -15,7 +15,7 @@ const cleanTestCreatedDocs = async (collections: string[]): Promise<void> => {
     });
   }));
 
-  await batch.commit();
+  // await batch.commit();
 };
 
 afterAll(async () => {
