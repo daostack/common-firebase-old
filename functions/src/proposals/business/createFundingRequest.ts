@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 
-import { fileValidationSchema, linkValidationSchema } from '../../util/schemas';
+import { fileValidationSchema, imageValidationSchema, linkValidationSchema } from '../../util/schemas';
 import { CommonError } from '../../util/errors';
 import { validate } from '../../util/validate';
 import { Nullable } from '../../util/types';
@@ -9,7 +9,7 @@ import { isCommonMember } from '../../common/business';
 import { commonDb } from '../../common/database';
 
 import { proposalDb } from '../database';
-import { IFundingRequestProposal, IProposalFile, IProposalLink } from '../proposalTypes';
+import { IFundingRequestProposal, IProposalFile, IProposalImage, IProposalLink } from '../proposalTypes';
 import { createEvent } from '../../util/db/eventDbService';
 import { EVENT_TYPES } from '../../event/event';
 
@@ -39,6 +39,9 @@ const createFundingProposalValidationSchema = yup.object({
     .optional(),
 
   files: yup.array(fileValidationSchema)
+    .optional(),
+
+  images: yup.array(imageValidationSchema)
     .optional()
 });
 
@@ -80,6 +83,7 @@ export const createFundingRequest = async (payload: CreateFundingProposalPayload
       title: payload.title,
       description: payload.description,
       links: payload.links as Nullable<IProposalLink[]> || [],
+      images: payload.images as Nullable<IProposalImage[]> || [],
       files: payload.files as Nullable<IProposalFile[]> || []
     },
 

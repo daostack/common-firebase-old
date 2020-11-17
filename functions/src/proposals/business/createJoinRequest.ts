@@ -40,9 +40,6 @@ const createRequestToJoinValidationSchema = yup.object({
     .required(),
 
   links: yup.array(linkValidationSchema)
-    .optional(),
-
-  files: yup.array(fileValidationSchema)
     .optional()
 });
 
@@ -116,8 +113,7 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
 
     description: {
       description: payload.description,
-      links: payload.links as Nullable<IProposalLink[]> || [],
-      files: payload.files as Nullable<IProposalFile[]> || []
+      links: payload.links as Nullable<IProposalLink[]> || []
     },
 
     join: {

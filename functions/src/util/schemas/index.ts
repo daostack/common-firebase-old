@@ -36,3 +36,10 @@ export const fileValidationSchema = yup.object({
     .url()
     .required()
 });
+
+export const imageValidationSchema = yup.object({
+  value: yup
+    .string()
+    .url()
+    .required()
+});
