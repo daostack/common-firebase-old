@@ -4,7 +4,7 @@ import { updateCard } from '../util/db/cardDb';
 import { updatePayment, pollPaymentStatus, IPaymentResp } from '../util/db/paymentDb';
 import {ethers} from 'ethers';
 import {v4} from 'uuid';
-import { NotFoundError } from '../util/errors/NotFoundError';
+import { CommonError } from '../util/errors/CommonError';
 
 const _updatePayment = async (paymentResponse: IPaymentResp, proposalId: string) : Promise<any> => {
   const doc = {
@@ -65,9 +65,7 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
     }
     pollPaymentStatus(data.data, proposerId, proposalId);
   } else {
-     // the error message will say: cannot find card with identified ${proposalId},
-     // should I make a CardError class, or use this NotFoundError?
-    throw new NotFoundError(proposalId, 'card');
+    throw new CommonError(`Could not find card with proposalId (${proposalId}).`);
   } 
   return `Create Payment: ${result}`;
 }
