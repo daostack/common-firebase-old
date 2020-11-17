@@ -34,8 +34,5 @@ jobs:
       - name: Install packages
         run: yarn install
 
-      - name: Setup CI environment
-        run: yarn ci:setup --token ${{ secrets.FIREBASE_TOKEN }}
-
       - name: Run tests
         run: yarn ci:test
