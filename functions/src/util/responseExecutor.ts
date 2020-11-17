@@ -1,7 +1,6 @@
 import express from 'express';
 
 import { StatusCodes } from '../constants';
-import { ValidationError } from './errors';
 
 interface IResponseExecutorAction {
   (): any;

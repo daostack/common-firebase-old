@@ -1,14 +1,15 @@
 import * as yup from 'yup';
 
-import { IFundingRequestProposal, IProposalFile, IProposalLink } from '../proposalTypes';
-import { CommonError, NotImplementedError } from '../../util/errors';
+import { fileValidationSchema, linkValidationSchema } from '../../util/schemas';
+import { CommonError } from '../../util/errors';
 import { validate } from '../../util/validate';
+import { Nullable } from '../../util/types';
+import { env, StatusCodes } from '../../constants';
 import { isCommonMember } from '../../common/business';
 import { commonDb } from '../../common/database';
-import { env, StatusCodes } from '../../constants';
+
 import { proposalDb } from '../database';
-import { fileValidationSchema, linkValidationSchema } from '../../util/schemas';
-import { Nullable } from '../../util/types';
+import { IFundingRequestProposal, IProposalFile, IProposalLink } from '../proposalTypes';
 
 const createFundingProposalValidationSchema = yup.object({
   commonId: yup

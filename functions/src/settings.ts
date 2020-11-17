@@ -37,7 +37,7 @@ export const PROPOSAL_TYPE = {
 };
 const secretClient = new SecretManagerServiceClient();
 
-export const getSecret = async (secretName) => {
+export const getSecret = async (secretName: string): Promise<any> => {
   const secret = `projects/${env.secretManagerProject}/secrets/${secretName}/versions/latest`;
   const [secretResult] = await secretClient.accessSecretVersion({name: secret})
   return secretResult.payload.data.toString();
