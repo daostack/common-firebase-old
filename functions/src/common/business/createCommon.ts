@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 
 import { validate } from '../../util/validate';
-import { commonLinkValidationScheme, commonRuleValidationSchema } from '../../util/schemas';
+import { commonLinkValidationScheme, commonRuleValidationSchema, linkValidationSchema } from '../../util/schemas';
 
 import { commonDb } from '../database';
 import { ICommonEntity, ICommonLink, ICommonRule } from '../types';
@@ -50,7 +50,7 @@ const createCommonDataValidationScheme = yup.object({
   rules: yup.array(commonRuleValidationSchema)
     .optional(),
 
-  links: yup.array(commonLinkValidationScheme)
+  links: yup.array(linkValidationSchema)
     .optional()
 });
 
