@@ -1,8 +1,7 @@
 import { db } from '../../settings';
 import { DocumentData, DocumentReference } from '@google-cloud/firestore';
-import {Collections} from '../../constants/collections';
+import { Collections } from '../../constants';
 
-// using DocumentData seems a bit vague though
 export const updateCard = async (doc: DocumentData): Promise<any> => (
   await db.collection(Collections.Cards)
     .doc(doc.id)
