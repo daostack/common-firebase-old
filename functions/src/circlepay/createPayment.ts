@@ -1,20 +1,8 @@
 import { Utils } from '../util/util';
 import { createAPayment } from './circlepay';
 import { updateCard } from '../util/db/cardDb';
-import { updatePayment, pollPaymentStatus } from '../util/db/paymentDb';
-// import {ethers} from 'ethers';
+import { updatePayment, pollPaymentStatus, IPaymentResp } from '../util/db/paymentDb';
 import {v4} from 'uuid';
-
-interface IPaymentResp {
-  id: string,
-  type: string,
-  source: {id: string, type: string},
-  amount: {amount: string, currency: string},
-  status: string,
-  refunds: string[],
-  createDate: string,
-  updateDate: string,
-}
 
 const _updatePayment = async (paymentResponse: IPaymentResp, proposalId: string) : Promise<any> => {
   const doc = {
@@ -36,10 +24,10 @@ interface IRequest {
   proposerId: string,
   proposalId: string,
   funding: number,
-  sessionId: string,
+  sessionId: string
 }
 
-export const createPaymentWeb = async (req: IRequest) : Promise<any> => {
+export const createPayment = async (req: IRequest) : Promise<any> => {
   let result = 'Could not process payment.';
   const {proposerId, proposalId, funding, ipAddress} = req;
   const cardData = await Utils.getCardByProposalId(proposalId);
@@ -51,7 +39,7 @@ export const createPaymentWeb = async (req: IRequest) : Promise<any> => {
       idempotencyKey: v4(),
       proposalId,
       metadata: {
-        email: user.email, 
+        email: user.email,
         sessionId: req.sessionId,
         ipAddress,
       },
@@ -75,7 +63,7 @@ export const createPaymentWeb = async (req: IRequest) : Promise<any> => {
       result = `Payment created. PaymentdId: ${data.data.id}`;
     }
     pollPaymentStatus(data.data, proposerId, proposalId);
-  } 
+  }
   // else if proposal is not associated with card?
   return `Create Payment: ${result}`;
 }

@@ -2,7 +2,7 @@ import admin from 'firebase-admin';
 
 import { ISubscriptionEntity, Nullable } from '../../util/types';
 import { Collections } from '../../util/constants';
-import { CommonError } from '../../util/errors';
+import { CommonError, NotFoundError } from '../../util/errors';
 
 const db = admin.firestore();
 
@@ -26,11 +26,7 @@ export const findSubscriptionById = async (subscriptionId: Nullable<string>): Pr
     .get()).data() as Nullable<ISubscriptionEntity>;
 
   if (!subscription) {
-    throw new CommonError(`
-      Cannot find subscription with id ${subscriptionId}
-    `, null, {
-      statusCode: 404
-    });
+    throw new NotFoundError(subscriptionId, 'subscription');
   }
 
   return subscription;

@@ -11,18 +11,18 @@ import {
   Nullable
 } from '../util/types';
 import { Collections, ErrorCodes } from '../util/constants';
-import { createEvent } from '../db/eventDbService';
 import { externalRequestExecutor } from '../util';
 import { CommonError } from '../util/errors';
 import { EVENT_TYPES } from '../event/event';
 import { circlePayApi } from '../settings';
 import { Utils } from '../util/util';
 
-import { circlePayHeaders } from './circlepay';
 import { addPaymentToCard } from './addPaymentToCard';
 import { updateSubscription } from '../subscriptions/business';
-import { getCardById } from '../db/cardDb';
-import { updatePayment } from '../db/paymentDb';
+import { getCardById } from '../util/db/cardDb';
+import { updatePayment } from '../util/db/paymentDb';
+import { createEvent } from '../util/db/eventDbService';
+import { getCirclePayOptions } from './circlepay';
 
 const db = admin.firestore();
 
@@ -80,7 +80,6 @@ export const createSubscriptionPayment = async (subscription: ISubscriptionEntit
   await createEvent({
     userId: subscription.userId,
     objectId: result.payment.id,
-    createdAt: new Date(),
     type: EVENT_TYPES.PAYMENT_CREATED
   });
 
@@ -100,6 +99,7 @@ export const createSubscriptionPayment = async (subscription: ISubscriptionEntit
  */
 const makePayment = async (card: ICardEntity, amount: number): Promise<ICirclePaymentResponseData> => {
   const user = (await Utils.getUserById(card.userId)) as IUserEntity;
+  const options = await getCirclePayOptions();
 
   const paymentId = uuid();
 
@@ -124,7 +124,7 @@ const makePayment = async (card: ICardEntity, amount: number): Promise<ICirclePa
   const {data} = await externalRequestExecutor<ICirclePaymentResponse>(async () => {
     return (await axios.post<ICirclePaymentResponse>(`${circlePayApi}/payments`,
       paymentData,
-      circlePayHeaders
+      options
     )).data;
   }, {
     errorCode: ErrorCodes.CirclePayError,

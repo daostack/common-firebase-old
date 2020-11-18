@@ -1,6 +1,6 @@
 import { ICardEntity, IPaymentEntity } from '../util/types';
 import { CommonError } from '../util/errors';
-import { updateCard } from '../db/cardDb';
+import { updateCard } from '../util/db/cardDb';
 
 /**
  * Links payment with a card

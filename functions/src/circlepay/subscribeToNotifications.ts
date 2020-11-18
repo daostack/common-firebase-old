@@ -1,13 +1,13 @@
 import axios from 'axios';
 
-import { env } from '../env';
 import { circlePayApi } from '../settings';
 import { externalRequestExecutor } from '../util';
-import { circlePayHeaders } from './circlepay';
 import { ErrorCodes } from '../util/constants';
-import { IUserEntity } from '../util/types';
+import { getCirclePayOptions } from './circlepay';
 
 export const subscribeToNotifications = async (): Promise<void> => {
+  const options = await getCirclePayOptions();
+
   const currentSubscriptions = await externalRequestExecutor<{
     data: {
       id: string;
@@ -18,7 +18,7 @@ export const subscribeToNotifications = async (): Promise<void> => {
       }[]
     }[];
   }>(async () => {
-    return (await axios.get(`${circlePayApi}/notifications/subscriptions`, circlePayHeaders)).data;
+    return (await axios.get(`${circlePayApi}/notifications/subscriptions`, options)).data;
   }, {
     errorCode: ErrorCodes.CirclePayError,
     userMessage: 'Call to CirclePay failed. Please try again later and if the issue persist contact us.'
@@ -55,8 +55,10 @@ export const subscribeToNotifications = async (): Promise<void> => {
 };
 
 const unsubscribeFromNotification = async (notificationId: string): Promise<void> => {
+  const options = await getCirclePayOptions();
+
   await externalRequestExecutor(async () => {
-    return (await axios.delete(`${circlePayApi}/notifications/${notificationId}`, circlePayHeaders));
+    return (await axios.delete(`${circlePayApi}/notifications/${notificationId}`, options));
   }, {
     errorCode: ErrorCodes.CirclePayError,
     userMessage: 'Something bad happened while trying to unsubscribe from notification'
@@ -64,10 +66,12 @@ const unsubscribeFromNotification = async (notificationId: string): Promise<void
 };
 
 const subscribeEndpoint = async (endpoint: string): Promise<void> => {
+  const options = await getCirclePayOptions();
+
   await externalRequestExecutor(async () => {
     return (await axios.post(`${circlePayApi}/notifications/subscriptions`, {
       endpoint
-    }, circlePayHeaders));
+    }, options));
   }, {
     errorCode: ErrorCodes.CirclePayError,
     userMessage: 'Something bad happened while trying to unsubscribe from notification'

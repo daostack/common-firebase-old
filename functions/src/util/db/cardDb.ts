@@ -40,7 +40,7 @@ export const getCardById = async (cardId: string): Promise<ICardEntity> => {
     .get()).data() as Nullable<ICardEntity>;
 
   if(!card) {
-    throw new CommonError(`Cannot find card with id ${cardId}`, null, {
+    throw new CommonError(`Cannot find card with id ${cardId}`, {
       statusCode: 404
     });
   }

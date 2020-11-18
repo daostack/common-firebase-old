@@ -4,12 +4,7 @@ import request from 'request';
 import { responseExecutor } from '../util/responseExecutor';
 import { commonApp, commonRouter } from '../util/commonApp';
 
-<<<<<<< HEAD
 import { createCirclePayCard, testIP } from './createCirclePayCard';
-=======
-import { createCirclePayCard, assignCard } from './createCirclePayCard';
-import { createPaymentWeb } from './createPaymentWeb';
->>>>>>> recurring
 import { encryption } from './circlepay';
 import { CommonError } from '../util/errors';
 import { handleNotification } from './handleNotification';
@@ -67,9 +62,7 @@ circlepay.post('/notification/ping', async (req, res, next) => {
 
       request(envelope.SubscribeURL, (err) => {
         if (err) {
-          throw new CommonError(
-            'Something wrong happened verifying the request',
-            null, {
+          throw new CommonError('Something wrong happened verifying the request', {
               error: err,
               errorString: JSON.stringify(err)
             }
@@ -81,7 +74,7 @@ circlepay.post('/notification/ping', async (req, res, next) => {
     } else if (envelope.Type === 'Notification') {
       await handleNotification(JSON.parse(envelope.Message) as ICircleNotification);
     } else {
-      throw new CommonError(`Unsupported type: ${envelope.Type}`, null, {
+      throw new CommonError(`Unsupported type: ${envelope.Type}`, {
         envelope,
         envelopeString: JSON.stringify(envelope)
       });

@@ -1,10 +1,10 @@
-import { ISubscriptionEntity } from '../../util/types';
+import { ISubscriptionEntity } from '../types';
 import { CommonError } from '../../util/errors';
 
-import { createEvent } from '../../db/eventDbService';
 import { EVENT_TYPES } from '../../event/event';
 import { createSubscriptionPayment } from '../../circlepay/createSubscriptionPayment';
 import { findSubscriptionById } from './findSubscriptionById';
+import { createEvent } from '../../util/db/eventDbService';
 
 /**
  * Charges one subscription (only if the due date is
@@ -29,9 +29,7 @@ export const chargeSubscription = async (subscription: ISubscriptionEntity): Pro
   try {
     // Check if the due date is in the past
     if (subscription.dueDate > new Date()) {
-      throw new CommonError(
-        `Trying to charge subscription ${subscription.id}, but the due date is in the future!`,
-        `Cannot charge your subscription`, {
+      throw new CommonError(`Trying to charge subscription ${subscription.id}, but the due date is in the future!`, {
           subscription
         }
       );
@@ -42,7 +40,6 @@ export const chargeSubscription = async (subscription: ISubscriptionEntity): Pro
     await createEvent({
       userId: subscription.userId,
       objectId: subscription.id,
-      createdAt: new Date(),
       type: EVENT_TYPES.SUBSCRIPTION_PAYMENT_CREATED
     });
   } catch (e) {
@@ -53,7 +50,6 @@ export const chargeSubscription = async (subscription: ISubscriptionEntity): Pro
     await createEvent({
       userId: subscription.userId,
       objectId: subscription.id,
-      createdAt: new Date(),
       type: EVENT_TYPES.SUBSCRIPTION_PAYMENT_FAILED
     });
   }

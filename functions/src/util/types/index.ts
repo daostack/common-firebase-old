@@ -6,40 +6,6 @@ export type Nullable<T> = T | null | undefined;
 
 export type CirclePaymentStatus = 'pending' | 'confirmed' | 'paid' | 'failed';
 
-// @todo Delete
-export interface IProposalEntity {
-  id: string;
-
-  proposerId: string;
-
-  dao: string;
-
-  description: {
-    funding: number;
-  }
-}
-
-// @todo Delete
-export interface ICommonMember {
-  address: string;
-  userId: string;
-}
-
-// @todo Delete
-export interface ICommonMetadata {
-  contribution: 'monthly' | 'one-time';
-}
-
-// @todo Delete
-export interface ICommonEntity {
-  id: string;
-  name: string;
-
-  members: ICommonMember[];
-
-  metadata: ICommonMetadata;
-}
-
 export interface ICardEntity {
   id: string;
 
@@ -52,33 +18,11 @@ export interface ICardEntity {
   proposals: string[];
 }
 
-export interface IEventEntity {
-  id: string;
-
-  userId: string;
-  objectId: string;
-
-  createdAt: Date;
-  type: EVENT_TYPES;
-}
-
-
 // @todo Fix
 export interface IUserEntity {
   id: string;
 
   email: string;
-
-  /**
-   * The address of the on-chain wallet
-   */
-  safeAddress: string;
-
-  /**
-   * This is the address of the local wallet (which is the
-   * owner of the on-chain wallet, which is stored as safeAddress)
-   */
-  ethereumAddress: string;
 }
 
 export interface ICircleNotification {

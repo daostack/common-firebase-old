@@ -2,12 +2,11 @@ import admin from 'firebase-admin';
 
 import { ICircleNotification, IPaymentEntity } from '../util/types';
 import { saveSubscriptionPayment } from './createSubscriptionPayment';
-import { createEvent } from '../db/eventDbService';
-import { Collections } from '../util/constants';
 import { EVENT_TYPES } from '../event/event';
 import { CommonError } from '../util/errors';
 import { findSubscriptionById, handleFailedPayment, handleSuccessfulSubscriptionPayment } from '../subscriptions/business';
-import { getPaymentSnapshot } from '../db/paymentDb';
+import { createEvent } from '../util/db/eventDbService';
+import { getPaymentSnapshot } from '../util/db/paymentDb';
 
 const db = admin.firestore();
 
@@ -25,7 +24,7 @@ export const handleNotification = async (notification: ICircleNotification): Pro
     throw new CommonError(`
       Cannot handle notification that is not of type 'payments' 
       or does not have payment object!
-    `, null, {
+    `, {
       notification,
       notificationString: JSON.stringify(notification)
     });
@@ -49,7 +48,6 @@ export const handleNotification = async (notification: ICircleNotification): Pro
       await createEvent({
         userId: subscription.userId,
         objectId: paymentObj.id,
-        createdAt: new Date(),
         type
       });
     }

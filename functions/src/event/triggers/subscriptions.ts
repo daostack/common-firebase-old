@@ -7,10 +7,10 @@
 
 import * as functions from 'firebase-functions';
 
-import {createEvent} from '../../db/eventDbService';
 import {Collections} from '../../util/constants';
 import {ISubscriptionEntity} from '../../util/types';
 import {EVENT_TYPES} from '../event';
+import { createEvent } from '../../util/db/eventDbService';
 
 functions.firestore
   .document(`/${Collections.Subscriptions}/{id}`)
@@ -20,7 +20,6 @@ functions.firestore
     await createEvent({
       userId: subscription.userId,
       objectId: subscription.id,
-      createdAt: new Date(),
       type: EVENT_TYPES.SUBSCRIPTION_CREATED
     });
   });

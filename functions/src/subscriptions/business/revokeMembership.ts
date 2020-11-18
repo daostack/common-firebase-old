@@ -1,17 +1,16 @@
-import { burnToken } from '../../relayer/util/burnToken';
 import { ISubscriptionEntity } from '../types';
 import { IUserEntity } from '../../util/types';
 import { Utils } from '../../util/util';
 import { EVENT_TYPES } from '../../event/event';
-import { createEvent } from '../../db/eventDbService';
 
 import { updateSubscription } from './updateSubscription';
+import { createEvent } from '../../util/db/eventDbService';
 
 export const revokeMembership = async (subscription: ISubscriptionEntity): Promise<void> => {
+  // @todo Not cool. Rework
   const user = await Utils.getUserById(subscription.userId) as IUserEntity;
 
-  // @question Witch address should we use for burning the tokens (safe or ethereum)?
-  await burnToken(user.safeAddress);
+  // @todo
 
   subscription.revoked = true;
 
@@ -20,7 +19,6 @@ export const revokeMembership = async (subscription: ISubscriptionEntity): Promi
   await createEvent({
     userId: subscription.userId,
     objectId: subscription.id,
-    createdAt: new Date(),
     type: EVENT_TYPES.MEMBERSHIP_REVOKED
   });
 }

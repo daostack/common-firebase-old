@@ -1,10 +1,9 @@
 import * as functions from 'firebase-functions';
 
-import { commonApp, commonRouter } from '../util/commonApp';
+import { commonApp, commonRouter } from '../util';
 import { responseExecutor } from '../util/responseExecutor';
 import { runtimeOptions } from '../util/constants';
 import { CommonError } from '../util/errors';
-import { Utils } from '../util/util';
 import { cancelSubscription, findSubscriptionById } from './business';
 import { CancellationReason } from './business/cancelSubscription';
 
@@ -14,16 +13,13 @@ router.post('/cancel', async (req, res, next) => {
   await responseExecutor(async () => {
     const {subscriptionId} = req.query;
 
-    // @todo Refactor this into a better way
-    const userId = await Utils.verifyId(req.body.idToken);
-
     if (!subscriptionId) {
       throw new CommonError('The subscription id is required, but not provided!');
     }
 
     const subscription = await findSubscriptionById(subscriptionId as string);
 
-    if (subscription.userId !== userId) {
+    if (subscription.userId !== req.user.uid) {
       throw new CommonError(`
         Cannot cancel subscription that is not yours
       `);

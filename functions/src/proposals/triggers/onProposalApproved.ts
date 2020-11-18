@@ -33,6 +33,7 @@ export const onProposalApproved = functions.firestore
           throw new CommonError(`Cannot process approved request to join with id ${event.objectId}`);
         }
 
+        // @todo Nope
         await createPayment({
           ipAddress: '127.0.0.1',
           proposalId: proposal.id,

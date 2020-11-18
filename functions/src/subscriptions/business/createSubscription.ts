@@ -5,9 +5,11 @@ import { db } from '../../settings';
 import { Utils } from '../../util/util';
 import { CommonError } from '../../util/errors';
 import { Collections } from '../../util/constants';
-import { ICardEntity, ICommonEntity, IProposalEntity, ISubscriptionEntity } from '../../util/types';
 import { createSubscriptionPayment } from '../../circlepay/createSubscriptionPayment';
-import { getDaoById } from '../../db/daoDbService';
+import { IProposalEntity } from '../../proposals/proposalTypes';
+import { ISubscriptionEntity } from '../types';
+import { commonDb } from '../../common/database';
+import { ICardEntity } from '../../util/types';
 
 
 /**
@@ -23,6 +25,14 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
     throw new CommonError('Cannot create subscription without proposal')
   }
 
+  if(proposal.type !== 'join') {
+    throw new CommonError('Cannot create subscription for proposals that are not join proposals', {
+      proposal
+    });
+  }
+
+  // ---- @todo Extract that
+
   const card = (await Utils.getCardByProposalId(proposal.id)) as ICardEntity;
 
   if (!card) {
@@ -31,11 +41,9 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
     );
   }
 
-  // const common = (await db.collection(Collections.Commons)
-  //   .doc(proposal.dao)
-  //   .get()).data() as ICommonEntity;
+  // ----
 
-  const common = (await getDaoById(proposal.dao)).data() as ICommonEntity;
+  const common = await commonDb.getCommon(proposal.commonId);
 
   const subscription: ISubscriptionEntity = {
     id: v4(),
@@ -51,7 +59,7 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
       new Date().getDate()
     ),
 
-    amount: proposal.description.funding / 100,
+    amount: proposal.join.funding,
 
     status: 'Active',
     revoked: false,
