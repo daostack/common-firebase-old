@@ -2,7 +2,6 @@ import { Utils } from '../util/util';
 import { createAPayment } from './circlepay';
 import { updateCard } from '../util/db/cardDb';
 import { updatePayment, pollPaymentStatus, IPaymentResp } from '../util/db/paymentDb';
-import {ethers} from 'ethers';
 import {v4} from 'uuid';
 import { CommonError } from '../util/errors/CommonError';
 
@@ -26,6 +25,7 @@ interface IRequest {
   proposerId: string,
   proposalId: string,
   funding: number,
+  sessionId: string,
 }
 
 export const createPayment = async (req: IRequest) : Promise<any> => {
@@ -41,7 +41,7 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
       proposalId,
       metadata: {
         email: user.email, 
-        sessionId: ethers.utils.id(proposerId).substring(0,50),
+        sessionId: req.sessionId,
         ipAddress,
       },
       amount: {

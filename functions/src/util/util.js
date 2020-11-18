@@ -20,26 +20,6 @@ class Utils {
     return `https://app.common.io/common/${commonId}`
   }
 
-  async verifyId(idToken) {
-    try {
-      const decodedToken = await admin.auth().verifyIdToken(idToken)
-      return decodedToken.uid;
-    } catch (error) {
-      console.error(error);
-
-      throw new CommonError(CFError.invalidIdToken)
-    }
-  }
-
-  async getUserDataByIdToken(idToken) {
-    try {
-      const decodedToken = await admin.auth().verifyIdToken(idToken)
-      return await this.getUserById(decodedToken.uid);
-    } catch (error) {
-      throw new CommonError(CFError.invalidIdToken)
-    }
-  }
-
   getUserRef(uid) {
     return admin.firestore().collection('users').doc(uid);
   }
