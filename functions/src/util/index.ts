@@ -1,4 +1,5 @@
 import admin from 'firebase-admin';
+import Timestamp = admin.firestore.Timestamp;
 
 export const db = admin.firestore();
 
@@ -7,7 +8,11 @@ export { externalRequestExecutor } from './externalRequestExecutor';
 export { commonApp, commonRouter } from './commonApp';
 
 // -- Lonely helpers
-export const addMonth = (date: Date): Date => {
+export const addMonth = (date: Date | Timestamp): Date => {
+  if(!(date instanceof Date)) {
+    date = date.toDate();
+  }
+
   if (date) {
     const d = (date = new Date(Number(date))).getDate();
 

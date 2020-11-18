@@ -3,7 +3,7 @@ import { IUserEntity } from '../../util/types';
 import { Utils } from '../../util/util';
 import { EVENT_TYPES } from '../../event/event';
 
-import { updateSubscription } from './updateSubscription';
+import { updateSubscription } from '../database/updateSubscription';
 import { createEvent } from '../../util/db/eventDbService';
 
 export const revokeMembership = async (subscription: ISubscriptionEntity): Promise<void> => {

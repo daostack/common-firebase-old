@@ -16,7 +16,7 @@ const db = admin.firestore();
  *
  * @returns { ISubscriptionEntity } - The found subscription
  */
-export const findSubscriptionById = async (subscriptionId: Nullable<string>): Promise<ISubscriptionEntity> => {
+export const getSubscription = async (subscriptionId: Nullable<string>): Promise<ISubscriptionEntity> => {
   if (!subscriptionId) {
     throw new CommonError('Cannot get subscription without providing the id!');
   }

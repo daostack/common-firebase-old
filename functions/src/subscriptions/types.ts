@@ -1,11 +1,9 @@
-import { CirclePaymentStatus } from '../util/types';
+import admin from 'firebase-admin';
+import Timestamp = admin.firestore.Timestamp;
 
-export interface ISubscriptionEntity {
-  /**
-   * The main identifier of the subscription
-   */
-  id: string;
+import { CirclePaymentStatus, IBaseEntity } from '../util/types';
 
+export interface ISubscriptionEntity extends IBaseEntity {
   /**
    * Link to the current funding card
    */
@@ -31,7 +29,7 @@ export interface ISubscriptionEntity {
   /**
    * When the next payment is going to be created
    */
-  dueDate: Date;
+  dueDate: Timestamp;
 
   /**
    * The currents status of the subscription
@@ -80,7 +78,7 @@ export interface ISubscriptionPaymentFailure {
   /**
    * When did the payment failure occur
    */
-  paymentFailedOn: Date;
+  paymentFailedOn: Timestamp;
 }
 
 export interface ISubscriptionMetadata {

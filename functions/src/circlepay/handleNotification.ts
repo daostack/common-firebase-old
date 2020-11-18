@@ -1,14 +1,14 @@
-import admin from 'firebase-admin';
-
-import { ICircleNotification, IPaymentEntity } from '../util/types';
-import { saveSubscriptionPayment } from './createSubscriptionPayment';
 import { EVENT_TYPES } from '../event/event';
+
 import { CommonError } from '../util/errors';
-import { findSubscriptionById, handleFailedPayment, handleSuccessfulSubscriptionPayment } from '../subscriptions/business';
 import { createEvent } from '../util/db/eventDbService';
 import { getPaymentSnapshot } from '../util/db/paymentDb';
+import { ICircleNotification, IPaymentEntity } from '../util/types';
 
-const db = admin.firestore();
+import { subscriptionDb } from '../subscriptions/database';
+import { handleFailedPayment, handleSuccessfulSubscriptionPayment } from '../subscriptions/business';
+
+import { saveSubscriptionPayment } from './createSubscriptionPayment';
 
 /**
  * Handles incoming CirclePay notification
@@ -41,7 +41,7 @@ export const handleNotification = async (notification: ICircleNotification): Pro
   const paymentObj = paymentSnap.data() as IPaymentEntity;
 
   if(paymentObj.type === 'SubscriptionPayment') {
-    const subscription = await findSubscriptionById(paymentObj.subscriptionId);
+    const subscription = await subscriptionDb.getSubscription(paymentObj.subscriptionId);
     const updateRes = await saveSubscriptionPayment(subscription, notification.payment);
 
     const createPaymentEvent = async (type: EVENT_TYPES): Promise<void> => {

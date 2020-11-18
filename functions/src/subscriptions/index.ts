@@ -4,8 +4,9 @@ import { commonApp, commonRouter } from '../util';
 import { responseExecutor } from '../util/responseExecutor';
 import { runtimeOptions } from '../util/constants';
 import { CommonError } from '../util/errors';
-import { cancelSubscription, findSubscriptionById } from './business';
+import { cancelSubscription } from './business';
 import { CancellationReason } from './business/cancelSubscription';
+import { subscriptionDb } from './database';
 
 const router = commonRouter();
 
@@ -17,7 +18,7 @@ router.post('/cancel', async (req, res, next) => {
       throw new CommonError('The subscription id is required, but not provided!');
     }
 
-    const subscription = await findSubscriptionById(subscriptionId as string);
+    const subscription = await subscriptionDb.getSubscription(subscriptionId as string);
 
     if (subscription.userId !== req.user.uid) {
       throw new CommonError(`

@@ -1,10 +1,11 @@
 import admin from 'firebase-admin';
+import Timestamp = admin.firestore.Timestamp;
+
+import { addMonth } from '../../util';
+import { CommonError } from '../../util/errors';
 
 import { ISubscriptionEntity } from '../types';
-import { addMonth } from '../../util';
-import { Collections } from '../../util/constants';
-import { CommonError } from '../../util/errors';
-import { updateSubscription } from './updateSubscription';
+import { subscriptionDb } from '../database';
 
 const db = admin.firestore();
 
@@ -31,8 +32,8 @@ export const handleSuccessfulSubscriptionPayment = async (subscription: ISubscri
   }
 
   // Update the date only if it is in the past (it should always be!)
-  if(new Date(subscription.dueDate) < new Date()) {
-    subscription.dueDate = addMonth(subscription.dueDate);
+  if(subscription.dueDate.toDate() < new Date()) {
+    subscription.dueDate = Timestamp.fromDate(addMonth(subscription.dueDate));
   } else {
     throw new CommonError(
       `Trying to update due date that is in the future 
@@ -43,5 +44,5 @@ export const handleSuccessfulSubscriptionPayment = async (subscription: ISubscri
   // await db.collection(Collections.Subscriptions)
   //   .doc(subscription.id)
   //   .set(subscription);
-  await updateSubscription(subscription);
+  await subscriptionDb.updateSubscription(subscription);
 };

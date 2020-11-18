@@ -1,7 +1,7 @@
 import { ISubscriptionEntity } from '../types';
 import { IPaymentEntity } from '../../util/types';
 import { CommonError } from '../../util/errors';
-import { updateSubscription } from './updateSubscription';
+import { updateSubscription } from '../database/updateSubscription';
 import { revokeMembership } from './revokeMembership';
 
 /**

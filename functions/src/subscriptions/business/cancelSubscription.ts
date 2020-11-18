@@ -1,7 +1,7 @@
 import { EVENT_TYPES } from '../../event/event';
 import { ISubscriptionEntity } from '../types';
 
-import { updateSubscription } from './updateSubscription';
+import { updateSubscription } from '../database/updateSubscription';
 import { revokeMembership } from './revokeMembership';
 import { createEvent } from '../../util/db/eventDbService';
 

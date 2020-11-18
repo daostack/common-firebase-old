@@ -1,15 +1,15 @@
-import { v4 } from 'uuid';
+import admin from 'firebase-admin';
+import Timestamp = admin.firestore.Timestamp;
 
-import { db } from '../../settings';
 
 import { Utils } from '../../util/util';
 import { CommonError } from '../../util/errors';
-import { Collections } from '../../util/constants';
 import { createSubscriptionPayment } from '../../circlepay/createSubscriptionPayment';
 import { IProposalEntity } from '../../proposals/proposalTypes';
 import { ISubscriptionEntity } from '../types';
 import { commonDb } from '../../common/database';
 import { ICardEntity } from '../../util/types';
+import { subscriptionDb } from '../database';
 
 
 /**
@@ -45,19 +45,15 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
 
   const common = await commonDb.getCommon(proposal.commonId);
 
-  const subscription: ISubscriptionEntity = {
-    id: v4(),
-
+  // Save the created subscription
+  const subscription: ISubscriptionEntity = await subscriptionDb.addSubscription({
     payments: [],
     proposalId: proposal.id,
     userId: proposal.proposerId,
     cardId: card.id,
+
     // Using Date().getDate() to ignore the time
-    dueDate: new Date(
-      new Date().getFullYear(),
-      new Date().getMonth(),
-      new Date().getDate()
-    ),
+    dueDate: Timestamp.now(),
 
     amount: proposal.join.funding,
 
@@ -70,11 +66,7 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
         name: common.name
       }
     }
-  };
-
-  await db.collection(Collections.Subscriptions)
-    .doc(subscription.id)
-    .set(subscription);
+  });
 
   // Charge the subscription for the initial payment
   await createSubscriptionPayment(subscription);

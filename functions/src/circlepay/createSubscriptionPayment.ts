@@ -1,4 +1,3 @@
-import admin from 'firebase-admin';
 import axios from 'axios';
 import { v4 as uuid } from 'uuid';
 
@@ -7,10 +6,9 @@ import {
   ICardEntity,
   IPaymentEntity,
   ISubscriptionEntity,
-  IUserEntity,
-  Nullable
+  IUserEntity
 } from '../util/types';
-import { Collections, ErrorCodes } from '../util/constants';
+import { ErrorCodes } from '../util/constants';
 import { externalRequestExecutor } from '../util';
 import { CommonError } from '../util/errors';
 import { EVENT_TYPES } from '../event/event';
@@ -18,13 +16,12 @@ import { circlePayApi } from '../settings';
 import { Utils } from '../util/util';
 
 import { addPaymentToCard } from './addPaymentToCard';
-import { updateSubscription } from '../subscriptions/business';
 import { getCardById } from '../util/db/cardDb';
 import { updatePayment } from '../util/db/paymentDb';
 import { createEvent } from '../util/db/eventDbService';
 import { getCirclePayOptions } from './circlepay';
+import { subscriptionDb } from '../subscriptions/database';
 
-const db = admin.firestore();
 
 interface ICirclePaymentResponse {
   data: ICirclePaymentResponseData;
@@ -184,7 +181,7 @@ export const saveSubscriptionPayment = async (subscription: ISubscriptionEntity,
   // await db.collection(Collections.Subscriptions)
   //   .doc(subscription.id)
   //   .set(subscription);
-  await updateSubscription(subscription);
+  await subscriptionDb.updateSubscription(subscription);
 
   return {
     payment,

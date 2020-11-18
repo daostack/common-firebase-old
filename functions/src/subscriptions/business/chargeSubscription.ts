@@ -3,8 +3,8 @@ import { CommonError } from '../../util/errors';
 
 import { EVENT_TYPES } from '../../event/event';
 import { createSubscriptionPayment } from '../../circlepay/createSubscriptionPayment';
-import { findSubscriptionById } from './findSubscriptionById';
 import { createEvent } from '../../util/db/eventDbService';
+import { subscriptionDb } from '../database';
 
 /**
  * Charges one subscription (only if the due date is
@@ -14,7 +14,7 @@ import { createEvent } from '../../util/db/eventDbService';
  */
 export const chargeSubscriptionById = async (subscriptionId: string): Promise<void> => {
   await chargeSubscription(
-    await findSubscriptionById(subscriptionId)
+    await subscriptionDb.getSubscription(subscriptionId)
   );
 };
 
@@ -28,7 +28,7 @@ export const chargeSubscription = async (subscription: ISubscriptionEntity): Pro
   // @todo Remember to do something if the charge failed, cause the subscription will not be charged again from here!!!
   try {
     // Check if the due date is in the past
-    if (subscription.dueDate > new Date()) {
+    if (subscription.dueDate.toDate() > new Date()) {
       throw new CommonError(`Trying to charge subscription ${subscription.id}, but the due date is in the future!`, {
           subscription
         }

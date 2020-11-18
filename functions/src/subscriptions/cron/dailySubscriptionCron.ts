@@ -1,6 +1,5 @@
 import * as functions from 'firebase-functions';
-import { chargeSubscriptions } from '../business/chargeSubscriptions';
-import { revokeMemberships } from '../business';
+import { chargeSubscriptions, revokeMemberships } from '../business';
 
 /**
  * Runs the daily cron job, responsible for charging the subscriptions
