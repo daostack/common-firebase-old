@@ -40,15 +40,13 @@ To run the script, you need to install gcloud and
 For ios:
 ```curl https://sdk.cloud.google.com | bash```
 
-# hosting 
-# functions
+# Cloud Functions
 
 ## Running the Cloud functions
 
 To run the firebase functions for the api you can run the following commands to:
 
 ### Locally
-
 
 **1. Set the environment which you want to start locally.**\
   (at this point we are using the **staging** env while testing/develop locally)
@@ -74,25 +72,12 @@ Note that this these cloud functions will operate on the production instance if 
 To deploy these functions, you will need some secrets in ./functions/_keys.
 Please ask the administrators for these keys.
 
-
 ```
 yarn deploy:staging
 yarn deploy:production
 ```
 
 ### Development
-To run a pubsub function you will need to have firebase-tools installed, run
-```
-npm i -g firebase-tools
-```
-Then run the following command to create a shell
-```
-firebase functions:shell
-```
-you can then call the API functions
 
-```
-graphql.graphql.get('update-daos')
-graphql.graphql.get('update-proposals')
-graphql.graphql.get('update-proposal-by-id')
-```
+// @todo
+    

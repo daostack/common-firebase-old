@@ -10,6 +10,7 @@
   "circlepay": {
     "apiUrl": "https://api-sandbox.circle.com/v1"
   },
+<<<<<<< HEAD
   "durations": {
     "funding": {
       "countdownPeriod": 604800,
@@ -21,4 +22,10 @@
     }
   },
   "secretManagerProject": "common-staging-50741"
+=======
+  "endpoints": {
+    "base": "https://us-central1-common-staging-50741.cloudfunctions.net",
+    "notifications": "/notifications/ping"
+  }
+>>>>>>> recurring
 }

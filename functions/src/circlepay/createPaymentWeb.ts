@@ -39,7 +39,7 @@ interface IRequest {
   sessionId: string,
 }
 
-export const createPayment = async (req: IRequest) : Promise<any> => {
+export const createPaymentWeb = async (req: IRequest) : Promise<any> => {
   let result = 'Could not process payment.';
   const {proposerId, proposalId, funding, ipAddress} = req;
   const cardData = await Utils.getCardByProposalId(proposalId);

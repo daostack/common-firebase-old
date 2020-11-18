@@ -91,7 +91,7 @@ export const createAPayment = async (paymentData: IPayment) : Promise<any> => {
   return await externalRequestExecutor(async () => {
     return await axios.post(`${circlePayApi}/payments`,
       paymentData,
-      options
+      circlePayHeaders
     );
   }, {
     errorCode: ErrorCodes.CirclePayError,
