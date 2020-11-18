@@ -5,6 +5,7 @@ import { IEventModel } from '../../event';
 import { createSubscription } from '../business';
 import { IJoinRequestProposal } from '../../proposals/proposalTypes';
 import { proposalDb } from '../../proposals/database';
+import { Collections } from '../../constants';
 
 /**
  * This trigger is executed on all proposal approval and is used
@@ -12,7 +13,7 @@ import { proposalDb } from '../../proposals/database';
  * use monthly payments
  */
 export const createSubscriptionsTrigger = functions.firestore
-  .document('/events/{id}')
+  .document(`/${Collections.Subscriptions}/{id}`)
   .onCreate(async (snap) => {
     const event = snap.data() as IEventModel;
 
