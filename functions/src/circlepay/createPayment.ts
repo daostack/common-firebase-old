@@ -1,6 +1,6 @@
 import { Utils } from '../util/util';
 import { createAPayment } from './circlepay';
-import { updateCard } from '../util/db/cardDb';
+import { updateCard, getCardByProposalId } from '../util/db/cardDb';
 import { updatePayment, pollPaymentStatus, IPaymentResp } from '../util/db/paymentDb';
 import {v4} from 'uuid';
 import { CommonError } from '../util/errors/CommonError';
@@ -31,7 +31,7 @@ interface IRequest {
 export const createPayment = async (req: IRequest) : Promise<any> => {
   let result = 'Could not process payment.';
   const {proposerId, proposalId, funding, ipAddress} = req;
-  const cardData = await Utils.getCardByProposalId(proposalId);
+  const cardData = await getCardByProposalId(proposalId);
 
   // if proposal is associeated with a card
   if (cardData) {

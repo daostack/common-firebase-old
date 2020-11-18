@@ -37,14 +37,8 @@ interface ICardCreatedPayload {
 
 export const createCirclePayCard = async (req: IRequest): Promise<ICardCreatedPayload> => {
   const cardData = req.body;
-
-  const uid: string = req.user.uid;
-
-  cardData.metadata.ipAddress = req.headers['x-forwarded-for'] || '127.0.0.1';  //req.headers.host.includes('localhost')
-                                                                                // ? '127.0.0.1' : req.headers.host;
-                                                                                // //ip must be like xxx.xxx.xxx.xxx,
-                                                                                // and not a text
-  cardData.metadata.sessionId = v4(); //ethers.utils.id(cardData.proposalId).substring(0,50);
+  cardData.metadata.ipAddress = req.headers['x-forwarded-for'] || '127.0.0.1';
+  cardData.metadata.sessionId = v4();
   cardData.idempotencyKey = v4();
 
   const { data } = await createCard(cardData);
@@ -79,15 +73,14 @@ export const assignCardToProposal = async (cardId: string, proposalId: string): 
     return;
   }
 
-  await cardDb.updateCard(cardId, {
+  await cardDb.updateCard({
+    id: cardId,
     proposals: [
       ...card.proposals,
       proposalId
     ]
   });
 };
-
-
 
 interface ITestIpPayload {
   ip: string;
