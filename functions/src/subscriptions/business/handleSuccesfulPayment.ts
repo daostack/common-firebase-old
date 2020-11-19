@@ -6,6 +6,8 @@ import { CommonError } from '../../util/errors';
 
 import { ISubscriptionEntity } from '../types';
 import { subscriptionDb } from '../database';
+import { commonDb } from '../../common/database';
+import { proposalDb } from '../../proposals/database';
 
 const db = admin.firestore();
 
@@ -32,7 +34,7 @@ export const handleSuccessfulSubscriptionPayment = async (subscription: ISubscri
   }
 
   // Update the date only if it is in the past (it should always be!)
-  if(subscription.dueDate.toDate() < new Date()) {
+  if (subscription.dueDate.toDate() < new Date()) {
     subscription.dueDate = Timestamp.fromDate(addMonth(subscription.dueDate));
   } else {
     throw new CommonError(
@@ -41,8 +43,16 @@ export const handleSuccessfulSubscriptionPayment = async (subscription: ISubscri
     `);
   }
 
-  // await db.collection(Collections.Subscriptions)
-  //   .doc(subscription.id)
-  //   .set(subscription);
-  await subscriptionDb.updateSubscription(subscription);
+  // Update the common
+  const proposal = await proposalDb.getJoinRequest(subscription.proposalId);
+  const common = await commonDb.getCommon(proposal.commonId);
+
+  common.balance += proposal.join.funding;
+  common.raised += proposal.join.funding;
+
+  // Save the updated data
+  await Promise.all([
+    commonDb.updateCommon(common),
+    subscriptionDb.updateSubscription(subscription)
+  ]);
 };

@@ -51,7 +51,7 @@ interface ICirclePaymentResponseData {
 /**
  * Creates a payment for subscription and saves it.
  *
- * @param subscriptionId - The id of the subscription that you want to charge
+ * @param subscription - The the subscription that you want to charge
  *
  * @throws { CommonError } - If there is pending payment
  *
@@ -86,7 +86,7 @@ export const createSubscriptionPayment = async (subscription: ISubscriptionEntit
 /**
  * Creates a payment on card. This only charges the card in circle and does not create payment record!
  *
- * @param cardId - the id of the card entity that we will charge (not the cardId from circle)
+ * @param card - the id of the card entity that we will charge (not the cardId from circle)
  * @param amount - the amount that we want to charge in USD
  *
  * @throws { CommonError } - if there is no card found for the provided card ID
@@ -113,7 +113,7 @@ const makePayment = async (card: ICardEntity, amount: number): Promise<ICirclePa
       currency: 'USD'
     },
     source: {
-      id: card.cardId,
+      id: card.id,
       type: 'card'
     }
   };

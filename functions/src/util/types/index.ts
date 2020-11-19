@@ -1,4 +1,3 @@
-import { EVENT_TYPES } from '../../event/event';
 import { IPaymentAmount, IPaymentRefund, IPaymentSource } from './payments';
 
 export type valueOf<T> = T[keyof T];

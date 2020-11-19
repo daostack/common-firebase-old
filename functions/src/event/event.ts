@@ -14,6 +14,7 @@ export enum EVENT_TYPES {
     COMMON_CREATION_FAILED = 'commonCreationFailed',
     COMMON_WHITELISTED = 'commonWhitelisted',
     COMMON_MEMBER_ADDED = 'commonMemberAdded',
+    COMMON_MEMBER_REMOVED = 'commonMemberRemoved',
 
 
     // Request to join related events

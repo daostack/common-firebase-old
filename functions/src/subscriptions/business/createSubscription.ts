@@ -10,6 +10,8 @@ import { ISubscriptionEntity } from '../types';
 import { commonDb } from '../../common/database';
 import { ICardEntity } from '../../util/types';
 import { subscriptionDb } from '../database';
+import { createEvent } from '../../util/db/eventDbService';
+import { EVENT_TYPES } from '../../event/event';
 
 
 /**
@@ -66,6 +68,13 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
         name: common.name
       }
     }
+  });
+
+  // Subscription is created so broadcast that
+  await createEvent({
+    userId: subscription.userId,
+    objectId: subscription.id,
+    type: EVENT_TYPES.SUBSCRIPTION_CREATED
   });
 
   // Charge the subscription for the initial payment
