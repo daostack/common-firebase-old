@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 
 import { validate } from '../../util/validate';
-import { commonLinkValidationScheme, commonRuleValidationSchema, linkValidationSchema } from '../../util/schemas';
+import { commonRuleValidationSchema, linkValidationSchema } from '../../util/schemas';
 
 import { commonDb } from '../database';
 import { ICommonEntity, ICommonLink, ICommonRule } from '../types';
