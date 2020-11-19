@@ -30,10 +30,6 @@ export enum EVENT_TYPES {
     FUNDING_REQUEST_EXECUTED = 'fundingRequestExecuted',
 
 
-    // Generic proposal related events
-    CREATION_PROPOSAL = 'creationProposal',
-
-
     // Voting related events
     VOTE_CREATED = 'voteCreated',
 
@@ -61,7 +57,7 @@ export const eventData: Record<string, IEventData> = {
             return [common.members[0].userId];
         }
     },
-    [EVENT_TYPES.CREATION_PROPOSAL]: {
+    [EVENT_TYPES.FUNDING_REQUEST_CREATED]: {
         eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: async (proposal: any): Promise<string[]> => {
