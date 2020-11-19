@@ -5,8 +5,6 @@ import { runtimeOptions } from '../constants';
 import { responseExecutor } from '../util/responseExecutor';
 
 import { createCommon } from './business';
-import { removeCommonMember } from './business/removeCommonMember';
-import { commonDb } from './database';
 
 const router = commonRouter();
 

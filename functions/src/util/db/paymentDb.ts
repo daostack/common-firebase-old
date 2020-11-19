@@ -5,15 +5,12 @@ import { EVENT_TYPES } from '../../event/event';
 import { createEvent } from '../db/eventDbService';
 import {Collections} from '../../constants';
 import { DocumentData } from '@google-cloud/firestore';
-import firebase from 'firebase';
-import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
-import { IPaymentEntity } from '../types';
 
 const polling = async ({validate, interval, paymentId}) : Promise<any> => {
-  console.log('start polling');
-  let attempts = 0;
-
-  const executePoll = async (resolve, reject) => {
+	console.log('start polling');
+	let attempts = 0;
+	
+	const executePoll = async (resolve, reject) => {
     console.log(`- poll #${attempts}`);
     const {data: {data}} = await getPayment(paymentId);
     attempts++;
@@ -42,24 +39,24 @@ export interface IPaymentResp {
 }
 
 export const pollPaymentStatus = async (paymentData: IPaymentResp, proposerId: string, proposalId: string) : Promise<any> => (
-  polling({
-    validate: (payment) => payment.status === 'confirmed',
-    interval: 10000,
-    paymentId: paymentData.id
-  })
-    .then(async (payment) => {
-      return await updateStatus(payment, 'confirmed');
+	polling({
+      validate: (payment) => payment.status === 'confirmed',
+      interval: 10000,
+      paymentId: paymentData.id
     })
-    .catch(async ({err,payment}) => {
-      console.error('Polling error', err);
-      // we are creating an event, but not using the error message from circle (e.g. card_invalid)
-      await createEvent({
-        userId: proposerId,
-        objectId: proposalId,
-        type: EVENT_TYPES.PAYMENT_FAILED
+      .then(async (payment) => {
+        return await updateStatus(payment, 'confirmed');
       })
-      return await updateStatus(payment, 'failed'); //@question perhaps send circle error status as the status for db?
-    })
+      .catch(async ({err,payment}) => {
+          console.error('Polling error', err);
+        // we are creating an event, but not using the error message from circle (e.g. card_invalid)
+        await createEvent({
+          userId: proposerId,
+          objectId: proposalId,
+          type: EVENT_TYPES.PAYMENT_FAILED
+        })
+        return await updateStatus(payment, 'failed'); //@question perhaps send circle error status as the status for db?
+      })
 );
 
 const updateStatus = async(payment, status) => {
@@ -75,15 +72,14 @@ export const updatePayment = async (paymentId: string, doc: DocumentData) : Prom
   await db.collection(Collections.Payments)
     .doc(paymentId)
     .set(
-      doc,
-      {
-        merge: true
-      }
+        doc,
+        {
+            merge: true
+        }
     )
 )
 
-export const getPaymentSnapshot = async (paymentId: string): Promise<DocumentSnapshot<IPaymentEntity>> => (
-  await db.collection(Collections.Payments)
-    .doc(paymentId)
-    .get() as unknown as DocumentSnapshot<IPaymentEntity>
-);
+export default {
+  updatePayment,
+  pollPaymentStatus
+}

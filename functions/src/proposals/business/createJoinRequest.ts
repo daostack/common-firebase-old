@@ -8,8 +8,8 @@ import { env, StatusCodes } from '../../constants';
 import { isCommonMember } from '../../common/business';
 import { commonDb } from '../../common/database';
 
-import { IJoinRequestProposal, IProposalFile, IProposalLink } from '../proposalTypes';
-import { fileValidationSchema, linkValidationSchema } from '../../util/schemas';
+import { IJoinRequestProposal, IProposalLink } from '../proposalTypes';
+import { linkValidationSchema } from '../../util/schemas';
 import { proposalDb } from '../database';
 import { isCardOwner } from '../../circlepay/business/isCardOnwer';
 import { assignCardToProposal } from '../../circlepay/createCirclePayCard';
