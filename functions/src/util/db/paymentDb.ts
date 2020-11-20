@@ -5,6 +5,9 @@ import { EVENT_TYPES } from '../../event/event';
 import { createEvent } from '../db/eventDbService';
 import {Collections} from '../../constants';
 import { DocumentData } from '@google-cloud/firestore';
+import { IPaymentEntity } from '../types';
+import admin from 'firebase-admin';
+import DocumentSnapshot = admin.firestore.DocumentSnapshot;
 
 const polling = async ({validate, interval, paymentId}) : Promise<any> => {
 	console.log('start polling');
@@ -78,6 +81,12 @@ export const updatePayment = async (paymentId: string, doc: DocumentData) : Prom
         }
     )
 )
+
+export const getPaymentSnapshot = async (paymentId: string): Promise<DocumentSnapshot<IPaymentEntity>> => (
+  await db.collection(Collections.Payments)
+    .doc(paymentId)
+    .get() as unknown as DocumentSnapshot<IPaymentEntity>
+);
 
 export default {
   updatePayment,
