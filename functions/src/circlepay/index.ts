@@ -10,6 +10,7 @@ import { CommonError } from '../util/errors';
 import { handleNotification } from './handleNotification';
 import { ICircleNotification } from '../util/types';
 import { subscribeToNotifications } from './subscribeToNotifications';
+import { createPayment } from './createPayment';
 
 const runtimeOptions = {
   timeoutSeconds: 540
@@ -99,6 +100,17 @@ circlepay.post('/notification/register', async (req, res, next) => {
     successMessage: 'Endpoints registered!'
   });
 });
+
+circlepay.post('/create-a-payment', async (req, res, next) => {    
+   await responseExecutor(    
+     async () => (await createPayment(req.body)),    
+     {    
+       req,    
+       res,    
+       next,    
+       successMessage: `Payment was successful`    
+     })    
+ });
 
 export const circlepayApp = functions
   .runWith(runtimeOptions)

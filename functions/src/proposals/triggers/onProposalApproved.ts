@@ -4,11 +4,12 @@ import { Collections } from '../../constants';
 import { IEventEntity } from '../../event/type';
 import { EVENT_TYPES } from '../../event/event';
 import { fundProposal } from '../business/fundProposal';
-import { proposalDb } from '../database';
 import { createSubscription } from '../../subscriptions/business';
+import { addCommonMemberByProposalId } from '../../common/business/addCommonMember';
 import { createPayment } from '../../circlepay/createPayment';
 import { commonDb } from '../../common/database';
-import { addCommonMemberByProposalId } from '../../common/business/addCommonMember';
+import { proposalDb } from '../database';
+import { createEvent } from '../../util/db/eventDbService';
 
 
 export const onProposalApproved = functions.firestore
@@ -20,6 +21,13 @@ export const onProposalApproved = functions.firestore
         console.info('Funding request was approved. Crunching some numbers');
 
         await fundProposal(event.objectId);
+
+        // Everything went fine so it is event time
+        await createEvent({
+          userId: event.userId,
+          objectId: event.objectId,
+          type: EVENT_TYPES.FUNDING_REQUEST_EXECUTED
+        });
       }
 
       // @refactor

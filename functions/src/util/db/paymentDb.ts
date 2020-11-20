@@ -42,24 +42,24 @@ export interface IPaymentResp {
 }
 
 export const pollPaymentStatus = async (paymentData: IPaymentResp, proposerId: string, proposalId: string) : Promise<any> => (
-  polling({
-    validate: (payment) => payment.status === 'confirmed',
-    interval: 10000,
-    paymentId: paymentData.id
-  })
-    .then(async (payment) => {
-      return await updateStatus(payment, 'confirmed');
+	polling({
+      validate: (payment) => payment.status === 'confirmed',
+      interval: 10000,
+      paymentId: paymentData.id
     })
-    .catch(async ({err,payment}) => {
-      console.error('Polling error', err);
-      // we are creating an event, but not using the error message from circle (e.g. card_invalid)
-      await createEvent({
-        userId: proposerId,
-        objectId: proposalId,
-        type: EVENT_TYPES.PAYMENT_FAILED
+      .then(async (payment) => {
+        return await updateStatus(payment, 'confirmed');
       })
-      return await updateStatus(payment, 'failed'); //@question perhaps send circle error status as the status for db?
-    })
+      .catch(async ({err,payment}) => {
+          console.error('Polling error', err);
+        // we are creating an event, but not using the error message from circle (e.g. card_invalid)
+        await createEvent({
+          userId: proposerId,
+          objectId: proposalId,
+          type: EVENT_TYPES.PAYMENT_FAILED
+        })
+        return await updateStatus(payment, 'failed'); //@question perhaps send circle error status as the status for db?
+      })
 );
 
 const updateStatus = async(payment, status) => {
@@ -87,3 +87,8 @@ export const getPaymentSnapshot = async (paymentId: string): Promise<DocumentSna
     .doc(paymentId)
     .get() as unknown as DocumentSnapshot<IPaymentEntity>
 );
+
+export default {
+  updatePayment,
+  pollPaymentStatus
+}

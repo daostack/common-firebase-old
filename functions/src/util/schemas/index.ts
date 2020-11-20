@@ -4,7 +4,7 @@ export const linkValidationSchema = yup.object({
   title: yup.string()
     .max(64),
 
-  address: yup.string()
+  value: yup.string()
     .required()
     .url()
 });
