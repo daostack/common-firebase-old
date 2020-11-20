@@ -125,11 +125,7 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
     countdownPeriod: env.durations.join.countdownPeriod,
     quietEndingPeriod: env.durations.join.quietEndingPeriod
   }) as IJoinRequestProposal;
-
-  // Link the card to the proposal
-  await assignCardToProposal(joinRequest.join.cardId, joinRequest.id);
-
-  // @todo Make it work without difference for running in test mode (tests are needed for circlepay)
+  
   // Link the card to the proposal
   if(!isTest) {
     await assignCardToProposal(joinRequest.join.cardId, joinRequest.id);
