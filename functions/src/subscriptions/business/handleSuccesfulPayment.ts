@@ -9,7 +9,6 @@ import { subscriptionDb } from '../database';
 import { commonDb } from '../../common/database';
 import { proposalDb } from '../../proposals/database';
 
-const db = admin.firestore();
 
 /**
  * Clears the state of the subscription and updates the due date on payment success

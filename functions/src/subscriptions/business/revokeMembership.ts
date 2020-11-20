@@ -1,6 +1,4 @@
 import { ISubscriptionEntity } from '../types';
-import { IUserEntity } from '../../util/types';
-import { Utils } from '../../util/util';
 import { EVENT_TYPES } from '../../event/event';
 
 import { updateSubscription } from '../database/updateSubscription';
