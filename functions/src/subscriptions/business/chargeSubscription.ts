@@ -14,7 +14,7 @@ import { subscriptionDb } from '../database';
  */
 export const chargeSubscriptionById = async (subscriptionId: string): Promise<void> => {
   await chargeSubscription(
-    await subscriptionDb.getSubscription(subscriptionId)
+    await subscriptionDb.get(subscriptionId)
   );
 };
 

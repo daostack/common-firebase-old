@@ -53,6 +53,6 @@ export const handleSuccessfulSubscriptionPayment = async (subscription: ISubscri
   // Save the updated data
   await Promise.all([
     commonDb.updateCommon(common),
-    subscriptionDb.updateSubscription(subscription)
+    subscriptionDb.update(subscription)
   ]);
 };

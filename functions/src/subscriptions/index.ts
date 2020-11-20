@@ -18,7 +18,7 @@ router.post('/cancel', async (req, res, next) => {
       throw new CommonError('The subscription id is required, but not provided!');
     }
 
-    const subscription = await subscriptionDb.getSubscription(subscriptionId as string);
+    const subscription = await subscriptionDb.get(subscriptionId as string);
 
     if (subscription.userId !== req.user.uid) {
       throw new CommonError(`

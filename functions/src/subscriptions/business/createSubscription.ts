@@ -23,12 +23,18 @@ import { EVENT_TYPES } from '../../event/event';
  * @throws { CommonError } - If the card, assigned to the proposal, is not found
  */
 export const createSubscription = async (proposal: IProposalEntity): Promise<ISubscriptionEntity> => {
-  if(!proposal || !proposal.id) {
-    throw new CommonError('Cannot create subscription without proposal')
+  if (!proposal || !proposal.id) {
+    throw new CommonError('Cannot create subscription without proposal');
   }
 
-  if(proposal.type !== 'join') {
+  if (proposal.type !== 'join') {
     throw new CommonError('Cannot create subscription for proposals that are not join proposals', {
+      proposal
+    });
+  }
+
+  if (!(await subscriptionDb.exists({proposalId: proposal.id}))) {
+    throw new CommonError('There is already created subscription for this proposal', {
       proposal
     });
   }
@@ -48,7 +54,7 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
   const common = await commonDb.getCommon(proposal.commonId);
 
   // Save the created subscription
-  const subscription: ISubscriptionEntity = await subscriptionDb.addSubscription({
+  const subscription: ISubscriptionEntity = await subscriptionDb.add({
     payments: [],
     proposalId: proposal.id,
     userId: proposal.proposerId,
