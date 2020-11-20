@@ -45,16 +45,9 @@ interface IRequest {
     keyId: string,
     encryptedData: string,
   };
-<<<<<<< HEAD
-
-  user?: {
-    uid: string;
-  };
-=======
   user: {
     uid: string;
   }
->>>>>>> dev
 }
 
 interface ICardCreatedPayload {
@@ -62,23 +55,10 @@ interface ICardCreatedPayload {
 }
 
 export const createCirclePayCard = async (req: IRequest): Promise<ICardCreatedPayload> => {
-<<<<<<< HEAD
-  const {idToken, ...cardData} = req.body;
-
-  let uid: string;
-
-  if(req.user.uid) {
-    uid = req.user.uid;
-  } else {
-    uid = await Utils.verifyId(idToken);
-  }
-
-=======
   const cardData = req.body;
 
   const uid: string = req.user.uid;
 
->>>>>>> dev
   cardData.metadata.ipAddress = req.headers['x-forwarded-for'] || '127.0.0.1';  //req.headers.host.includes('localhost')
                                                                                 // ? '127.0.0.1' : req.headers.host;
                                                                                 // //ip must be like xxx.xxx.xxx.xxx,
