@@ -8,11 +8,14 @@ import { env, StatusCodes } from '../../constants';
 import { isCommonMember } from '../../common/business';
 import { commonDb } from '../../common/database';
 
-import { IJoinRequestProposal, IProposalFile, IProposalLink } from '../proposalTypes';
-import { fileValidationSchema, linkValidationSchema } from '../../util/schemas';
+import { IJoinRequestProposal, IProposalLink } from '../proposalTypes';
+import { linkValidationSchema } from '../../util/schemas';
 import { proposalDb } from '../database';
 import { isCardOwner } from '../../circlepay/business/isCardOnwer';
 import { assignCardToProposal } from '../../circlepay/createCirclePayCard';
+import { createEvent } from '../../util/db/eventDbService';
+import { EVENT_TYPES } from '../../event/event';
+import { isTest } from '../../util/environment';
 
 const createRequestToJoinValidationSchema = yup.object({
   commonId: yup
@@ -37,9 +40,6 @@ const createRequestToJoinValidationSchema = yup.object({
     .required(),
 
   links: yup.array(linkValidationSchema)
-    .optional(),
-
-  files: yup.array(fileValidationSchema)
     .optional()
 });
 
@@ -60,8 +60,9 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
   // Acquire the required data
   const common = await commonDb.getCommon(payload.commonId);
 
-  // Check if the card is owned by the user
-  if(!(await isCardOwner(payload.proposerId, payload.cardId))) {
+  // @todo Make it work without difference for running in test mode (tests are needed for circlepay)
+  // Check if the card is owned by the user (only if not in tests)
+  if (!isTest && !(await isCardOwner(payload.proposerId, payload.cardId))) {
     // Do not let them know if that card exists. It is just 'NotFound' even
     // if it exists, but is not theirs
     throw new NotFoundError(payload.cardId, 'card');
@@ -112,14 +113,13 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
 
     description: {
       description: payload.description,
-      links: payload.links as Nullable<IProposalLink[]> || [],
-      files: payload.files as Nullable<IProposalFile[]> || []
+      links: payload.links as Nullable<IProposalLink[]> || []
     },
 
     join: {
       cardId: payload.cardId,
       funding: payload.funding,
-      fundingType: common.metadata.contributionType,
+      fundingType: common.metadata.contributionType
     },
 
     countdownPeriod: env.durations.join.countdownPeriod,
@@ -129,7 +129,18 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
   // Link the card to the proposal
   await assignCardToProposal(joinRequest.join.cardId, joinRequest.id);
 
-  // @todo Create event
+  // @todo Make it work without difference for running in test mode (tests are needed for circlepay)
+  // Link the card to the proposal
+  if(!isTest) {
+    await assignCardToProposal(joinRequest.join.cardId, joinRequest.id);
+  }
+
+  // Create event
+  await createEvent({
+    userId: payload.proposerId,
+    objectId: joinRequest.id,
+    type: EVENT_TYPES.REQUEST_TO_JOIN_CREATED
+  });
 
   return joinRequest as IJoinRequestProposal;
 };

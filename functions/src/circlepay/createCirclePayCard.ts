@@ -1,9 +1,9 @@
-import { Utils } from '../util/util';
 import { createCard } from './circlepay';
 import { updateCard } from '../util/db/cardDb';
 import { v4 } from 'uuid';
 import * as cardDb from '../util/db/cardDb';
 import axios from 'axios';
+import { NotFoundError } from '../util/errors';
 
 const _updateCard = async (userId: string, id: string, proposalId: string): Promise<any> => {
   const doc = {
@@ -25,7 +25,6 @@ const _updateCard = async (userId: string, id: string, proposalId: string): Prom
 interface IRequest {
   headers: { host?: string },
   body: {
-    idToken: string,
     billingDetails: {
       name: string,
       city: string,
@@ -46,10 +45,16 @@ interface IRequest {
     keyId: string,
     encryptedData: string,
   };
+<<<<<<< HEAD
 
   user?: {
     uid: string;
   };
+=======
+  user: {
+    uid: string;
+  }
+>>>>>>> dev
 }
 
 interface ICardCreatedPayload {
@@ -57,6 +62,7 @@ interface ICardCreatedPayload {
 }
 
 export const createCirclePayCard = async (req: IRequest): Promise<ICardCreatedPayload> => {
+<<<<<<< HEAD
   const {idToken, ...cardData} = req.body;
 
   let uid: string;
@@ -67,6 +73,12 @@ export const createCirclePayCard = async (req: IRequest): Promise<ICardCreatedPa
     uid = await Utils.verifyId(idToken);
   }
 
+=======
+  const cardData = req.body;
+
+  const uid: string = req.user.uid;
+
+>>>>>>> dev
   cardData.metadata.ipAddress = req.headers['x-forwarded-for'] || '127.0.0.1';  //req.headers.host.includes('localhost')
                                                                                 // ? '127.0.0.1' : req.headers.host;
                                                                                 // //ip must be like xxx.xxx.xxx.xxx,
@@ -94,6 +106,10 @@ export const createCirclePayCard = async (req: IRequest): Promise<ICardCreatedPa
  */
 export const assignCardToProposal = async (cardId: string, proposalId: string): Promise<void> => {
   const card = (await cardDb.getCardRef(cardId).get()).data();
+
+  if(!card) {
+    throw new NotFoundError(cardId, 'card');
+  }
 
   if (card.proposals.some(x => x === proposalId)) {
     // The proposal is already assigned to

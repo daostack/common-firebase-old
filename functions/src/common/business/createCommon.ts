@@ -1,10 +1,12 @@
 import * as yup from 'yup';
 
 import { validate } from '../../util/validate';
-import { commonRuleValidationSchema } from '../../util/schemas';
+import { commonRuleValidationSchema, linkValidationSchema } from '../../util/schemas';
 
 import { commonDb } from '../database';
-import { ICommonEntity, ICommonRule } from '../types';
+import { ICommonEntity, ICommonLink, ICommonRule } from '../types';
+import { createEvent } from '../../util/db/eventDbService';
+import { EVENT_TYPES } from '../../event/event';
 
 // The validation schema for creating commons (and creating typings by inferring them)
 const createCommonDataValidationScheme = yup.object({
@@ -43,9 +45,13 @@ const createCommonDataValidationScheme = yup.object({
 
   contributionType: yup.string()
     .oneOf(['one-time', 'monthly'])
-    .default('one-time'),
+    .default('one-time')
+    .required(),
 
   rules: yup.array(commonRuleValidationSchema)
+    .optional(),
+
+  links: yup.array(linkValidationSchema)
     .optional()
 });
 
@@ -69,6 +75,7 @@ export const createCommon = async (payload: CreateCommonPayload): Promise<ICommo
     name,
     image,
     rules,
+    links,
     userId,
     action,
     byline,
@@ -86,6 +93,7 @@ export const createCommon = async (payload: CreateCommonPayload): Promise<ICommo
     fundingGoalDeadline,
 
     rules: rules as ICommonRule[] || [],
+    links: links as ICommonLink[] || [],
 
     members: [{
       userId
@@ -104,7 +112,12 @@ export const createCommon = async (payload: CreateCommonPayload): Promise<ICommo
     register: 'na'
   });
 
-  // @todo Create CommonCreatedEvent :D
+  // Broadcast the common created event
+  await createEvent({
+    userId,
+    objectId: common.id,
+    type: EVENT_TYPES.COMMON_CREATED
+  });
 
   return common;
-}
+};
