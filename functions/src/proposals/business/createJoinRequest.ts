@@ -125,7 +125,7 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
     countdownPeriod: env.durations.join.countdownPeriod,
     quietEndingPeriod: env.durations.join.quietEndingPeriod
   }) as IJoinRequestProposal;
-  
+
   // Link the card to the proposal
   if(!isTest) {
     await assignCardToProposal(joinRequest.join.cardId, joinRequest.id);
