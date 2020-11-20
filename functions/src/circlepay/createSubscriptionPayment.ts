@@ -181,7 +181,7 @@ export const saveSubscriptionPayment = async (subscription: ISubscriptionEntity,
   // await db.collection(Collections.Subscriptions)
   //   .doc(subscription.id)
   //   .set(subscription);
-  await subscriptionDb.updateSubscription(subscription);
+  await subscriptionDb.update(subscription);
 
   return {
     payment,

@@ -13,7 +13,7 @@ import { Collections } from '../../constants';
  * use monthly payments
  */
 export const createSubscriptionsTrigger = functions.firestore
-  .document(`/${Collections.Subscriptions}/{id}`)
+  .document(`/${Collections.Event}/{id}`)
   .onCreate(async (snap) => {
     const event = snap.data() as IEventModel;
 

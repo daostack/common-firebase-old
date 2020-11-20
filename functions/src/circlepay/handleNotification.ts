@@ -41,7 +41,7 @@ export const handleNotification = async (notification: ICircleNotification): Pro
   const paymentObj = paymentSnap.data() as IPaymentEntity;
 
   if(paymentObj.type === 'SubscriptionPayment') {
-    const subscription = await subscriptionDb.getSubscription(paymentObj.subscriptionId);
+    const subscription = await subscriptionDb.get(paymentObj.subscriptionId);
     const updateRes = await saveSubscriptionPayment(subscription, notification.payment);
 
     const createPaymentEvent = async (type: EVENT_TYPES): Promise<void> => {
