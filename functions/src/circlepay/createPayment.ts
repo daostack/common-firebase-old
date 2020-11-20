@@ -1,20 +1,9 @@
 import { Utils } from '../util/util';
 import { createAPayment } from './circlepay';
-import { updateCard } from '../db/cardDb';
-import { updatePayment, pollPaymentStatus } from '../db/paymentDb';
-import {ethers} from 'ethers';
-import v4 from 'uuid';
-
-interface IPaymentResp {
-  id: string,
-  type: string,
-  source: {id: string, type: string},
-  amount: {amount: string, currency: string},
-  status: string,
-  refunds: string[],
-  createDate: string,
-  updateDate: string,
-}
+import { updateCard } from '../util/db/cardDb';
+import { updatePayment, pollPaymentStatus, IPaymentResp } from '../util/db/paymentDb';
+import {v4} from 'uuid';
+import { CommonError } from '../util/errors/CommonError';
 
 const _updatePayment = async (paymentResponse: IPaymentResp, proposalId: string) : Promise<any> => {
   const doc = {
@@ -36,12 +25,13 @@ interface IRequest {
   proposerId: string,
   proposalId: string,
   funding: number,
+  sessionId: string,
 }
 
 export const createPayment = async (req: IRequest) : Promise<any> => {
   let result = 'Could not process payment.';
   const {proposerId, proposalId, funding, ipAddress} = req;
-  const cardData = await Utils.getCardByProposalId(proposalId)
+  const cardData = await Utils.getCardByProposalId(proposalId);
 
   // if proposal is associeated with a card
   if (cardData) {
@@ -51,7 +41,7 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
       proposalId,
       metadata: {
         email: user.email, 
-        sessionId: ethers.utils.id(proposerId).substring(0,50),
+        sessionId: req.sessionId,
         ipAddress,
       },
       amount: {
@@ -60,11 +50,11 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
       },
       verification: 'none',
       source: {
-        id: cardData.cardId,
+        id: cardData.id,
         type: 'card'
       },
     }
-    // an error that needs attention: functions: Error: socket hang up, use promiseRetry
+
     const {data} = await createAPayment(paymentData);
 
     if (data) {
@@ -73,8 +63,9 @@ export const createPayment = async (req: IRequest) : Promise<any> => {
       await updateCard(cardData.id, cardData);
       result = `Payment created. PaymentdId: ${data.data.id}`;
     }
-    pollPaymentStatus(data.data);
+    pollPaymentStatus(data.data, proposerId, proposalId);
+  } else {
+    throw new CommonError(`Could not find card with proposalId (${proposalId}).`);
   } 
-  // else if proposal is not associated with card?
   return `Create Payment: ${result}`;
 }

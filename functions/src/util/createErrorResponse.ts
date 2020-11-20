@@ -1,7 +1,7 @@
 import express from 'express';
 
 import { CommonError, ICommonError } from './errors/CommonError';
-import { StatusCodes } from './constants';
+import { StatusCodes } from '../constants';
 
 export interface IErrorResponse {
   error: string;
@@ -14,6 +14,8 @@ export interface IErrorResponse {
 }
 
 export const createErrorResponse = (req: express.Request, res: express.Response, error: ICommonError): void => {
+  console.info(`Error occurred at ${req.path}`);
+
   // Here `error instanceof CommonError` does not work for some
   // strange reason so for now we can assume that if the error
   // has errorId it is CommonError
@@ -25,6 +27,7 @@ export const createErrorResponse = (req: express.Request, res: express.Response,
       errorCode: error.errorCode,
       errorMessage: error.userMessage,
       request: {
+        id: req.sessionId,
         body: req.body,
         query: req.query,
         headers: req.headers
@@ -36,9 +39,10 @@ export const createErrorResponse = (req: express.Request, res: express.Response,
       error.statusCode ||
       StatusCodes.InternalServerError;
 
-    console.log(`
+    console.info(`
       Creating error response with message '${error.message}' 
       for error (${error.errorId || 'No id available'})
+      occurred in request ${req.sessionId}
     `);
 
 
@@ -50,7 +54,7 @@ export const createErrorResponse = (req: express.Request, res: express.Response,
       new CommonError(`
         The error passed to createErrorResponse was not of
         CommonError type. This should never happen!
-      `, null, {
+      `, {
         payload: error
       })
     );

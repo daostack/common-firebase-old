@@ -1,7 +1,6 @@
 import express from 'express';
 
-import { getArc } from '../settings';
-import { StatusCodes } from './constants';
+import { StatusCodes } from '../constants';
 
 interface IResponseExecutorAction {
   (): any;
@@ -18,15 +17,11 @@ interface IResponseExecutor {
   (action: IResponseExecutorAction, payload: IResponseExecutorPayload): Promise<void>
 }
 
-export const responseExecutor: IResponseExecutor = async (action, { res, next, successMessage }): Promise<void> => {
+export const responseExecutor: IResponseExecutor = async (action, { req, res, next, successMessage }): Promise<void> => {
   try {
-    let actionResult = await action();
+    const actionResult = await action() || {};
 
-    // console.log(`ActionResult --> ${actionResult}`);
-
-    if (!actionResult) {
-      actionResult = {};
-    }
+    console.info(`Creating response for request ${req.sessionId}`);
 
     res
       .status(StatusCodes.Ok)
@@ -37,52 +32,6 @@ export const responseExecutor: IResponseExecutor = async (action, { res, next, s
 
     return next();
   } catch (e) {
-    return next(e);
-  }
-};
-
-interface IResponseCreateExecutor {
-  (action: IResponseExecutorAction, payload: IResponseExecutorPayload, retried?: boolean): Promise<void>
-}
-
-export const responseCreateExecutor: IResponseCreateExecutor = async (action, { req, res, next, successMessage }, retried = false): Promise<void> => {
-  const arc = await getArc();
-
-  try {
-    let actionResult = await action();
-
-    if (!actionResult) {
-      actionResult = {};
-    }
-
-    res
-      .status(StatusCodes.Ok)
-      .json({
-        message: successMessage,
-        ...actionResult
-      });
-
-    return next();
-  } catch (e) {
-    if (e.message.match('^No contract with address') && !retried) {
-
-      // @todo Type the arc if possible
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      await arc.fetchAllContracts(false);
-
-      console.log('<--- No contract with address error, updating new arc --->');
-
-      await responseCreateExecutor(action, {
-        req,
-        res,
-        next,
-        successMessage
-      }, true);
-
-      return next();
-    }
-
     return next(e);
   }
 };

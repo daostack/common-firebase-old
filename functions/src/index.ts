@@ -1,36 +1,25 @@
-import { env } from './env';
-import { tests } from './tests';
 import * as cron from './cron';
-import graphqlTriggers from './graphql/util/triggers';
-import * as notification from './notification';
 import * as event from './event';
-import * as circlepayTriggers from './circlepay/triggers';
-import * as emailTriggers from './email/triggers';
+import * as notification from './notification';
+import * as messageTriggers from './discussionMessage/triggers';
 
-import { createApp } from './creation';
-import { graphqlApp } from './graphql';
-import { relayerApp } from './relayer';
 import { circlepayApp } from './circlepay';
+import { commonsApp } from './common';
+import { proposalCrons, proposalTriggers, proposalsApp } from './proposals';
 import { backofficeApp } from './backoffice';
 
-// Add the __tests__ endpoints only if enabled
-if(env.tests.enabled) {
-  exports.tests = tests;
-}
 
 // --- Express apps
-exports.create = createApp;
-exports.relayer = relayerApp;
-exports.graphql = graphqlApp;
-exports.circlepay = circlepayApp;
-exports.backoffice = backofficeApp;
-
+export const commons = commonsApp;
+export const circlepay = circlepayApp;
+export const proposals = proposalsApp;
+export const backoffice = backofficeApp;
 
 // --- Triggers and Subscriptions
-exports.graphqlSubs = graphqlTriggers;
-exports.notificationSub = notification;
 exports.eventSub = event;
-exports.circlepayTriggers = circlepayTriggers;
-exports.emailTriggers = emailTriggers
+exports.notificationSub = notification;
+exports.proposalCrons = proposalCrons;
+exports.messageTriggers = messageTriggers;
+exports.proposalTriggers = proposalTriggers;
 
-exports.cronJobs = cron.crons;
+exports.cronJobs = cron;

@@ -3,9 +3,9 @@ import * as functions from 'firebase-functions';
 import { responseExecutor } from '../util/responseExecutor';
 import { commonApp, commonRouter } from '../util/commonApp';
 
-import { createCirclePayCard, assignCard } from './createCirclePayCard';
-import { createPayment } from './createPayment';
+import { createCirclePayCard, testIP } from './createCirclePayCard';
 import { encryption } from './circlepay';
+import { createPayment } from './createPayment';
 
 const runtimeOptions = {
   timeoutSeconds: 540
@@ -24,16 +24,6 @@ circlepay.post('/create-card', async (req, res, next) => {
     });
 });
 
-circlepay.post('/assign-card', async (req, res, next) => {
-  await responseExecutor(
-    async () => (await assignCard(req)), {
-      req,
-      res,
-      next,
-      successMessage: `CirclePay card assigned successfully!`
-    });
-});
-
 circlepay.get('/encryption', async (req, res, next) => {
   console.log('index/encryption');
   await responseExecutor(
@@ -46,17 +36,27 @@ circlepay.get('/encryption', async (req, res, next) => {
     });
 });
 
-circlepay.post('/create-a-payment', async (req, res, next) => {
-  console.log('index/create-a-payment');
+circlepay.get('/testIP', async (req, res, next) => {
   await responseExecutor(
-    async () => (await createPayment(req.body)),
+    async () => (await testIP()),
     {
       req,
       res,
       next,
-      successMessage: `Payment was successful`
-    })
+      successMessage: `Test Ip generated`
+    });
 });
+
+circlepay.post('/create-a-payment', async (req, res, next) => {    
+   await responseExecutor(    
+     async () => (await createPayment(req.body)),    
+     {    
+       req,    
+       res,    
+       next,    
+       successMessage: `Payment was successful`    
+     })    
+ });
 
 export const circlepayApp = functions
   .runWith(runtimeOptions)
