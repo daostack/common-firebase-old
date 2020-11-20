@@ -7,6 +7,16 @@ import { proposalsApp } from '../helpers/supertests';
 import { createTestCommon } from '../helpers/createTestCommon';
 import { createTestJoinRequest } from '../helpers/createTestProposal';
 
+import { isCardOwner } from '../../functions/src/circlepay/business/isCardOwner';
+import { assignCardToProposal } from '../../functions/src/circlepay/business/assignCardToProposal';
+
+jest.mock('../../functions/src/circlepay/business/isCardOwner');
+jest.mock('../../functions/src/circlepay/business/assignCardToProposal');
+
+(isCardOwner as jest.Mock).mockImplementation(async () => true);
+(assignCardToProposal as jest.Mock).mockImplementation(() => new Promise((resolve) => resolve()));
+
+
 const votingEndpoint = '/create/vote';
 
 const test = firebaseFunctionsTests({
