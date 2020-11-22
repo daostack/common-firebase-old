@@ -29,18 +29,6 @@ export const getCardByProposalId = async (proposalId: string) : Promise<any> => 
     return cardData;
   }
 
-  // moved from util/util.js, not in use at the moment
-   /*export const getCardByUserId = async (userId: string) : Promise<any> => {
-    const cardRef = await db.collection('cards')
-      .where('userId', '==', userId)
-      .get();
-        if (cardRef.docs.length === 0) {
-          throw new CommonError(`Could not find user with id ${userId} associated with a CirclePay card.`);
-        }
-    const cardData = cardRef.docs.map(doc => doc.data())[0];
-    return cardData;
-  }*/
-
 /**
  * Returns the card document reference by the card ID
  *
