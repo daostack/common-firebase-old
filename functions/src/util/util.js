@@ -62,9 +62,5 @@ class Utils {
 
 module.exports = {
   Utils: new Utils(),
-  PROPOSAL_TYPE: {
-    Join: 'Join',
-    FundingRequest: 'FundingRequest',
-  },
   DAO_REGISTERED: 'registered'
 }

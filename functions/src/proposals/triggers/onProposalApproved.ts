@@ -6,6 +6,7 @@ import { fundProposal } from '../business/fundProposal';
 import { createPayment } from '../../circlepay/createPayment';
 import { CommonError } from '../../util/errors';
 import { proposalDb } from '../database';
+import { createEvent } from '../../util/db/eventDbService';
 
 
 export const onProposalApproved = functions.firestore
@@ -17,6 +18,13 @@ export const onProposalApproved = functions.firestore
         console.info('Funding request was approved. Crunching some numbers');
 
         await fundProposal(event.objectId);
+
+        // Everything went fine so it is event time
+        await createEvent({
+          userId: event.userId,
+          objectId: event.objectId,
+          type: EVENT_TYPES.FUNDING_REQUEST_EXECUTED
+        });
       }
 
       // @refactor
@@ -27,7 +35,7 @@ export const onProposalApproved = functions.firestore
         const proposal = await proposalDb.getProposal(event.objectId);
 
         if (proposal.type !== 'join') {
-          throw new CommonError(`Cannot process approved request to join with id ${event.objectId}`);
+          throw new CommonError(`Cannot process REQUEST_TO_JOIN_ACCEPTED because the associated object (${event.objectId}) is not a join proposal`);
         }
 
         await createPayment({
