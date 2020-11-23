@@ -62,7 +62,7 @@ export const notifyData: Record<string, IEventData> = {
               description: commonData.metadata.description,
               about: commonData.metadata.byline,
               paymentType: 'one-time',
-              minContribution: commonData.metadata.minimum
+              minContribution: commonData.metadata.minFeeToJoin
             }
           }
         ]
@@ -202,19 +202,26 @@ export const notifyData: Record<string, IEventData> = {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (messageId: string) => {
         const message = (await getDiscussionMessageById(messageId)).data();
+        const commonId = message.commonId
+          || (await getProposalById(message.discussionId)).data().commonId;
+        
+        const path = message.commonId
+          ? `Discussions/${commonId}/${message.discussionId}`
+          : `ProposalScreen/${commonId}/${message.discussionId}/1`; // 1 is tabIndex of chats in ProposalScreen
+        
         return {
-          message,
           sender: (await getUserById(message.ownerId)).data(),
-          commonData : (await getDaoById(message.commonId)).data()
+          commonData : (await getDaoById(commonId)).data(),
+          path
         }
       },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    notification: async ( {message, sender, commonData} ) => (
+    notification: async ( {sender, commonData, path} ) => (
       {
           title: `New message!`,
-          body: `${sender.displayName} commented in "${commonData.name}"`,
+          body: `${getNameString(sender)} commented in "${commonData.name}"`,
           image: commonData.metadata.image || '',
-          path: `Discussions/${commonData.id}/${message.discussionId}`
+          path
       }
     ),
   },

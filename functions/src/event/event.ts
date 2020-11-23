@@ -81,7 +81,9 @@ export const eventData: Record<string, IEventData> = {
         eventObject: async (discussionMessageId: string): Promise<any> => (await getDiscussionMessageById(discussionMessageId)).data(),
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: async (discussionMessage: any): Promise<string[]> => {
+            // message can be attached to a discussion or to a proposal (in proposal chat)
             const discussion = (await getDiscussionById(discussionMessage.discussionId)).data()
+                || (await getProposalById(discussionMessage.discussionId)).data() 
             const common =(await getDaoById(discussion.commonId)).data();
             return common.members.map(member => member.userId)
         }
