@@ -24,12 +24,10 @@ export const subscribeToNotifications = async (): Promise<void> => {
     userMessage: 'Call to CirclePay failed. Please try again later and if the issue persist contact us.'
   });
 
-  // let endpoints = [
-  //   env.hosts.firebase,
-  //   env.hosts.local
-  // ];
-
-  let endpoints = ['https://11184351a378.ngrok.io/common-staging-50741/us-central1/circlepay/notification/ping'];
+ let endpoints = [
+   env.hosts.firebase,
+   env.hosts.local
+ ];
 
   for (const sub of currentSubscriptions.data) {
     if (endpoints.some(endpoint => endpoint === sub.endpoint)) {
