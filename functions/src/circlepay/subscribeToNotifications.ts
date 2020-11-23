@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import { circlePayApi } from '../settings';
 import { externalRequestExecutor } from '../util';
-import { ErrorCodes } from '../util/constants';
+import { env, ErrorCodes } from '../constants';
 import { getCirclePayOptions } from './circlepay';
 
 export const subscribeToNotifications = async (): Promise<void> => {
@@ -25,8 +25,7 @@ export const subscribeToNotifications = async (): Promise<void> => {
   });
 
  let endpoints = [
-   env.hosts.firebase,
-   env.hosts.local
+   env.endpoints.base + env.endpoints.notifications,
  ];
 
   for (const sub of currentSubscriptions.data) {
