@@ -82,10 +82,10 @@ Here `{{userId}}` is the ID of the user you want to authenticate with.
 
 Each of the cloud functions should have extensive test suites written for them. For that we are using 
 [Jest](https://jestjs.io/docs/en/getting-started). All tests are placed under the __tests__ folder and should end
-with either `.spec.ts` or `.test.ts`. The commands for runnning the tests are:
+with either `.spec.ts` or `.test.ts`. The commands for running the tests are:
 
 `yarn test` - Just runs the tests once without setting up the firebase emulator.
 `yarn test:watch` - Just runs the tests on every file change, but without setting up any firebase emulators
 
 `yarn test:emulator` - Bad name, cool command. It first setups the firebase emulators and then runs the tests on top 
-of it. This command is mainly used by the GitHub Actions CI
+of it. This command is mainly used by the GitHub Actions CI.
