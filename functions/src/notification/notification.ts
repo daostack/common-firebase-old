@@ -63,7 +63,7 @@ export const notifyData: Record<string, IEventData> = {
               description: commonData.metadata.description,
               about: commonData.metadata.byline,
               paymentType: 'one-time',
-              minContribution: commonData.metadata.minimum
+              minContribution: commonData.metadata.minFeeToJoin
             }
           }
         ]
