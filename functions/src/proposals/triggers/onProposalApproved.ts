@@ -39,7 +39,7 @@ export const onProposalApproved = functions.firestore
         if (proposal.join.fundingType === 'monthly') {
           await createSubscription(proposal);
         } else {
-          // @todo Nope
+          // @todo Rework this (and extract it, this is way too much logic for event listener)
           await createPayment({
             ipAddress: '127.0.0.1',
             proposalId: proposal.id,
