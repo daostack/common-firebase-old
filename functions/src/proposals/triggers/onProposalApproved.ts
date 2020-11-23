@@ -1,5 +1,4 @@
 import * as functions from 'firebase-functions';
-
 import { Collections } from '../../constants';
 import { IEventEntity } from '../../event/type';
 import { EVENT_TYPES } from '../../event/event';

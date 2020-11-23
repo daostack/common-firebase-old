@@ -4,10 +4,15 @@ import { Collections } from '../../constants';
 import { ICardEntity, Nullable } from '../types';
 import { CommonError } from '../errors';
 
+import {getProposalById} from './proposalDbService';
 
-export const updateCard = async (cardId: string, doc: DocumentData): Promise<any> => (
+export const createNewCard = async (doc: DocumentData): Promise<any> => (
+  await updateCard(doc)
+)
+
+export const updateCard = async (doc: DocumentData): Promise<any> => (
   await db.collection(Collections.Cards)
-    .doc(cardId)
+    .doc(doc.id)
     .set(
       doc,
       {
@@ -15,6 +20,11 @@ export const updateCard = async (cardId: string, doc: DocumentData): Promise<any
       }
     )
 );
+
+export const getCardByProposalId = async (proposalId: string) : Promise<any> => {
+  const proposal = (await getProposalById(proposalId)).data();
+  return await getCardById(proposal.join.cardId);
+}
 
 /**
  * Returns the card document reference by the card ID
@@ -51,5 +61,7 @@ export const getCardById = async (cardId: string): Promise<ICardEntity> => {
 
 export default {
   updateCard,
-  getCardRef
+  getCardRef,
+  getCardByProposalId,
+  createNewCard
 };
