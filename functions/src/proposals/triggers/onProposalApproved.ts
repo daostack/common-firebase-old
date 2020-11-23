@@ -36,6 +36,14 @@ export const onProposalApproved = functions.firestore
 
         const proposal = await proposalDb.getJoinRequest(event.objectId);
 
+        await createPayment({
+          ipAddress: '127.0.0.1',
+          proposalId: proposal.id,
+          proposerId: proposal.proposerId,
+          funding: proposal.join.funding,
+          sessionId: context.eventId
+        });
+        
         // If the proposal is monthly create subscription. Otherwise charge
         if (proposal.join.fundingType === 'monthly') {
           await createSubscription(proposal);
