@@ -1,5 +1,5 @@
 import { createCard } from './circlepay';
-import { updateCard } from '../util/db/cardDb';
+import { createNewCard } from '../util/db/cardDb';
 import { v4 } from 'uuid';
 import * as cardDb from '../util/db/cardDb';
 import axios from 'axios';
@@ -44,7 +44,7 @@ export const createCirclePayCard = async (req: IRequest): Promise<ICardCreatedPa
 
   const { data } = await createCard(cardData);
   
-  await updateCard({
+  await createNewCard({
       id: data.id,
       userId: req.user.uid,
       creationDate: new Date(),

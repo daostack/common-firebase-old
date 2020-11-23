@@ -4,6 +4,10 @@ import { Collections } from '../../constants';
 import {getProposalById} from './proposalDbService';
 import { CommonError } from '../../util/errors/CommonError';
 
+export const createNewCard = async (doc: DocumentData): Promise<any> => (
+  await updateCard(doc)
+)
+
 export const updateCard = async (doc: DocumentData): Promise<any> => (
   await db.collection(Collections.Cards)
     .doc(doc.id)
@@ -42,5 +46,6 @@ export const getCardRef = (cardId: string): DocumentReference => {
 export default {
   updateCard,
   getCardRef,
-  getCardByProposalId
+  getCardByProposalId,
+  createNewCard
 };
