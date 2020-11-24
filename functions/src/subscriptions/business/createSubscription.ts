@@ -8,10 +8,10 @@ import { createSubscriptionPayment } from '../../circlepay/createSubscriptionPay
 import { IProposalEntity } from '../../proposals/proposalTypes';
 import { ISubscriptionEntity } from '../types';
 import { commonDb } from '../../common/database';
-import { ICardEntity } from '../../util/types';
 import { subscriptionDb } from '../database';
 import { createEvent } from '../../util/db/eventDbService';
 import { EVENT_TYPES } from '../../event/event';
+import { getCardById } from '../../util/db/cardDb';
 
 
 /**
@@ -33,18 +33,7 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
     });
   }
 
-  // ---- @todo Extract that
-
-  const card = (await Utils.getCardByProposalId(proposal.id)) as ICardEntity;
-
-  if (!card) {
-    throw new CommonError(
-      `Cannot create subscription for proposal (${proposal.id}), because there is no card found!`
-    );
-  }
-
-  // ----
-
+  const card = await getCardById(proposal.join.cardId)
   const common = await commonDb.getCommon(proposal.commonId);
 
   // Save the created subscription

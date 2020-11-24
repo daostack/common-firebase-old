@@ -28,7 +28,7 @@ export const addPaymentToCard = async (card: ICardEntity, payment: IPaymentEntit
     //   .doc(card.id)
     //   .set(card);
 
-    await updateCard(card.id, card);
+    await updateCard(card);
   }
 
   return card;

@@ -38,6 +38,7 @@ export interface ICircleNotification {
 
 export * from '../../subscriptions/types';
 export * from './payments';
+export * from './cards';
 
 export type BaseEntityType = 'id' | 'createdAt' | 'updatedAt';
 
