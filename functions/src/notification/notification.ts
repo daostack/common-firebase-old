@@ -201,16 +201,16 @@ export const notifyData: Record<string, IEventData> = {
   [EVENT_TYPES.MESSAGE_CREATED]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (messageId: string) => {
-        const message = (await getDiscussionMessageById(messageId)).data();
-        const commonId = message.commonId
-          || (await getProposalById(message.discussionId)).data().commonId;
+        const discussionMessage = (await getDiscussionMessageById(messageId)).data();
+        const commonId = discussionMessage.commonId
+          || (await getProposalById(discussionMessage.discussionId)).data().commonId;
         
-        const path = message.commonId
-          ? `Discussions/${commonId}/${message.discussionId}`
-          : `ProposalScreen/${commonId}/${message.discussionId}/1`; // 1 is tabIndex of chats in ProposalScreen
+        const path = discussionMessage.commonId
+          ? `Discussions/${commonId}/${discussionMessage.discussionId}`
+          : `ProposalScreen/${commonId}/${discussionMessage.discussionId}/1`; // 1 is tabIndex of chats in ProposalScreen
         
         return {
-          sender: (await getUserById(message.ownerId)).data(),
+          sender: (await getUserById(discussionMessage.ownerId)).data(),
           commonData : (await getDaoById(commonId)).data(),
           path
         }
