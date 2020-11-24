@@ -20,4 +20,4 @@ export const updateProposal = async (proposal: IProposalEntity): Promise<IPropos
     .update(proposalDoc);
 
   return proposalDoc;
-}
+};

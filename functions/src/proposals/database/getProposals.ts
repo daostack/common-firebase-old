@@ -37,6 +37,6 @@ export const getProposals = async (options: IGetProposalsOptions): Promise<IProp
     proposalsQuery = proposalsQuery.where('commonId', '==', options.commonId);
   }
 
-  return (await proposalsQuery.get() as QuerySnapshot<IProposalEntity>)
+  return (await proposalsQuery.get())
     .docs.map(x => x.data());
 };

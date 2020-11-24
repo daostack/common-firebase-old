@@ -16,17 +16,17 @@ import { IProposalEntity } from '../proposalTypes';
  * @returns - The found proposal
  */
 export const getProposal = async (proposalId: string): Promise<IProposalEntity> => {
-  if(!proposalId) {
+  if (!proposalId) {
     throw new ArgumentError('proposalId', proposalId);
   }
 
   const proposal = (await proposalsCollection
     .doc(proposalId)
-    .get()).data() as Nullable<IProposalEntity>;
+    .get()).data();
 
-  if(!proposal) {
+  if (!proposal) {
     throw new NotFoundError(proposalId, 'proposal');
   }
 
   return proposal;
-}
+};

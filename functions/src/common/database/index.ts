@@ -4,9 +4,17 @@ import { Collections } from '../../constants';
 import { addCommon } from './addCommon';
 import { getCommon } from './getCommon';
 import { updateCommon } from './updateCommon';
+import { ICommonEntity } from '../types';
 
-// @todo Find a way to type this (looks like it is intentionally not possible?)
-export const commonCollection = db.collection(Collections.Commons);
+export const commonCollection = db.collection(Collections.Commons)
+  .withConverter<ICommonEntity>({
+    fromFirestore(snapshot: FirebaseFirestore.QueryDocumentSnapshot): ICommonEntity {
+      return snapshot.data() as ICommonEntity;
+    },
+    toFirestore(object: ICommonEntity | Partial<ICommonEntity>): FirebaseFirestore.DocumentData {
+      return object;
+    }
+  });
 
 export const commonDb = {
   addCommon,

@@ -15,17 +15,17 @@ import { NotFoundError } from '../../util/errors/NotFoundError';
  * @returns - The found common
  */
 export const getCommon = async (commonId: string): Promise<ICommonEntity> => {
-  if(!commonId) {
+  if (!commonId) {
     throw new ArgumentError('commonId', commonId);
   }
 
   const common = (await commonCollection
     .doc(commonId)
-    .get()).data() as Nullable<ICommonEntity>;
+    .get()).data();
 
-  if(!common) {
+  if (!common) {
     throw new NotFoundError(commonId, 'common');
   }
 
   return common;
-}
+};
