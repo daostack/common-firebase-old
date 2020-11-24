@@ -28,7 +28,7 @@ export const addCommon = async (common: Omit<ICommonEntity, BaseEntityType | Omi
     ...common
   };
 
-  if(process.env.NODE_ENV === 'test') {
+  if (process.env.NODE_ENV === 'test') {
     commonDoc['testCreated'] = true;
   }
 

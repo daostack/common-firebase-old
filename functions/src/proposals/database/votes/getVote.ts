@@ -16,17 +16,17 @@ import { IVoteEntity } from '../../voteTypes';
  * @returns - The found vote
  */
 export const getVote = async (voteId: string): Promise<IVoteEntity> => {
-  if(!voteId) {
+  if (!voteId) {
     throw new ArgumentError('voteId', voteId);
   }
 
   const vote = (await votesCollection
     .doc(voteId)
-    .get()).data() as Nullable<IVoteEntity>;
+    .get()).data();
 
-  if(!vote) {
+  if (!vote) {
     throw new NotFoundError(voteId, 'vote');
   }
 
   return vote;
-}
+};

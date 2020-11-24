@@ -20,4 +20,4 @@ export const updateCommon = async (common: ICommonEntity): Promise<ICommonEntity
     .update(commonEntity);
 
   return commonEntity;
-}
+};

@@ -32,7 +32,7 @@ export const addProposal = async (proposal: SharedOmit<IProposalEntity, BaseEnti
     ...(proposal as IProposalEntity)
   };
 
-  if(process.env.NODE_ENV === 'test') {
+  if (process.env.NODE_ENV === 'test') {
     proposalDoc['testCreated'] = true;
   }
 

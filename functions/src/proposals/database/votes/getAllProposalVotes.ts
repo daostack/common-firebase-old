@@ -14,7 +14,7 @@ import QuerySnapshot = admin.firestore.QuerySnapshot;
 export const getAllProposalVotes = async (proposalId: string): Promise<IVoteEntity[]> => {
   const votes = await votesCollection
     .where('proposalId', '==', proposalId)
-    .get() as QuerySnapshot<IVoteEntity>;
+    .get();
 
   return votes.docs.map(x => x.data());
 };
