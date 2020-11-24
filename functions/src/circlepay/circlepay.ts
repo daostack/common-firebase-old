@@ -5,7 +5,12 @@ import { ErrorCodes } from '../constants';
 
 const CIRCLEPAY_APIKEY = 'CIRCLEPAY_APIKEY';
 
-export const getCirclePayOptions = async () => (
+export const getCirclePayOptions = async (): Promise<{
+  headers: {
+    authorization: string;
+    [key: string]: string;
+  }
+}> => (
   getSecret(CIRCLEPAY_APIKEY).then((apiKey) => (
     {
       headers: {
