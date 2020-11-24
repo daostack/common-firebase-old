@@ -96,7 +96,7 @@ export const notifyData: Record<string, IEventData> = {
           const proposalData = (await getProposalById(objectId)).data();
           return {
               proposalData,
-              commonData: (await getDaoById(proposalData.dao)).data(),
+              commonData: (await getDaoById(proposalData.commonId)).data(),
               userData: (await getUserById(proposalData.proposerId)).data(),
           }
       },

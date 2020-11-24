@@ -61,7 +61,7 @@ export const eventData: Record<string, IEventData> = {
         eventObject: async (proposalId: string): Promise<any> => (await getProposalById(proposalId)).data(),
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: async (proposal: any): Promise<string[]> => {
-            const proposalDao = (await getDaoById(proposal.dao)).data();
+            const proposalDao = (await getDaoById(proposal.commonId)).data();
             const userFilter = proposalDao.members.map(member => {
                 return member.userId;
             });
