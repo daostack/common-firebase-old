@@ -73,7 +73,7 @@ export const notifyData: Record<string, IEventData> = {
     data: async (proposalId: string) => {
         const proposalData = (await getProposalById(proposalId)).data();
         return {
-            commonData: (await getDaoById(proposalData.dao)).data(),
+            commonData: (await getDaoById(proposalData.commonId)).data(),
             userData: (await getUserById(proposalData.proposerId)).data()
         }
     },
@@ -148,7 +148,7 @@ export const notifyData: Record<string, IEventData> = {
         const proposalData = (await getProposalById(objectId)).data();
         return { 
           proposalData,
-          commonData : (await getDaoById(proposalData.dao)).data()
+          commonData : (await getDaoById(proposalData.commonId)).data()
         }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -166,7 +166,7 @@ export const notifyData: Record<string, IEventData> = {
     data: async (objectId: string) => {
         const proposalData = (await getProposalById(objectId)).data();
         return { 
-          commonData : (await getDaoById(proposalData.dao)).data()
+          commonData : (await getDaoById(proposalData.commonId)).data()
         }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -185,7 +185,7 @@ export const notifyData: Record<string, IEventData> = {
     data: async (objectId: string) => {
         const proposalData = (await getProposalById(objectId)).data();
         return { 
-          commonData : (await getDaoById(proposalData.dao)).data()
+          commonData : (await getDaoById(proposalData.commonId)).data()
         }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -230,7 +230,7 @@ export const notifyData: Record<string, IEventData> = {
     data: async (proposalId: string) => {
         const proposalData = (await getProposalById(proposalId)).data();
         return {
-            commonData: (await getDaoById(proposalData.dao)).data(),
+            commonData: (await getDaoById(proposalData.commonId)).data(),
             userData: (await getUserById(proposalData.proposerId)).data(),
         }
     },
