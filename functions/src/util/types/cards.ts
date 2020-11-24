@@ -1,6 +1,14 @@
+/**
+ * @todo Write docs
+ */
 export interface ICardEntity {
   id: string;
 
-  cardId: string;
+  creationData: Date;
+
   userId: string;
+  cardId: string;
+
+  payments: string[];
+  proposals: string[];
 }

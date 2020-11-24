@@ -1,21 +1,12 @@
 import { IPaymentAmount, IPaymentRefund, IPaymentSource } from './payments';
+import admin from 'firebase-admin';
+
+import Timestamp = admin.firestore.Timestamp;
 
 export type valueOf<T> = T[keyof T];
 export type Nullable<T> = T | null | undefined;
 
 export type CirclePaymentStatus = 'pending' | 'confirmed' | 'paid' | 'failed';
-
-export interface ICardEntity {
-  id: string;
-
-  creationData: Date;
-
-  userId: string;
-  cardId: string;
-
-  payments: string[];
-  proposals: string[];
-}
 
 // @todo Fix
 export interface IUserEntity {
@@ -47,9 +38,6 @@ export interface ICircleNotification {
 
 export * from '../../subscriptions/types';
 export * from './payments';
-
-import admin from 'firebase-admin';
-import Timestamp = admin.firestore.Timestamp;
 
 export type BaseEntityType = 'id' | 'createdAt' | 'updatedAt';
 
