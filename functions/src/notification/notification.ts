@@ -1,11 +1,11 @@
 import admin from 'firebase-admin';
 import { EVENT_TYPES } from "../event/event";
 import { env } from '../constants';
-import { getDaoById } from '../util/db/daoDbService';
-import { getProposalById } from '../util/db/proposalDbService';
 import { getUserById } from '../util/db/userDbService';
 import { Utils } from '../util/util';
 import { getDiscussionMessageById } from '../util/db/discussionMessagesDb';
+import { proposalDb } from '../proposals/database';
+import { commonDb } from '../common/database';
 
 const messaging = admin.messaging();
 
@@ -30,7 +30,7 @@ export const notifyData: Record<string, IEventData> = {
   [EVENT_TYPES.COMMON_CREATED]: {
       // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       data: async (objectId: string) => {
-          const commonData = (await getDaoById(objectId)).data();
+          const commonData = (await commonDb.getCommon(objectId));
           return {
             commonData,
             userData: (await getUserById(commonData.members[0].userId)).data(),
@@ -71,9 +71,9 @@ export const notifyData: Record<string, IEventData> = {
   [EVENT_TYPES.REQUEST_TO_JOIN_CREATED] : {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (proposalId: string) => {
-        const proposalData = (await getProposalById(proposalId)).data();
+        const proposalData = (await proposalDb.getProposal(proposalId));
         return {
-            commonData: (await getDaoById(proposalData.commonId)).data(),
+            commonData: (await commonDb.getCommon(proposalData.commonId)),
             userData: (await getUserById(proposalData.proposerId)).data()
         }
     },
@@ -93,10 +93,10 @@ export const notifyData: Record<string, IEventData> = {
   [EVENT_TYPES.FUNDING_REQUEST_CREATED] : {
       // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
       data: async (objectId: string) => {
-          const proposalData = (await getProposalById(objectId)).data();
+          const proposalData = (await proposalDb.getProposal(objectId));
           return {
               proposalData,
-              commonData: (await getDaoById(proposalData.commonId)).data(),
+              commonData: (await commonDb.getCommon(proposalData.commonId)),
               userData: (await getUserById(proposalData.proposerId)).data(),
           }
       },
@@ -114,7 +114,7 @@ export const notifyData: Record<string, IEventData> = {
   [EVENT_TYPES.COMMON_WHITELISTED] : {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (commonId: string) => {
-      const commonData = (await getDaoById(commonId)).data();
+      const commonData = (await commonDb.getCommon(commonId));
         return { 
           commonData,
           userData: (await getUserById(commonData.metadata.founderId)),
@@ -145,10 +145,10 @@ export const notifyData: Record<string, IEventData> = {
   [EVENT_TYPES.FUNDING_REQUEST_ACCEPTED] : {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
-        const proposalData = (await getProposalById(objectId)).data();
+        const proposalData = (await proposalDb.getProposal(objectId));
         return { 
           proposalData,
-          commonData : (await getDaoById(proposalData.commonId)).data()
+          commonData : (await commonDb.getCommon(proposalData.commonId))
         }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -164,9 +164,9 @@ export const notifyData: Record<string, IEventData> = {
   [EVENT_TYPES.REQUEST_TO_JOIN_ACCEPTED]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
-        const proposalData = (await getProposalById(objectId)).data();
+        const proposalData = (await proposalDb.getProposal(objectId));
         return { 
-          commonData : (await getDaoById(proposalData.commonId)).data()
+          commonData : (await commonDb.getCommon(proposalData.commonId))
         }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -183,9 +183,9 @@ export const notifyData: Record<string, IEventData> = {
   [EVENT_TYPES.REQUEST_TO_JOIN_REJECTED]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
-        const proposalData = (await getProposalById(objectId)).data();
+        const proposalData = (await proposalDb.getProposal(objectId));
         return { 
-          commonData : (await getDaoById(proposalData.commonId)).data()
+          commonData : (await commonDb.getCommon(proposalData.commonId))
         }
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -203,7 +203,7 @@ export const notifyData: Record<string, IEventData> = {
     data: async (messageId: string) => {
         const discussionMessage = (await getDiscussionMessageById(messageId)).data();
         const commonId = discussionMessage.commonId
-          || (await getProposalById(discussionMessage.discussionId)).data().commonId;
+          || (await proposalDb.getProposal(discussionMessage.discussionId))?.commonId;
         
         const path = discussionMessage.commonId
           ? `Discussions/${commonId}/${discussionMessage.discussionId}`
@@ -211,7 +211,7 @@ export const notifyData: Record<string, IEventData> = {
         
         return {
           sender: (await getUserById(discussionMessage.ownerId)).data(),
-          commonData : (await getDaoById(commonId)).data(),
+          commonData : (await commonDb.getCommon(commonId)),
           path
         }
       },
@@ -228,9 +228,9 @@ export const notifyData: Record<string, IEventData> = {
   [EVENT_TYPES.PAYMENT_FAILED] : {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (proposalId: string) => {
-        const proposalData = (await getProposalById(proposalId)).data();
+        const proposalData = (await proposalDb.getProposal(proposalId));
         return {
-            commonData: (await getDaoById(proposalData.commonId)).data(),
+            commonData: (await commonDb.getCommon(proposalData.commonId)),
             userData: (await getUserById(proposalData.proposerId)).data(),
         }
     },
