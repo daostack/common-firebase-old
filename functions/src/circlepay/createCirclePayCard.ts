@@ -41,6 +41,7 @@ interface ICardCreatedPayload {
 export const createCirclePayCard = async (req: IRequest): Promise<ICardCreatedPayload> => {
   // @todo Any king of validation????
   const cardData = req.body;
+  // Without passing data: cannot read property ipAddress of undefined => validation is highly needed
   cardData.metadata.ipAddress = req.headers['x-forwarded-for'] || '127.0.0.1';
   // @todo I think there should be session ID on the request object. This is not using the express requests (to witch I appended the types), so there is no way to access it
   cardData.metadata.sessionId = v4();
