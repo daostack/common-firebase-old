@@ -1,6 +1,4 @@
 import { getTemplatedEmail } from '../../functions/src/notification/email';
-import { runTest } from '../helpers/runTest';
-import '../../functions/src';
 
 const requestToJoinStubs = {
   userName: 'Test Name',
@@ -12,7 +10,7 @@ const requestToJoinPartialStubs = {
   userName: 'Test Name'
 };
 
-runTest(async () => {
+describe('The email sending', () => {
   it('should be successful with all stubs', () => {
     const templatedEmail = getTemplatedEmail('requestToJoinSubmitted', {
       emailStubs: requestToJoinStubs
@@ -34,7 +32,7 @@ runTest(async () => {
     expect(() => {
       getTemplatedEmail('requestToJoinSubmitted', {
         emailStubs: requestToJoinPartialStubs
-      })
+      });
     }).toThrow();
   });
-})
+});

@@ -72,7 +72,7 @@ export const assignCardToProposal = async (cardId: string, proposalId: string): 
     throw new NotFoundError(cardId, 'card');
   }
 
-  if (card.proposals.some(x => x === proposalId)) {
+  if (card.proposals?.some(x => x === proposalId)) {
     // The proposal is already assigned to
     // that card so just return
     return;
@@ -81,7 +81,7 @@ export const assignCardToProposal = async (cardId: string, proposalId: string): 
   await cardDb.updateCard({
     id: cardId,
     proposals: [
-      ...card.proposals,
+      ...card.proposals || [],
       proposalId
     ]
   });
