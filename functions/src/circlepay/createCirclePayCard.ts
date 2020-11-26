@@ -1,27 +1,10 @@
 import { createCard } from './circlepay';
-import { updateCard } from '../util/db/cardDb';
+import { createNewCard } from '../util/db/cardDb';
 import { v4 } from 'uuid';
 import * as cardDb from '../util/db/cardDb';
 import axios from 'axios';
 import { NotFoundError } from '../util/errors';
 
-const _updateCard = async (userId: string, id: string, proposalId: string): Promise<any> => {
-  const doc = {
-    id,
-    userId,
-    proposals: [proposalId],
-    creationData: new Date(),
-    payments: []
-  };
-
-  if (proposalId) {
-    console.warn('Creating card without proposal ID');
-  }
-
-  await updateCard(id, doc);
-};
-
-// try to use ICardData from ./circlepay
 interface IRequest {
   headers: { host?: string },
   body: {
@@ -36,7 +19,6 @@ interface IRequest {
     expMonth: number,
     expYear: number,
     idempotencyKey: string,
-    proposalId: string,
     metadata: {
       email: string,
       ipAddress: string,
@@ -56,19 +38,19 @@ interface ICardCreatedPayload {
 
 export const createCirclePayCard = async (req: IRequest): Promise<ICardCreatedPayload> => {
   const cardData = req.body;
-
-  const uid: string = req.user.uid;
-
-  cardData.metadata.ipAddress = req.headers['x-forwarded-for'] || '127.0.0.1';  //req.headers.host.includes('localhost')
-                                                                                // ? '127.0.0.1' : req.headers.host;
-                                                                                // //ip must be like xxx.xxx.xxx.xxx,
-                                                                                // and not a text
-  cardData.metadata.sessionId = v4(); //ethers.utils.id(cardData.proposalId).substring(0,50);
+  cardData.metadata.ipAddress = req.headers['x-forwarded-for'] || '127.0.0.1';
+  cardData.metadata.sessionId = v4();
   cardData.idempotencyKey = v4();
 
-  const {data} = await createCard(cardData);
-
-  await _updateCard(uid, data.id, cardData.proposalId);
+  const { data } = await createCard(cardData);
+  
+  await createNewCard({
+      id: data.id,
+      userId: req.user.uid,
+      creationDate: new Date(),
+      payments: [],
+      proposals: [],
+  });
 
   return {
     cardId: data.id
@@ -91,21 +73,20 @@ export const assignCardToProposal = async (cardId: string, proposalId: string): 
     throw new NotFoundError(cardId, 'card');
   }
 
-  if (card.proposals.some(x => x === proposalId)) {
-    // The proposal is already assigned to
-    // that card so just return
+  // If there are proposals on the card check if some
+  // of them is the one that we are currently adding
+  if (card.proposals && card.proposals.some(x => x === proposalId)) {
     return;
   }
 
-  await cardDb.updateCard(cardId, {
+  await cardDb.updateCard({
+    id: cardId,
     proposals: [
-      ...card.proposals,
+      ...(card.proposals || []),
       proposalId
     ]
   });
 };
-
-
 
 interface ITestIpPayload {
   ip: string;

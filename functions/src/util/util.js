@@ -9,7 +9,6 @@ const { env } = require('../constants');
 const CFError = {
   invalidIdToken: 'invalidIdToken',
   emptyPaymentData: 'emptyPaymentData',
-  emptyCardData: 'emptyCardData',
   emptyUserData: 'emptyUserData'
 }
 
@@ -48,38 +47,6 @@ class Utils {
     }
   }
 
-  async getCardById(cardId) {
-    const cardRef = admin.firestore().collection('cards').doc(cardId);
-    const cardData = await cardRef.get().then(doc => doc.data());
-    if (!cardData) {
-      throw new CommonError(`Could not find card with id ${cardId}.`)
-    }
-    return cardData;
-  }
-
-  async getCardByUserId(userId) {
-    const cardRef = await admin.firestore().collection('cards')
-      .where('userId', '==', userId)
-      .get();
-        if (cardRef.docs.length === 0) {
-          throw new CommonError(`Could not find user with id ${userId} associated with a CirclePay card.`);
-        }
-    const cardData = cardRef.docs.map(doc => doc.data())[0];
-    return cardData;
-  }
-
-  async getCardByProposalId(proposalId) {
-    try {
-      const cardRef = await admin.firestore().collection('cards')
-        .where('proposals', 'array-contains', proposalId)
-        .get();
-      const cardData = cardRef.docs.map(doc => doc.data())[0];
-      return cardData;
-    } catch (err) {
-      throw new CommonError(CFError.emptyUserData)
-    }
-  }
-
   async getPaymentById(paymentId) {
     try {
       const paymentRef = await admin.firestore().collection('payments')
@@ -95,9 +62,5 @@ class Utils {
 
 module.exports = {
   Utils: new Utils(),
-  PROPOSAL_TYPE: {
-    Join: 'Join',
-    FundingRequest: 'FundingRequest',
-  },
   DAO_REGISTERED: 'registered'
 }
