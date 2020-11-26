@@ -11,10 +11,11 @@ export async function getPayout():Promise<any> {
     const COLLECTION_NAME = 'proposals';
 
     const data = await db.collection(COLLECTION_NAME)
-    .where("winningOutcome", "==", 1)
-    .where("type", "==", "FundingRequest")
+    .where("voteOutcome", "==", 1)
+    .where("type", "==", "fundingRequest")
     .get();
 
+    console.log(data)
     const proposals = data.docs.map(doc => doc.data())
     for (const property in proposals) {
 

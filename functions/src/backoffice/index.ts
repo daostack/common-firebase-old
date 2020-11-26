@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 
-import { commonApp, commonRouter } from '../util/commonApp';
+import { commonApp, commonRouter } from '../util';
 import { responseExecutor } from '../util/responseExecutor';
 import { getPayout, getBalance } from './backoffice';
 import { google } from 'googleapis'
