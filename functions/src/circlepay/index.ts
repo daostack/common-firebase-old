@@ -6,10 +6,26 @@ import { commonApp, commonRouter } from '../util/commonApp';
 import { createCirclePayCard, testIP } from './createCirclePayCard';
 import { encryption } from './circlepay';
 import { createPayment } from './createPayment';
+import { getSecret } from '../settings';
+import { createCard } from './cards/business/createCard';
 
 const runtimeOptions = {
   timeoutSeconds: 540
 };
+
+const CIRCLEPAY_APIKEY = 'CIRCLEPAY_APIKEY';
+export const getCircleHeaders = async () => (
+  getSecret(CIRCLEPAY_APIKEY).then((apiKey) => (
+    {
+      headers: {
+        accept: 'application/json',
+        authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      }
+    })
+  )
+);
+
 
 const circlepay = commonRouter();
 
@@ -23,6 +39,28 @@ circlepay.post('/create-card', async (req, res, next) => {
       successMessage: `CirclePay card created!`
     });
 });
+
+circlepay.post('/create/card', async (req, res, next) => {
+  console.log(req.ip);
+
+
+  await responseExecutor(
+    async () => (await createCard({
+      ...req.body,
+      ipAddress: '127.0.0.1', // @todo Strange. There is no Ip to be find in the request object. Make it be :D
+      ownerId: req.user.uid,
+      sessionId: req.sessionId
+    })),
+    {
+      req,
+      res,
+      next,
+      successMessage: `CirclePay card created successfully!`
+    });
+});
+
+
+
 
 circlepay.get('/encryption', async (req, res, next) => {
   console.log('index/encryption');
@@ -47,16 +85,16 @@ circlepay.get('/testIP', async (req, res, next) => {
     });
 });
 
-circlepay.post('/create-a-payment', async (req, res, next) => {    
-   await responseExecutor(    
-     async () => (await createPayment(req.body)),    
-     {    
-       req,    
-       res,    
-       next,    
-       successMessage: `Payment was successful`    
-     })    
- });
+circlepay.post('/create-a-payment', async (req, res, next) => {
+  await responseExecutor(
+    async () => (await createPayment(req.body)),
+    {
+      req,
+      res,
+      next,
+      successMessage: `Payment was successful`
+    });
+});
 
 export const circlepayApp = functions
   .runWith(runtimeOptions)

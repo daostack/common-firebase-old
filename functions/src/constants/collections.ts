@@ -6,5 +6,6 @@ export const Collections = {
   Votes: 'votes',
   // @todo Make this plural
   Event: 'event',
-  Cards: 'cards'
+  Cards: 'cards',
+  Users: 'users'
 };

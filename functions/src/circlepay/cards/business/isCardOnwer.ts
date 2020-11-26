@@ -1,5 +1,5 @@
-import { db } from '../../settings';
-import { Collections } from '../../constants';
+import { db } from '../../../settings';
+import { Collections } from '../../../constants';
 
 /**
  * Checks if the user is the creator of the card

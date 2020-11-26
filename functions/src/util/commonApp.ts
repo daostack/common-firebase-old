@@ -47,7 +47,7 @@ export const commonApp = (router: express.Router): express.Application => {
 
       res.status(503).send();
     }
-  })
+  });
 
   app.use(errorHandling);
 
