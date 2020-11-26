@@ -87,10 +87,8 @@ export const createCard = async (payload: CreateCardPayload): Promise<ICardEntit
     }
   };
 
-  // circle card id and user id should be unique :<
-
   // Create the card on Circle
-  const response = await externalRequestExecutor<ICircleCreateCardResponse>(async () => {
+  const { data: response } = await externalRequestExecutor<ICircleCreateCardResponse>(async () => {
     return (await axios.post<ICircleCreateCardResponse>(`${circlePayApi}/cards`,
       data,
       headers
@@ -100,11 +98,32 @@ export const createCard = async (payload: CreateCardPayload): Promise<ICardEntit
     userMessage: 'Cannot create the card, because it was rejected by Circle'
   });
 
-  console.log(JSON.stringify(response));
+  // Check if the use already has the same card
+  const existingCards = await cardDb.getMany({
+    ownerId: user.uid,
+    circleCardId: response.id
+  });
+
+  if (existingCards.length) {
+    //  note to self:
+    //    this should not end up deployed as we currently
+    //    have no UI for that, so we are creating new card
+    //    on every request. Just return the found card without
+    //    saving it again
+    //
+    // ========================================================================
+    //
+    // throw new CommonError(`Cannot resave the same card for the same user!`, {
+    //   cardId: response.id,
+    //   userId: user.id
+    // });
+    return existingCards[0];
+  }
+
 
   // If the card was created successfully save it
   const card = await cardDb.add({
-    ownerId: user.id,
+    ownerId: user.uid,
     circleCardId: response.id,
     metadata: {
       billingDetails: data.billingDetails,
@@ -115,8 +134,12 @@ export const createCard = async (payload: CreateCardPayload): Promise<ICardEntit
 
   // Create event
   await createEvent({
-    type: EVENT_TYPES.
-  })
+    type: EVENT_TYPES.CARD_CREATED,
+    userId: user.uid,
+    objectId: card.id
+  });
+
+  console.log(card);
 
   // Return the created card
   return card;

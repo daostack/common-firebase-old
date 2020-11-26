@@ -1,19 +1,21 @@
 export interface ICircleCreateCardResponse {
-  id: string;
+  data: {
+    id: string;
 
-  billingDetails: ICircleBillingDetails;
+    billingDetails: ICircleBillingDetails;
 
-  metadata: {
-    email: string;
-    phoneNumber: string;
+    metadata: {
+      email: string;
+      phoneNumber: string;
+    }
+
+    expMonth: number;
+    expYear: number;
+    network: 'VISA' | 'MASTERCARD';
+    last4: string;
+    createDate: Date;
+    updateDate: Date;
   }
-
-  expMonth: number;
-  expYear: number;
-  network: 'VISA' | 'MASTERCARD';
-  last4: string;
-  createDate: Date;
-  updateDate: Date;
 }
 
 

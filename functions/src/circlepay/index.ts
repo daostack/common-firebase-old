@@ -41,9 +41,6 @@ circlepay.post('/create-card', async (req, res, next) => {
 });
 
 circlepay.post('/create/card', async (req, res, next) => {
-  console.log(req.ip);
-
-
   await responseExecutor(
     async () => (await createCard({
       ...req.body,
