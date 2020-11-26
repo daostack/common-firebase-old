@@ -1,3 +1,5 @@
+import admin from 'firebase-admin';
+import Timestamp = admin.firestore.Timestamp;
 import { v4 } from 'uuid';
 
 import { BaseEntityType, SharedOmit } from '../../util/types';
@@ -18,9 +20,8 @@ export const addProposal = async (proposal: SharedOmit<IProposalEntity, BaseEnti
   const proposalDoc: IProposalEntity = {
     id: v4(),
 
-    // @todo Move to timestamps
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
 
     votes: [],
     votesFor: 0,

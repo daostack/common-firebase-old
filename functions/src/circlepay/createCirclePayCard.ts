@@ -55,9 +55,9 @@ export const createCirclePayCard = async (req: IRequest): Promise<ICardCreatedPa
     // @todo What happens if two users use the same card
       id: data.id,
       userId: req.user.uid,
-      creationDate: new Date(), // @todo No need to pass creation Date
-    // @todo Why this is here. There should be no need to pass empty arrays
-      payments: []
+      creationDate: new Date(),
+      payments: [],
+      proposals: [],
   });
 
   // @todo Why are we only returning the id of the card. And that id is the id that circle gave us, not ours
@@ -82,11 +82,9 @@ export const assignCardToProposal = async (cardId: string, proposalId: string): 
     throw new NotFoundError(cardId, 'card');
   }
 
-  // Don't like this, but some cards are
-  // created with no proposals array
+  // If there are proposals on the card check if some
+  // of them is the one that we are currently adding
   if (card.proposals && card.proposals.some(x => x === proposalId)) {
-    // The proposal is already assigned to
-    // that card so just return
     return;
   }
 
