@@ -51,6 +51,8 @@ interface ICirclePaymentResponseData {
 /**
  * Creates a payment for subscription and saves it.
  *
+ * @deprecated
+ *
  * @param subscription - The the subscription that you want to charge
  *
  * @throws { CommonError } - If there is pending payment

@@ -5,6 +5,8 @@ import { updateCard } from '../util/db/cardDb';
 /**
  * Links payment with a card
  *
+ * @deprecated
+ *
  * @param card - The card entity
  * @param payment - The payment entity
  *

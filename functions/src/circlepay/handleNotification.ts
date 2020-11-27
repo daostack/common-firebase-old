@@ -13,6 +13,8 @@ import { saveSubscriptionPayment } from './createSubscriptionPayment';
 /**
  * Handles incoming CirclePay notification
  *
+ * @deprecated
+ *
  * @param notification - the notification that we have received
  *
  * @throws { CommonError } - if the notification type is different than payment

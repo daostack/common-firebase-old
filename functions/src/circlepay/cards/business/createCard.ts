@@ -60,8 +60,6 @@ type CreateCardPayload = yup.InferType<typeof createCardValidationSchema>;
 /**
  * Creates card in the FireStore and on Circle side.
  *
- *
- *
  * @param payload
  */
 export const createCard = async (payload: CreateCardPayload): Promise<ICardEntity> => {
@@ -138,8 +136,6 @@ export const createCard = async (payload: CreateCardPayload): Promise<ICardEntit
     userId: user.uid,
     objectId: card.id
   });
-
-  console.log(card);
 
   // Return the created card
   return card;

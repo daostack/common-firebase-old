@@ -1,8 +1,9 @@
 import { db } from '../../../util';
 import { Collections } from '../../../constants';
+import { NotImplementedError } from '../../../util/errors';
 
 import { IPaymentEntity } from '../types';
-import { NotImplementedError } from '../../../util/errors';
+import { addPayment } from './addPayment';
 
 export const PaymentsCollection = db.collection(Collections.Payments)
   .withConverter<IPaymentEntity>({
@@ -22,7 +23,5 @@ export const paymentDb = {
   getMany: () => {
     throw new NotImplementedError('Payment GetMany is not implemented');
   },
-  add: () => {
-    throw new NotImplementedError('Payment Add is not implemented');
-  }
+  add: addPayment
 };

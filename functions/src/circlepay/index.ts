@@ -51,7 +51,7 @@ circlepay.post('/create/card', async (req, res, next) => {
       ...req.body,
       ipAddress: '127.0.0.1', // @todo Strange. There is no Ip to be find in the request object. Make it be :D
       ownerId: req.user.uid,
-      sessionId: req.sessionId
+      sessionId: req.requestId
     })),
     {
       req,

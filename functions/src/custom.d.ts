@@ -4,7 +4,7 @@ declare namespace Express {
       uid: string;
     }
 
-    sessionId: string;
+    requestId: string;
   }
 }
 

@@ -12,9 +12,10 @@ export interface ICardEntity extends IBaseEntity {
    */
   ownerId: string;
 
+  /**
+   * Some metadata, useful for the UI
+   */
   metadata: ICardMetadata;
-
-  payments: any[]; // @todo
 }
 
 /**

@@ -1,12 +1,11 @@
 import { v4 } from 'uuid';
 import admin from 'firebase-admin';
-
-import { ICardEntity } from '../types';
-import { BaseEntityType, SharedOmit } from '../../../util/types';
-import { CardCollection } from './index';
 import Timestamp = admin.firestore.Timestamp;
 
-type OmittedProperties = 'payments';
+import { BaseEntityType, SharedOmit } from '../../../util/types';
+
+import { ICardEntity } from '../types';
+import { CardCollection } from './index';
 
 /**
  * Prepares the passed card for saving and saves it. Please note that
@@ -14,14 +13,12 @@ type OmittedProperties = 'payments';
  *
  * @param card - the card to be saved
  */
-export const addCard = async (card: SharedOmit<ICardEntity, BaseEntityType | OmittedProperties>): Promise<ICardEntity> => {
+export const addCard = async (card: SharedOmit<ICardEntity, BaseEntityType>): Promise<ICardEntity> => {
   const cardDoc: ICardEntity = {
     id: v4(),
 
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
-
-    payments: [],
 
     ...card
   };

@@ -1,3 +1,7 @@
+// ---- Card related ---- //
+
+import { CirclePaymentStatus } from '../util/types';
+
 export interface ICircleCreateCardResponse {
   data: {
     id: string;
@@ -17,8 +21,6 @@ export interface ICircleCreateCardResponse {
     updateDate: Date;
   }
 }
-
-
 
 export interface ICircleCreateCardPayload {
   /**
@@ -52,22 +54,7 @@ export interface ICircleCreateCardPayload {
   expYear: number;
 
 
-  metadata: {
-    /**
-     * Email of the user
-     */
-    email: string;
-
-    /**
-     * Hash of the session identifier; typically of the end user.
-     */
-    sessionId: string;
-
-    /**
-     * Single IPv4 or IPv6 address of user
-     */
-    ipAddress: string;
-  }
+  metadata: ICircleMetadata;
 }
 
 interface ICircleBillingDetails {
@@ -108,4 +95,75 @@ interface ICircleBillingDetails {
    * Postal / ZIP code of the address.
    */
   postalCode: string;
+}
+
+// ---- Payment Related ---- //
+
+type PaymentVerification = 'none' | 'cvv';
+
+interface IPaymentAmount {
+  amount: number;
+  currency: string;
+}
+
+interface IPaymentSource {
+  id: string;
+  type: 'card';
+}
+
+interface IPaymentFee {
+  amount: string;
+  currency: string;
+}
+
+interface ICircleCreatePaymentBase {
+  verification: PaymentVerification;
+  metadata: ICircleMetadata;
+  amount: IPaymentAmount;
+  source: IPaymentSource;
+
+
+  idempotencyKey: string;
+}
+
+interface ICircleCreatePaymentVerification extends ICircleCreatePaymentBase {
+  verification: 'cvv';
+
+  keyId: string;
+  encryptedData: string;
+}
+
+interface ICircleCreatePaymentNoVerification extends ICircleCreatePaymentBase {
+  verification: 'none';
+}
+
+export type ICircleCreatePaymentPayload = ICircleCreatePaymentVerification | ICircleCreatePaymentNoVerification;
+
+export interface ICircleCreatePaymentResponse {
+  data: {
+    id: string;
+    type: 'payment';
+    status: CirclePaymentStatus;
+    fees: IPaymentFee;
+
+    [key: string]: any;
+  }
+}
+
+// ---- Shared ---- //
+interface ICircleMetadata {
+  /**
+   * Email of the user
+   */
+  email: string;
+
+  /**
+   * Hash of the session identifier; typically of the end user.
+   */
+  sessionId: string;
+
+  /**
+   * Single IPv4 or IPv6 address of user
+   */
+  ipAddress: string;
 }
