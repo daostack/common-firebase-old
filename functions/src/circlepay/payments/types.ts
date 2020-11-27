@@ -31,6 +31,11 @@ interface IPaymentEntityBase extends IBaseEntity {
    * The ID of the object, for which the payment was created
    */
   objectId: string;
+
+  /**
+   * The ID of the payment on circle side
+   */
+  circlePaymentId: string;
 }
 
 export interface IPaymentAmount {
@@ -64,10 +69,10 @@ export interface ISubscriptionPayment extends IPaymentEntityBase {
 
 }
 
-export interface IJoinPayment extends IPaymentEntityBase {
+export interface IProposalPayment extends IPaymentEntityBase {
   type: 'one-time';
 
 }
 
 
-export type IPaymentEntity = ISubscriptionPayment | IJoinPayment;
+export type IPaymentEntity = ISubscriptionPayment | IProposalPayment;

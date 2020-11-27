@@ -136,7 +136,8 @@ export const createPayment = async (payload: CreatePaymentPayload): Promise<IPay
 
     type: payload.type,
     objectId: payload.objectId,
-    status: response.status
+    status: response.status,
+    circlePaymentId: response.id
   });
 
   // Create event

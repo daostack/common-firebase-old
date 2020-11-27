@@ -139,7 +139,9 @@ interface ICircleCreatePaymentNoVerification extends ICircleCreatePaymentBase {
 
 export type ICircleCreatePaymentPayload = ICircleCreatePaymentVerification | ICircleCreatePaymentNoVerification;
 
-export interface ICircleCreatePaymentResponse {
+export type ICircleCreatePaymentResponse = ICirclePayment;
+
+export interface ICirclePayment {
   data: {
     id: string;
     type: 'payment';
