@@ -1,14 +1,17 @@
 import * as functions from 'firebase-functions';
 import request from 'request';
+import { v4 } from 'uuid';
 
+import { commonApp, commonRouter } from '../util';
+import { ICircleNotification } from '../util/types';
 import { responseExecutor } from '../util/responseExecutor';
-import { commonApp, commonRouter } from '../util/commonApp';
+
+import * as payments from './payments/business/createPayment';
 
 import { createCirclePayCard, testIP } from './createCirclePayCard';
 import { encryption } from './circlepay';
 import { CommonError } from '../util/errors';
 import { handleNotification } from './handleNotification';
-import { ICircleNotification } from '../util/types';
 import { subscribeToNotifications } from './subscribeToNotifications';
 import { createPayment } from './createPayment';
 import { getSecret } from '../settings';
@@ -62,8 +65,6 @@ circlepay.post('/create/card', async (req, res, next) => {
 });
 
 
-
-
 circlepay.get('/encryption', async (req, res, next) => {
   console.log('index/encryption');
   await responseExecutor(
@@ -97,6 +98,26 @@ circlepay.post('/create-a-payment', async (req, res, next) => {
       successMessage: `Payment was successful`
     });
 });
+
+circlepay.post('/create/payment', async (req, res, next) => {
+  await responseExecutor(
+    async () => (await payments.createPayment({
+      ...req.body,
+
+      type: 'one-time',
+      objectId: v4(),
+      userId: req.user.uid,
+      ipAddress: '127.0.0.1', // @todo Strange. There is no Ip to be find in the request object. Make it be :D
+      sessionId: req.requestId
+    })),
+    {
+      req,
+      res,
+      next,
+      successMessage: `Payment was successful`
+    });
+});
+
 
 circlepay.post('/notification/ping', async (req, res, next) => {
   console.info('Received notification from Circle');
@@ -146,17 +167,6 @@ circlepay.post('/notification/register', async (req, res, next) => {
     successMessage: 'Endpoints registered!'
   });
 });
-
-circlepay.post('/create-a-payment', async (req, res, next) => {    
-   await responseExecutor(    
-     async () => (await createPayment(req.body)),    
-     {    
-       req,    
-       res,    
-       next,    
-       successMessage: `Payment was successful`    
-     })    
- });
 
 export const circlepayApp = functions
   .runWith(runtimeOptions)

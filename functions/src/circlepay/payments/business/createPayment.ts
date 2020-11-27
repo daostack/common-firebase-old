@@ -42,13 +42,13 @@ const createPaymentValidationSchema = yup.object({
   encryptedData: yup.string()
     .when('type', {
       is: 'one-time',
-      then: yup.string().required()
+      then: yup.string() //.required()
     }),
 
   keyId: yup.string()
     .when('type', {
       is: 'one-time',
-      then: yup.string().required()
+      then: yup.string() //.required()
     })
 });
 
