@@ -33,6 +33,12 @@ interface IPaymentEntityBase extends IBaseEntity {
   objectId: string;
 
   /**
+   * The ID of the user that was charged. Useful for retrieving all
+   * payments of one user
+   */
+  userId: string;
+
+  /**
    * The ID of the payment on circle side
    */
   circlePaymentId: string;
@@ -71,7 +77,6 @@ export interface ISubscriptionPayment extends IPaymentEntityBase {
 
 export interface IProposalPayment extends IPaymentEntityBase {
   type: 'one-time';
-
 }
 
 

@@ -16,6 +16,8 @@ import { subscribeToNotifications } from './subscribeToNotifications';
 import { createPayment } from './createPayment';
 import { getSecret } from '../settings';
 import { createCard } from './cards/business/createCard';
+import { createProposalPayment } from './payments/business/createProposalPayment';
+import { logger } from 'firebase-functions';
 
 const runtimeOptions = {
   timeoutSeconds: 540
@@ -118,6 +120,22 @@ circlepay.post('/create/payment', async (req, res, next) => {
     });
 });
 
+circlepay.post('/proposal/create/payment', async (req, res, next) => {
+  await responseExecutor(
+    async () => (await createProposalPayment({
+      ...req.body,
+
+      userId: req.user.uid,
+      ipAddress: '127.0.0.1', // @todo Strange. There is no Ip to be find in the request object. Make it be :D
+      sessionId: req.requestId
+    })),
+    {
+      req,
+      res,
+      next,
+      successMessage: `Payment was successful`
+    });
+});
 
 circlepay.post('/notification/ping', async (req, res, next) => {
   console.info('Received notification from Circle');

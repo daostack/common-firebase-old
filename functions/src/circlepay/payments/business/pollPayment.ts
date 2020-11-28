@@ -1,12 +1,17 @@
-import { IPaymentEntity } from '../types';
-import { ArgumentError } from '../../../util/errors';
+import axios from 'axios';
+
 import { externalRequestExecutor, poll } from '../../../util';
 import { CirclePaymentStatus } from '../../../util/types';
-import axios from 'axios';
+import { ArgumentError, CommonError } from '../../../util/errors';
 import { circlePayApi } from '../../../settings';
+import { createEvent } from '../../../util/db/eventDbService';
+import { EVENT_TYPES } from '../../../event/event';
 import { ErrorCodes } from '../../../constants';
+
 import { getCirclePayOptions } from '../../circlepay';
 import { ICirclePayment } from '../../types';
+import { IPaymentEntity } from '../types';
+import { paymentDb } from '../database';
 
 interface IPollPaymentOptions {
   interval: number;
@@ -16,13 +21,13 @@ interface IPollPaymentOptions {
    * Whether an error will be throw if the payment is finalized, but
    * the status is failed
    */
-  throwOnePaymentFailed: boolean;
+  throwOnPaymentFailed: boolean;
 }
 
 const defaultPaymentOptions: IPollPaymentOptions = {
   interval: 60,
   maxRetries: 32,
-  throwOnePaymentFailed: false
+  throwOnPaymentFailed: false
 };
 
 /**
@@ -59,9 +64,30 @@ export const pollPayment = async (payment: IPaymentEntity, pollPaymentOptions?: 
 
   const status = await poll<CirclePaymentStatus>(pollFn, validateFn, options.interval, options.maxRetries);
 
-  // @todo Update payment
-  // @todo Event
-  // @todo Return the updated payment
+  // Update payment
+  payment = await paymentDb.update({
+    ...payment,
 
+    status
+  });
+
+  // Event
+  await createEvent({
+    type: status === 'failed'
+      ? EVENT_TYPES.PAYMENT_FAILED
+      : status === 'paid'
+        ? EVENT_TYPES.PAYMENT_PAID
+        : status === 'confirmed'
+          ? EVENT_TYPES.PAYMENT_CONFIRMED
+          : EVENT_TYPES.PAYMENT_UPDATED,
+    objectId: payment.id,
+    userId: payment.userId
+  });
+
+  if(options.throwOnPaymentFailed && payment.status === 'failed') {
+    throw new CommonError('Payment failed');
+  }
+
+  // Return the updated payment
   return payment;
 };

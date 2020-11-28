@@ -44,6 +44,6 @@ export const fundProposal = async (proposalId: string): Promise<void> => {
   // Persist the changes asynchronously
   await Promise.all([
     commonDb.updateCommon(common),
-    proposalDb.updateProposal(proposal)
+    proposalDb.update(proposal)
   ]);
 };

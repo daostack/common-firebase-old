@@ -136,6 +136,7 @@ export const createPayment = async (payload: CreatePaymentPayload): Promise<IPay
 
     type: payload.type,
     objectId: payload.objectId,
+    userId: user.uid,
     status: response.status,
     circlePaymentId: response.id
   });

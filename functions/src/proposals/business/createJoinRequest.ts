@@ -119,7 +119,8 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
     join: {
       cardId: payload.cardId,
       funding: payload.funding,
-      fundingType: common.metadata.contributionType
+      fundingType: common.metadata.contributionType,
+      payments: []
     },
 
     countdownPeriod: env.durations.join.countdownPeriod,

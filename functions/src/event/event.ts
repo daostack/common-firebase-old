@@ -38,6 +38,7 @@ export enum EVENT_TYPES {
   // Payment related events
   PAYMENT_CREATED = 'paymentCreated',
   PAYMENT_CONFIRMED = 'paymentConfirmed',
+  PAYMENT_UPDATED = 'paymentConfirmed',
   PAYMENT_FAILED = 'paymentFailed',
   PAYMENT_PAID = 'paymentPaid',
 
