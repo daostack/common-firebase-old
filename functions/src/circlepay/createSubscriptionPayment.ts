@@ -15,7 +15,6 @@ import { EVENT_TYPES } from '../event/event';
 import { circlePayApi } from '../settings';
 import { Utils } from '../util/util';
 
-import { addPaymentToCard } from './addPaymentToCard';
 import { getCardById } from '../util/db/cardDb';
 import { updatePayment } from '../util/db/paymentDb';
 import { createEvent } from '../util/db/eventDbService';
@@ -74,7 +73,8 @@ export const createSubscriptionPayment = async (subscription: ISubscriptionEntit
   const circleResponse = await makePayment(card, subscription.amount);
   const result = await saveSubscriptionPayment(subscription, circleResponse);
 
-  await addPaymentToCard(card, result.payment);
+  // @todo
+  // await addPaymentToCard(card, result.payment);
 
   await createEvent({
     userId: subscription.userId,

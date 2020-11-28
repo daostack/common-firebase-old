@@ -5,9 +5,6 @@ import axios from 'axios';
 import { commonApp, commonRouter, externalRequestExecutor } from '../util';
 import { ICircleNotification } from '../util/types';
 import { responseExecutor } from '../util/responseExecutor';
-
-
-import { testIP } from './createCirclePayCard';
 import { getCirclePayOptions } from './circlepay';
 import { CommonError } from '../util/errors';
 import { handleNotification } from './notifications/bussiness/handleNotification';
@@ -78,8 +75,12 @@ circlepay.get('/encryption', async (req, res, next) => {
 
 circlepay.get('/testIP', async (req, res, next) => {
   await responseExecutor(
-    async () => (await testIP()),
-    {
+    async () => {
+      const response = await axios.get('https://api.ipify.org?format=json');
+      return {
+        ip: response.data
+      };
+    }, {
       req,
       res,
       next,
