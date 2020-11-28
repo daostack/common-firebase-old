@@ -1,28 +1,26 @@
 import * as functions from 'firebase-functions';
 import request from 'request';
-import { v4 } from 'uuid';
+import axios from 'axios';
 
-import { commonApp, commonRouter } from '../util';
+import { commonApp, commonRouter, externalRequestExecutor } from '../util';
 import { ICircleNotification } from '../util/types';
 import { responseExecutor } from '../util/responseExecutor';
 
-import * as payments from './payments/business/createPayment';
 
-import { createCirclePayCard, testIP } from './createCirclePayCard';
-import { encryption } from './circlepay';
+import { testIP } from './createCirclePayCard';
+import { getCirclePayOptions } from './circlepay';
 import { CommonError } from '../util/errors';
-import { handleNotification } from './handleNotification';
-import { subscribeToNotifications } from './subscribeToNotifications';
-import { createPayment } from './createPayment';
-import { getSecret } from '../settings';
+import { handleNotification } from './notifications/bussiness/handleNotification';
+import { subscribeToNotifications } from './notifications/bussiness/subscribeToNotifications';
+import { circlePayApi, getSecret } from '../settings';
 import { createCard } from './cards/business/createCard';
-import { createProposalPayment } from './payments/business/createProposalPayment';
-import { logger } from 'firebase-functions';
+import { ErrorCodes } from '../constants';
 
 const runtimeOptions = {
   timeoutSeconds: 540
 };
 
+// @todo Rework this
 const CIRCLEPAY_APIKEY = 'CIRCLEPAY_APIKEY';
 export const getCircleHeaders = async () => (
   getSecret(CIRCLEPAY_APIKEY).then((apiKey) => (
@@ -39,18 +37,8 @@ export const getCircleHeaders = async () => (
 
 const circlepay = commonRouter();
 
+// @todo I don't like the URL. Change it to create/card (also in the app, that's why it is more work)
 circlepay.post('/create-card', async (req, res, next) => {
-  await responseExecutor(
-    async () => (await createCirclePayCard(req)),
-    {
-      req,
-      res,
-      next,
-      successMessage: `CirclePay card created!`
-    });
-});
-
-circlepay.post('/create/card', async (req, res, next) => {
   await responseExecutor(
     async () => (await createCard({
       ...req.body,
@@ -68,9 +56,18 @@ circlepay.post('/create/card', async (req, res, next) => {
 
 
 circlepay.get('/encryption', async (req, res, next) => {
-  console.log('index/encryption');
   await responseExecutor(
-    async () => (await encryption()),
+    async () => {
+      const options = await getCirclePayOptions();
+      const response = await externalRequestExecutor(async () => {
+        return await axios.get(`${circlePayApi}/encryption/public`, options);
+      }, {
+        errorCode: ErrorCodes.CirclePayError,
+        userMessage: 'Call to CirclePay failed. Please try again later and if the issue persist contact us.'
+      });
+
+      return response.data;
+    },
     {
       req,
       res,
@@ -87,53 +84,6 @@ circlepay.get('/testIP', async (req, res, next) => {
       res,
       next,
       successMessage: `Test Ip generated`
-    });
-});
-
-circlepay.post('/create-a-payment', async (req, res, next) => {
-  await responseExecutor(
-    async () => (await createPayment(req.body)),
-    {
-      req,
-      res,
-      next,
-      successMessage: `Payment was successful`
-    });
-});
-
-circlepay.post('/create/payment', async (req, res, next) => {
-  await responseExecutor(
-    async () => (await payments.createPayment({
-      ...req.body,
-
-      type: 'one-time',
-      objectId: v4(),
-      userId: req.user.uid,
-      ipAddress: '127.0.0.1', // @todo Strange. There is no Ip to be find in the request object. Make it be :D
-      sessionId: req.requestId
-    })),
-    {
-      req,
-      res,
-      next,
-      successMessage: `Payment was successful`
-    });
-});
-
-circlepay.post('/proposal/create/payment', async (req, res, next) => {
-  await responseExecutor(
-    async () => (await createProposalPayment({
-      ...req.body,
-
-      userId: req.user.uid,
-      ipAddress: '127.0.0.1', // @todo Strange. There is no Ip to be find in the request object. Make it be :D
-      sessionId: req.requestId
-    })),
-    {
-      req,
-      res,
-      next,
-      successMessage: `Payment was successful`
     });
 });
 

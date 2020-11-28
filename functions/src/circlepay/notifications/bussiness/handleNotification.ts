@@ -1,19 +1,17 @@
-import { EVENT_TYPES } from '../event/event';
+import { EVENT_TYPES } from '../../../event/event';
 
-import { CommonError } from '../util/errors';
-import { createEvent } from '../util/db/eventDbService';
-import { getPaymentSnapshot } from '../util/db/paymentDb';
-import { ICircleNotification, IPaymentEntity } from '../util/types';
+import { CommonError } from '../../../util/errors';
+import { createEvent } from '../../../util/db/eventDbService';
+import { getPaymentSnapshot } from '../../../util/db/paymentDb';
+import { ICircleNotification, IPaymentEntity } from '../../../util/types';
 
-import { subscriptionDb } from '../subscriptions/database';
-import { handleFailedPayment, handleSuccessfulSubscriptionPayment } from '../subscriptions/business';
+import { subscriptionDb } from '../../../subscriptions/database';
+import { handleFailedPayment, handleSuccessfulSubscriptionPayment } from '../../../subscriptions/business';
 
-import { saveSubscriptionPayment } from './createSubscriptionPayment';
+import { saveSubscriptionPayment } from '../../createSubscriptionPayment';
 
 /**
  * Handles incoming CirclePay notification
- *
- * @deprecated
  *
  * @param notification - the notification that we have received
  *

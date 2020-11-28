@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-import { circlePayApi } from '../settings';
-import { externalRequestExecutor } from '../util';
-import { env, ErrorCodes } from '../constants';
-import { getCirclePayOptions } from './circlepay';
+import { circlePayApi } from '../../../settings';
+import { externalRequestExecutor } from '../../../util';
+import { env, ErrorCodes } from '../../../constants';
+import { getCirclePayOptions } from '../../circlepay';
 
 export const subscribeToNotifications = async (): Promise<void> => {
   const options = await getCirclePayOptions();

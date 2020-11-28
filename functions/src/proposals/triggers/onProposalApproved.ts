@@ -1,11 +1,11 @@
 import * as functions from 'firebase-functions';
+
 import { Collections } from '../../constants';
 import { IEventEntity } from '../../event/type';
 import { EVENT_TYPES } from '../../event/event';
 import { fundProposal } from '../business/fundProposal';
 import { createSubscription } from '../../subscriptions/business';
 import { addCommonMemberByProposalId } from '../../common/business/addCommonMember';
-import { createPayment } from '../../circlepay/createPayment';
 import { commonDb } from '../../common/database';
 import { proposalDb } from '../database';
 import { createEvent } from '../../util/db/eventDbService';
@@ -39,14 +39,8 @@ export const onProposalApproved = functions.firestore
         if (proposal.join.fundingType === 'monthly') {
           await createSubscription(proposal);
         } else {
-          // @todo Rework this (and extract it, this is way too much logic for event listener)
-          await createPayment({
-            ipAddress: '127.0.0.1',
-            proposalId: proposal.id,
-            proposerId: proposal.proposerId,
-            funding: proposal.join.funding,
-            sessionId: context.eventId
-          });
+          // On review if this is still todo comment hit me with something heavy :D
+          // @todo Create payment
 
           // Update common funding info
           const common = await commonDb.getCommon(proposal.commonId);
