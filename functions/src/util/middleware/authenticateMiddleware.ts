@@ -42,6 +42,8 @@ export const authenticate: RequestHandler = async (req, res, next) => {
         } else {
           throw new UnauthorizedError();
         }
+
+        return next();
       }
     }
   } catch (e) {
