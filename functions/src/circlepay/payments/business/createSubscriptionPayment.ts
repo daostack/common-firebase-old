@@ -3,8 +3,12 @@ import { NotImplementedError } from '../../../util/errors';
 import * as yup from 'yup';
 import { validate } from '../../../util/validate';
 import { subscriptionDb } from '../../../subscriptions/database';
-import { createEvent } from '../../../util/db/eventDbService';
-import { EVENT_TYPES } from '../../../event/event';
+import { createPayment } from './createPayment';
+import { pollPaymentStatus } from './pollPaymentStatus';
+import { isFinalized, isSuccessful } from '../helpers';
+import { logger } from '../../../util';
+import { handleFailedPayment, handleSuccessfulSubscriptionPayment } from '../../../subscriptions/business';
+import { paymentDb } from '../database';
 
 const createSubscriptionPaymentValidationSchema = yup.object({
   subscriptionId: yup.string()
@@ -15,7 +19,7 @@ const createSubscriptionPaymentValidationSchema = yup.object({
     .required(),
 
   sessionId: yup.string()
-    .required()
+    .required(),
 });
 
 
@@ -26,12 +30,34 @@ export const createSubscriptionPayment = async (payload: yup.InferType<typeof cr
   // Find the subscription
   const subscription = await subscriptionDb.get(payload.subscriptionId);
 
-  // Create event
-  // await createEvent({
-  //   userId: subscription.userId,
-  //   objectId: result.payment.id,
-  //   type: EVENT_TYPES.PAYMENT_CREATED
-  // });
+  // The cardID and if the user is the owner of that card will be validated in that function. Also the Id of the
+  // proposal will be used as idempotency key, so we are insured that only one payment will be made for one proposal
+  // (of one-time type)
+  let payment = await createPayment({
+    userId: subscription.userId,
+    cardId: subscription.cardId,
+    ipAddress: payload.ipAddress,
+    sessionId: payload.sessionId,
 
-  throw new NotImplementedError();
-}
+    type: 'subscription',
+    amount: subscription.amount,
+    objectId: `${subscription.id}-${(
+      (await paymentDb.getMany({
+        subscriptionId: subscription.id // @todo Include successful status ... notes
+      })).length
+    )}`
+  });
+
+  // Poll the payment
+  payment = await pollPaymentStatus(payment);
+
+  if (isSuccessful(payment)) {
+    await handleSuccessfulSubscriptionPayment(subscription);
+  } else if (isFinalized(payment)) {
+    await handleFailedPayment(subscription, payment);
+  } else {
+    logger.warn('Payment is not in finalized or successful state after polling {payment}', payment);
+  }
+
+  return payment as ISubscriptionPayment;
+};

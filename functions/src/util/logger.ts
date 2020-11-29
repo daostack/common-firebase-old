@@ -1,7 +1,10 @@
-export const logger = {
-  log: (...args: any): void => {
+type severity = 'log' | 'info' | 'warn' | 'error';
+type logFn = (message: string, ...args: any) => void;
+
+export const logger: { [key in severity]: logFn } = {
+  log: (message, args) => {
     // eslint-disable-next-line no-console
-    console.log(...args);
+    console.log(message, ...args);
   },
   info: (...args: any): void => {
     // eslint-disable-next-line no-console

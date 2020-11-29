@@ -2,10 +2,10 @@ import admin from 'firebase-admin';
 import { QuerySnapshot } from '@google-cloud/firestore';
 
 import { Collections } from '../../util/constants';
-import { ISubscriptionEntity } from '../../util/types';
 import { CommonError } from '../../util/errors';
 
 import { chargeSubscription } from './chargeSubscription';
+import { ISubscriptionEntity } from '../types';
 
 const db = admin.firestore();
 

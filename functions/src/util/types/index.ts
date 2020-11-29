@@ -1,4 +1,3 @@
-import { IPaymentAmount, IPaymentRefund, IPaymentSource } from './payments';
 import admin from 'firebase-admin';
 
 import Timestamp = admin.firestore.Timestamp;
@@ -14,6 +13,24 @@ export interface IUserEntity {
 
   email: string;
 }
+
+export interface IPaymentSource {
+  id: string;
+  type: string;
+}
+
+export interface IPaymentAmount {
+  amount: string;
+  currency: string;
+}
+
+export interface IPaymentRefund {
+  id: string;
+  type: 'payment' | string;
+  amount: IPaymentAmount;
+  status: CirclePaymentStatus;
+}
+
 
 export interface ICircleNotification {
   clientId: string;
@@ -35,10 +52,6 @@ export interface ICircleNotification {
     refunds: IPaymentRefund[];
   }
 }
-
-export * from '../../subscriptions/types';
-export * from './payments';
-export * from './cards';
 
 export type BaseEntityType = 'id' | 'createdAt' | 'updatedAt';
 

@@ -1,12 +1,13 @@
 import moment from 'moment';
+import { v4 } from 'uuid';
 
 import { ISubscriptionEntity } from '../types';
 import { CommonError } from '../../util/errors';
 
 import { EVENT_TYPES } from '../../event/event';
-import { createSubscriptionPayment } from '../../circlepay/createSubscriptionPayment';
 import { createEvent } from '../../util/db/eventDbService';
 import { subscriptionDb } from '../database';
+import { createSubscriptionPayment } from '../../circlepay/payments/business/createSubscriptionPayment';
 
 /**
  * Charges one subscription (only if the due date is
@@ -35,12 +36,10 @@ export const chargeSubscription = async (subscription: ISubscriptionEntity): Pro
   }
 
   try {
-    await createSubscriptionPayment(subscription);
-
-    await createEvent({
-      userId: subscription.userId,
-      objectId: subscription.id,
-      type: EVENT_TYPES.SUBSCRIPTION_PAYMENT_CREATED
+    const payment = await createSubscriptionPayment({
+      subscriptionId: subscription.id,
+      sessionId: v4(),
+      ipAddress: '127.0.0.1'
     });
   } catch (e) {
     console.error(new CommonError(`

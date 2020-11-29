@@ -23,7 +23,6 @@ const createPaymentValidationSchema = yup.object({
     .required(),
 
   objectId: yup.string()
-    .uuid()
     .required(),
 
   ipAddress: yup.string()
@@ -138,7 +137,7 @@ export const createPayment = async (payload: CreatePaymentPayload): Promise<IPay
     objectId: payload.objectId,
     userId: user.uid,
     status: response.status,
-    circlePaymentId: response.id
+    circlePaymentId: response.id,
   });
 
   // Create event

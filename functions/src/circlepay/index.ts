@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 import request from 'request';
 import axios from 'axios';
 
-import { commonApp, commonRouter, externalRequestExecutor } from '../util';
+import { commonApp, commonRouter, externalRequestExecutor, logger } from '../util';
 import { ICircleNotification } from '../util/types';
 import { responseExecutor } from '../util/responseExecutor';
 import { getCirclePayOptions } from './circlepay';

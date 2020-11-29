@@ -5,10 +5,10 @@ import { IEventEntity } from '../../event/type';
 import { EVENT_TYPES } from '../../event/event';
 import { fundProposal } from '../business/fundProposal';
 import { createSubscription } from '../../subscriptions/business';
-import { addCommonMemberByProposalId } from '../../common/business/addCommonMember';
 import { commonDb } from '../../common/database';
 import { proposalDb } from '../database';
 import { createEvent } from '../../util/db/eventDbService';
+import { createProposalPayment } from '../../circlepay/payments/business/createProposalPayment';
 
 
 export const onProposalApproved = functions.firestore
@@ -39,8 +39,12 @@ export const onProposalApproved = functions.firestore
         if (proposal.join.fundingType === 'monthly') {
           await createSubscription(proposal);
         } else {
-          // On review if this is still todo comment hit me with something heavy :D
-          // @todo Create payment
+          // Create the payment
+          const payment = await createProposalPayment({
+            proposalId: proposal.id,
+            sessionId: context.eventId,
+            ipAddress: '127.0.0.1' // @t
+          });
 
           // Update common funding info
           const common = await commonDb.getCommon(proposal.commonId);
@@ -50,9 +54,6 @@ export const onProposalApproved = functions.firestore
 
           await commonDb.updateCommon(common);
         }
-
-        // Add member to the common
-        await addCommonMemberByProposalId(proposal.id);
       }
     }
   );

@@ -1,5 +1,6 @@
 import { db } from '../../../settings';
 import { Collections } from '../../../constants';
+import { cardDb } from '../database';
 
 /**
  * Checks if the user is the creator of the card
@@ -8,8 +9,5 @@ import { Collections } from '../../../constants';
  * @param cardId - The ID of the card, against which we want to check
  */
 export const isCardOwner = async (userId: string, cardId: string): Promise<boolean> => {
-  // @todo Circle DB?
-  const card = (await db.collection(Collections.Cards).doc(cardId).get()).data();
-
-  return card.userId === userId;
+  return (await cardDb.get(cardId)).ownerId === userId;
 };

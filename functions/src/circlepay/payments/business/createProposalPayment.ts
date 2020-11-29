@@ -6,16 +6,9 @@ import { validate } from '../../../util/validate';
 import { proposalDb } from '../../../proposals/database';
 
 import { createPayment } from './createPayment';
-import { pollPayment } from './pollPayment';
+import { pollPaymentStatus } from './pollPaymentStatus';
 
 const createProposalPaymentValidationSchema = yup.object({
-  userId: yup.string()
-    .required(),
-
-  cardId: yup.string()
-    .uuid()
-    .required(),
-
   proposalId: yup.string()
     .uuid()
     .required(),
@@ -30,6 +23,8 @@ const createProposalPaymentValidationSchema = yup.object({
 /**
  * Creates payment for join request and then updates the join request with payment information
  *
+ * @throws { CommonError } - If the proposal is of subscription join type
+ *
  * @param payload
  */
 export const createProposalPayment = async (payload: yup.InferType<typeof createProposalPaymentValidationSchema>): Promise<IProposalPayment> => {
@@ -38,15 +33,6 @@ export const createProposalPayment = async (payload: yup.InferType<typeof create
 
   // Find the proposal
   const proposal = await proposalDb.getJoinRequest(payload.proposalId);
-
-  // Check if the proposal is made by the user
-  if (proposal.proposerId !== payload.userId) {
-    throw new CommonError('Cannot create proposal payment for proposal, that is not owned by the user', {
-      proposalId: proposal.id,
-      proposerId: proposal.proposerId,
-      userId: payload.userId
-    });
-  }
 
   // Check if the proposal is with the correct contribution type
   if (proposal.join.fundingType !== 'one-time') {
@@ -61,8 +47,8 @@ export const createProposalPayment = async (payload: yup.InferType<typeof create
   // proposal will be used as idempotency key, so we are insured that only one payment will be made for one proposal
   // (of one-time type)
   let payment = await createPayment({
-    userId: payload.userId,
-    cardId: payload.cardId,
+    userId: proposal.proposerId,
+    cardId: proposal.join.cardId,
     ipAddress: payload.ipAddress,
     sessionId: payload.sessionId,
 
@@ -84,7 +70,7 @@ export const createProposalPayment = async (payload: yup.InferType<typeof create
   });
 
   // Poll the payment
-  payment = await pollPayment(payment);
+  payment = await pollPaymentStatus(payment);
 
   // Return the payment
   return payment as IProposalPayment;

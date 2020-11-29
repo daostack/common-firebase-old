@@ -72,7 +72,6 @@ export interface IPaymentSource {
 
 export interface ISubscriptionPayment extends IPaymentEntityBase {
   type: 'subscription';
-
 }
 
 export interface IProposalPayment extends IPaymentEntityBase {
@@ -80,4 +79,4 @@ export interface IProposalPayment extends IPaymentEntityBase {
 }
 
 
-export type IPaymentEntity = ISubscriptionPayment | IProposalPayment;
+export type IPaymentEntity = IPaymentEntityBase //ISubscriptionPayment | IProposalPayment;
