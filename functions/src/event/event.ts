@@ -9,8 +9,6 @@ interface IEventData {
     notifyUserFilter: (eventObj: any) => string[] | Promise<string[]>;
 }
 
-//interface
-
 // excluding event owner (message creator, etc) from userFilter so she wouldn't get notified
 const excludeOwner = (members: ICommonMember[], ownerId: string) : string[] => (
     members
