@@ -124,7 +124,6 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
 
   // Link the card to the proposal
   if(!isTest) {
-  if(!isTest) {
     await assignCardToProposal(joinRequest.join.cardId, joinRequest.id);
   }
 
