@@ -26,10 +26,6 @@ const createCardValidationSchema = yup.object({
     .string()
     .required(),
 
-  idempotencyKey: yup
-    .string()
-    .required(),
-
   sessionId: yup
     .string()
     .required(),
@@ -76,7 +72,7 @@ export const createCard = async (payload: CreateCardPayload): Promise<ICardEntit
     encryptedData: payload.encryptedData,
     expMonth: payload.expMonth,
     expYear: payload.expYear,
-    idempotencyKey: payload.idempotencyKey || payload.sessionId,
+    idempotencyKey: payload.sessionId,
     keyId: payload.keyId,
     metadata: {
       email: user.email,

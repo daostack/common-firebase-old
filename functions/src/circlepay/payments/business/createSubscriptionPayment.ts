@@ -1,4 +1,6 @@
 import { ISubscriptionPayment } from '../types';
+import { v4 } from 'uuid';
+
 import { NotImplementedError } from '../../../util/errors';
 import * as yup from 'yup';
 import { validate } from '../../../util/validate';
@@ -41,12 +43,19 @@ export const createSubscriptionPayment = async (payload: yup.InferType<typeof cr
 
     type: 'subscription',
     amount: subscription.amount,
-    objectId: `${subscription.id}-${(
-      (await paymentDb.getMany({
-        subscriptionId: subscription.id // @todo Include successful status ... notes
-      })).length
-    )}`
+    objectId: v4()
   });
+
+  // let payment = await createPayment({
+  //   userId: proposal.proposerId,
+  //   cardId: proposal.join.cardId,
+  //   ipAddress: payload.ipAddress,
+  //   sessionId: payload.sessionId,
+  //
+  //   type: 'one-time',
+  //   amount: proposal.join.funding,
+  //   objectId: proposal.id
+  // });
 
   // Poll the payment
   payment = await pollPaymentStatus(payment);

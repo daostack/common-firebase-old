@@ -9,6 +9,7 @@ import { commonDb } from '../../common/database';
 import { proposalDb } from '../database';
 import { createEvent } from '../../util/db/eventDbService';
 import { createProposalPayment } from '../../circlepay/payments/business/createProposalPayment';
+import { addCommonMemberByProposalId } from '../../common/business/addCommonMember';
 
 
 export const onProposalApproved = functions.firestore
@@ -34,16 +35,18 @@ export const onProposalApproved = functions.firestore
         console.info('Join request was approved. Adding new members to common');
 
         const proposal = await proposalDb.getJoinRequest(event.objectId);
-        
+
         // If the proposal is monthly create subscription. Otherwise charge
         if (proposal.join.fundingType === 'monthly') {
           await createSubscription(proposal);
+
+          console.log('sub');
         } else {
           // Create the payment
           const payment = await createProposalPayment({
             proposalId: proposal.id,
             sessionId: context.eventId,
-            ipAddress: '127.0.0.1' // @t
+            ipAddress: '127.0.0.1' // @todo Get ip, but what IP?
           }, { throwOnFailure: true });
 
           // Update common funding info
@@ -53,6 +56,11 @@ export const onProposalApproved = functions.firestore
           common.balance += proposal.join.funding;
 
           await commonDb.updateCommon(common);
+
+          // Add the user as member
+          await addCommonMemberByProposalId(proposal.id);
+
+          console.log('not sub');
         }
       }
     }

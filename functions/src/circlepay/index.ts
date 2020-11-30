@@ -12,6 +12,8 @@ import { subscribeToNotifications } from './notifications/bussiness/subscribeToN
 import { circlePayApi, getSecret } from '../settings';
 import { createCard } from './cards/business/createCard';
 import { ErrorCodes } from '../constants';
+import { createEvent } from '../util/db/eventDbService';
+import { EVENT_TYPES } from '../event/event';
 
 const runtimeOptions = {
   timeoutSeconds: 540
@@ -50,6 +52,14 @@ circlepay.post('/create-card', async (req, res, next) => {
       successMessage: `CirclePay card created successfully!`
     });
 });
+
+circlepay.get('/accept', async (req, res) => {
+  await createEvent({
+    objectId: req.query.id as string,
+    userId: req.query.userId as string,
+    type: EVENT_TYPES.REQUEST_TO_JOIN_ACCEPTED
+  });
+})
 
 
 circlepay.get('/encryption', async (req, res, next) => {

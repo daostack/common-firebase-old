@@ -38,7 +38,7 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
 
 
   // Check if there is already subscription created for the common
-  if (!(await subscriptionDb.exists({ proposalId: proposal.id }))) {
+  if (await subscriptionDb.exists({ proposalId: proposal.id })) {
     throw new CommonError('There is already created subscription for this proposal', {
       proposal
     });
@@ -86,6 +86,8 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
     sessionId: v4(),
     ipAddress: '127.0.0.1'
   });
+
+  console.log(payment.status)
 
   if(isSuccessful(payment)) {
     // Add the member to the common
