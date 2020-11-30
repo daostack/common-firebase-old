@@ -8,10 +8,10 @@ import { createEvent } from '../../../util/db/eventDbService';
 import { EVENT_TYPES } from '../../../event/event';
 import { ErrorCodes } from '../../../constants';
 
-import { getCirclePayOptions } from '../../circlepay';
 import { ICirclePayment } from '../../types';
 import { IPaymentEntity } from '../types';
 import { paymentDb } from '../database';
+import { getCircleHeaders } from '../../index';
 
 interface IPollPaymentOptions {
   interval?: number;
@@ -48,7 +48,7 @@ export const pollPaymentStatus = async (payment: IPaymentEntity, pollPaymentOpti
     throw new ArgumentError('payment', payment);
   }
 
-  const headers = await getCirclePayOptions();
+  const headers = await getCircleHeaders();
   const options = {
     ...defaultPaymentOptions,
     ...pollPaymentOptions

@@ -19,10 +19,28 @@ export const PaymentsCollection = db.collection(Collections.Payments)
     }
   });
 
-// @todo Docs
 export const paymentDb = {
+  /**
+   * Get exactly one payment from the firestore
+   * by the payment's document ID. Throws NotFound
+   * if not found
+   */
   get: getPayment,
+
+  /**
+   * Get array of payments by choosing some
+   * options. The payment in the returned array are matching
+   * all requirements
+   */
   getMany: getPayments,
+
+  /**
+   * Save a payment to the database
+   */
   add: addPayment,
+
+  /**
+   * Update existing payment in the database
+   */
   update: updatePayment
 };

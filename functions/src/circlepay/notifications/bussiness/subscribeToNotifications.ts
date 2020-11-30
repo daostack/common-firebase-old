@@ -3,10 +3,10 @@ import axios from 'axios';
 import { circlePayApi } from '../../../settings';
 import { externalRequestExecutor } from '../../../util';
 import { env, ErrorCodes } from '../../../constants';
-import { getCirclePayOptions } from '../../circlepay';
+import { getCircleHeaders } from '../../index';
 
 export const subscribeToNotifications = async (): Promise<void> => {
-  const options = await getCirclePayOptions();
+  const options = await getCircleHeaders();
 
   const currentSubscriptions = await externalRequestExecutor<{
     data: {
@@ -52,7 +52,7 @@ export const subscribeToNotifications = async (): Promise<void> => {
 };
 
 const unsubscribeFromNotification = async (notificationId: string): Promise<void> => {
-  const options = await getCirclePayOptions();
+  const options = await getCircleHeaders();
 
   await externalRequestExecutor(async () => {
     return (await axios.delete(`${circlePayApi}/notifications/${notificationId}`, options));
@@ -63,7 +63,7 @@ const unsubscribeFromNotification = async (notificationId: string): Promise<void
 };
 
 const subscribeEndpoint = async (endpoint: string): Promise<void> => {
-  const options = await getCirclePayOptions();
+  const options = await getCircleHeaders();
 
   await externalRequestExecutor(async () => {
     return (await axios.post(`${circlePayApi}/notifications/subscriptions`, {

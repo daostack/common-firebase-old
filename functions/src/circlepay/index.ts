@@ -2,24 +2,20 @@ import * as functions from 'firebase-functions';
 import request from 'request';
 import axios from 'axios';
 
-import { commonApp, commonRouter, externalRequestExecutor, logger } from '../util';
+import { commonApp, commonRouter, externalRequestExecutor } from '../util';
 import { ICircleNotification } from '../util/types';
 import { responseExecutor } from '../util/responseExecutor';
-import { getCirclePayOptions } from './circlepay';
 import { CommonError } from '../util/errors';
 import { handleNotification } from './notifications/bussiness/handleNotification';
 import { subscribeToNotifications } from './notifications/bussiness/subscribeToNotifications';
 import { circlePayApi, getSecret } from '../settings';
 import { createCard } from './cards/business/createCard';
 import { ErrorCodes } from '../constants';
-import { createEvent } from '../util/db/eventDbService';
-import { EVENT_TYPES } from '../event/event';
 
 const runtimeOptions = {
   timeoutSeconds: 540
 };
 
-// @todo Rework this
 const CIRCLEPAY_APIKEY = 'CIRCLEPAY_APIKEY';
 export const getCircleHeaders = async () => (
   getSecret(CIRCLEPAY_APIKEY).then((apiKey) => (
@@ -36,7 +32,6 @@ export const getCircleHeaders = async () => (
 
 const circlepay = commonRouter();
 
-// @todo I don't like the URL. Change it to create/card (also in the app, that's why it is more work)
 circlepay.post('/create-card', async (req, res, next) => {
   await responseExecutor(
     async () => (await createCard({
@@ -53,19 +48,10 @@ circlepay.post('/create-card', async (req, res, next) => {
     });
 });
 
-circlepay.get('/accept', async (req, res) => {
-  await createEvent({
-    objectId: req.query.id as string,
-    userId: req.query.userId as string,
-    type: EVENT_TYPES.REQUEST_TO_JOIN_ACCEPTED
-  });
-})
-
-
 circlepay.get('/encryption', async (req, res, next) => {
   await responseExecutor(
     async () => {
-      const options = await getCirclePayOptions();
+      const options = await getCircleHeaders();
       const response = await externalRequestExecutor(async () => {
         return await axios.get(`${circlePayApi}/encryption/public`, options);
       }, {
