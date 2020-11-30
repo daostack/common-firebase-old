@@ -1,12 +1,13 @@
 import * as yup from 'yup';
 
 import { IProposalPayment } from '../types';
-import { CommonError } from '../../../util/errors';
+import { CommonError, PaymentError } from '../../../util/errors';
 import { validate } from '../../../util/validate';
 import { proposalDb } from '../../../proposals/database';
 
 import { createPayment } from './createPayment';
 import { pollPaymentStatus } from './pollPaymentStatus';
+import { isFailed } from '../helpers/statusHelper';
 
 const createProposalPaymentValidationSchema = yup.object({
   proposalId: yup.string()
@@ -20,14 +21,31 @@ const createProposalPaymentValidationSchema = yup.object({
     .required()
 });
 
+interface ICreatePaymentOptions {
+  /**
+   * Whether error will be thrown if the payment fails
+   */
+  throwOnFailure: boolean;
+}
+
+const createPaymentDefaultOptions: ICreatePaymentOptions = {
+  throwOnFailure: false
+};
+
 /**
  * Creates payment for join request and then updates the join request with payment information
  *
  * @throws { CommonError } - If the proposal is of subscription join type
+ * @throws { PaymentError } - If the payment fails and the throw option is true
  *
  * @param payload
  */
-export const createProposalPayment = async (payload: yup.InferType<typeof createProposalPaymentValidationSchema>): Promise<IProposalPayment> => {
+export const createProposalPayment = async (payload: yup.InferType<typeof createProposalPaymentValidationSchema>, createPaymentOptions?: Partial<ICreatePaymentOptions>): Promise<IProposalPayment> => {
+  const options = {
+    ...createPaymentDefaultOptions,
+    ...createPaymentOptions
+  };
+
   // Validate the data
   await validate(payload, createProposalPaymentValidationSchema);
 
@@ -71,6 +89,10 @@ export const createProposalPayment = async (payload: yup.InferType<typeof create
 
   // Poll the payment
   payment = await pollPaymentStatus(payment);
+
+  if (options.throwOnFailure && isFailed(payment)) {
+    throw new PaymentError(payment.id, payment.circlePaymentId);
+  }
 
   // Return the payment
   return payment as IProposalPayment;

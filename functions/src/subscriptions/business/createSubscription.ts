@@ -44,7 +44,7 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
     });
   }
 
-  // Aquire the required data
+  // Acquire the required data
   const card = await cardDb.get(proposal.join.cardId);
   const common = await commonDb.getCommon(proposal.commonId);
 

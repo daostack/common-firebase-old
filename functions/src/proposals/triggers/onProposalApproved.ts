@@ -44,7 +44,7 @@ export const onProposalApproved = functions.firestore
             proposalId: proposal.id,
             sessionId: context.eventId,
             ipAddress: '127.0.0.1' // @t
-          });
+          }, { throwOnFailure: true });
 
           // Update common funding info
           const common = await commonDb.getCommon(proposal.commonId);

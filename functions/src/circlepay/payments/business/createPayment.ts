@@ -51,7 +51,7 @@ const createPaymentValidationSchema = yup.object({
     })
 });
 
-interface CreatePaymentPayload extends yup.InferType<typeof createPaymentValidationSchema> {
+interface ICreatePaymentPayload extends yup.InferType<typeof createPaymentValidationSchema> {
   /**
    * This is the ID of the object that we are charging (either the subscription or proposal id). It is used
    * as idempotency key, so we don't charge more than one time for one thing (@todo figure out the subscription)
@@ -64,7 +64,15 @@ interface CreatePaymentPayload extends yup.InferType<typeof createPaymentValidat
   amount: number;
 }
 
-export const createPayment = async (payload: CreatePaymentPayload): Promise<IPaymentEntity> => {
+/**
+ * This function only creates the payment with circle and saves it in the database. No polling is done here.
+ * Please do not use directly or use with caution.
+ *
+ * @throws { CommonError } - If the card is not owned by the user
+ *
+ * @param payload - The data needed for creating payment
+ */
+export const createPayment = async (payload: ICreatePaymentPayload): Promise<IPaymentEntity> => {
   // Validate the data
   await validate(payload, createPaymentValidationSchema);
 
@@ -137,7 +145,7 @@ export const createPayment = async (payload: CreatePaymentPayload): Promise<IPay
     objectId: payload.objectId,
     userId: user.uid,
     status: response.status,
-    circlePaymentId: response.id,
+    circlePaymentId: response.id
   });
 
   // Create event
