@@ -2,14 +2,17 @@ import { getDiscussionMessageById } from '../util/db/discussionMessagesDb';
 import { getDiscussionById } from '../util/db/discussionDbService';
 import { proposalDb } from '../proposals/database';
 import { commonDb } from '../common/database';
+import { ICommonMember } from '../common/types';
 
 interface IEventData {
     eventObject: (eventObjId: string) => any;
     notifyUserFilter: (eventObj: any) => string[] | Promise<string[]>;
 }
 
+//interface
+
 // excluding event owner (message creator, etc) from userFilter so she wouldn't get notified
-const excludeOwner = (members, ownerId) => (
+const excludeOwner = (members: ICommonMember[], ownerId: string) : string[] => (
     members
         .filter((member) => member.userId !== ownerId)
         .map((member) => member.userId)
