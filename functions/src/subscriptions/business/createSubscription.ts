@@ -1,8 +1,6 @@
 import admin from 'firebase-admin';
 import Timestamp = admin.firestore.Timestamp;
 
-
-import { Utils } from '../../util/util';
 import { CommonError } from '../../util/errors';
 import { createSubscriptionPayment } from '../../circlepay/createSubscriptionPayment';
 import { IProposalEntity } from '../../proposals/proposalTypes';
