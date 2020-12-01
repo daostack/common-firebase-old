@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 
 import { commonApp, commonRouter } from '../util';
 import { responseExecutor } from '../util/responseExecutor';
-import { getPayout, getBalance } from './backoffice';
+import { getPayout, getPayin, getBalance } from './backoffice';
 import { google } from 'googleapis'
 import serviceAccount from '../env/adminsdk-keys.json';
 
@@ -50,7 +50,7 @@ backofficeRouter.get('/payout', async (req, res, next) => {
           if (data.hasOwnProperty(key)) {
               const cells = []
               cells.push(data[key].proposalId)
-              cells.push(data[key].fundingRequest.amount)
+              cells.push(data[key].fundingRequest.amount/100)
               cells.push(data[key].resolvedAt)
               cells.push(data[key].proposerId)
               cells.push(data[key].email)
@@ -75,7 +75,77 @@ backofficeRouter.get('/payout', async (req, res, next) => {
       await sheets.spreadsheets.values.update({
           auth: jwtClient,
           spreadsheetId: '1muC-dGhS_MOEZYKSTNyMthG1NHlo8-4mlb_K5ExD7QM',
-          range: 'PAYOUT!A1',  // update this range of cells
+          range: 'PAY_OUT!A1',  // update this range of cells
+          valueInputOption: 'RAW',
+          requestBody: resource
+      }, {})
+
+      return data;
+    }, {
+      req,
+      res,
+      next,
+      successMessage: `Fetch PAYOUT succesfully!`
+    }
+  );
+});
+
+backofficeRouter.get('/payin', async (req, res, next) => {
+  await responseExecutor(
+    async () => {
+      const values = [[
+        'Proposal Id',
+        'Amount',
+        'Proposal data',
+        'User UID',
+        'User email',
+        'First name',
+        'Last name',
+        'Common id',
+        'Common name',
+        'Payment id',
+        'Payment status',
+        'Payment amount',
+        'Fees',
+        'Payment creation date',
+        'Payment updated'
+      ]];
+
+      const data = await getPayin();
+
+      for (const key in data) {
+          // eslint-disable-next-line no-prototype-builtins
+          if (data.hasOwnProperty(key)) {
+              const cells = []
+              cells.push(data[key].proposalId)
+              cells.push(data[key].join.funding/100)
+              cells.push(data[key].resolvedAt)
+              cells.push(data[key].proposerId)
+              cells.push(data[key].email)
+              cells.push(data[key].firstName)
+              cells.push(data[key].lastName)
+              cells.push(data[key].daoId)
+              cells.push(data[key].name)
+              cells.push(data[key].paymentId)
+              cells.push(data[key].status)
+              if(data[key].amount) cells.push(data[key].amount.amount)
+              else cells.push('')
+              if(data[key].fee) cells.push(data[key].fee/100)
+              else cells.push('')
+              cells.push(data[key].creationDate)
+              cells.push(data[key].updateDate)
+              values.push(cells)
+          }
+      }
+      const resource = {
+        values,
+      };
+
+      await jwtAuthPromise
+      await sheets.spreadsheets.values.update({
+          auth: jwtClient,
+          spreadsheetId: '1muC-dGhS_MOEZYKSTNyMthG1NHlo8-4mlb_K5ExD7QM',
+          range: 'PAY_IN!A1',  // update this range of cells
           valueInputOption: 'RAW',
           requestBody: resource
       }, {})
