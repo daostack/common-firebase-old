@@ -2,6 +2,7 @@ import * as cron from './cron';
 import * as event from './event';
 import * as notification from './notification';
 import * as messageTriggers from './discussionMessage/triggers';
+import * as commonTriggers from './common';
 import * as subscriptionsTriggers from './subscriptions/triggers';
 import * as commonTriggers from './common';
 
