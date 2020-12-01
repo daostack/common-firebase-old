@@ -4,7 +4,6 @@ import * as notification from './notification';
 import * as messageTriggers from './discussionMessage/triggers';
 import * as commonTriggers from './common';
 import * as subscriptionsTriggers from './subscriptions/triggers';
-import * as commonTriggers from './common';
 
 import { circlepayApp } from './circlepay';
 import { commonsApp } from './common';
