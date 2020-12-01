@@ -35,7 +35,7 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
 
   const card = await getCardById(proposal.join.cardId);
 
-  if (!(await subscriptionDb.exists({ proposalId: proposal.id }))) {
+  if (await subscriptionDb.exists({ proposalId: proposal.id })) {
     throw new CommonError('There is already created subscription for this proposal', {
       proposal
     });
