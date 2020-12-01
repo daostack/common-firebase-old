@@ -48,8 +48,8 @@ export const processVote = async (vote: IVoteEntity): Promise<void> => {
   proposal.votesFor = currentVoteCount.votesFor;
   proposal.votesAgainst = currentVoteCount.votesAgainst;
 
-  // Check for vote flip
-  if (votesBefore.outcome !== currentVoteCount.outcome) {
+  // Check for vote flip (but not on the first vote)
+  if (votesBefore.outcome !== currentVoteCount.outcome && votes.length > 1) {
     console.info(`A vote flip occurred after vote ${vote.id}`);
 
     // If the proposal is in the quiet ending stage and
