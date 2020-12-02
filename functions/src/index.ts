@@ -3,7 +3,6 @@ import * as event from './event';
 import * as notification from './notification';
 import * as messageTriggers from './discussionMessage/triggers';
 import * as commonTriggers from './common';
-import * as subscriptionsTriggers from './subscriptions/triggers';
 
 import { circlepayApp } from './circlepay';
 import { commonsApp } from './common';
@@ -24,6 +23,5 @@ exports.proposalCrons = proposalCrons;
 exports.messageTriggers = messageTriggers;
 exports.proposalTriggers = proposalTriggers;
 exports.commonTriggers = commonTriggers;
-exports.subscriptionTriggers = subscriptionsTriggers;
 
 exports.cronJobs = cron;
