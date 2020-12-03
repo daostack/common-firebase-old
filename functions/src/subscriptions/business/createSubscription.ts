@@ -2,7 +2,6 @@ import { v4 } from 'uuid';
 import admin from 'firebase-admin';
 import Timestamp = admin.firestore.Timestamp;
 
-
 import { CommonError } from '../../util/errors';
 import { IProposalEntity } from '../../proposals/proposalTypes';
 import { ISubscriptionEntity } from '../types';

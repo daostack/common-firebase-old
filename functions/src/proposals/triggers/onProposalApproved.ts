@@ -39,8 +39,6 @@ export const onProposalApproved = functions.firestore
         // If the proposal is monthly create subscription. Otherwise charge
         if (proposal.join.fundingType === 'monthly') {
           await createSubscription(proposal);
-
-          console.log('sub');
         } else {
           // Create the payment
           const payment = await createProposalPayment({
@@ -59,8 +57,6 @@ export const onProposalApproved = functions.firestore
 
           // Add the user as member
           await addCommonMemberByProposalId(proposal.id);
-
-          console.log('not sub');
         }
       }
     }
