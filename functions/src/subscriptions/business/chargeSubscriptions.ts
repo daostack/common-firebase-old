@@ -11,7 +11,7 @@ const db = admin.firestore();
 
 /**
  *  Charges all subscriptions that are due today. Only
- *  to be used from the cron job!
+ *  to be used from the crons job!
  */
 export const chargeSubscriptions = async (): Promise<void> => {
   console.info(`Beginning subscription charging for ${new Date().getDate()}`);
