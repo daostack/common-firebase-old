@@ -1,16 +1,14 @@
 import * as functions from 'firebase-functions';
-import request from 'request';
 import axios from 'axios';
 
 import { commonApp, commonRouter, externalRequestExecutor } from '../util';
-import { ICircleNotification } from '../util/types';
 import { responseExecutor } from '../util/responseExecutor';
-import { CommonError } from '../util/errors';
-import { handleNotification } from './notifications/bussiness/handleNotification';
-import { subscribeToNotifications } from './notifications/bussiness/subscribeToNotifications';
 import { circlePayApi, getSecret } from '../settings';
-import { createCard } from './cards/business/createCard';
 import { ErrorCodes } from '../constants';
+
+import { addCardEndpoints } from './cards';
+import { addBankAccountEndpoints } from './backAccounts';
+import { addNotificaitonEndpoints } from './notifications';
 
 const runtimeOptions = {
   timeoutSeconds: 540
@@ -32,21 +30,9 @@ export const getCircleHeaders = async () => (
 
 const circlepay = commonRouter();
 
-circlepay.post('/create-card', async (req, res, next) => {
-  await responseExecutor(
-    async () => (await createCard({
-      ...req.body,
-      ipAddress: '127.0.0.1', // @todo Strange. There is no Ip to be find in the request object. Make it be :D
-      ownerId: req.user.uid,
-      sessionId: req.requestId
-    })),
-    {
-      req,
-      res,
-      next,
-      successMessage: `CirclePay card created successfully!`
-    });
-});
+addCardEndpoints(circlepay);
+addBankAccountEndpoints(circlepay);
+addNotificaitonEndpoints(circlepay);
 
 circlepay.get('/encryption', async (req, res, next) => {
   await responseExecutor(
@@ -82,55 +68,6 @@ circlepay.get('/testIP', async (req, res, next) => {
       next,
       successMessage: `Test Ip generated`
     });
-});
-
-circlepay.post('/notification/ping', async (req, res, next) => {
-  console.info('Received notification from Circle');
-
-  await responseExecutor(async () => {
-    const envelope = JSON.parse(req.body);
-
-    if (envelope.Type === 'SubscriptionConfirmation') {
-      console.info('Trying to confirm subscription!', envelope.SubscribeURL);
-
-      request(envelope.SubscribeURL, (err) => {
-        if (err) {
-          throw new CommonError('Something wrong happened verifying the request', {
-              error: err,
-              errorString: JSON.stringify(err)
-            }
-          );
-        }
-
-        console.info('Successfully subscribed to the notifications!');
-      });
-    } else if (envelope.Type === 'Notification') {
-      await handleNotification(JSON.parse(envelope.Message) as ICircleNotification);
-    } else {
-      throw new CommonError(`Unsupported type: ${envelope.Type}`, {
-        envelope,
-        envelopeString: JSON.stringify(envelope)
-      });
-    }
-
-    console.info('Successfully handled notification');
-  }, {
-    req,
-    res,
-    next,
-    successMessage: 'Successfully handled notification'
-  });
-});
-
-circlepay.post('/notification/register', async (req, res, next) => {
-  await responseExecutor(async () => {
-    return await subscribeToNotifications();
-  }, {
-    req,
-    res,
-    next,
-    successMessage: 'Endpoints registered!'
-  });
 });
 
 export const circlepayApp = functions
