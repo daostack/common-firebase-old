@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import iban from 'ibantools';
+import * as iban from 'ibantools';
 import { v4 } from 'uuid';
 
 import { billingDetailsValidationSchema } from '../../../util/schemas';
@@ -13,10 +13,9 @@ import { ICircleCreateCardResponse } from '../../types';
 import axios from 'axios';
 import { circlePayApi } from '../../../settings';
 import { ErrorCodes } from '../../../constants';
+import { bankAccountDb } from '../database';
 
 const bankAccountValidationSchema = yup.object({
-  idempotencyKey: yup.string(),
-
   iban: yup
     .string()
     .required()
@@ -40,12 +39,17 @@ export const createBankAccount = async (payload: createBankAccountPayload): Prom
 
   // Format the data for circle
   const headers = await getCircleHeaders();
+
+  // @todo Better payload build?
   const data: ICircleCreateBankAccountPayload = {
     iban: payload.iban,
     idempotencyKey: v4(),
 
-    bankAddress: payload.bankAddress as any,
     billingDetails: payload.billingDetails as any,
+    bankAddress: {
+      ...payload.bankAddress as any,
+      bankName: payload.bankAddress.name
+    },
   }
 
   // Create the account on Circle
@@ -59,5 +63,27 @@ export const createBankAccount = async (payload: createBankAccountPayload): Prom
     userMessage: 'Cannot create the bank account, because it was rejected by Circle'
   });
 
-  return response as any;
+  // Check if the account exists
+  const existingBankAccounts = await bankAccountDb.getMany({
+    fingerprint: response.fingerprint
+  });
+
+  // If there is entity for that bank account just return it
+  if (existingBankAccounts.length) {
+    return existingBankAccounts[0];
+  }
+
+  // If there are no entities for this account - create it
+  const bankAccount = await bankAccountDb.add({
+    circleId: response.id,
+    circleFingerprint: response.fingerprint,
+
+    bank: response.bankAddress as any,
+    billingDetails: response.billingDetails as any
+  });
+
+  // @todo Create event
+
+  // Return the created bank account
+  return bankAccount;
 };
