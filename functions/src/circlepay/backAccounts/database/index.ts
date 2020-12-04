@@ -3,6 +3,8 @@ import { Collections } from '../../../constants';
 import { IBankAccountEntity } from '../types';
 import { addBankAccount } from './addBankAccount';
 import { getBankAccounts } from './getBankAccounts';
+import { bankAccountExists } from './bankAccountExists';
+import { getBankAccount } from './getBankAccount';
 
 
 export const BankAccountCollection = db.collection(Collections.BankAccounts)
@@ -18,5 +20,7 @@ export const BankAccountCollection = db.collection(Collections.BankAccounts)
 
 export const bankAccountDb = {
   add: addBankAccount,
-  getMany: getBankAccounts
+  get: getBankAccount,
+  getMany: getBankAccounts,
+  exists: bankAccountExists
 };

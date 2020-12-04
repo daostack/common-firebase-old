@@ -12,6 +12,8 @@ import { circlePayApi, getSecret } from '../settings';
 import { createCard } from './cards/business/createCard';
 import { ErrorCodes } from '../constants';
 import { createBankAccount } from './backAccounts/bussiness/createBankAccount';
+import { createPayout } from './payouts/business/createPayout';
+import { approvePayout } from './payouts/business/approvePayout';
 
 const runtimeOptions = {
   timeoutSeconds: 540
@@ -151,6 +153,36 @@ circlepay.post('/wires/create', async (req, res, next) => {
   });
 });
 
+// ----- Payouts
+
+circlepay.post('/payouts/create', async (req, res, next) => {
+  await responseExecutor(async () => {
+    const data = await createPayout(req.body);
+  }, {
+    req,
+    res,
+    next,
+    successMessage: 'Payout created'
+  });
+});
+
+circlepay.get('/payouts/approve', async (req, res, next) => {
+  await responseExecutor(async () => {
+    return {
+      approved: await approvePayout(req.query)
+    };
+  }, {
+    req,
+    res,
+    next,
+    successMessage: 'Payout created'
+  });
+});
+
 export const circlepayApp = functions
   .runWith(runtimeOptions)
-  .https.onRequest(commonApp(circlepay));
+  .https.onRequest(commonApp(circlepay, {
+    unauthenticatedRoutes: [
+      '/payouts/approve'
+    ]
+  }));

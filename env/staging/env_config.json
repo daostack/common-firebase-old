@@ -24,5 +24,9 @@
   "endpoints": {
     "base": "https://us-central1-common-staging-50741.cloudfunctions.net",
     "notifications": "/notifications/ping"
+  },
+  "payouts": {
+    "approvers": ["alexander2001ivanov@gmail.com"],
+    "neededApprovals": 1
   }
 }

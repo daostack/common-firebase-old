@@ -31,9 +31,9 @@ const bankAccountValidationSchema = yup.object({
   bankAddress: billingDetailsValidationSchema
 });
 
-type createBankAccountPayload = yup.InferType<typeof bankAccountValidationSchema>;
+type CreateBankAccountPayload = yup.InferType<typeof bankAccountValidationSchema>;
 
-export const createBankAccount = async (payload: createBankAccountPayload): Promise<IBankAccountEntity> => {
+export const createBankAccount = async (payload: CreateBankAccountPayload): Promise<IBankAccountEntity> => {
   // Validate the provided data
   await validate(payload, bankAccountValidationSchema);
 
