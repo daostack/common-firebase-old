@@ -1,5 +1,4 @@
 import express from 'express';
-import { CommonError } from '../errors';
 
 interface IRouteBasedMiddlewareOptions {
   /**
