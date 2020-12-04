@@ -3,7 +3,17 @@ import { getBalances } from '../circlepay/circlepay';
 
 
 
-export async function getBalance():Promise<any> {
+export async function getCommonBalance():Promise<any> {
+    const COLLECTION_NAME = 'daos';
+    const data = await db.collection(COLLECTION_NAME)
+    .get();
+
+    const daos = data.docs.map(doc => doc.data())
+
+    return daos
+}
+
+export async function getCircleBalance():Promise<any> {
     const {data: {data}} = await getBalances();
     return data
 }

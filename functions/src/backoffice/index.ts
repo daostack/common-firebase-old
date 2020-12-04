@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 
 import { commonApp, commonRouter } from '../util';
 import { responseExecutor } from '../util/responseExecutor';
-import { getPayout, getPayin, getBalance } from './backoffice';
+import { getPayout, getPayin, getCircleBalance, getCommonBalance } from './backoffice';
 import { google } from 'googleapis'
 import serviceAccount from '../env/adminsdk-keys.json';
 
@@ -160,11 +160,58 @@ backofficeRouter.get('/payin', async (req, res, next) => {
   );
 });
 
-backofficeRouter.get('/balance', async (req, res, next) => {
+backofficeRouter.get('/commonbalance', async (req, res, next) => {
   await responseExecutor(
     async () => {
       
-      const data = await getBalance();
+      const data = await getCommonBalance();
+      const values = [[
+        'Common id',
+        'Common name',
+        'Balance',
+        'Date'
+      ]];
+      for (const key in data) {
+        // eslint-disable-next-line no-prototype-builtins
+        if (data.hasOwnProperty(key)) {
+          const cells = []
+          cells.push(data[key].id)
+          cells.push(data[key].name)
+          cells.push(data[key].balance/100)
+          cells.push(data[key].updatedAt._seconds+' '+data[key].updatedAt._nanoseconds)
+          values.push(cells)
+        }
+
+      }
+
+      const resource = {
+        values,
+      };
+
+      await jwtAuthPromise
+      await sheets.spreadsheets.values.update({
+          auth: jwtClient,
+          spreadsheetId: '1muC-dGhS_MOEZYKSTNyMthG1NHlo8-4mlb_K5ExD7QM',
+          range: 'COMMON_BALANCES!A1',  // update this range of cells
+          valueInputOption: 'RAW',
+          requestBody: resource
+      }, {})
+
+      return data;
+    }, {
+      req,
+      res,
+      next,
+      successMessage: `Fetch BALANCE succesfully!`
+    }
+  );
+});
+
+backofficeRouter.get('/circlebalance', async (req, res, next) => {
+  await responseExecutor(
+    async () => {
+      
+      const data = await getCircleBalance();
       const values = [[
         'Account',
         'Available',
