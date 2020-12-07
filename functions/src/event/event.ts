@@ -50,6 +50,12 @@ export enum EVENT_TYPES {
   PAYMENT_FAILED = 'paymentFailed',
   PAYMENT_PAID = 'paymentPaid',
 
+  // Payout related events
+  PAYOUT_CREATED = 'payoutCreated',
+  PAYOUT_APPROVED = 'payoutApproved',
+  PAYOUT_EXECUTED = 'payoutExecuted',
+  PAYOUT_VOIDED = 'payoutVoided',
+
   // Card related events
   CARD_CREATED = 'cardCreated',
 

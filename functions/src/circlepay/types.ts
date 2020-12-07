@@ -97,14 +97,16 @@ interface ICircleBillingDetails {
   postalCode: string;
 }
 
+interface IAmount {
+  amount: number;
+  currency: string;
+}
+
 // ---- Payment Related ---- //
 
 type PaymentVerification = 'none' | 'cvv';
 
-interface IPaymentAmount {
-  amount: number;
-  currency: string;
-}
+type IPaymentAmount = IAmount;
 
 interface IPaymentSource {
   id: string;
@@ -168,4 +170,35 @@ interface ICircleMetadata {
    * Single IPv4 or IPv6 address of user
    */
   ipAddress: string;
+}
+
+// ----- Payout types
+
+interface ICirclePayoutDestination {
+  type: 'wire';
+
+  /**
+   * The ID on circle side of the destination
+   */
+  id: string;
+}
+
+interface ICirclePayoutMetadata {
+  beneficiaryEmail: string;
+}
+
+type IPayoutAmount = IAmount;
+
+
+export interface ICircleCreatePayoutPayload {
+  destination: ICirclePayoutDestination;
+  metadata: ICirclePayoutMetadata;
+  amount: IPayoutAmount;
+}
+
+export interface ICircleCreatePayoutResponse {
+  data: {
+    id: string;
+    destination: ICirclePayoutDestination;
+  }
 }

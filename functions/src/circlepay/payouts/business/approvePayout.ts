@@ -3,6 +3,8 @@ import { validate } from '../../../util/validate';
 import { payoutDb } from '../database';
 import { CommonError } from '../../../util/errors';
 import { updatePayout } from '../database/updatePayout';
+import { createEvent } from '../../../util/db/eventDbService';
+import { EVENT_TYPES } from '../../../event/event';
 
 const approvePayoutSchema = yup.object({
   payoutId: yup
@@ -35,6 +37,11 @@ export const approvePayout = async (payload: ApprovePayoutPayload): Promise<bool
     });
   }
 
+  // If the payout is executed just return true
+  if (payout.executed) {
+    return true;
+  }
+
   // Find the token
   const token = payout.security.find(x => x.id === Number(payload.index));
 
@@ -51,18 +58,24 @@ export const approvePayout = async (payload: ApprovePayoutPayload): Promise<bool
     // If the token is valid - redeem it
     token.redeemed = true;
 
-    // @todo event
+    // Create event
+    await createEvent({
+      objectId: payout.id,
+      type: EVENT_TYPES.PAYOUT_APPROVED
+    });
   } else {
     // If the token is invalid - change the redemption attempts number
     token.redemptionAttempts += 1;
-
-    // @todo event
 
     // If the redemption attempts are more than or equal to 3 void the payout
     if (token.redemptionAttempts >= 3) {
       payout.voided = true;
 
-      // @todo event
+      // Create event
+      await createEvent({
+        objectId: payout.id,
+        type: EVENT_TYPES.PAYOUT_VOIDED
+      });
     }
   }
 
@@ -73,6 +86,7 @@ export const approvePayout = async (payload: ApprovePayoutPayload): Promise<bool
 
   // Save the changes
   await updatePayout(payout);
+
 
   // Return the current status of the payout
   return token.redeemed;

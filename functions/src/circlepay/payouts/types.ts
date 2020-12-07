@@ -1,8 +1,9 @@
 import { IBaseEntity } from '../../util/types';
 
 export type PayoutStatus = 'pending';
+export type PayoutType = 'independent' | 'proposal';
 
-export interface IPayoutEntity extends IBaseEntity {
+interface IPayoutBaseEntity extends IBaseEntity {
   /**
    * This is the id of the payout on circle side. Cam
    * be useful for updating payout status
@@ -10,10 +11,10 @@ export interface IPayoutEntity extends IBaseEntity {
   circlePayoutId: string;
 
   /**
-   * The ID of the proposal, for witch the payout
-   * is made
+   * Whether the payout was created for proposal, or
+   * is independent of that
    */
-  proposalId: string;
+  type: PayoutType;
 
   /**
    * The destination of the payment
@@ -86,3 +87,17 @@ export interface IPayoutDestination {
    */
   circleId: string;
 }
+
+interface IProposalPayoutEntity extends IPayoutBaseEntity {
+  type: 'proposal'
+
+  /**
+   * The ID of the proposal, for witch the payout
+   * is made
+   */
+  proposalId: string;
+}
+
+type IIndependentPayoutEntity = IPayoutBaseEntity
+
+export type IPayoutEntity = IProposalPayoutEntity | IIndependentPayoutEntity;

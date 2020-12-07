@@ -1,6 +1,8 @@
 import admin from 'firebase-admin';
 
 import Timestamp = admin.firestore.Timestamp;
+import { IEventEntity } from '../../event/type';
+import { EventContext } from 'firebase-functions/lib/cloud-functions';
 
 export type valueOf<T> = T[keyof T];
 export type Nullable<T> = T | null | undefined;
@@ -77,3 +79,11 @@ export interface IBaseEntity {
    */
   updatedAt: Timestamp;
 }
+
+/**
+ * This is just generic trigger function
+ *
+ * @param eventObj - The object containing the event details
+ * @param context - Context about the currently executing trigger
+ */
+export type IEventTrigger = (eventObj: IEventEntity, context: EventContext) => void | Promise<void>

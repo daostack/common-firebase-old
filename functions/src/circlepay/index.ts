@@ -12,8 +12,9 @@ import { circlePayApi, getSecret } from '../settings';
 import { createCard } from './cards/business/createCard';
 import { ErrorCodes } from '../constants';
 import { createBankAccount } from './backAccounts/bussiness/createBankAccount';
-import { createPayout } from './payouts/business/createPayout';
+import { createProposalPayout } from './payouts/business/createProposalPayout';
 import { approvePayout } from './payouts/business/approvePayout';
+import { payoutTriggers } from './payouts/triggers';
 
 const runtimeOptions = {
   timeoutSeconds: 540
@@ -157,7 +158,7 @@ circlepay.post('/wires/create', async (req, res, next) => {
 
 circlepay.post('/payouts/create', async (req, res, next) => {
   await responseExecutor(async () => {
-    const data = await createPayout(req.body);
+    const data = await createProposalPayout(req.body);
   }, {
     req,
     res,
@@ -178,6 +179,10 @@ circlepay.get('/payouts/approve', async (req, res, next) => {
     successMessage: 'Payout created'
   });
 });
+
+export const circlePayTriggers = {
+  ...payoutTriggers
+}
 
 export const circlepayApp = functions
   .runWith(runtimeOptions)
