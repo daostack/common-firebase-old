@@ -4,10 +4,11 @@ import * as notification from './notification';
 import * as messageTriggers from './discussionMessage/triggers';
 // import * as commonTriggers from './common';
 
-import { circlepayApp, circlePayTriggers } from './circlepay';
+import { circlepayApp } from './circlepay';
 import { commonsApp } from './common';
 import { proposalCrons, proposalTriggers, proposalsApp } from './proposals';
 import { subscriptionsApp } from './subscriptions';
+import { payoutTriggers } from './circlepay/payouts/triggers';
 
 // --- Express apps
 export const commons = commonsApp;
@@ -22,7 +23,7 @@ exports.notificationSub = notification;
 exports.proposalCrons = proposalCrons;
 exports.messageTriggers = messageTriggers;
 exports.proposalTriggers = proposalTriggers;
-exports.circleTriggers = circlePayTriggers;
+exports.payoutTriggers = payoutTriggers;
 // exports.commonTriggers = commonTriggers;
 
 exports.cronJobs = cron;

@@ -2,6 +2,14 @@
 
 import { CirclePaymentStatus } from '../util/types';
 
+// ---- Shared
+
+interface ICircleIndempotentPayload {
+  idempotencyKey: string;
+}
+
+// ---- Unsorted
+
 export interface ICircleCreateCardResponse {
   data: {
     id: string;
@@ -190,7 +198,7 @@ interface ICirclePayoutMetadata {
 type IPayoutAmount = IAmount;
 
 
-export interface ICircleCreatePayoutPayload {
+export interface ICircleCreatePayoutPayload extends ICircleIndempotentPayload {
   destination: ICirclePayoutDestination;
   metadata: ICirclePayoutMetadata;
   amount: IPayoutAmount;

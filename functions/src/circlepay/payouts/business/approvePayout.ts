@@ -82,7 +82,7 @@ export const approvePayout = async (payload: ApprovePayoutPayload): Promise<bool
   // Update the token in the payout
   const tokenIndex = payout.security.findIndex(x => x.id === token.id);
 
-  payout[tokenIndex] = token;
+  payout.security[tokenIndex] = token;
 
   // Save the changes
   await updatePayout(payout);

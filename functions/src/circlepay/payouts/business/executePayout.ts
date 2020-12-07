@@ -28,6 +28,7 @@ export const executePayout = async (payout: IPayoutEntity): Promise<void> => {
   // Format the data
   const headers = await getCircleHeaders();
   const data: ICircleCreatePayoutPayload = {
+    idempotencyKey: payout.id,
     amount: {
       amount: payout.amount / 100,
       currency: 'USD'
