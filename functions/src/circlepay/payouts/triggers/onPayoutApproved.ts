@@ -2,7 +2,6 @@ import { IEventTrigger } from '../../../util/types';
 import { EVENT_TYPES } from '../../../event/event';
 import { CommonError } from '../../../util/errors';
 import { env } from '../../../constants';
-import emailClient from './../../../notification/email';
 import { payoutDb } from '../database';
 import { executePayout } from '../business/executePayout';
 

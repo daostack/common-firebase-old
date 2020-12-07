@@ -59,6 +59,7 @@ export const executePayout = async (payout: IPayoutEntity): Promise<void> => {
     ...payout,
 
     circlePayoutId: response.id,
+    status: response.status,
     executed: true
   });
 

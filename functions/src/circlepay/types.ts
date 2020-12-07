@@ -182,6 +182,10 @@ interface ICircleMetadata {
 
 // ----- Payout types
 
+type IPayoutAmount = IAmount;
+type IPayoutStatus = 'pending' | 'failed' | 'complete';
+
+
 interface ICirclePayoutDestination {
   type: 'wire';
 
@@ -195,9 +199,6 @@ interface ICirclePayoutMetadata {
   beneficiaryEmail: string;
 }
 
-type IPayoutAmount = IAmount;
-
-
 export interface ICircleCreatePayoutPayload extends ICircleIndempotentPayload {
   destination: ICirclePayoutDestination;
   metadata: ICirclePayoutMetadata;
@@ -207,6 +208,16 @@ export interface ICircleCreatePayoutPayload extends ICircleIndempotentPayload {
 export interface ICircleCreatePayoutResponse {
   data: {
     id: string;
+    status: IPayoutStatus;
     destination: ICirclePayoutDestination;
+  }
+}
+
+export interface ICircleGetPayoutResponse {
+  data: {
+    id: string;
+    destination: ICirclePayoutDestination;
+    amount: IPayoutAmount;
+    status: IPayoutStatus;
   }
 }

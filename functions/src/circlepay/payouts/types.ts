@@ -1,15 +1,9 @@
 import { IBaseEntity } from '../../util/types';
 
-export type PayoutStatus = 'pending';
+export type PayoutStatus = 'pending' | 'complete' | 'failed';
 export type PayoutType = 'independent' | 'proposal';
 
 interface IPayoutBaseEntity extends IBaseEntity {
-  /**
-   * This is the id of the payout on circle side. Cam
-   * be useful for updating payout status
-   */
-  circlePayoutId: string;
-
   /**
    * Whether the payout was created for proposal, or
    * is independent of that
@@ -20,11 +14,6 @@ interface IPayoutBaseEntity extends IBaseEntity {
    * The destination of the payment
    */
   destination: IPayoutDestination;
-
-  /**
-   * The current status of the payout
-   */
-  status: PayoutStatus;
 
   /**
    * The amount of the payout in US dollar cents
@@ -43,6 +32,28 @@ interface IPayoutBaseEntity extends IBaseEntity {
    */
   voided: boolean;
 }
+
+interface IExecutedPayout extends IPayoutBaseEntity {
+  executed: true;
+
+  /**
+   * This is the id of the payout on circle side. Cam
+   * be useful for updating payout status
+   */
+  circlePayoutId: string;
+
+  /**
+   * The current status of the payout
+   */
+  status: PayoutStatus;
+}
+
+interface IUnexecutedPayout extends IPayoutBaseEntity {
+  executed: false;
+}
+
+type IExecutablePayoutEntity = IUnexecutedPayout | IExecutedPayout;
+
 
 /**
  * Security details about the payout, needed for the
@@ -88,7 +99,7 @@ export interface IPayoutDestination {
   circleId: string;
 }
 
-interface IProposalPayoutEntity extends IPayoutBaseEntity {
+type IProposalPayoutEntity = IExecutablePayoutEntity & {
   type: 'proposal'
 
   /**
@@ -98,6 +109,6 @@ interface IProposalPayoutEntity extends IPayoutBaseEntity {
   proposalId: string;
 }
 
-type IIndependentPayoutEntity = IPayoutBaseEntity
+type IIndependentPayoutEntity = IExecutablePayoutEntity;
 
 export type IPayoutEntity = IProposalPayoutEntity | IIndependentPayoutEntity;

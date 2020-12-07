@@ -32,7 +32,6 @@ export const createIndependentPayout = async (payload: CreatePayoutPayload): Pro
 
   // Create the payout
   const payout = await payoutDb.add({
-    circlePayoutId: null,
     type: 'independent',
 
     amount: payload.amount,
@@ -49,7 +48,6 @@ export const createIndependentPayout = async (payload: CreatePayoutPayload): Pro
       redemptionAttempts: 0
     })),
 
-    status: 'pending',
     executed: false,
     voided: false
   });
