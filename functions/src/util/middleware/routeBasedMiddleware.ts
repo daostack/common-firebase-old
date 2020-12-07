@@ -1,5 +1,4 @@
 import express from 'express';
-import { CommonError } from '../errors';
 
 interface IRouteBasedMiddlewareOptions {
   /**
@@ -10,11 +9,28 @@ interface IRouteBasedMiddlewareOptions {
   /**
    * Only those routes will not have the passed middleware
    */
-  exclude?: string[]
+  exclude?: string[],
+
+  /**
+   * Whether the middleware will be applied if both the include
+   * amd exclude arrays are empty
+   */
+  applyByDefault?: boolean;
 }
 
-export const routeBasedMiddleware = (middleware: express.RequestHandler, options: IRouteBasedMiddlewareOptions): express.RequestHandler =>
-  (req, res, next) => {
+const defaultOptions: IRouteBasedMiddlewareOptions = {
+  applyByDefault: true,
+  exclude: [],
+  include: []
+};
+
+export const routeBasedMiddleware = (middleware: express.RequestHandler, middlewareOptions: IRouteBasedMiddlewareOptions): express.RequestHandler => {
+  const options = {
+    ...defaultOptions,
+    ...middlewareOptions
+  };
+
+  return (req, res, next) => {
     if (options.include?.length) {
       if (options.include.some(x => x === req.path)) {
         return middleware(req, res, next);
@@ -31,5 +47,8 @@ export const routeBasedMiddleware = (middleware: express.RequestHandler, options
       }
     }
 
-    return next();
+    return options.applyByDefault
+      ? middleware(req, res, next)
+      : next();
   };
+};
