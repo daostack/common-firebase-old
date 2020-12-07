@@ -95,7 +95,7 @@
     "@typescript-eslint/no-var-requires": 0,
 
     // We have custom logger that we should use. Disallow the console, as it breaks out logs
-    "no-console": 2
+    "no-console": 1
   },
   "overrides": [
     {
