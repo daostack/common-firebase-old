@@ -2,6 +2,8 @@ import * as functions from 'firebase-functions';
 import request from 'request';
 import axios from 'axios';
 
+import * as payoutCrons from './payouts/crons';
+
 import { commonApp, commonRouter, externalRequestExecutor } from '../util';
 import { ICircleNotification } from '../util/types';
 import { responseExecutor } from '../util/responseExecutor';
@@ -14,7 +16,6 @@ import { ErrorCodes } from '../constants';
 import { createBankAccount } from './backAccounts/bussiness/createBankAccount';
 import { createProposalPayout } from './payouts/business/createProposalPayout';
 import { approvePayout } from './payouts/business/approvePayout';
-import { payoutTriggers } from './payouts/triggers';
 import { createIndependentPayout } from './payouts/business/createIndependentPayout';
 
 const runtimeOptions = {
@@ -185,7 +186,11 @@ circlepay.get('/payouts/approve', async (req, res, next) => {
   });
 });
 
-export const circlepayApp = functions
+export const circlePayCrons = {
+  ...payoutCrons
+}
+
+export const circlePayApp = functions
   .runWith(runtimeOptions)
   .https.onRequest(commonApp(circlepay, {
     unauthenticatedRoutes: [

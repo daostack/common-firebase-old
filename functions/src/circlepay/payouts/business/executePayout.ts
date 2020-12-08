@@ -1,7 +1,6 @@
 import { IPayoutEntity } from '../types';
 import { CommonError } from '../../../util/errors';
 import { externalRequestExecutor } from '../../../util';
-import { ICircleCreateBankAccountResponse } from '../../cards/circleTypes';
 import axios from 'axios';
 import { circlePayApi } from '../../../settings';
 import { ErrorCodes } from '../../../constants';
