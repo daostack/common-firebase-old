@@ -32,11 +32,16 @@ async function updateUser(userId, doc) {
                 merge: true
             }
         );
+}
 
+async function getAllUsers() {
+    const snapshot = await db.collection(COLLECTION_NAME).get();
+    return snapshot.docs.map(doc => doc.data());
 }
 
 module.exports = {
     findUserByAddress,
     getUserById,
-    updateUser
+    updateUser,
+    getAllUsers
 };
