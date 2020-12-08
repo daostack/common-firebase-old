@@ -1,10 +1,8 @@
 import moment from 'moment';
 import { firestore } from 'firebase-admin';
 import { env } from '../constants';
-import { firebaseAdmin } from '../settings';
 
 const client = new firestore.v1.FirestoreAdminClient();
-
 
 /**
  * Util for creating a firestore backup for the current
@@ -16,10 +14,9 @@ export const backup = (): Promise<any> => {
   const projectId = process.env.GCP_PROJECT || process.env.GCLOUD_PROJECT;
   const databaseName = client.databasePath(projectId, '(default)');
 
-
   const date = moment(new Date());
 
-  const bucketPrefix = `${env.storage.bucket}/backup/daily/${date.format()}`;
+  const bucketPrefix = `${env.storage.bucket}/backup/${date.format()}`;
 
 
   return client.exportDocuments({
