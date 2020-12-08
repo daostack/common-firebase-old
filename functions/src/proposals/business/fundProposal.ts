@@ -2,6 +2,8 @@ import { CommonError } from '../../util/errors';
 
 import { proposalDb } from '../database';
 import { commonDb } from '../../common/database';
+import admin from 'firebase-admin';
+import FieldValue = admin.firestore.FieldValue;
 
 /**
  * Changes the status of the proposal and updates the common. If the common currently has
@@ -38,7 +40,8 @@ export const fundProposal = async (proposalId: string): Promise<void> => {
 
   // Change the commons balance and
   // update the funding proposal
-  common.balance -= proposal.fundingRequest.amount;
+  common.balance = FieldValue.increment(proposal.fundingRequest.amount * -1) as any;
+
   proposal.fundingRequest.funded = true;
 
   // Persist the changes asynchronously

@@ -8,6 +8,7 @@ import { ISubscriptionEntity } from '../types';
 import { subscriptionDb } from '../database';
 import { commonDb } from '../../common/database';
 import { proposalDb } from '../../proposals/database';
+import FieldValue = admin.firestore.FieldValue;
 
 
 /**
@@ -46,8 +47,8 @@ export const handleSuccessfulSubscriptionPayment = async (subscription: ISubscri
   const proposal = await proposalDb.getJoinRequest(subscription.proposalId);
   const common = await commonDb.getCommon(proposal.commonId);
 
-  common.balance += proposal.join.funding;
-  common.raised += proposal.join.funding;
+  common.balance = FieldValue.increment(proposal.join.funding) as any;
+  common.raised = FieldValue.increment(proposal.join.funding) as any;
 
   // Save the updated data
   await Promise.all([
