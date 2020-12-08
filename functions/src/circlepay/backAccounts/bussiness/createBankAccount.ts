@@ -33,17 +33,17 @@ const bankAccountValidationSchema = yup.object({
 
 type CreateBankAccountPayload = yup.InferType<typeof bankAccountValidationSchema>;
 
+const normalizeIban = (iban: string): string => iban.toUpperCase().trim();
+
 export const createBankAccount = async (payload: CreateBankAccountPayload): Promise<IBankAccountEntity> => {
   // Validate the provided data
   await validate(payload, bankAccountValidationSchema);
 
   // Format the data for circle
   const headers = await getCircleHeaders();
-
-  // @todo Better payload build?
   const data: ICircleCreateBankAccountPayload = {
-    iban: payload.iban,
     idempotencyKey: v4(),
+    iban: normalizeIban(payload.iban),
 
     billingDetails: payload.billingDetails as any,
     bankAddress: {
