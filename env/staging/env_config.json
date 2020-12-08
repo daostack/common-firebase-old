@@ -24,5 +24,8 @@
   "endpoints": {
     "base": "https://us-central1-common-staging-50741.cloudfunctions.net",
     "notifications": "/notifications/ping"
+  },
+  "storage": {
+    "bucket": "gs://common-staging-50741.appspot.com"
   }
 }
