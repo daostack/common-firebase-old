@@ -11,22 +11,20 @@ import { commonDb } from '../../common/database';
 import { getProposalById } from './proposalDbService';
 import { addCommonMemberByProposalId } from '../../common/business/addCommonMember';
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
-import admin from 'firebase-admin';
-import FieldValue = admin.firestore.FieldValue;
 
-const polling = async ({ validate, interval, paymentId }): Promise<any> => {
+const polling = async ({validate, interval, paymentId}): Promise<any> => {
   console.log('start polling');
   let attempts = 0;
 
   const executePoll = async (resolve, reject) => {
     console.log(`- poll #${attempts}`);
-    const { data: { data } } = await getPayment(paymentId);
+    const {data: {data}} = await getPayment(paymentId);
     attempts++;
 
     if (validate(data)) {
       return resolve(data);
     } else if (data.status === 'failed') {
-      return reject({ err: new Error('Payment failed'), payment: data });
+      return reject({err: new Error('Payment failed'), payment: data});
     } else {
       return setTimeout(executePoll, interval * 2, resolve, reject);
     }
@@ -57,7 +55,7 @@ export const pollPaymentStatus = async (paymentData: IPaymentResp, proposerId: s
       await addNewMemberToCommon(proposalId);
       return await updateStatus(payment, 'confirmed');
     })
-    .catch(async ({ err, payment }) => {
+    .catch(async ({err, payment}) => {
       console.error('Polling error', err);
       // we are creating an event, but not using the error message from circle (e.g. card_invalid)
       await createEvent({
@@ -89,27 +87,24 @@ export const updatePayment = async (paymentId: string, doc: DocumentData): Promi
     )
 );
 
-const addNewMemberToCommon = async (proposalId) => {
-  const proposal = (await getProposalById(proposalId)).data();
-  const common = await commonDb.getCommon(proposal.commonId);
-  // Update common funding info
+const addNewMemberToCommon = async (proposalId) => {    
+   const proposal = (await getProposalById(proposalId)).data();    
+   const common = await commonDb.getCommon(proposal.commonId);    
+   // Update common funding info    
+   common.raised += proposal.join.funding;    
+   common.balance += proposal.join.funding;    
 
-  console.log('here')
+    await commonDb.updateCommon(common);    
+   // Add member to the common    
+   await addCommonMemberByProposalId(proposalId);    
 
-  common.raised = FieldValue.increment(proposal.join.funding) as any;
-  common.balance = FieldValue.increment(proposal.join.funding) as any;
-
-  await commonDb.updateCommon(common);
-  // Add member to the common
-  await addCommonMemberByProposalId(proposalId);
-
-  // Everything went fine so it is event time
-  await createEvent({
-    userId: proposal.proposerId,
-    objectId: proposal.id,
-    type: EVENT_TYPES.REQUEST_TO_JOIN_EXECUTED
-  });
-};
+    // Everything went fine so it is event time    
+   await createEvent({    
+     userId: proposal.proposerId,    
+     objectId: proposal.id,    
+     type: EVENT_TYPES.REQUEST_TO_JOIN_EXECUTED    
+   });    
+ }
 
 export const getPaymentSnapshot = async (paymentId: string): Promise<DocumentSnapshot<IPaymentEntity>> => (
   await db.collection(Collections.Payments)

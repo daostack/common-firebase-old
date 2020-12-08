@@ -112,7 +112,6 @@ circlepay.post('/create-a-payment', async (req, res, next) => {
      })    
  });
 
-
 export const circlepayApp = functions
   .runWith(runtimeOptions)
   .https.onRequest(commonApp(circlepay));
