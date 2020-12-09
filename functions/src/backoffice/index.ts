@@ -28,7 +28,8 @@ backofficeRouter.get('/payout', async (req, res, next) => {
       const values = [[
         'Proposal Id',
         'Amount',
-        'Approval data',
+        'Approval created at',
+        'Approval updated at',
         'User UID',
         'User email',
         'First name',
@@ -49,21 +50,34 @@ backofficeRouter.get('/payout', async (req, res, next) => {
           // eslint-disable-next-line no-prototype-builtins
           if (data.hasOwnProperty(key)) {
               const cells = []
-              cells.push(data[key].proposalId)
-              cells.push(data[key].fundingRequest.amount/100)
-              cells.push(data[key].resolvedAt)
-              cells.push(data[key].proposerId)
-              cells.push(data[key].email)
-              cells.push(data[key].firstName)
-              cells.push(data[key].lastName)
-              cells.push(data[key].daoId)
-              cells.push(data[key].name)
-              cells.push(data[key].paymentId)
-              cells.push(data[key].status)
-              cells.push(data[key].amount? `${data[key].amount.amount} ${data[key].amount.currency}` : '' )
-              cells.push('fees')
-              cells.push(data[key].creationDate)
-              cells.push(data[key].updateDate)
+              cells.push(data[key].proposal.id)
+              cells.push(data[key].proposal.fundingRequest.amount/100)
+              cells.push(new Date(data[key].proposal.createdAt.toDate()).toDateString())
+              cells.push(new Date(data[key].proposal.updatedAt.toDate()).toDateString())
+              cells.push(data[key].proposal.proposerId)
+              cells.push(data[key].user.email)
+              cells.push(data[key].user.firstName)
+              cells.push(data[key].user.lastName)
+              cells.push(data[key].common.id)
+              cells.push(data[key].common.name)
+              if(data[key].payment){
+                cells.push(data[key].payment.id)
+                cells.push(data[key].payment.status)
+                cells.push(data[key].payment.amount? `${data[key].payment.amount.amount} ${data[key].payment.amount.currency}` : '' )
+                cells.push(data[key].payment.fee/100)
+                const creationDate = data[key].payment.creationDate.split(/\D+/)
+                const updateDate = data[key].payment.updateDate.split(/\D+/)
+                cells.push(new Date(Date.UTC(creationDate[0], --creationDate[1], creationDate[2], creationDate[3], creationDate[4], creationDate[5], creationDate[6])).toDateString())
+                cells.push(new Date(Date.UTC(updateDate[0], --updateDate[1], updateDate[2], updateDate[3], updateDate[4], updateDate[5], updateDate[6])).toDateString())
+              } else {
+                cells.push("")
+                cells.push("")
+                cells.push("")
+                cells.push("")
+                cells.push("")
+                cells.push("")
+              }
+              
               values.push(cells)
           }
       }
@@ -96,13 +110,16 @@ backofficeRouter.get('/payin', async (req, res, next) => {
       const values = [[
         'Proposal Id',
         'Amount',
-        'Proposal data',
+        'Proposal title',
+        'Proposal created at',
+        'Proposal updated at',
         'User UID',
         'User email',
         'First name',
         'Last name',
         'Common id',
         'Common name',
+        'Common information',
         'Payment id',
         'Payment status',
         'Payment amount',
@@ -117,29 +134,47 @@ backofficeRouter.get('/payin', async (req, res, next) => {
           // eslint-disable-next-line no-prototype-builtins
           if (data.hasOwnProperty(key)) {
               const cells = []
-              cells.push(data[key].proposalId)
-              cells.push(data[key].join.funding/100)
-              cells.push(data[key].resolvedAt)
-              cells.push(data[key].proposerId)
-              cells.push(data[key].email)
-              cells.push(data[key].firstName)
-              cells.push(data[key].lastName)
-              cells.push(data[key].daoId)
-              cells.push(data[key].name)
-              cells.push(data[key].paymentId)
-              cells.push(data[key].status)
-              if(data[key].amount) cells.push(data[key].amount.amount)
-              else cells.push('')
-              if(data[key].fee) cells.push(data[key].fee/100)
-              else cells.push('')
-              cells.push(data[key].creationDate)
-              cells.push(data[key].updateDate)
+              cells.push(data[key].proposal.id)
+              cells.push(data[key].proposal.join.funding/100)
+              cells.push(data[key].proposal.description.title)
+              cells.push(new Date(data[key].proposal.createdAt.toDate()).toDateString())
+              cells.push(new Date(data[key].proposal.updatedAt.toDate()).toDateString())
+              cells.push(data[key].proposal.proposerId)
+              cells.push(data[key].user.email)
+              cells.push(data[key].user.firstName)
+              cells.push(data[key].user.lastName)
+              cells.push(data[key].common.id)
+              cells.push(data[key].common.name)
+              cells.push(data[key].common.metadata.contributionType)
+
+              if(data[key].payment){
+                cells.push(data[key].payment.id)
+                cells.push(data[key].payment.status)
+                cells.push(data[key].payment.amount.amount)
+                cells.push(data[key].payment.fee/100)
+                const creationDate = data[key].payment.creationDate.split(/\D+/)
+                const updateDate = data[key].payment.updateDate.split(/\D+/)
+                cells.push(new Date(Date.UTC(creationDate[0], --creationDate[1], creationDate[2], creationDate[3], creationDate[4], creationDate[5], creationDate[6])).toDateString())
+                cells.push(new Date(Date.UTC(updateDate[0], --updateDate[1], updateDate[2], updateDate[3], updateDate[4], updateDate[5], updateDate[6])).toDateString())
+                
+              }
+              else{
+                cells.push("")
+                cells.push("")
+                cells.push("")
+                cells.push("")
+                cells.push("")
+                cells.push("")
+              }
+              
               values.push(cells)
           }
       }
       const resource = {
         values,
       };
+
+      console.log(resource);
 
       await jwtAuthPromise
       await sheets.spreadsheets.values.update({
@@ -169,6 +204,7 @@ backofficeRouter.get('/commonbalance', async (req, res, next) => {
         'Common id',
         'Common name',
         'Balance',
+        'Updated At',
         'Date'
       ]];
       for (const key in data) {
@@ -178,7 +214,8 @@ backofficeRouter.get('/commonbalance', async (req, res, next) => {
           cells.push(data[key].id)
           cells.push(data[key].name)
           cells.push(data[key].balance/100)
-          cells.push(data[key].updatedAt._seconds+' '+data[key].updatedAt._nanoseconds)
+          cells.push(new Date(data[key].updatedAt.toDate()).toDateString())
+          cells.push(new Date().toDateString())
           values.push(cells)
         }
 

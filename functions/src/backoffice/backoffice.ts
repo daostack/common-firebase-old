@@ -40,21 +40,21 @@ export async function getPayin():Promise<any> {
             const user = await db.collection('users').doc(proposal.proposerId).get()
             const userData = user.data()
             if(userData){
-                proposals[property] = { ...proposal, proposalId:proposal.id, ...userData, userId:userData.id}
+                proposals[property] = { proposal: proposal, user: userData}
             }
 
             //eslint-disable-next-line no-await-in-loop
             const dao = await db.collection('daos').doc(proposal.commonId).get()
             const daoData = dao.data()
             if(daoData){
-                proposals[property] = { ...proposals[property], ...daoData, daoId:daoData.id}
+                proposals[property] = { ...proposals[property], common: daoData}
             }
 
             // eslint-disable-next-line no-await-in-loop
             const payment = await db.collection('payments').where("proposalId", "==", proposal.id).limit(1).get()
             if(!payment.empty){
                 const paymentData = payment.docs[0].data();
-                proposals[property] = { ...proposals[property], ...paymentData, paymentId:paymentData.id}
+                proposals[property] = { ...proposals[property], payment: paymentData}
             }
         }
         
@@ -75,6 +75,7 @@ export async function getPayout():Promise<any> {
 
     console.log(data)
     const proposals = data.docs.map(doc => doc.data())
+
     for (const property in proposals) {
 
         const proposal = proposals[property];
@@ -85,21 +86,21 @@ export async function getPayout():Promise<any> {
             const user = await db.collection('users').doc(proposal.proposerId).get()
             const userData = user.data()
             if(userData){
-                proposals[property] = { ...proposal, proposalId:proposal.id, ...userData, userId:userData.id}
+                proposals[property] = { proposal: proposal, user: userData}
             }
 
             //eslint-disable-next-line no-await-in-loop
             const dao = await db.collection('daos').doc(proposal.commonId).get()
             const daoData = dao.data()
             if(daoData){
-                proposals[property] = { ...proposals[property], ...daoData, daoId:daoData.id}
+                proposals[property] = { ...proposals[property], common: daoData}
             }
 
             // eslint-disable-next-line no-await-in-loop
             const payment = await db.collection('payments').where("proposalId", "==", proposal.id).limit(1).get()
             if(!payment.empty){
                 const paymentData = payment.docs[0].data();
-                proposals[property] = { ...proposals[property], ...paymentData, paymentId:paymentData.id}
+                proposals[property] = { ...proposals[property], payment: paymentData}
             }
         }
         
