@@ -14,6 +14,7 @@ async function findUserByAddress(ethereumAddress, key = 'safeAddress') {
 
     const snapshot = await query.get()
     if (snapshot.size === 0) {
+        // eslint-disable-next-line no-console
         console.error(`No member found with ${key} === ${ethereumAddress}`)
         return null
     } else {

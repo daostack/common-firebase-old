@@ -269,7 +269,7 @@ export default new class Notification implements INotification {
     // @question Ask about this rule "promise/always-return". It is kinda useless so we may disable it globally?
     // eslint-disable-next-line promise/always-return
     const messageSent: admin.messaging.MessagingDevicesResponse = await messaging.sendToDevice(tokens, payload, options);
-    console.log('Send Success', messageSent);
+    logger.info('Send Success', messageSent);
   }
 
   async sendToAllUsers(title: string, body: string, image = '', path: string) {
@@ -288,11 +288,11 @@ export default new class Notification implements INotification {
       },
     } as admin.messaging.Message;
     
-    console.log("payload -> ", payload);
+    logger.info("payload -> ", payload);
 
     // @question Ask about this rule "promise/always-return". It is kinda useless so we may disable it globally?
     // eslint-disable-next-line promise/always-return
     const messageSent: string = await messaging.send(payload);
-    console.log('Send Success', messageSent);
+    logger.info('Send Success', { messageSent });
   }
 };

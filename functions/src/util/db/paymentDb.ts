@@ -15,11 +15,11 @@ import admin from 'firebase-admin';
 import FieldValue = admin.firestore.FieldValue;
 
 const polling = async ({ validate, interval, paymentId }): Promise<any> => {
-  console.log('start polling');
+  logger.info('start polling');
   let attempts = 0;
 
   const executePoll = async (resolve, reject) => {
-    console.log(`- poll #${attempts}`);
+    logger.debug(`- poll #${attempts}`);
     const { data: { data } } = await getPayment(paymentId);
     attempts++;
 
@@ -58,7 +58,7 @@ export const pollPaymentStatus = async (paymentData: IPaymentResp, proposerId: s
       return await updateStatus(payment, 'confirmed');
     })
     .catch(async ({ err, payment }) => {
-      console.error('Polling error', err);
+      logger.warn('Polling error', err);
       // we are creating an event, but not using the error message from circle (e.g. card_invalid)
       await createEvent({
         userId: proposerId,
@@ -93,8 +93,6 @@ const addNewMemberToCommon = async (proposalId) => {
   const proposal = (await getProposalById(proposalId)).data();
   const common = await commonDb.getCommon(proposal.commonId);
   // Update common funding info
-
-  console.log('here')
 
   common.raised = FieldValue.increment(proposal.join.funding) as any;
   common.balance = FieldValue.increment(proposal.join.funding) as any;

@@ -22,7 +22,7 @@ export const processVote = async (vote: IVoteEntity): Promise<void> => {
 
   // Check for majority and update the proposal state
   if (await hasAbsoluteMajority(proposal, common)) {
-    console.info(`After vote (${vote.id}) proposal (${proposal.id}) has majority. Finalizing.`);
+    logger.info(`After vote (${vote.id}) proposal (${proposal.id}) has majority. Finalizing.`);
 
     await finalizeProposal(proposal);
   }
@@ -50,12 +50,12 @@ export const processVote = async (vote: IVoteEntity): Promise<void> => {
 
   // Check for vote flip (but not on the first vote)
   if (votesBefore.outcome !== currentVoteCount.outcome && votes.length > 1) {
-    console.info(`A vote flip occurred after vote ${vote.id}`);
+    logger.info(`A vote flip occurred after vote ${vote.id}`);
 
     // If the proposal is in the quiet ending stage and
     // there was a vote flip extend the countdown
     if (isInQuietEnding(proposal)) {
-      console.info(`
+      logger.info(`
         Extending the countdown period of proposal (${proposal.id}) 
         because there was a vote flip during the quiet ending period.
       `);

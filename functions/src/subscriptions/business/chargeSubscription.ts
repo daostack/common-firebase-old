@@ -43,9 +43,9 @@ export const chargeSubscription = async (subscription: ISubscriptionEntity): Pro
       type: EVENT_TYPES.SUBSCRIPTION_PAYMENT_CREATED
     });
   } catch (e) {
-    console.error(new CommonError(`
-      Payment for subscription (${subscription.id}) has failed!
-    `));
+    logger.error('Payment for subscription has failed!', {
+      subscriptionId: subscription.id
+    });
 
     await createEvent({
       userId: subscription.userId,

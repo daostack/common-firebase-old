@@ -74,7 +74,11 @@ export const handleNotification = async (notification: ICircleNotification): Pro
 
         break;
       case 'failed':
-        console.warn('Subscription payment failed!', subscription.id, paymentObj.id);
+        logger.warn('Subscription payment failed!', {
+          subscriptionId: subscription.id,
+          paymentId: paymentObj.id
+        });
+
         await createPaymentEvent(EVENT_TYPES.PAYMENT_FAILED);
 
         // This is good place to retry the payment?
@@ -85,6 +89,6 @@ export const handleNotification = async (notification: ICircleNotification): Pro
         throw new CommonError(`Unknown payment status: ${notification.payment.status}`)
     }
   } else {
-    console.warn('Non subscription payments are not currently supported!');
+    logger.warn('Non subscription payments are not currently supported!');
   }
 };

@@ -1,3 +1,5 @@
+import './util/logger';
+
 import * as cron from './cron';
 import * as event from './event';
 import * as notification from './notification';

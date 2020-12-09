@@ -36,7 +36,7 @@ export const subscribeToNotifications = async (): Promise<void> => {
         // eslint-disable-next-line no-await-in-loop
         await unsubscribeFromNotification(sub.id);
       } catch (e) {
-        console.error(`
+        logger.warn(`
           Unable to unsubscribe from ${sub.id} for endpoint ${sub.endpoint}
         `, e);
       }
