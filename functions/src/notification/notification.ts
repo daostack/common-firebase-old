@@ -170,7 +170,7 @@ export const notifyData: Record<string, IEventData> = {
             templateKey: 'userFundingRequestAccepted',
             emailStubs: {
               userName: getNameString(userData),
-              proposal: proposalData.title
+              proposal: proposalData.description.title
             }
           },
           {
@@ -184,10 +184,8 @@ export const notifyData: Record<string, IEventData> = {
               proposalId: proposalData.id,
               userName: getNameString(userData),
               userEmail: userData.email,
-              //paymentId: paymentData?.id, -> ? 
               userId: userData.uid,
-              // should this be called payoutAmount?
-              paymentAmount: proposalData.fundingRequest.amount,
+              fundingAmount: proposalData.fundingRequest.amount,
               submittedOn: proposalData.createdAt,
               passedOn: new Date(),
               log: 'Funding request accepted',

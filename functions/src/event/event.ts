@@ -85,8 +85,6 @@ export const eventData: Record<string, IEventData> = {
             const userFilter = proposalDao.members.map(member => {
                 return member.userId;
             });
-            //@askTai this is unlikely, but when a user has the app on a few devices, 
-            // he will get notified about his own funding proposal created, so I exluded him, or should I have not?
             return excludeOwner(userFilter, proposal.proposerId)
         }
     },
