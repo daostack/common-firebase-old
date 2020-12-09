@@ -2,17 +2,19 @@ import * as cron from './cron';
 import * as event from './event';
 import * as notification from './notification';
 import * as messageTriggers from './discussionMessage/triggers';
+import * as commonTriggers from './common';
 
 import { circlepayApp } from './circlepay';
 import { commonsApp } from './common';
 import { proposalCrons, proposalTriggers, proposalsApp } from './proposals';
+import { subscriptionsApp } from './subscriptions';
 import { backofficeApp } from './backoffice';
-
 
 // --- Express apps
 export const commons = commonsApp;
 export const circlepay = circlepayApp;
 export const proposals = proposalsApp;
+export const subscriptions = subscriptionsApp;
 export const backoffice = backofficeApp;
 
 // --- Triggers and Subscriptions
@@ -21,5 +23,6 @@ exports.notificationSub = notification;
 exports.proposalCrons = proposalCrons;
 exports.messageTriggers = messageTriggers;
 exports.proposalTriggers = proposalTriggers;
+exports.commonTriggers = commonTriggers;
 
 exports.cronJobs = cron;
