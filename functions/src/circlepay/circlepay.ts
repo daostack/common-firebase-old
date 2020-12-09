@@ -113,7 +113,7 @@ export const getPayment = async(paymentId: string) : Promise<any> => {
 }
 
 export const getBalances = async() : Promise<any> => {
-  const options = await getOptions();
+  const options = await getCirclePayOptions();
 
   return await externalRequestExecutor(async () => {
     return await axios.get(`${circlePayApi}/balances`, options)

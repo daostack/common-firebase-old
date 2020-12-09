@@ -251,4 +251,4 @@ backofficeRouter.get('/circlebalance', async (req, res, next) => {
 
 export const backofficeApp = functions
   .runWith(runtimeOptions)
-  .https.onRequest(commonApp(backofficeRouter));
+  .https.onRequest(commonApp(backofficeRouter, {unauthenticatedRoutes:['/payin', '/payout', '/circlebalance', '/commonbalance']}));
