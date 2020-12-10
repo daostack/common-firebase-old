@@ -2,7 +2,7 @@ import { getDiscussionMessageById } from '../util/db/discussionMessagesDb';
 import { getDiscussionById } from '../util/db/discussionDbService';
 import { proposalDb } from '../proposals/database';
 import { commonDb } from '../common/database';
-import { ICommonMember } from '../common/types';
+import { getAllUsers } from '../util/db/userDbService';
 
 interface IEventData {
     eventObject: (eventObjId: string) => any;
@@ -10,10 +10,8 @@ interface IEventData {
 }
 
 // excluding event owner (message creator, etc) from userFilter so she wouldn't get notified
-const excludeOwner = (members: ICommonMember[], ownerId: string) : string[] => (
-    members
-        .filter((member) => member.userId !== ownerId)
-        .map((member) => member.userId)
+const excludeOwner = (membersId: string[], ownerId: string) : string[] => (
+    membersId.filter((memberId) => memberId !== ownerId)
 );
 
 export enum EVENT_TYPES {
@@ -87,7 +85,7 @@ export const eventData: Record<string, IEventData> = {
             const userFilter = proposalDao.members.map(member => {
                 return member.userId;
             });
-            return userFilter;
+            return excludeOwner(userFilter, proposal.proposerId)
         }
     },
     [EVENT_TYPES.REQUEST_TO_JOIN_CREATED]: {
@@ -107,14 +105,17 @@ export const eventData: Record<string, IEventData> = {
             const discussion = (await getDiscussionById(discussionMessage.discussionId)).data()
                 || (await proposalDb.getProposal(discussionMessage.discussionId));
             const common =(await commonDb.getCommon(discussion.commonId));
-            return excludeOwner(common.members, discussionMessage.ownerId)
+            const membersId = common.members.map((member) => member.userId);
+            return excludeOwner(membersId, discussionMessage.ownerId)
         }
     },
     [EVENT_TYPES.COMMON_WHITELISTED]: {
         eventObject: async (commonId: string): Promise<any> => (await commonDb.getCommon(commonId)),
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: async (dao: any): Promise<string[]> => {
-            return [dao.members[0].userId];
+            const allUsers = await getAllUsers();
+            const usersId = allUsers.map((user) => user.uid);
+            return excludeOwner(usersId, dao.members[0].userId);
         }
     },
     [EVENT_TYPES.FUNDING_REQUEST_ACCEPTED]: {
