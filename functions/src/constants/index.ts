@@ -41,6 +41,10 @@ interface Env {
   }
 
   secretManagerProject: string;
+  
+  backoffice: {
+    sheetUrl: string;
+  }
 }
 
 export const env = merge(envConfig, envSecrets) as Env;
