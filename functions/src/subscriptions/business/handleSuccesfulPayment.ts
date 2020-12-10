@@ -2,6 +2,7 @@ import admin from 'firebase-admin';
 import moment from 'moment';
 
 import Timestamp = admin.firestore.Timestamp;
+import FieldValue = admin.firestore.FieldValue;
 
 import { addMonth } from '../../util';
 import { CommonError } from '../../util/errors';
@@ -52,8 +53,8 @@ export const handleSuccessfulSubscriptionPayment = async (subscription: ISubscri
   const proposal = await proposalDb.getJoinRequest(subscription.proposalId);
   const common = await commonDb.getCommon(proposal.commonId);
 
-  common.balance += proposal.join.funding;
-  common.raised += proposal.join.funding;
+  common.balance = FieldValue.increment(proposal.join.funding) as any;
+  common.raised = FieldValue.increment(proposal.join.funding) as any;
 
   // Save the updated data
   await Promise.all([
