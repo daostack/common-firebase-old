@@ -2,6 +2,7 @@ import { getDiscussionMessageById } from '../util/db/discussionMessagesDb';
 import { getDiscussionById } from '../util/db/discussionDbService';
 import { proposalDb } from '../proposals/database';
 import { commonDb } from '../common/database';
+import { getAllUsers } from '../util/db/userDbService';
 interface IEventData {
   eventObject: (eventObjId: string) => any;
   notifyUserFilter: (eventObj: any) => string[] | Promise<string[]>;

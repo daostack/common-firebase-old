@@ -1,5 +1,4 @@
 import { db } from '../../settings';
-import { getPayment } from '../../circlepay/circlepay';
 import { Utils } from '../util';
 import { EVENT_TYPES } from '../../event/event';
 import { createEvent } from './eventDbService';
@@ -14,24 +13,25 @@ import admin from 'firebase-admin';
 import FieldValue = admin.firestore.FieldValue;
 
 const polling = async ({ validate, interval, paymentId }): Promise<any> => {
-  console.log('start polling');
-  let attempts = 0;
-
-  const executePoll = async (resolve, reject) => {
-    console.log(`- poll #${attempts}`);
-    const { data: { data } } = await getPayment(paymentId);
-    attempts++;
-
-    if (validate(data)) {
-      return resolve(data);
-    } else if (data.status === 'failed') {
-      return reject({ err: new Error('Payment failed'), payment: data });
-    } else {
-      return setTimeout(executePoll, interval * 2, resolve, reject);
-    }
-  };
-
-  return new Promise(executePoll);
+  console.error('Ping alex if you see this log')
+  // console.log('start polling');
+  // let attempts = 0;
+  //
+  // const executePoll = async (resolve, reject) => {
+  //   console.log(`- poll #${attempts}`);
+  //   const { data: { data } } = await getPayment(paymentId);
+  //   attempts++;
+  //
+  //   if (validate(data)) {
+  //     return resolve(data);
+  //   } else if (data.status === 'failed') {
+  //     return reject({ err: new Error('Payment failed'), payment: data });
+  //   } else {
+  //     return setTimeout(executePoll, interval * 2, resolve, reject);
+  //   }
+  // };
+  //
+  // return new Promise(executePoll);
 };
 
 export interface IPaymentResp {
