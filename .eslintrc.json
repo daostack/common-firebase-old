@@ -92,10 +92,7 @@
     "promise/no-nesting": 1,
 
     // This is temporary rule that we should remove on later stage
-    "@typescript-eslint/no-var-requires": 0,
-
-    // We have custom logger that we should use. Disallow the console, as it breaks out logs
-    "no-console": 1
+    "@typescript-eslint/no-var-requires": 0
   },
   "overrides": [
     {

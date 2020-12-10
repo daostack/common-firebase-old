@@ -23,7 +23,7 @@ const runtimeOptions = {
 };
 
 const CIRCLEPAY_APIKEY = 'CIRCLEPAY_APIKEY';
-export const getCircleHeaders = async () => (
+export const getCircleHeaders = async (): Promise<any> => (
   getSecret(CIRCLEPAY_APIKEY).then((apiKey) => (
     {
       headers: {

@@ -5,7 +5,7 @@ import { env } from '../../../constants';
 import emailClient from './../../../notification/email';
 import { payoutDb } from '../database';
 
-export const onPayoutCreated: IEventTrigger = async (eventObj, context) => {
+export const onPayoutCreated: IEventTrigger = async (eventObj) => {
   if(eventObj.type !== EVENT_TYPES.PAYOUT_CREATED) {
     throw new CommonError(`onPayoutCreated was executed on ${eventObj.type}`);
   }

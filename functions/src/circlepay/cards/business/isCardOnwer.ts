@@ -1,5 +1,3 @@
-import { db } from '../../../settings';
-import { Collections } from '../../../constants';
 import { cardDb } from '../database';
 
 /**

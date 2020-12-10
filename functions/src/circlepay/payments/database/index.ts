@@ -1,6 +1,5 @@
 import { db } from '../../../util';
 import { Collections } from '../../../constants';
-import { NotImplementedError } from '../../../util/errors';
 
 import { IPaymentEntity } from '../types';
 import { addPayment } from './addPayment';
@@ -14,7 +13,7 @@ export const PaymentsCollection = db.collection(Collections.Payments)
       return snapshot.data() as IPaymentEntity;
     },
 
-    toFirestore(object: IPaymentEntity | Partial<IPaymentEntity>, options?: FirebaseFirestore.SetOptions): FirebaseFirestore.DocumentData {
+    toFirestore(object: IPaymentEntity | Partial<IPaymentEntity>): FirebaseFirestore.DocumentData {
       return object;
     }
   });

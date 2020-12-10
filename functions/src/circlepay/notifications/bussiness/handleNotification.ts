@@ -1,12 +1,5 @@
-import { EVENT_TYPES } from '../../../event/event';
-
 import { CommonError } from '../../../util/errors';
-import { createEvent } from '../../../util/db/eventDbService';
 import { ICircleNotification } from '../../../util/types';
-
-import { subscriptionDb } from '../../../subscriptions/database';
-import { handleSuccessfulSubscriptionPayment } from '../../../subscriptions/business';
-import { paymentDb } from '../../payments/database';
 
 /**
  * Handles incoming CirclePay notification

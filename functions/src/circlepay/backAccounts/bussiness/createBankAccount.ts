@@ -1,16 +1,14 @@
+import axios from 'axios';
 import * as yup from 'yup';
 import * as iban from 'ibantools';
-import { v4 } from 'uuid';
 
+import { v4 } from 'uuid';
 import { billingDetailsValidationSchema } from '../../../util/schemas';
-import { IBankAccountEntity } from '../types';
-import { NotImplementedError } from '../../../util/errors';
 import { validate } from '../../../util/validate';
+import { IBankAccountEntity } from '../types';
 import { getCircleHeaders } from '../../index';
 import { ICircleCreateBankAccountPayload, ICircleCreateBankAccountResponse } from '../../cards/circleTypes';
 import { externalRequestExecutor } from '../../../util';
-import { ICircleCreateCardResponse } from '../../types';
-import axios from 'axios';
 import { circlePayApi } from '../../../settings';
 import { ErrorCodes } from '../../../constants';
 import { bankAccountDb } from '../database';

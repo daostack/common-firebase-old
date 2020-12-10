@@ -13,7 +13,7 @@ export const BankAccountCollection = db.collection(Collections.BankAccounts)
       return snapshot.data() as IBankAccountEntity;
     },
 
-    toFirestore(object: IBankAccountEntity | Partial<IBankAccountEntity>, options?: FirebaseFirestore.SetOptions): FirebaseFirestore.DocumentData {
+    toFirestore(object: IBankAccountEntity | Partial<IBankAccountEntity>): FirebaseFirestore.DocumentData {
       return object;
     }
   });

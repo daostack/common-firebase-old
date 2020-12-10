@@ -1,7 +1,6 @@
 import { ISubscriptionPayment } from '../types';
 import { v4 } from 'uuid';
 
-import { NotImplementedError } from '../../../util/errors';
 import * as yup from 'yup';
 import { validate } from '../../../util/validate';
 import { subscriptionDb } from '../../../subscriptions/database';
@@ -10,7 +9,6 @@ import { pollPaymentStatus } from './pollPaymentStatus';
 import { isFinalized, isSuccessful } from '../helpers';
 import { logger } from '../../../util';
 import { handleFailedPayment, handleSuccessfulSubscriptionPayment } from '../../../subscriptions/business';
-import { paymentDb } from '../database';
 
 const createSubscriptionPaymentValidationSchema = yup.object({
   subscriptionId: yup.string()

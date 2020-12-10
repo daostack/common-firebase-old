@@ -41,7 +41,7 @@ export const onProposalApproved = functions.firestore
           await createSubscription(proposal);
         } else {
           // Create the payment
-          const payment = await createProposalPayment({
+          await createProposalPayment({
             proposalId: proposal.id,
             sessionId: context.eventId,
             ipAddress: '127.0.0.1' // @todo Get ip, but what IP?

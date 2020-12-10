@@ -36,7 +36,7 @@ export const chargeSubscription = async (subscription: ISubscriptionEntity): Pro
   }
 
   try {
-    const payment = await createSubscriptionPayment({
+    await createSubscriptionPayment({
       subscriptionId: subscription.id,
       sessionId: v4(),
       ipAddress: '127.0.0.1'
