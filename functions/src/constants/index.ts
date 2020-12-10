@@ -41,7 +41,12 @@ interface Env {
   }
 
   secretManagerProject: string;
-  
+  local: string;
+
+  payouts: {
+    approvers: string[];
+    neededApprovals: number;
+  }
   backoffice: {
     sheetUrl: string;
   }
