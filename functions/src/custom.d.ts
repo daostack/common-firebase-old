@@ -7,7 +7,7 @@ declare global {
         uid: string;
       }
 
-      sessionId: string;
+      requestId: string;
     }
   }
 

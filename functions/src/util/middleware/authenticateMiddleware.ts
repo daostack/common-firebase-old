@@ -33,7 +33,7 @@ export const authenticate: RequestHandler = async (req, res, next) => {
         });
       } else {
         // Here we should only be on test environment
-        logger.warn(`Testing authorization is being used! ${req.sessionId}`);
+        logger.warn(`Testing authorization is being used! ${req.requestId}`);
 
         const parsedUser = JSON.parse(req.headers.authorization);
 
