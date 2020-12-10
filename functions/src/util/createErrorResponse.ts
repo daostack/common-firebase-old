@@ -27,7 +27,7 @@ export const createErrorResponse = (req: express.Request, res: express.Response,
       errorCode: error.errorCode,
       errorMessage: error.userMessage,
       request: {
-        id: req.sessionId,
+        id: req.requestId,
         body: req.body,
         query: req.query,
         headers: req.headers
@@ -42,7 +42,7 @@ export const createErrorResponse = (req: express.Request, res: express.Response,
     logger.info(`
       Creating error response with message '${error.message}' 
       for error (${error.errorId || 'No id available'})
-      occurred in request ${req.sessionId}
+      occurred in request ${req.requestId}
     `);
 
     logger.error('Error occurred', {
