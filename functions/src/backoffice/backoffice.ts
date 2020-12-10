@@ -62,7 +62,6 @@ export async function getPayin():Promise<any> {
         }
         
     }
-    console.log(payments)
     return payments
 
 
