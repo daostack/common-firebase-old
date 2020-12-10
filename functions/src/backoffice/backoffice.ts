@@ -20,46 +20,50 @@ export async function getCircleBalance():Promise<any> {
 
 
 export async function getPayin():Promise<any> {
-    const COLLECTION_NAME = 'proposals';
+    const COLLECTION_NAME = 'payments';
 
     const data = await db.collection(COLLECTION_NAME)
-    .where("join.funding", ">", 0)
-    .where("state", "==", "passed")
-    .where("type", "==", "join")
+    .orderBy("creationDate", "asc")
+    .where("status", "==", "confirmed")
     .get();
 
-    console.log(data)
-    const proposals = data.docs.map(doc => doc.data())
-    for (const property in proposals) {
+    const payments = data.docs.map(doc => doc.data())
+    for (const property in payments) {
 
-        const proposal = proposals[property];
+        const payment = payments[property];
 
-        if(proposal.proposerId){
-
-            // eslint-disable-next-line no-await-in-loop
-            const user = await db.collection('users').doc(proposal.proposerId).get()
-            const userData = user.data()
-            if(userData){
-                proposals[property] = { proposal: proposal, user: userData}
-            }
-
-            //eslint-disable-next-line no-await-in-loop
-            const dao = await db.collection('daos').doc(proposal.commonId).get()
-            const daoData = dao.data()
-            if(daoData){
-                proposals[property] = { ...proposals[property], common: daoData}
-            }
+        if(payment.proposalId){
 
             // eslint-disable-next-line no-await-in-loop
-            const payment = await db.collection('payments').where("proposalId", "==", proposal.id).limit(1).get()
-            if(!payment.empty){
-                const paymentData = payment.docs[0].data();
-                proposals[property] = { ...proposals[property], payment: paymentData}
+            const proposal = await db.collection('proposals').doc(payment.proposalId).get()
+            const proposalData = proposal.data()
+            if(proposalData){
+                payments[property] = { payment: payment, proposal: proposalData}
             }
+
+            if(proposalData){
+                //eslint-disable-next-line no-await-in-loop
+                const dao = await db.collection('daos').doc(proposalData.commonId).get()
+                const daoData = dao.data()
+                if(daoData){
+                    payments[property] = { ...payments[property], common: daoData}
+                }
+            }
+
+            if(proposalData){
+                //eslint-disable-next-line no-await-in-loop
+                const user = await db.collection('users').doc(proposalData.proposerId).get()
+                const userData = user.data()
+                if(userData){
+                    payments[property] = { ...payments[property], user: userData}
+                }
+            }
+            
         }
         
     }
-    return proposals
+    console.log(payments)
+    return payments
 
 
 }
@@ -68,45 +72,48 @@ export async function getPayout():Promise<any> {
     const COLLECTION_NAME = 'proposals';
 
     const data = await db.collection(COLLECTION_NAME)
-    .where("fundingRequest.amount", ">", 0)
-    .where("state", "==", "passed")
-    .where("type", "==", "fundingRequest")
+    .orderBy("createdAt", "asc")
     .get();
 
-    console.log(data)
     const proposals = data.docs.map(doc => doc.data())
-
+    const filterProposals = {};
+    let key = 0;
     for (const property in proposals) {
 
         const proposal = proposals[property];
 
-        if(proposal.proposerId){
+        if(!proposal.fundingRequest) continue;
+        if(proposal.fundingRequest.amount === 0) continue;
+        if(proposal.state !== "passed") continue;
+        if(proposal.type !== "fundingRequest") continue;
+        if(!proposal.proposerId) continue;
 
-            // eslint-disable-next-line no-await-in-loop
-            const user = await db.collection('users').doc(proposal.proposerId).get()
-            const userData = user.data()
-            if(userData){
-                proposals[property] = { proposal: proposal, user: userData}
-            }
+        filterProposals[key] = { proposal: proposal}
+        // eslint-disable-next-line no-await-in-loop
+        const user = await db.collection('users').doc(proposal.proposerId).get()
+        const userData = user.data()
+        if(userData){
+            filterProposals[key] = { ...filterProposals[key], user: userData}
+        }
 
-            //eslint-disable-next-line no-await-in-loop
-            const dao = await db.collection('daos').doc(proposal.commonId).get()
-            const daoData = dao.data()
-            if(daoData){
-                proposals[property] = { ...proposals[property], common: daoData}
-            }
+        //eslint-disable-next-line no-await-in-loop
+        const dao = await db.collection('daos').doc(proposal.commonId).get()
+        const daoData = dao.data()
+        if(daoData){
+            filterProposals[key] = { ...filterProposals[key], common: daoData}
+        }
 
-            // eslint-disable-next-line no-await-in-loop
-            const payment = await db.collection('payments').where("proposalId", "==", proposal.id).limit(1).get()
-            if(!payment.empty){
-                const paymentData = payment.docs[0].data();
-                proposals[property] = { ...proposals[property], payment: paymentData}
-            }
+        // eslint-disable-next-line no-await-in-loop
+        const payment = await db.collection('payments').where("proposalId", "==", proposal.id).limit(1).get()
+        if(!payment.empty){
+            const paymentData = payment.docs[0].data();
+            filterProposals[key] = { ...filterProposals[key], payment: paymentData}
         }
         
+        key++;
     }
     
 
-    return proposals
+    return filterProposals
 
 }

@@ -45,7 +45,6 @@ backofficeRouter.get('/payout', async (req, res, next) => {
       ]];
 
       const data = await getPayout();
-
       for (const key in data) {
           // eslint-disable-next-line no-prototype-builtins
           if (data.hasOwnProperty(key)) {
@@ -109,7 +108,7 @@ backofficeRouter.get('/payin', async (req, res, next) => {
     async () => {
       const values = [[
         'Proposal Id',
-        'Amount',
+        'Funding',
         'Proposal title',
         'Proposal created at',
         'Proposal updated at',
@@ -174,8 +173,6 @@ backofficeRouter.get('/payin', async (req, res, next) => {
         values,
       };
 
-      console.log(resource);
-
       await jwtAuthPromise
       await sheets.spreadsheets.values.update({
           auth: jwtClient,
@@ -190,7 +187,7 @@ backofficeRouter.get('/payin', async (req, res, next) => {
       req,
       res,
       next,
-      successMessage: `Fetch PAYOUT succesfully!`
+      successMessage: `Fetch PAYIN succesfully!`
     }
   );
 });
