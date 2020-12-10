@@ -2,16 +2,16 @@ import admin from 'firebase-admin';
 import { QuerySnapshot } from '@google-cloud/firestore';
 
 import { Collections } from '../../util/constants';
-import { ISubscriptionEntity } from '../../util/types';
 import { CommonError } from '../../util/errors';
 
 import { chargeSubscription } from './chargeSubscription';
+import { ISubscriptionEntity } from '../types';
 
 const db = admin.firestore();
 
 /**
  *  Charges all subscriptions that are due today. Only
- *  to be used from the cron job!
+ *  to be used from the crons job!
  */
 export const chargeSubscriptions = async (): Promise<void> => {
   console.info(`Beginning subscription charging for ${new Date().getDate()}`);

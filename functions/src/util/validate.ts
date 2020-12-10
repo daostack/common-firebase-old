@@ -15,7 +15,7 @@ import { CommonError, ValidationError } from './errors';
  *
  * @returns Promise
  */
-export const validate = async <T extends any>(payload: T, schema: ObjectSchema): Promise<void> => {
+export const validate = async <T extends Record<string, any>>(payload: T, schema: ObjectSchema<T>): Promise<void> => {
   try {
     await schema
       .noUnknown()

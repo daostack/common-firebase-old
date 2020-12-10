@@ -10,6 +10,7 @@ const userJoinedSuccess = require('./templates/userJoinedSuccess');
 const adminWalletCreationFailed = require('./templates/adminWalletCreationFailed');
 const adminJoinedButPaymentFailed = require('./templates/adminJoinedButFailedPayment');
 const adminPayInSuccess = require('./templates/adminPayInSuccess');
+const approvePayout = require('./templates/approvePayout');
 
 const { CommonError } = require('../../util/errors');
 
@@ -29,7 +30,8 @@ const templates = {
   userJoinedButFailedPayment,
   userJoinedSuccess,
   adminJoinedButPaymentFailed,
-  adminPayInSuccess
+  adminPayInSuccess,
+  approvePayout
 };
 
 const globalDefaultStubs = {

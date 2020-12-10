@@ -3,10 +3,9 @@ import { getDiscussionById } from '../util/db/discussionDbService';
 import { proposalDb } from '../proposals/database';
 import { commonDb } from '../common/database';
 import { getAllUsers } from '../util/db/userDbService';
-
 interface IEventData {
-    eventObject: (eventObjId: string) => any;
-    notifyUserFilter: (eventObj: any) => string[] | Promise<string[]>;
+  eventObject: (eventObjId: string) => any;
+  notifyUserFilter: (eventObj: any) => string[] | Promise<string[]>;
 }
 
 // excluding event owner (message creator, etc) from userFilter so she wouldn't get notified
@@ -15,51 +14,63 @@ const excludeOwner = (membersId: string[], ownerId: string) : string[] => (
 );
 
 export enum EVENT_TYPES {
-    // Common related events
-    COMMON_CREATED = 'commonCreated',
-    COMMON_CREATION_FAILED = 'commonCreationFailed',
-    COMMON_WHITELISTED = 'commonWhitelisted',
-    COMMON_MEMBER_ADDED = 'commonMemberAdded',
-    COMMON_MEMBER_REMOVED = 'commonMemberRemoved',
+  // Common related events
+  COMMON_CREATED = 'commonCreated',
+  COMMON_CREATION_FAILED = 'commonCreationFailed',
+  COMMON_WHITELISTED = 'commonWhitelisted',
+  COMMON_MEMBER_ADDED = 'commonMemberAdded',
+  COMMON_MEMBER_REMOVED = 'commonMemberRemoved',
 
 
-    // Request to join related events
-    REQUEST_TO_JOIN_CREATED = 'requestToJoinCreated',
-    REQUEST_TO_JOIN_ACCEPTED = 'requestToJoinAccepted',
-    REQUEST_TO_JOIN_REJECTED = 'requestToJoinRejected',
-    REQUEST_TO_JOIN_EXECUTED = 'requestToJoinExecuted',
+  // Request to join related events
+  REQUEST_TO_JOIN_CREATED = 'requestToJoinCreated',
+  REQUEST_TO_JOIN_ACCEPTED = 'requestToJoinAccepted',
+  REQUEST_TO_JOIN_REJECTED = 'requestToJoinRejected',
+  REQUEST_TO_JOIN_EXECUTED = 'requestToJoinExecuted',
 
 
-    // Funding request related event
-    FUNDING_REQUEST_CREATED = 'fundingRequestCreated',
-    FUNDING_REQUEST_ACCEPTED = 'fundingRequestAccepted',
-    FUNDING_REQUEST_REJECTED = 'fundingRequestRejected',
-    FUNDING_REQUEST_EXECUTED = 'fundingRequestExecuted',
+  // Funding request related event
+  FUNDING_REQUEST_CREATED = 'fundingRequestCreated',
+  FUNDING_REQUEST_ACCEPTED = 'fundingRequestAccepted',
+  FUNDING_REQUEST_REJECTED = 'fundingRequestRejected',
+  FUNDING_REQUEST_EXECUTED = 'fundingRequestExecuted',
 
 
-    // Voting related events
-    VOTE_CREATED = 'voteCreated',
+  // Voting related events
+  VOTE_CREATED = 'voteCreated',
 
 
-    // Payment related events
-    PAYMENT_CREATED = 'paymentCreated',
-    PAYMENT_CONFIRMED = 'paymentConfirmed',
-    PAYMENT_FAILED = 'paymentFailed',
-    PAYMENT_PAID = 'paymentPaid',
+  // Payment related events
+  PAYMENT_CREATED = 'paymentCreated',
+  PAYMENT_CONFIRMED = 'paymentConfirmed',
+  PAYMENT_UPDATED = 'paymentConfirmed',
+  PAYMENT_FAILED = 'paymentFailed',
+  PAYMENT_PAID = 'paymentPaid',
 
+  // Payout related events
+  PAYOUT_CREATED = 'payoutCreated',
+  PAYOUT_APPROVED = 'payoutApproved',
+  PAYOUT_EXECUTED = 'payoutExecuted',
+  PAYOUT_VOIDED = 'payoutVoided',
 
-    // Messaging related events
-    MESSAGE_CREATED = 'messageCreated',
+  PAYOUT_COMPLETED = 'payoutCompleted',
+  PAYOUT_FAILED = 'payoutFailed',
 
-    // Subscriptions
-    SUBSCRIPTION_CREATED = 'subscriptionCreated',
-    SUBSCRIPTION_PAYMENT_CREATED = 'subscriptionPaymentCreated',
-    SUBSCRIPTION_PAYMENT_FAILED = 'subscriptionPaymentFailed',
-    SUBSCRIPTION_CANCELED_BY_USER = 'subscriptionCanceledByUser',
-    SUBSCRIPTION_CANCELED_BY_PAYMENT_FAILURE = 'subscriptionCanceledByPaymentFailure',
+  // Card related events
+  CARD_CREATED = 'cardCreated',
 
-    // Membership
-    MEMBERSHIP_REVOKED = 'membershipRevoked'
+  // Messaging related events
+  MESSAGE_CREATED = 'messageCreated',
+
+  // Subscriptions
+  SUBSCRIPTION_CREATED = 'subscriptionCreated',
+  SUBSCRIPTION_PAYMENT_CREATED = 'subscriptionPaymentCreated',
+  SUBSCRIPTION_PAYMENT_FAILED = 'subscriptionPaymentFailed',
+  SUBSCRIPTION_CANCELED_BY_USER = 'subscriptionCanceledByUser',
+  SUBSCRIPTION_CANCELED_BY_PAYMENT_FAILURE = 'subscriptionCanceledByPaymentFailure',
+
+  // Membership
+  MEMBERSHIP_REVOKED = 'membershipRevoked'
 }
 
 export const eventData: Record<string, IEventData> = {
