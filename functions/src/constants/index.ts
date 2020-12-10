@@ -41,6 +41,7 @@ interface Env {
   }
 
   secretManagerProject: string;
+  local: string;
 
   payouts: {
     approvers: string[];

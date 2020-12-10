@@ -14,7 +14,7 @@ export const onPayoutCreated: IEventTrigger = async (eventObj) => {
 
   env.payouts.approvers.map((async (approver, index) => {
     const urlBase = process.env.NODE_ENV === 'dev'
-      ? 'http://localhost:5003/common-staging-50741/us-central1'
+      ? env.local
       : env.endpoints.base;
 
     await emailClient.sendTemplatedEmail({
