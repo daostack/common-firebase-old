@@ -42,9 +42,9 @@ export const chargeSubscription = async (subscription: ISubscriptionEntity): Pro
       ipAddress: '127.0.0.1'
     });
   } catch (e) {
-    console.error(new CommonError(`
-      Payment for subscription (${subscription.id}) has failed!
-    `));
+    logger.error('Payment for subscription has failed!', {
+      subscriptionId: subscription.id
+    });
 
     await createEvent({
       userId: subscription.userId,

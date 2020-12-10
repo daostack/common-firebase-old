@@ -7,7 +7,6 @@ import { subscriptionDb } from '../../../subscriptions/database';
 import { createPayment } from './createPayment';
 import { pollPaymentStatus } from './pollPaymentStatus';
 import { isFinalized, isSuccessful } from '../helpers';
-import { logger } from '../../../util';
 import { handleFailedPayment, handleSuccessfulSubscriptionPayment } from '../../../subscriptions/business';
 
 const createSubscriptionPaymentValidationSchema = yup.object({

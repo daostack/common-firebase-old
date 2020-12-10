@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { IPayoutEntity } from '../types';
-import { externalRequestExecutor, logger } from '../../../util';
+import { externalRequestExecutor } from '../../../util';
 import { ICircleGetPayoutResponse } from '../../types';
 import { circlePayApi } from '../../../settings';
 import { ErrorCodes } from '../../../constants';

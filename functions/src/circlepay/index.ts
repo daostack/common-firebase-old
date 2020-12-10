@@ -91,13 +91,13 @@ circlepay.get('/testIP', async (req, res, next) => {
 });
 
 circlepay.post('/notification/ping', async (req, res, next) => {
-  console.info('Received notification from Circle');
+  logger.info('Received notification from Circle');
 
   await responseExecutor(async () => {
     const envelope = JSON.parse(req.body);
 
     if (envelope.Type === 'SubscriptionConfirmation') {
-      console.info('Trying to confirm subscription!', envelope.SubscribeURL);
+      logger.info('Trying to confirm subscription!', envelope.SubscribeURL);
 
       request(envelope.SubscribeURL, (err) => {
         if (err) {
@@ -108,7 +108,7 @@ circlepay.post('/notification/ping', async (req, res, next) => {
           );
         }
 
-        console.info('Successfully subscribed to the notifications!');
+        logger.info('Successfully subscribed to the notifications!');
       });
     } else if (envelope.Type === 'Notification') {
       await handleNotification(JSON.parse(envelope.Message) as ICircleNotification);
@@ -119,7 +119,7 @@ circlepay.post('/notification/ping', async (req, res, next) => {
       });
     }
 
-    console.info('Successfully handled notification');
+    logger.info('Successfully handled notification');
   }, {
     req,
     res,

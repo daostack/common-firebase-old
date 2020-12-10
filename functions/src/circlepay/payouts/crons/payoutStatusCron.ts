@@ -1,6 +1,5 @@
 import * as functions from 'firebase-functions';
 import { payoutDb } from '../database';
-import { logger } from '../../../util';
 import { updatePayoutStatus } from '../business/updatePayoutStatus';
 
 // Update the payout statuses every 12 hours

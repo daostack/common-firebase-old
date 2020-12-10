@@ -4,7 +4,8 @@
     "*.json",
     "*.yml",
     "*.sh",
-    "functions/dist/**"
+    "functions/dist/**",
+    "*.test.ts"
   ],
   "parserOptions": {
     // Required for certain syntax usages
@@ -92,7 +93,10 @@
     "promise/no-nesting": 1,
 
     // This is temporary rule that we should remove on later stage
-    "@typescript-eslint/no-var-requires": 0
+    "@typescript-eslint/no-var-requires": 0,
+
+    // Console usage is not allowed. Use logger instead
+    "no-console": 2
   },
   "overrides": [
     {

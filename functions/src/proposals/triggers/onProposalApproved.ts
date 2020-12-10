@@ -18,7 +18,7 @@ export const onProposalApproved = functions.firestore
       const event = eventSnap.data() as IEventEntity;
 
       if (event.type === EVENT_TYPES.FUNDING_REQUEST_ACCEPTED) {
-        console.info('Funding request was approved. Crunching some numbers');
+        logger.info('Funding request was approved. Crunching some numbers');
 
         await fundProposal(event.objectId);
 
@@ -32,7 +32,7 @@ export const onProposalApproved = functions.firestore
 
       // @refactor
       if (event.type === EVENT_TYPES.REQUEST_TO_JOIN_ACCEPTED) {
-        console.info('Join request was approved. Adding new members to common');
+        logger.info('Join request was approved. Adding new members to common');
 
         const proposal = await proposalDb.getJoinRequest(event.objectId);
 

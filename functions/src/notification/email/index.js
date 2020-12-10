@@ -48,6 +48,9 @@ const isNullOrUndefined = (val) =>
 const getTemplatedEmail = (templateKey, payload) => {
   let { template, subject, emailStubs, subjectStubs } = templates[templateKey];
 
+
+  // @todo Logger is not definded here because the file is JS. Move it to TS
+  // eslint-disable-next-line no-console
   console.debug('Email templating started');
 
   if (isNullOrUndefined(template)) {
@@ -92,6 +95,7 @@ const getTemplatedEmail = (templateKey, payload) => {
     subject = replaceAll(subject, `{{${stub}}}`, payload.subjectStubs[stub]);
   }
 
+  // eslint-disable-next-line no-console
   console.debug(`Email templating finished for template ${templateKey}`);
 
   return {
@@ -109,6 +113,7 @@ const sendTemplatedEmail = async ({ templateKey, emailStubs, subjectStubs, to })
     const emailPromises = [];
 
     to.forEach((emailTo) => {
+      // eslint-disable-next-line no-console
       console.log(`Sending ${templateKey} to ${emailTo}.`)
 
       emailPromises.push(mailer.sendMail({
@@ -120,6 +125,7 @@ const sendTemplatedEmail = async ({ templateKey, emailStubs, subjectStubs, to })
 
     await Promise.all(emailPromises);
   } else {
+    // eslint-disable-next-line no-console
     console.log(`Sending ${templateKey} to ${to}.`)
 
     await mailer.sendMail(
@@ -130,6 +136,7 @@ const sendTemplatedEmail = async ({ templateKey, emailStubs, subjectStubs, to })
   }
 
 
+  // eslint-disable-next-line no-console
   console.log('Templated email send successfully');
 };
 

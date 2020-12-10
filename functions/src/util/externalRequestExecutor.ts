@@ -14,11 +14,11 @@ export const externalRequestExecutor = async <T = any>(func: () => T | Promise<T
   try {
     const result = await func();
 
-    console.info('External request made successfully');
+    logger.info('External request made successfully');
 
     return result;
   } catch (err) {
-    console.error('Circle error response: ', err.response?.data);
+    logger.warn('Circle error response: ', err.response?.data);
 
     throw new CommonError(
       data.message || `External service failed. ErrorCode: ${data.errorCode}`, {

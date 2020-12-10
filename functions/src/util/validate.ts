@@ -32,9 +32,9 @@ export const validate = async <T extends Record<string, any>>(payload: T, schema
         }
       });
     }
-    console.trace('Validation failed with payload', payload);
 
-    console.log('Validation Errors:', e.errors);
+    logger.debug('Validation failed with payload', payload);
+    logger.info('Validation Errors:', e.errors);
 
     throw new ValidationError(e);
   }
