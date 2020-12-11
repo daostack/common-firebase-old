@@ -31,7 +31,7 @@ export const fundProposal = async (proposalId: string): Promise<void> => {
   }
 
   if (common.balance < proposal.fundingRequest.amount) {
-    console.warn(`Proposal with id ${proposal.id} cannot be funded, because the common does not have enough balance!`);
+    logger.warn(`Proposal with id ${proposal.id} cannot be funded, because the common does not have enough balance!`);
 
     throw new CommonError(`Proposal with id ${proposal.id} cannot be funded, because the common does not have enough balance!`);
 
@@ -47,6 +47,6 @@ export const fundProposal = async (proposalId: string): Promise<void> => {
   // Persist the changes asynchronously
   await Promise.all([
     commonDb.updateCommon(common),
-    proposalDb.updateProposal(proposal)
+    proposalDb.update(proposal)
   ]);
 };

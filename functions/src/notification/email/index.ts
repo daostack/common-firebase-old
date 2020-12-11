@@ -2,6 +2,7 @@ import { sendMail } from './mailer';
 import { env } from '../../constants';
 import { CommonError } from '../../util/errors';
 
+import { approvePayout } from './templates/approvePayout';
 import { userCommonCreated } from './templates/userCommonCreated';
 import { userJoinedSuccess } from './templates/userJoinedSuccess';
 import { adminPayInSuccess } from './templates/adminPayInSuccess';
@@ -25,7 +26,8 @@ const templates = {
   userJoinedButFailedPayment,
   userJoinedSuccess,
   adminJoinedButPaymentFailed,
-  adminPayInSuccess
+  adminPayInSuccess,
+  approvePayout
 };
 
 const globalDefaultStubs = {
@@ -52,6 +54,9 @@ export const getTemplatedEmail = (templateKey: keyof typeof templates, payload: 
   // @ts-ignore
   const { emailStubs, subjectStubs } = templates[templateKey];
 
+
+  // @todo Logger is not definded here because the file is JS. Move it to TS
+  // eslint-disable-next-line no-console
   console.debug('Email templating started');
 
   if (isNullOrUndefined(template)) {
@@ -96,6 +101,7 @@ export const getTemplatedEmail = (templateKey: keyof typeof templates, payload: 
     subject = replaceAll(subject, `{{${stub}}}`, payload.subjectStubs[stub]);
   }
 
+  // eslint-disable-next-line no-console
   console.debug(`Email templating finished for template ${templateKey}`);
 
   return {
@@ -120,6 +126,7 @@ export const sendTemplatedEmail: SendTemplatedEmail = async ({ templateKey, emai
     const emailPromises = [];
 
     to.forEach((emailTo) => {
+      // eslint-disable-next-line no-console
       console.log(`Sending ${templateKey} to ${emailTo}.`);
 
       emailPromises.push(sendMail(
@@ -131,6 +138,7 @@ export const sendTemplatedEmail: SendTemplatedEmail = async ({ templateKey, emai
 
     await Promise.all(emailPromises);
   } else {
+    // eslint-disable-next-line no-console
     console.log(`Sending ${templateKey} to ${to}.`);
 
     await sendMail(
@@ -141,6 +149,7 @@ export const sendTemplatedEmail: SendTemplatedEmail = async ({ templateKey, emai
   }
 
 
+  // eslint-disable-next-line no-console
   console.log('Templated email send successfully');
 };
 

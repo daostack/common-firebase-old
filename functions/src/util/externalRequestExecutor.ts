@@ -10,15 +10,15 @@ interface IExternalErrorData {
   [key: string]: any;
 }
 
-export const externalRequestExecutor = async <T = any>(func: () => any, data: IExternalErrorData): Promise<T> => {
+export const externalRequestExecutor = async <T = any>(func: () => T | Promise<T>, data: IExternalErrorData): Promise<T> => {
   try {
     const result = await func();
 
-    console.info('External request made successfully');
+    logger.info('External request made successfully');
 
     return result;
   } catch (err) {
-    console.error('Circle error response: ', err.response?.data);
+    logger.warn('Circle error response: ', err.response?.data);
 
     throw new CommonError(
       data.message || `External service failed. ErrorCode: ${data.errorCode}`, {
