@@ -46,7 +46,7 @@ interface ITemplatedEmail {
 
 // @todo Make the payload type based on the templateKey
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-const getTemplatedEmail = (templateKey: keyof typeof templates, payload: any): ITemplatedEmail => {
+export const getTemplatedEmail = (templateKey: keyof typeof templates, payload: any): ITemplatedEmail => {
   let { template, subject } = templates[templateKey];
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -111,7 +111,7 @@ type SendTemplatedEmail = (data: {
   to: string | string[]
 }) => Promise<void>;
 
-const sendTemplatedEmail: SendTemplatedEmail = async ({ templateKey, emailStubs, subjectStubs, to }) => {
+export const sendTemplatedEmail: SendTemplatedEmail = async ({ templateKey, emailStubs, subjectStubs, to }) => {
   to === 'admin' && (to = env.mail.adminMail);
 
   const { body, subject } = getTemplatedEmail(templateKey, { emailStubs, subjectStubs });
