@@ -2,8 +2,8 @@ import * as functions from 'firebase-functions';
 
 import { commonApp, commonRouter } from '../util';
 
-const CURRENT_VERSION = '1.8';
-const OLDEST_SUPPORTED_VERSION = '1.8';
+const CURRENT_VERSION = '1.9';
+const OLDEST_SUPPORTED_VERSION = '1.9';
 
 const metadataRouter = commonRouter();
 
