@@ -28,38 +28,42 @@ export async function getPayin():Promise<any> {
     .get();
 
     const payments = data.docs.map(doc => doc.data())
+    let key = 0;
+
     for (const property in payments) {
 
         const payment = payments[property];
 
-        if(payment.proposalId){
+        if(!payment.proposalId) continue;
+        
 
-            // eslint-disable-next-line no-await-in-loop
-            const proposal = await db.collection('proposals').doc(payment.proposalId).get()
-            const proposalData = proposal.data()
-            if(proposalData){
-                payments[property] = { payment: payment, proposal: proposalData}
-            }
-
-            if(proposalData){
-                //eslint-disable-next-line no-await-in-loop
-                const dao = await db.collection('daos').doc(proposalData.commonId).get()
-                const daoData = dao.data()
-                if(daoData){
-                    payments[property] = { ...payments[property], common: daoData}
-                }
-            }
-
-            if(proposalData){
-                //eslint-disable-next-line no-await-in-loop
-                const user = await db.collection('users').doc(proposalData.proposerId).get()
-                const userData = user.data()
-                if(userData){
-                    payments[property] = { ...payments[property], user: userData}
-                }
-            }
-            
+        // eslint-disable-next-line no-await-in-loop
+        const proposal = await db.collection('proposals').doc(payment.proposalId).get()
+        const proposalData = proposal.data()
+        if(proposalData){
+            payments[key] = { payment: payment, proposal: proposalData}
         }
+
+        if(proposalData){
+            //eslint-disable-next-line no-await-in-loop
+            const dao = await db.collection('daos').doc(proposalData.commonId).get()
+            const daoData = dao.data()
+            if(daoData){
+                payments[key] = { ...payments[key], common: daoData}
+            }
+        }
+
+        if(proposalData){
+            //eslint-disable-next-line no-await-in-loop
+            const user = await db.collection('users').doc(proposalData.proposerId).get()
+            const userData = user.data()
+            if(userData){
+                payments[key] = { ...payments[key], user: userData}
+            }
+        }
+            
+        key++;
+
         
     }
     return payments
