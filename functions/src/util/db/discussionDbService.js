@@ -8,6 +8,14 @@ async function getDiscussionById(discussionId) {
         .get();
 }
 
+// get all discussion messages of a discussion, descending order
+async function getDiscussionMessagesByDiscussionId(discussionId) {
+	return await db.collection('discussionMessage')
+      .where('discussionId', '==', discussionId)
+      .orderBy('createTime', 'desc').get();
+}
+
 module.exports = {
     getDiscussionById,
+    getDiscussionMessagesByDiscussionId,
 };

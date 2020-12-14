@@ -1,11 +1,48 @@
 import { getDiscussionMessageById } from '../util/db/discussionMessagesDb';
-import { getDiscussionById } from '../util/db/discussionDbService';
+import { getDiscussionById, getDiscussionMessagesByDiscussionId } from '../util/db/discussionDbService';
 import { proposalDb } from '../proposals/database';
 import { commonDb } from '../common/database';
 import { getAllUsers } from '../util/db/userDbService';
 interface IEventData {
   eventObject: (eventObjId: string) => any;
   notifyUserFilter: (eventObj: any) => string[] | Promise<string[]>;
+}
+
+
+/**
+ * [async Notification limiting; users would stop
+ * recieving comment notifications after 5 notifications were already sent
+ * when the user comments, the counter is 'reset' and starting counting 5 notifications again]
+ * @param  {string}            discussionOwner        [owner of the discussion/proposal]
+ * @param  {string}            discussionId           [id of the discussion/proposal]
+ * @param  {string}            discussionMessageOwner [onwer of the last message that triggered this notification]
+ * @return {Promise<string[]>}                        [array of users that should be notified about this comment]
+ */
+const sendNotifTo = async (discussionOwner: string, discussionId: string, discussionMessageOwner: string) : Promise<string[]> => {
+    // get messages from db in a descending order
+    const docs = (await getDiscussionMessagesByDiscussionId(discussionId)).docs;
+    const users = docs.map((doc) => doc.data().ownerId)
+    
+    // when this is the first comment, users will be empty, discussionOwner should get this notification, 
+    users.push(discussionOwner);
+    
+    const userFilter = [];
+    const currSender = users[0]; // this is the user that just commented that created this notification
+
+    for (let i = 1, limitCounter = 0; i < users.length && limitCounter < 5; i++) {
+        if (currSender === users[1]) {
+            // don't notify any users, this is a consecutive comment of the same user
+            break;
+        }
+        if (!userFilter.includes(users[i]) && users[i] !== discussionMessageOwner) {
+            userFilter.push(users[i]);
+        }
+        // increment counter for each messageOwner in users, including duplicates, but excluding consecutive duplicates 
+        if (userFilter[userFilter.length - 1] !== users[i - 1]) {
+            limitCounter ++;
+        }
+    }
+    return userFilter;
 }
 
 // excluding event owner (message creator, etc) from userFilter so she wouldn't get notified
@@ -113,11 +150,14 @@ export const eventData: Record<string, IEventData> = {
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         notifyUserFilter: async (discussionMessage: any): Promise<string[]> => {
             // message can be attached to a discussion or to a proposal (in proposal chat)
-            const discussion = (await getDiscussionById(discussionMessage.discussionId)).data()
-                || (await proposalDb.getProposal(discussionMessage.discussionId));
-            const common =(await commonDb.getCommon(discussion.commonId));
-            const membersId = common.members.map((member) => member.userId);
-            return excludeOwner(membersId, discussionMessage.ownerId)
+            const discussionId = discussionMessage.discussionId;
+            const discussion = (await getDiscussionById(discussionId)).data()
+                || (await proposalDb.getProposal(discussionId));
+
+            const discussionOwner = discussion.proposerId || discussion.ownerId;
+            const userFilter = await sendNotifTo(discussionOwner, discussionId, discussionMessage.ownerId);
+
+            return excludeOwner(userFilter, discussionMessage.ownerId); // calling this may be redundant, check in the morning
         }
     },
     [EVENT_TYPES.COMMON_WHITELISTED]: {
