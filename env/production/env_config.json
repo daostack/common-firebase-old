@@ -29,7 +29,7 @@
     "approvers": ["alexander2001ivanov@gmail.com"],
     "neededApprovals": 1
   },
-  "local": "http://localhost:5003/common-staging-50741/us-central1",
+  "local": "http://localhost:5003/common-daostack/us-central1",
   "backoffice":{
     "sheetUrl": "1Dvrg0nfzdLqHOlQTf_2JMhW2DMxDgq7yIA97PDUYeWU"
   }
