@@ -8,9 +8,7 @@ export const getCommonBalance = async() : Promise<any> => {
     const data = await db.collection(COLLECTION_NAME)
     .get();
 
-    const daos = data.docs.map(doc => doc.data())
-
-    return daos
+    return data.docs.map(doc => doc.data())
 }
 
 export const getCircleBalance = async() : Promise<any> => {
