@@ -3,7 +3,7 @@ import { getBalances } from '../circlepay/circlepay';
 
 
 
-export async function getCommonBalance():Promise<any> {
+export const getCommonBalance = async() : Promise<any> => {
     const COLLECTION_NAME = 'daos';
     const data = await db.collection(COLLECTION_NAME)
     .get();
@@ -13,13 +13,12 @@ export async function getCommonBalance():Promise<any> {
     return daos
 }
 
-export async function getCircleBalance():Promise<any> {
+export const getCircleBalance = async() : Promise<any> => {
     const {data: {data}} = await getBalances();
     return data
 }
 
-
-export async function getPayin():Promise<any> {
+export const getPayin = async() : Promise<any> => {
     const COLLECTION_NAME = 'payments';
 
     const data = await db.collection(COLLECTION_NAME)
@@ -71,7 +70,8 @@ export async function getPayin():Promise<any> {
 
 }
 
-export async function getPayout():Promise<any> {
+export const getPayout = async() : Promise<any> => {
+
     const COLLECTION_NAME = 'proposals';
 
     const data = await db.collection(COLLECTION_NAME)
