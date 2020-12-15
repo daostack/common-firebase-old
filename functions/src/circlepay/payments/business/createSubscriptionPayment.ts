@@ -7,7 +7,8 @@ import { subscriptionDb } from '../../../subscriptions/database';
 import { createPayment } from './createPayment';
 import { pollPaymentStatus } from './pollPaymentStatus';
 import { isFinalized, isSuccessful } from '../helpers';
-import { handleFailedPayment, handleSuccessfulSubscriptionPayment } from '../../../subscriptions/business';
+import { handleFailedSubscriptionPayment, handleSuccessfulSubscriptionPayment } from '../../../subscriptions/business';
+import { proposalDb } from '../../../proposals/database';
 
 const createSubscriptionPaymentValidationSchema = yup.object({
   subscriptionId: yup.string()
@@ -43,24 +44,32 @@ export const createSubscriptionPayment = async (payload: yup.InferType<typeof cr
     objectId: v4()
   });
 
-  // let payment = await createPayment({
-  //   userId: proposal.proposerId,
-  //   cardId: proposal.join.cardId,
-  //   ipAddress: payload.ipAddress,
-  //   sessionId: payload.sessionId,
-  //
-  //   type: 'one-time',
-  //   amount: proposal.join.funding,
-  //   objectId: proposal.id
-  // });
+  // If this is the initial subscription charge
+  // update the proposal as well
+  if (subscription.charges === 0) {
+    await proposalDb.update({
+      id: subscription.proposalId,
+      paymentState: 'pending'
+    });
+  }
 
   // Poll the payment
   payment = await pollPaymentStatus(payment);
 
   if (isSuccessful(payment)) {
     await handleSuccessfulSubscriptionPayment(subscription);
+
+    await proposalDb.update({
+      id: subscription.proposalId,
+      paymentState: 'confirmed'
+    });
   } else if (isFinalized(payment)) {
-    await handleFailedPayment(subscription, payment);
+    await handleFailedSubscriptionPayment(subscription, payment);
+
+    await proposalDb.update({
+      id: subscription.proposalId,
+      paymentState: 'failed'
+    });
   } else {
     logger.warn('Payment is not in finalized or successful state after polling {payment}', payment);
   }

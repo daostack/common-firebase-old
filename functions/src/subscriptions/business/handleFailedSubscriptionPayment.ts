@@ -12,7 +12,7 @@ import { IPaymentEntity } from '../../circlepay/payments/types';
  *
  * @throws { CommonError } - If the subscription status is not 'Active' or 'PaymentFailed'
  */
-export const handleFailedPayment = async (subscription: ISubscriptionEntity, payment: IPaymentEntity): Promise<void> => {
+export const handleFailedSubscriptionPayment = async (subscription: ISubscriptionEntity, payment: IPaymentEntity): Promise<void> => {
   const failedPayment = {
     paymentStatus: payment.status,
     paymentId: payment.id
