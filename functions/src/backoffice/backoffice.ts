@@ -12,7 +12,7 @@ export const getCommonBalance = async() : Promise<any> => {
 }
 
 export const getCircleBalance = async() : Promise<any> => {
-    const {data: {data}} = await getBalances();
+    const { data } = (await getBalances()).data;
     return data
 }
 
