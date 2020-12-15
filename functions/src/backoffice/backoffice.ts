@@ -48,7 +48,7 @@ export const getPayin = async() : Promise<any> => {
             const dao = await db.collection(DAOS_COLLECTION_NAME).doc(proposalData.commonId).get()
             const daoData = dao.data()
             if(daoData){
-                payments[key] = { ...payments[key], common: daoData}
+                payments[key] = {...payments[key], common: daoData}
             }
         }
 
@@ -57,7 +57,7 @@ export const getPayin = async() : Promise<any> => {
             const user = await db.collection(USERS_COLLECTION_NAME).doc(proposalData.proposerId).get()
             const userData = user.data()
             if(userData){
-                payments[key] = { ...payments[key], user: userData}
+                payments[key] = {...payments[key], user: userData}
             }
         }
             
@@ -94,21 +94,21 @@ export const getPayout = async() : Promise<any> => {
         const user = await db.collection(USERS_COLLECTION_NAME).doc(proposal.proposerId).get()
         const userData = user.data()
         if(userData){
-            filterProposals[key] = { ...filterProposals[key], user: userData}
+            filterProposals[key] = {...filterProposals[key], user: userData}
         }
 
         //eslint-disable-next-line no-await-in-loop
         const dao = await db.collection(DAOS_COLLECTION_NAME).doc(proposal.commonId).get()
         const daoData = dao.data()
         if(daoData){
-            filterProposals[key] = { ...filterProposals[key], common: daoData}
+            filterProposals[key] = {...filterProposals[key], common: daoData}
         }
 
         // eslint-disable-next-line no-await-in-loop
         const payment = await db.collection(PAYMENTS_COLLECTION_NAME).where("proposalId", "==", proposal.id).limit(1).get()
         if(!payment.empty){
             const paymentData = payment.docs[0].data();
-            filterProposals[key] = { ...filterProposals[key], payment: paymentData}
+            filterProposals[key] = {...filterProposals[key], payment: paymentData}
         }
         
         key++;
