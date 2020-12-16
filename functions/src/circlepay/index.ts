@@ -147,7 +147,7 @@ circlepay.post('/wires/create', async (req, res, next) => {
 
     return {
       id: data.id
-    }
+    };
   }, {
     req,
     res,
@@ -160,10 +160,26 @@ circlepay.post('/wires/create', async (req, res, next) => {
 
 circlepay.post('/payouts/create', async (req, res, next) => {
   await responseExecutor(async () => {
-    if(req.body.type === 'proposal') {
-      await createProposalPayout(req.body);
-    } else if(req.body.type === 'independent') {
-      await createIndependentPayout(req.body)
+    if (req.body.wire) {
+      const bankAccount = await createBankAccount(req.body.wire);
+
+      if (req.body.payout.type === 'proposal') {
+        await createProposalPayout({
+          ...req.body.payout,
+          bankAccountId: bankAccount.id
+        });
+      } else if (req.body.payout.type === 'independent') {
+        await createIndependentPayout({
+          ...req.body.payout,
+          bankAccountId: bankAccount.id
+        });
+      }
+    } else {
+      if (req.body.type === 'proposal') {
+        await createProposalPayout(req.body);
+      } else if (req.body.type === 'independent') {
+        await createIndependentPayout(req.body);
+      }
     }
   }, {
     req,
@@ -188,7 +204,7 @@ circlepay.get('/payouts/approve', async (req, res, next) => {
 
 export const circlePayCrons = {
   ...payoutCrons
-}
+};
 
 export const circlePayApp = functions
   .runWith(runtimeOptions)
