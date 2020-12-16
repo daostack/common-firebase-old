@@ -14,6 +14,9 @@ import { userJoinedButFailedPayment } from './templates/userJoinedButFailedPayme
 import { adminFundingRequestAccepted } from './templates/adminFundingRequestAccepted';
 import { adminPreauthorizationFailed } from './templates/adminPreauthorizationFailed';
 import { adminJoinedButPaymentFailed } from './templates/adminJoinedButFailedPayment';
+import { subscriptionCanceled } from './templates/subscriptionCanceled';
+import { subscriptionChargeFailed } from './templates/subscriptionChargeFailed';
+import { subscriptionCharged } from './templates/subscriptionCharged';
 
 const templates = {
   requestToJoinSubmitted,
@@ -27,7 +30,10 @@ const templates = {
   userJoinedSuccess,
   adminJoinedButPaymentFailed,
   adminPayInSuccess,
-  approvePayout
+  approvePayout,
+  subscriptionCanceled,
+  subscriptionCharged,
+  subscriptionChargeFailed
 };
 
 const globalDefaultStubs = {
@@ -40,6 +46,24 @@ const replaceAll = (string, search, replace) => {
 
 const isNullOrUndefined = (val) =>
   val === null || val === undefined;
+
+interface IStub {
+  required: boolean;
+  default?: string;
+}
+
+export interface IEmailTemplate {
+  template: string;
+  subject: string;
+
+  emailStubs?: {
+    [key: string]: IStub;
+  };
+
+  subjectStubs?: {
+    [key: string]: IStub;
+  };
+}
 
 interface ITemplatedEmail {
   body: string;
@@ -110,12 +134,14 @@ export const getTemplatedEmail = (templateKey: keyof typeof templates, payload: 
   };
 };
 
-type SendTemplatedEmail = (data: {
+export interface ISendTemplatedEmailData {
   templateKey: keyof typeof templates,
-  emailStubs: any,
-  subjectStubs: any,
+  emailStubs?: any,
+  subjectStubs?: any,
   to: string | string[]
-}) => Promise<void>;
+}
+
+type SendTemplatedEmail = (data: ISendTemplatedEmailData) => Promise<void>;
 
 export const sendTemplatedEmail: SendTemplatedEmail = async ({ templateKey, emailStubs, subjectStubs, to }) => {
   to === 'admin' && (to = env.mail.adminMail);

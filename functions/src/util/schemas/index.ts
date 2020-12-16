@@ -1,5 +1,8 @@
 import * as yup from 'yup';
 
+const isDistrictRequired = (country: string): boolean =>
+  country === 'US' || country === 'CA';
+
 export const linkValidationSchema = yup.object({
   title: yup.string()
     .max(64),
@@ -66,7 +69,10 @@ export const billingDetailsValidationSchema = yup.object({
 
   district: yup
     .string()
-    .required(),
+    .when('country', {
+      is: isDistrictRequired,
+      then: yup.string().required()
+    }),
 
   postalCode: yup
     .string()
