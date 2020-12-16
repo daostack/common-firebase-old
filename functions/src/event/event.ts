@@ -4,6 +4,9 @@ import { commonDb } from '../common/database';
 import { getAllUsers } from '../util/db/userDbService';
 import { discussionDb } from '../discussion/database';
 import { discussionMessageDb } from '../discussionMessage/database';
+import { subscriptionDb } from '../subscriptions/database';
+import { paymentDb } from '../circlepay/payments/database';
+import { ISubscriptionPayment } from '../circlepay/payments/types';
 
 interface IEventData {
   eventObject: (eventObjId: string) => any;
@@ -48,8 +51,8 @@ const sendNotifTo = async (discussionOwner: string, discussionId: string) : Prom
 }
 
 // excluding event owner (message creator, etc) from userFilter so she wouldn't get notified
-const excludeOwner = (membersId: string[], ownerId: string) : string[] => (
-    membersId.filter((memberId) => memberId !== ownerId)
+const excludeOwner = (membersId: string[], ownerId: string): string[] => (
+  membersId.filter((memberId) => memberId !== ownerId)
 );
 
 export enum EVENT_TYPES {
@@ -105,6 +108,8 @@ export enum EVENT_TYPES {
   SUBSCRIPTION_CREATED = 'subscriptionCreated',
   SUBSCRIPTION_PAYMENT_CREATED = 'subscriptionPaymentCreated',
   SUBSCRIPTION_PAYMENT_FAILED = 'subscriptionPaymentFailed',
+  SUBSCRIPTION_PAYMENT_CONFIRMED = 'subscriptionPaymentConfirmed',
+  SUBSCRIPTION_PAYMENT_STUCK = 'subscriptionPaymentStuck',
   SUBSCRIPTION_CANCELED_BY_USER = 'subscriptionCanceledByUser',
   SUBSCRIPTION_CANCELED_BY_PAYMENT_FAILURE = 'subscriptionCanceledByPaymentFailure',
 
