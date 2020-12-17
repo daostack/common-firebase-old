@@ -395,7 +395,7 @@ export const notifyData: Record<string, IEventData> = {
 };
 
 export default new class Notification implements INotification {
-  async send(tokens, title, body, image = '', path, options = {
+  async send(tokens = [], title, body, image = '', path, options = {
     contentAvailable: true,
     mutable_content: true,
     priority: 'high'
@@ -413,8 +413,8 @@ export default new class Notification implements INotification {
 
     // @question Ask about this rule "promise/always-return". It is kinda useless so we may disable it globally?
     // eslint-disable-next-line promise/always-return
-    const messageSent: admin.messaging.MessagingDevicesResponse = await messaging.sendToDevice(tokens, payload, options);
-    logger.info('Send Success', messageSent);
+    const messageSent: admin.messaging.MessagingDevicesResponse = tokens.length > 0 && await messaging.sendToDevice(tokens, payload, options);
+    //console.info('Send Success', messageSent);
   }
 
   async sendToAllUsers(title: string, body: string, image = '', path: string) {
@@ -433,11 +433,11 @@ export default new class Notification implements INotification {
       }
     } as admin.messaging.Message;
 
-    logger.info('payload -> ', payload);
+    //console.info('payload -> ', payload);
 
     // @question Ask about this rule "promise/always-return". It is kinda useless so we may disable it globally?
     // eslint-disable-next-line promise/always-return
     const messageSent: string = await messaging.send(payload);
-    logger.info('Send Success', { messageSent });
+    //console.info('Send Success', { messageSent });
   }
 };
