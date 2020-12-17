@@ -1,7 +1,8 @@
 import admin from 'firebase-admin';
 import Timestamp = admin.firestore.Timestamp;
+import { IBaseEntity } from '../util/types';
 
-export interface IDiscussionEntity{
+export interface IDiscussionEntity extends IBaseEntity {
   /**
    * Title of the discussion
    */

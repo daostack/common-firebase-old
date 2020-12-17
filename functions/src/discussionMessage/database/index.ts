@@ -6,4 +6,4 @@ export const discussionMessageCollection = db.collection(Collections.DiscussionM
 
 export const discussionMessageDb = {
 	getAllMessagesOfDiscussion,
-}
+};

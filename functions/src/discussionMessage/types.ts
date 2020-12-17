@@ -1,7 +1,7 @@
 import admin from 'firebase-admin';
 import Timestamp = admin.firestore.Timestamp;
 
-export interface IDiscussionMessage{
+export interface IDiscussionMessage {
 
   /**
    * ID of the parent discussion of this message, could be a Discussion ID, or a Proposal ID 

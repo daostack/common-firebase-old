@@ -1,6 +1,5 @@
 import { discussionMessageCollection } from './index';
 import { IDiscussionMessage } from '../../discussionMessage/types';
-import { Nullable } from '../../util/types';
 
 export const getAllMessagesOfDiscussion = async (discussionId: string) : Promise<IDiscussionMessage[]> => {
 	const discussionMessages = await discussionMessageCollection
@@ -9,7 +8,7 @@ export const getAllMessagesOfDiscussion = async (discussionId: string) : Promise
     
     return (await discussionMessages
       .docs.map(message =>
-        message.data() as Nullable<IDiscussionMessage>
+        message.data() as IDiscussionMessage
       )
     )
-}
+};
