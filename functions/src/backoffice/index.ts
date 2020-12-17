@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 
 import { commonApp, commonRouter } from '../util';
 import { responseExecutor } from '../util/responseExecutor';
-import { getPayout, getPayin, getCircleBalance, getCommonBalance } from './backoffice';
+import { backofficeDb } from './database';
 import { google } from 'googleapis'
 import serviceAccount from '../env/adminsdk-keys.json';
 import { getSecret } from '../settings';
@@ -22,9 +22,9 @@ const runtimeOptions = {
   timeoutSeconds: 540 // Maximum time 9 mins
 };
 
-const backofficeRouter = commonRouter();
+const router = commonRouter();
 
-backofficeRouter.get('/payout', async (req, res, next) => {
+router.get('/payout', async (req, res, next) => {
   await responseExecutor(
     async () => {
       const values = [[
@@ -46,7 +46,7 @@ backofficeRouter.get('/payout', async (req, res, next) => {
         'Payment updated'
       ]];
 
-      const data = await getPayout();
+      const data = await backofficeDb.getPayout();
       for (const key in data) {
           // eslint-disable-next-line no-prototype-builtins
           if (data.hasOwnProperty(key)) {
@@ -106,7 +106,7 @@ backofficeRouter.get('/payout', async (req, res, next) => {
   );
 });
 
-backofficeRouter.get('/payin', async (req, res, next) => {
+router.get('/payin', async (req, res, next) => {
   await responseExecutor(
     async () => {
       const values = [[
@@ -130,7 +130,7 @@ backofficeRouter.get('/payin', async (req, res, next) => {
         'Payment updated'
       ]];
 
-      const data = await getPayin();
+      const data = await backofficeDb.getPayin();
 
       for (const key in data) {
           // eslint-disable-next-line no-prototype-builtins
@@ -220,11 +220,11 @@ backofficeRouter.get('/payin', async (req, res, next) => {
   );
 });
 
-backofficeRouter.get('/commonbalance', async (req, res, next) => {
+router.get('/commonbalance', async (req, res, next) => {
   await responseExecutor(
     async () => {
       
-      const data = await getCommonBalance();
+      const data = await backofficeDb.getCommonBalance();
       const values = [[
         'Common id',
         'Common name',
@@ -270,11 +270,11 @@ backofficeRouter.get('/commonbalance', async (req, res, next) => {
   );
 });
 
-backofficeRouter.get('/circlebalance', async (req, res, next) => {
+router.get('/circlebalance', async (req, res, next) => {
   await responseExecutor(
     async () => {
       
-      const data = await getCircleBalance();
+      const data = await backofficeDb.getCircleBalance();
       const values = [[
         'Account',
         'Available',
@@ -314,7 +314,7 @@ backofficeRouter.get('/circlebalance', async (req, res, next) => {
 
 export const backofficeApp = functions
   .runWith(runtimeOptions)
-  .https.onRequest(commonApp(backofficeRouter, {
+  .https.onRequest(commonApp(router, {
     unauthenticatedRoutes:[
       '/payin', 
       '/payout', 
