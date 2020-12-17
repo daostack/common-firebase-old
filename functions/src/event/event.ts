@@ -4,9 +4,6 @@ import { commonDb } from '../common/database';
 import { getAllUsers } from '../util/db/userDbService';
 import { discussionDb } from '../discussion/database';
 import { discussionMessageDb } from '../discussionMessage/database';
-import { subscriptionDb } from '../subscriptions/database';
-import { paymentDb } from '../circlepay/payments/database';
-import { ISubscriptionPayment } from '../circlepay/payments/types';
 
 interface IEventData {
   eventObject: (eventObjId: string) => any;
@@ -23,7 +20,7 @@ interface IEventData {
  * @param  discussionMessageOwner - onwer of the last message that triggered this notification
  * @return userFilter             - array of users that should be notified about this comment
  */
-const sendNotifTo = async (discussionOwner: string, discussionId: string) : Promise<string[]> => {
+const limitRecipients = async (discussionOwner: string, discussionId: string) : Promise<string[]> => {
     // get messages from db in a descending order
     const discussionMessages = await discussionMessageDb.getAllMessagesOfDiscussion(discussionId);
     const users = discussionMessages.map((message) => message.ownerId);
@@ -162,7 +159,7 @@ export const eventData: Record<string, IEventData> = {
                 || (await proposalDb.getProposal(discussionId));
 
             const discussionOwner = discussion.proposerId || discussion.ownerId;
-            return await sendNotifTo(discussionOwner, discussionId);
+            return await limitRecipients(discussionOwner, discussionId);
         }
     },
     [EVENT_TYPES.COMMON_WHITELISTED]: {
