@@ -5,6 +5,8 @@ import { responseExecutor } from '../util/responseExecutor';
 import { getPayout, getPayin, getCircleBalance, getCommonBalance } from './backoffice';
 import { google } from 'googleapis'
 import serviceAccount from '../env/adminsdk-keys.json';
+import { getSecret } from '../settings';
+
 import { env } from '../constants';
 
 
@@ -14,7 +16,6 @@ const jwtClient = new google.auth.JWT({
     key: serviceAccount.private_key,
     scopes: [ 'https://www.googleapis.com/auth/spreadsheets' ],  // read and write sheets
 })
-const jwtAuthPromise = jwtClient.authorize()
 
 
 const runtimeOptions = {
@@ -85,6 +86,7 @@ backofficeRouter.get('/payout', async (req, res, next) => {
         values,
       };
 
+      const jwtAuthPromise = jwtClient.authorize()
       await jwtAuthPromise
       await sheets.spreadsheets.values.update({
           auth: jwtClient,
@@ -198,6 +200,7 @@ backofficeRouter.get('/payin', async (req, res, next) => {
         values,
       };
 
+      const jwtAuthPromise = jwtClient.authorize()
       await jwtAuthPromise
       await sheets.spreadsheets.values.update({
           auth: jwtClient,
@@ -247,6 +250,7 @@ backofficeRouter.get('/commonbalance', async (req, res, next) => {
         values,
       };
 
+      const jwtAuthPromise = jwtClient.authorize()
       await jwtAuthPromise
       await sheets.spreadsheets.values.update({
           auth: jwtClient,
@@ -288,7 +292,7 @@ backofficeRouter.get('/circlebalance', async (req, res, next) => {
         values,
       };
 
-
+      const jwtAuthPromise = jwtClient.authorize()
       await jwtAuthPromise
       await sheets.spreadsheets.values.update({
           auth: jwtClient,
