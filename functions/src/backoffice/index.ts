@@ -2,9 +2,9 @@ import * as functions from 'firebase-functions';
 
 import { commonApp, commonRouter } from '../util';
 import { responseExecutor } from '../util/responseExecutor';
+import serviceAccount from '../constants/env/adminsdk-keys.json';
 import { backofficeDb } from './database';
 import { google } from 'googleapis'
-import serviceAccount from '../env/adminsdk-keys.json';
 import { getSecret } from '../settings';
 
 import { env } from '../constants';
