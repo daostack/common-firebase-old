@@ -395,7 +395,7 @@ export const notifyData: Record<string, IEventData> = {
 };
 
 export default new class Notification implements INotification {
-  async send(tokens, title, body, image = '', path, options = {
+  async send(tokens = [], title, body, image = '', path, options = {
     contentAvailable: true,
     mutable_content: true,
     priority: 'high'
