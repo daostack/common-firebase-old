@@ -275,7 +275,7 @@ router.get('/circlebalance', async (req, res, next) => {
   await responseExecutor(
     async () => {
       
-      const data = await backofficeDb.getCircleBalance();
+      const data = (await backofficeDb.getCircleBalance()).data.data;
       const values = [[
         'Account',
         'Available',

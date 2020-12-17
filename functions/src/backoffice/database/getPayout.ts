@@ -2,16 +2,15 @@ import { ProposalsCollection, UsersCollection, CommonCollection, PaymentsCollect
 
 export async function getPayout():Promise<any> {
 
-    const proposalsCollectionQuery: any = ProposalsCollection;
+    const proposalsQuery: any = ProposalsCollection;
 
-    proposalsCollectionQuery
+    proposalsQuery
     .orderBy("createdAt", "asc")
 
 
-    const proposals = await proposalsCollectionQuery
-    .get()
-    .docs
-    .map(proposal => proposal.data()) || [];
+    const proposals = (await proposalsQuery.get()).docs
+    .map(payment => payment.data()) || [];
+
 
     const filterProposals = {};
     let key = 0;
@@ -27,27 +26,27 @@ export async function getPayout():Promise<any> {
 
         filterProposals[key] = { proposal: proposal}
 
-        const usersCollectionQuery: any = UsersCollection;
+        const usersQuery: any = UsersCollection;
 
         // eslint-disable-next-line no-await-in-loop
-        const user = await usersCollectionQuery.doc(proposal.proposerId).get()
+        const user = await usersQuery.doc(proposal.proposerId).get()
         const userData = user.data()
         if(userData){
             filterProposals[key] = {...filterProposals[key], user: userData}
         }
 
-        const commonsCollectionQuery: any = CommonCollection;
+        const commonsQuery: any = CommonCollection;
         //eslint-disable-next-line no-await-in-loop
-        const dao = await commonsCollectionQuery.doc(proposal.commonId).get()
+        const dao = await commonsQuery.doc(proposal.commonId).get()
         const daoData = dao.data()
         if(daoData){
             filterProposals[key] = {...filterProposals[key], common: daoData}
         }
 
-        const paymentsCollectionQuery: any = PaymentsCollection;
+        const paymentsQuery: any = PaymentsCollection;
 
         // eslint-disable-next-line no-await-in-loop
-        const payment = await paymentsCollectionQuery.where("proposalId", "==", proposal.id).limit(1).get()
+        const payment = await paymentsQuery.where("proposalId", "==", proposal.id).limit(1).get()
 
         if(!payment.empty){
             const paymentData = payment.docs[0].data();
