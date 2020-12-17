@@ -158,7 +158,7 @@ export const eventData: Record<string, IEventData> = {
         notifyUserFilter: async (discussionMessage: any): Promise<string[]> => {
             // message can be attached to a discussion or to a proposal (in proposal chat)
             const discussionId = discussionMessage.discussionId;
-            const discussion = (await discussionDb.getDiscussion(discussionId))
+            const discussion = (await discussionDb.getDiscussion(discussionId, { throwOnFailure: false }))
                 || (await proposalDb.getProposal(discussionId));
 
             const discussionOwner = discussion.proposerId || discussion.ownerId;
