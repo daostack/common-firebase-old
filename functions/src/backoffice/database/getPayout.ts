@@ -1,9 +1,18 @@
 import { ProposalsCollection, UsersCollection, CommonCollection, PaymentsCollection } from './index';
 
 export async function getPayout():Promise<any> {
+
     const proposalsCollectionQuery: any = ProposalsCollection;
 
-    const proposals = await proposalsCollectionQuery.orderBy("createdAt", "asc").get().docs.map(proposal => proposal.data());
+    proposalsCollectionQuery
+    .orderBy("createdAt", "asc")
+
+
+    const proposals = await proposalsCollectionQuery
+    .get()
+    .docs
+    .map(proposal => proposal.data()) || [];
+
     const filterProposals = {};
     let key = 0;
     for (const property in proposals) {

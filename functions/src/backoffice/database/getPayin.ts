@@ -1,9 +1,13 @@
 import { PaymentsCollection, ProposalsCollection, CommonCollection, UsersCollection } from './index';
 
 export async function getPayin():Promise<any> {
-    const paymentsCollectionQuery: any = PaymentsCollection;
-    const payments = await paymentsCollectionQuery.orderBy("creationDate", "asc").where("status", "==", "confirmed").get().docs.map(payment => payment.data());
 
+    const paymentsQuery: any = PaymentsCollection;
+    paymentsQuery.orderBy("creationDate", "asc").where("status", "==", "confirmed")
+
+    
+    const payments = (await paymentsQuery.get()).docs
+    .map(payment => payment.data()) || [];
 
     let key = 0;
 
@@ -13,20 +17,21 @@ export async function getPayin():Promise<any> {
 
         if(!payment.proposalId) continue;
         
-        const proposalsCollectionQuery: any = ProposalsCollection;
+        const proposalsQuery: any = ProposalsCollection;
+        proposalsQuery.orderBy("createdAt", "asc")
 
         // eslint-disable-next-line no-await-in-loop
-        const proposal = await proposalsCollectionQuery.doc(payment.proposalId).get()
+        const proposal = (await proposalsQuery.doc(payment.proposalId).get())
         const proposalData = proposal.data()
         if(proposalData){
             payments[key] = { payment: payment, proposal: proposalData}
         }
 
         if(proposalData){
-            const commonCollectionQuery: any = CommonCollection;
+            const commonQuery: any = CommonCollection;
 
             //eslint-disable-next-line no-await-in-loop
-            const dao = await commonCollectionQuery.doc(proposalData.commonId).get()
+            const dao = await commonQuery.doc(proposalData.commonId).get()
             const daoData = dao.data()
             if(daoData){
                 payments[key] = {...payments[key], common: daoData}
@@ -34,10 +39,11 @@ export async function getPayin():Promise<any> {
         }
 
         if(proposalData){
-            const usersCollectionQuery: any = UsersCollection;
+            const usersQuery: any = UsersCollection;
+            usersQuery.orderBy("createdAt", "asc")
 
             //eslint-disable-next-line no-await-in-loop
-            const user = await usersCollectionQuery.doc(proposalData.proposerId).get()
+            const user = await (usersQuery.doc(proposalData.proposerId).get())
 
             const userData = user.data()
             if(userData){

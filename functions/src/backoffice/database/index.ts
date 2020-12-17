@@ -33,7 +33,6 @@ export const PaymentsCollection = db.collection(Collections.Payments)
 
 
 export const ProposalsCollection = db.collection(Collections.Proposals)
-.orderBy("createdAt", "asc")
 .withConverter<IProposalEntity>({
     fromFirestore(snapshot: FirebaseFirestore.QueryDocumentSnapshot): IProposalEntity {
     return snapshot.data() as IProposalEntity;
@@ -44,7 +43,6 @@ export const ProposalsCollection = db.collection(Collections.Proposals)
 });
 
 export const UsersCollection = db.collection(Collections.Users)
-.orderBy("createdAt", "asc")
 .withConverter<IUserEntity>({
     fromFirestore(snapshot: FirebaseFirestore.QueryDocumentSnapshot): IUserEntity {
     return snapshot.data() as IUserEntity;
