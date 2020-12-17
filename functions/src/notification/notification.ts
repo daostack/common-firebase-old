@@ -7,7 +7,7 @@ import { getDiscussionMessageById } from '../util/db/discussionMessagesDb';
 import { proposalDb } from '../proposals/database';
 import { commonDb } from '../common/database';
 import { subscriptionDb } from '../subscriptions/database';
-import { ISendTempalatedEmailData } from './email';
+import { ISendTemplatedEmailData } from './email';
 import { ISubscriptionEntity } from '../subscriptions/types';
 import { IUserEntity } from '../users/types';
 import { userDb } from '../users/database';
@@ -189,14 +189,14 @@ export const notifyData: Record<string, IEventData> = {
           emailStubs: {
             commonName: commonData.name,
             commonLink: Utils.getCommonLink(commonData.id),
-            commonBalance: commonData.balance,
+            commonBalance: (commonData.balance / 100).toLocaleString('en-US', {style: 'currency', currency: 'USD'}),
             commonId: commonData.id,
             proposalId: proposalData.id,
             userName: getNameString(userData),
             userEmail: userData.email,
             userId: userData.uid,
-            fundingAmount: proposalData.fundingRequest.amount,
-            submittedOn: proposalData.createdAt,
+            fundingAmount: (proposalData.fundingRequest.amount / 100).toLocaleString('en-US', {style: 'currency', currency: 'USD'}),
+            submittedOn: proposalData.createdAt.toDate(),
             passedOn: new Date(),
             log: 'Funding request accepted'
           }
@@ -319,7 +319,7 @@ export const notifyData: Record<string, IEventData> = {
     email: ({ subscription, user }: {
       subscription: ISubscriptionEntity,
       user: IUserEntity
-    }): ISendTempalatedEmailData => ({
+    }): ISendTemplatedEmailData => ({
       to: user.email,
       templateKey: 'subscriptionChargeFailed',
       emailStubs: {
@@ -345,7 +345,7 @@ export const notifyData: Record<string, IEventData> = {
     email: ({ subscription, user }: {
       subscription: ISubscriptionEntity,
       user: IUserEntity
-    }): ISendTempalatedEmailData => ({
+    }): ISendTemplatedEmailData => ({
       to: user.email,
       templateKey: 'subscriptionCanceled',
       emailStubs: {
@@ -376,7 +376,7 @@ export const notifyData: Record<string, IEventData> = {
       subscription: ISubscriptionEntity,
       user: IUserEntity,
       card: ICardEntity
-    }): ISendTempalatedEmailData => ({
+    }): ISendTemplatedEmailData => ({
       to: user.email,
       templateKey: 'subscriptionCharged',
       subjectStubs: {
