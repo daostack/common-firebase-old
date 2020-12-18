@@ -46,9 +46,10 @@ export const notifyData: Record<string, IEventData> = {
       };
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ({ commonData, userData }) => {
+    email: ({ commonData, userData }) : ISendTemplatedEmailData[] => {
       return [
         {
+          to: userData.email,
           templateKey: 'userCommonCreated',
           emailStubs: {
             userName: getNameString(userData),
@@ -87,7 +88,7 @@ export const notifyData: Record<string, IEventData> = {
       };
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ({ commonData, userData }) => {
+    email: ({ commonData, userData }) : ISendTemplatedEmailData => {
       return {
         to: userData.email,
         templateKey: 'requestToJoinSubmitted',
@@ -139,7 +140,7 @@ export const notifyData: Record<string, IEventData> = {
       };
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ({ commonData, userData }) => {
+    email: ({ commonData, userData }) : ISendTemplatedEmailData => {
       return {
         to: userData.email,
         templateKey: 'userCommonFeatured',
@@ -173,7 +174,7 @@ export const notifyData: Record<string, IEventData> = {
       };
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ({ userData, proposalData, commonData /*paymentData*/ }) => {
+    email: ({ userData, proposalData, commonData /*paymentData*/ }) : ISendTemplatedEmailData[] => {
       return [
         {
           to: userData.email,
@@ -189,14 +190,14 @@ export const notifyData: Record<string, IEventData> = {
           emailStubs: {
             commonName: commonData.name,
             commonLink: Utils.getCommonLink(commonData.id),
-            commonBalance: commonData.balance,
+            commonBalance: (commonData.balance / 100).toLocaleString('en-US', {style: 'currency', currency: 'USD'}),
             commonId: commonData.id,
             proposalId: proposalData.id,
             userName: getNameString(userData),
             userEmail: userData.email,
             userId: userData.uid,
-            fundingAmount: proposalData.fundingRequest.amount,
-            submittedOn: proposalData.createdAt,
+            fundingAmount: (proposalData.fundingRequest.amount / 100).toLocaleString('en-US', {style: 'currency', currency: 'USD'}),
+            submittedOn: proposalData.createdAt.toDate(),
             passedOn: new Date(),
             log: 'Funding request accepted'
           }
@@ -223,7 +224,7 @@ export const notifyData: Record<string, IEventData> = {
       };
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ({ commonData, userData }) => {
+    email: ({ commonData, userData }) : ISendTemplatedEmailData => {
       return {
         to: userData.email,
         templateKey: 'userJoinedSuccess',
@@ -291,7 +292,7 @@ export const notifyData: Record<string, IEventData> = {
       };
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ({ commonData, userData }) => {
+    email: ({ commonData, userData }) : ISendTemplatedEmailData => {
       return {
         to: userData.email,
         templateKey: 'userJoinedButFailedPayment',
@@ -395,7 +396,7 @@ export const notifyData: Record<string, IEventData> = {
 };
 
 export default new class Notification implements INotification {
-  async send(tokens, title, body, image = '', path, options = {
+  async send(tokens = [], title, body, image = '', path, options = {
     contentAvailable: true,
     mutable_content: true,
     priority: 'high'
@@ -413,7 +414,8 @@ export default new class Notification implements INotification {
 
     // @question Ask about this rule "promise/always-return". It is kinda useless so we may disable it globally?
     // eslint-disable-next-line promise/always-return
-    const messageSent: admin.messaging.MessagingDevicesResponse = await messaging.sendToDevice(tokens, payload, options);
+    // sendToDevice cannot have an empty tokens array
+    const messageSent: admin.messaging.MessagingDevicesResponse = tokens.length > 0 && await messaging.sendToDevice(tokens, payload, options);
     logger.info('Send Success', messageSent);
   }
 
@@ -433,7 +435,7 @@ export default new class Notification implements INotification {
       }
     } as admin.messaging.Message;
 
-    logger.info('payload -> ', payload);
+    //console.info('payload -> ', payload);
 
     // @question Ask about this rule "promise/always-return". It is kinda useless so we may disable it globally?
     // eslint-disable-next-line promise/always-return
