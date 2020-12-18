@@ -84,9 +84,7 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
     sessionId: v4(),
     ipAddress: '127.0.0.1'
   });
-
-  console.log('Pament', payment);
-
+  
   if (isSuccessful(payment)) {
     // Add the member to the common
     await addCommonMemberByProposalId(proposal.id);

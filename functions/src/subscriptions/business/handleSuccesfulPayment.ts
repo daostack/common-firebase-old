@@ -63,6 +63,10 @@ export const handleSuccessfulSubscriptionPayment = async (subscription: ISubscri
   // Save the updated data
   await Promise.all([
     commonDb.updateCommon(common),
-    subscriptionDb.update(subscription)
+    subscriptionDb.update(subscription),
+    proposalDb.update({
+      id: subscription.proposalId,
+      paymentState: 'confirmed'
+    })
   ]);
 };

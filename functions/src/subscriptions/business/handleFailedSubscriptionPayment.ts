@@ -3,6 +3,7 @@ import { CommonError } from '../../util/errors';
 import { updateSubscription } from '../database/updateSubscription';
 import { revokeMembership } from './revokeMembership';
 import { IPaymentEntity } from '../../circlepay/payments/types';
+import { proposalDb } from '../../proposals/database';
 
 /**
  * Handles update for the subscription document on payment failure
@@ -39,5 +40,11 @@ export const handleFailedSubscriptionPayment = async (subscription: ISubscriptio
   // Update metadata about the subscription
   subscription.charges = (subscription.charges || 0) + 1;
 
-  await updateSubscription(subscription);
+  await Promise.all([
+    updateSubscription(subscription),
+    await proposalDb.update({
+      id: subscription.proposalId,
+      paymentState: 'failed'
+    })
+  ]);
 };

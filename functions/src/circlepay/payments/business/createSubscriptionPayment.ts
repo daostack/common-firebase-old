@@ -51,9 +51,15 @@ export const createSubscriptionPayment = async (payload: yup.InferType<typeof cr
     payment,
     subscription
   });
+
   // If this is the initial subscription charge
   // update the proposal as well
   if (subscription.charges === 0) {
+    logger.info('Creating initial subscription charge. Marking it as pending', {
+      subscription,
+      payment
+    });
+
     await proposalDb.update({
       id: subscription.proposalId,
       paymentState: 'pending'
@@ -77,11 +83,6 @@ export const createSubscriptionPayment = async (payload: yup.InferType<typeof cr
     });
 
     await handleSuccessfulSubscriptionPayment(subscription);
-
-    await proposalDb.update({
-      id: subscription.proposalId,
-      paymentState: 'confirmed'
-    });
   } else if (isFinalized(payment)) {
     await createEvent({
       type: EVENT_TYPES.SUBSCRIPTION_PAYMENT_FAILED,
@@ -90,11 +91,6 @@ export const createSubscriptionPayment = async (payload: yup.InferType<typeof cr
     });
 
     await handleFailedSubscriptionPayment(subscription, payment);
-
-    await proposalDb.update({
-      id: subscription.proposalId,
-      paymentState: 'failed'
-    });
   } else {
     await createEvent({
       type: EVENT_TYPES.SUBSCRIPTION_PAYMENT_STUCK,
