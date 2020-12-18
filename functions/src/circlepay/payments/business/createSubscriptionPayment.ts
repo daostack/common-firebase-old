@@ -1,14 +1,13 @@
-import { ISubscriptionPayment } from '../types';
-import { v4 } from 'uuid';
-
 import * as yup from 'yup';
+
+import { ISubscriptionPayment } from '../types';
 import { validate } from '../../../util/validate';
 import { subscriptionDb } from '../../../subscriptions/database';
 import { createPayment } from './createPayment';
 import { pollPaymentStatus } from './pollPaymentStatus';
-import { isFinalized, isSuccessful } from '../helpers';
-import { createEvent } from '../../../util/db/eventDbService';
 import { EVENT_TYPES } from '../../../event/event';
+import { createEvent } from '../../../util/db/eventDbService';
+import { isFinalized, isSuccessful } from '../helpers';
 import { handleFailedSubscriptionPayment, handleSuccessfulSubscriptionPayment } from '../../../subscriptions/business';
 import { proposalDb } from '../../../proposals/database';
 

@@ -25,6 +25,8 @@ export const handleFailedSubscriptionPayment = async (subscription: ISubscriptio
   } else if (subscription.status === 'PaymentFailed') {
     subscription.paymentFailures.push(failedPayment);
 
+    await updateSubscription(subscription);
+
     // If there are more than 3 failed payment cancel
     // the subscription (so on the 4th attempt)
     if (subscription.paymentFailures.length > 3) {

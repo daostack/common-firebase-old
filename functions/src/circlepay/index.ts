@@ -17,7 +17,8 @@ import { createBankAccount } from './backAccounts/bussiness/createBankAccount';
 import { createProposalPayout } from './payouts/business/createProposalPayout';
 import { approvePayout } from './payouts/business/approvePayout';
 import { createIndependentPayout } from './payouts/business/createIndependentPayout';
-import { chargeSubscriptions, revokeMemberships } from '../subscriptions/business';
+import { chargeSubscription, chargeSubscriptions, revokeMemberships } from '../subscriptions/business';
+import { subscriptionDb } from '../subscriptions/database';
 
 const runtimeOptions = {
   timeoutSeconds: 540
@@ -189,16 +190,26 @@ circlepay.get('/payouts/approve', async (req, res, next) => {
 });
 
 circlepay.get('/test', async (req, res) => {
-  // await Promise.all([
-  //   chargeSubscriptions(),
-  //   revokeMemberships()
-  // ]);
-  //
-  // res.send('done');
-  const options = await getCircleHeaders();
-  await axios.get(`${circlePayApi}/encryption/public`, options);
+  await Promise.all([
+    chargeSubscriptions(),
+    revokeMemberships()
+  ]);
 
-  res.send('ok');
+  res.send('done');
+})
+
+circlepay.get('/charge/subscription', async (req, res) => {
+  const subscription = await subscriptionDb.get(req.query.id as string);
+
+  try {
+    await chargeSubscription(subscription);
+
+    res.status(200)
+      .send('done');
+  } catch (e) {
+    res.status(500)
+      .send(e);
+  }
 })
 
 export const circlePayCrons = {
@@ -210,6 +221,7 @@ export const circlePayApp = functions
   .https.onRequest(commonApp(circlepay, {
     unauthenticatedRoutes: [
       '/payouts/approve',
+      '/charge/subscription',
       '/test'
     ]
   }));

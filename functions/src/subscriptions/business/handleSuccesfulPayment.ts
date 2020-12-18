@@ -11,8 +11,6 @@ import { ISubscriptionEntity } from '../types';
 import { subscriptionDb } from '../database';
 import { proposalDb } from '../../proposals/database';
 import { commonDb } from '../../common/database';
-import { createEvent } from '../../util/db/eventDbService';
-import { EVENT_TYPES } from '../../event/event';
 
 
 /**
