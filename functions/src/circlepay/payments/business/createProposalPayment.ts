@@ -80,6 +80,7 @@ export const createProposalPayment = async (payload: yup.InferType<typeof create
   // Attach the payment to the proposal
   await proposalDb.update({
     ...proposal,
+    paymentState: 'pending',
     join: {
       ...proposal.join,
       payments: [
@@ -112,6 +113,14 @@ export const createProposalPayment = async (payload: yup.InferType<typeof create
     userId: payment.userId
   });
 
+
+  // Update the payment status
+  await proposalDb.update({
+    ...proposal,
+    paymentState: payment.status === 'paid'
+      ? 'confirmed'
+      : payment.status
+  });
 
   if (options.throwOnFailure && isFailed(payment)) {
     throw new PaymentError(payment.id, payment.circlePaymentId);

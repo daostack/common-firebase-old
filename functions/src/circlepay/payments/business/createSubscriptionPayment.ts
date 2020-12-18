@@ -7,9 +7,10 @@ import { subscriptionDb } from '../../../subscriptions/database';
 import { createPayment } from './createPayment';
 import { pollPaymentStatus } from './pollPaymentStatus';
 import { isFinalized, isSuccessful } from '../helpers';
-import { handleFailedPayment, handleSuccessfulSubscriptionPayment } from '../../../subscriptions/business';
 import { createEvent } from '../../../util/db/eventDbService';
 import { EVENT_TYPES } from '../../../event/event';
+import { handleFailedSubscriptionPayment, handleSuccessfulSubscriptionPayment } from '../../../subscriptions/business';
+import { proposalDb } from '../../../proposals/database';
 
 const createSubscriptionPaymentValidationSchema = yup.object({
   subscriptionId: yup.string()
@@ -50,6 +51,14 @@ export const createSubscriptionPayment = async (payload: yup.InferType<typeof cr
     payment,
     subscription
   });
+  // If this is the initial subscription charge
+  // update the proposal as well
+  if (subscription.charges === 0) {
+    await proposalDb.update({
+      id: subscription.proposalId,
+      paymentState: 'pending'
+    });
+  }
 
   // Poll the payment
   payment = await pollPaymentStatus(payment);
@@ -68,6 +77,11 @@ export const createSubscriptionPayment = async (payload: yup.InferType<typeof cr
     });
 
     await handleSuccessfulSubscriptionPayment(subscription);
+
+    await proposalDb.update({
+      id: subscription.proposalId,
+      paymentState: 'confirmed'
+    });
   } else if (isFinalized(payment)) {
     await createEvent({
       type: EVENT_TYPES.SUBSCRIPTION_PAYMENT_FAILED,
@@ -75,7 +89,12 @@ export const createSubscriptionPayment = async (payload: yup.InferType<typeof cr
       userId: payment.userId
     });
 
-    await handleFailedPayment(subscription, payment);
+    await handleFailedSubscriptionPayment(subscription, payment);
+
+    await proposalDb.update({
+      id: subscription.proposalId,
+      paymentState: 'failed'
+    });
   } else {
     await createEvent({
       type: EVENT_TYPES.SUBSCRIPTION_PAYMENT_STUCK,
