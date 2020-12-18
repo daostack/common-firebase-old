@@ -45,8 +45,20 @@ export const createSubscriptionPayment = async (payload: yup.InferType<typeof cr
     objectId: subscription.id
   });
 
+
+  logger.info(`Starting polling subscription payment with ID ${payment.id}`, {
+    payment,
+    subscription
+  });
+
   // Poll the payment
   payment = await pollPaymentStatus(payment);
+
+  logger.info(`Polling finished for subscription payment with ID ${payment.id} with status ${payment.status}`, {
+    payment,
+    subscription
+  });
+
 
   if (isSuccessful(payment)) {
     await createEvent({
@@ -71,7 +83,7 @@ export const createSubscriptionPayment = async (payload: yup.InferType<typeof cr
       userId: payment.userId
     });
 
-    logger.warn('Payment is not in finalized or successful state after polling {payment}', payment);
+    logger.warn('Payment is not in finalized or successful state after polling', { payment });
   }
 
   return payment as ISubscriptionPayment;

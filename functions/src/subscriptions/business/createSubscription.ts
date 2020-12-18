@@ -85,13 +85,15 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
     ipAddress: '127.0.0.1'
   });
 
-  if(isSuccessful(payment)) {
+  console.log('Pament', payment);
+
+  if (isSuccessful(payment)) {
     // Add the member to the common
     await addCommonMemberByProposalId(proposal.id);
-  } else if (!isFinalized(payment)){
-    // Delete the subscription
-    // await subscriptionDb.delete(subscription.id);
-    logger.warn('Initial subscription payment for subscription failed!', { subscription, payment })
+  } else if (!isFinalized(payment)) {
+    logger.warn('Initial subscription payment for subscription failed!', { subscription, payment });
+
+    await subscriptionDb.delete(subscription.id);
   }
 
   return subscription;

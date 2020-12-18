@@ -40,18 +40,24 @@ export const chargeSubscriptions = async (): Promise<void> => {
     if (subscriptionEntity.status === 'Active' || subscriptionEntity.status === 'PaymentFailed') {
       // eslint-disable-next-line no-loop-func
       promiseArr.push((async () => {
-        logger.info(`Charging subscription (${subscriptionEntity.id}) with $${subscriptionEntity.amount}`);
-        logger.debug(`Charging subscription`, subscriptionEntity);
+        logger.info(`Charging subscription (${subscriptionEntity.id}) with $${subscriptionEntity.amount}`, {
+          subscription: subscriptionEntity,
+          date: new Date()
+        });
 
         // Add try/catch so that if one charge fails
         // the others won't be canceled because of it
         try {
           await chargeSubscription(subscriptionEntity);
 
-          logger.info(`Charged subscription (${subscriptionEntity.id}) with $${subscriptionEntity.amount}`);
-          logger.debug(`Charged subscription`, subscriptionEntity);
+          logger.info(`Charged subscription (${subscriptionEntity.id}) with $${subscriptionEntity.amount}`, {
+            subscription: subscriptionEntity,
+            date: new Date()
+          });
         } catch (e) {
-          logger.warn('Error occurred while trying to charge subscription', e);
+          logger.warn('Error occurred while trying to charge subscription', {
+            error: e
+          });
         }
       })());
     } else {

@@ -89,8 +89,16 @@ export const createProposalPayment = async (payload: yup.InferType<typeof create
     }
   });
 
+  logger.info(`Starting polling payment with ID ${payment.id}`, {
+    payment
+  });
+
   // Poll the payment
   payment = await pollPaymentStatus(payment);
+
+  logger.info(`Polling finished for payment with ID ${payment.id} with status ${payment.status}`, {
+    payment
+  });
 
   await createEvent({
     type: payment.status === 'failed'

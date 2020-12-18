@@ -19,6 +19,11 @@ export const removeCommonMember = async (common: ICommonEntity, memberId: string
     });
   }
 
+  logger.info('Removing common member', {
+    common,
+    member: memberId
+  });
+
   // Remove the member
   common.members.splice(
     common.members.findIndex(x => x.userId === memberId),
@@ -33,5 +38,5 @@ export const removeCommonMember = async (common: ICommonEntity, memberId: string
     userId: memberId,
     objectId: common.id,
     type: EVENT_TYPES.COMMON_MEMBER_REMOVED
-  })
+  });
 };
