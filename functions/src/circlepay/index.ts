@@ -17,6 +17,8 @@ import { createBankAccount } from './backAccounts/bussiness/createBankAccount';
 import { createProposalPayout } from './payouts/business/createProposalPayout';
 import { approvePayout } from './payouts/business/approvePayout';
 import { createIndependentPayout } from './payouts/business/createIndependentPayout';
+import { chargeSubscription, chargeSubscriptions, revokeMemberships } from '../subscriptions/business';
+import { subscriptionDb } from '../subscriptions/database';
 
 const runtimeOptions = {
   timeoutSeconds: 540
@@ -57,6 +59,7 @@ circlepay.post('/create-card', async (req, res, next) => {
 circlepay.get('/encryption', async (req, res, next) => {
   await responseExecutor(
     async () => {
+
       const options = await getCircleHeaders();
       const response = await externalRequestExecutor(async () => {
         return await axios.get(`${circlePayApi}/encryption/public`, options);
@@ -147,7 +150,7 @@ circlepay.post('/wires/create', async (req, res, next) => {
 
     return {
       id: data.id
-    }
+    };
   }, {
     req,
     res,
@@ -160,10 +163,26 @@ circlepay.post('/wires/create', async (req, res, next) => {
 
 circlepay.post('/payouts/create', async (req, res, next) => {
   await responseExecutor(async () => {
-    if(req.body.type === 'proposal') {
-      await createProposalPayout(req.body);
-    } else if(req.body.type === 'independent') {
-      await createIndependentPayout(req.body)
+    if (req.body.wire) {
+      const bankAccount = await createBankAccount(req.body.wire);
+
+      if (req.body.payout.type === 'proposal') {
+        await createProposalPayout({
+          ...req.body.payout,
+          bankAccountId: bankAccount.id
+        });
+      } else if (req.body.payout.type === 'independent') {
+        await createIndependentPayout({
+          ...req.body.payout,
+          bankAccountId: bankAccount.id
+        });
+      }
+    } else {
+      if (req.body.type === 'proposal') {
+        await createProposalPayout(req.body);
+      } else if (req.body.type === 'independent') {
+        await createIndependentPayout(req.body);
+      }
     }
   }, {
     req,
@@ -186,14 +205,39 @@ circlepay.get('/payouts/approve', async (req, res, next) => {
   });
 });
 
+circlepay.get('/test', async (req, res) => {
+  await Promise.all([
+    chargeSubscriptions(),
+    revokeMemberships()
+  ]);
+
+  res.send('done');
+})
+
+circlepay.get('/charge/subscription', async (req, res) => {
+  const subscription = await subscriptionDb.get(req.query.id as string);
+
+  try {
+    await chargeSubscription(subscription);
+
+    res.status(200)
+      .send('done');
+  } catch (e) {
+    res.status(500)
+      .send(e);
+  }
+})
+
 export const circlePayCrons = {
   ...payoutCrons
-}
+};
 
 export const circlePayApp = functions
   .runWith(runtimeOptions)
   .https.onRequest(commonApp(circlepay, {
     unauthenticatedRoutes: [
-      '/payouts/approve'
+      '/payouts/approve',
+      '/charge/subscription',
+      '/test'
     ]
   }));
