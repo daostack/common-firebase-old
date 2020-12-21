@@ -3,42 +3,44 @@ import { PaymentsCollection, ProposalsCollection, CommonCollection, UsersCollect
 export async function getPayin():Promise<any> {
 
     const paymentsQuery: any = PaymentsCollection;
-    paymentsQuery.orderBy("creationDate", "asc").where("status", "==", "confirmed")
+    paymentsQuery.orderBy("createdAt", "asc").where("status", "==", "confirmed");
 
     
     const payments = (await paymentsQuery.get()).docs
     .map(payment => payment.data()) || [];
 
+
     let key = 0;
+    const payInCollection = {}
 
     for (const property in payments) {
 
         const payment = payments[property];
 
-        if(!payment.proposalId) continue;
-        
+        if(!payment.objectId) continue;
+
+
         const proposalsQuery: any = ProposalsCollection;
         proposalsQuery.orderBy("createdAt", "asc")
 
         // eslint-disable-next-line no-await-in-loop
-        const proposal = (await proposalsQuery.doc(payment.proposalId).get())
+        const proposal = (await proposalsQuery.doc(payment.objectId).get())
         const proposalData = proposal.data()
-        if(proposalData){
-            payments[key] = { payment: payment, proposal: proposalData}
-        }
 
         if(proposalData){
+            payInCollection[key] = { payment: payment, proposal: proposalData}
+    
+
             const commonQuery: any = CommonCollection;
 
             //eslint-disable-next-line no-await-in-loop
             const dao = await commonQuery.doc(proposalData.commonId).get()
             const daoData = dao.data()
             if(daoData){
-                payments[key] = {...payments[key], common: daoData}
+                payInCollection[key] = {...payInCollection[key], common: daoData}
             }
-        }
+        
 
-        if(proposalData){
             const usersQuery: any = UsersCollection;
             usersQuery.orderBy("createdAt", "asc")
 
@@ -47,13 +49,13 @@ export async function getPayin():Promise<any> {
 
             const userData = user.data()
             if(userData){
-                payments[key] = {...payments[key], user: userData}
+                payInCollection[key] = {...payInCollection[key], user: userData}
             }
+        
+        
+            key++;
         }
-            
-        key++;
-
         
     }
-    return payments
+    return payInCollection
 }

@@ -159,16 +159,13 @@ export async function fillPayInSheet():Promise<any> {
             cells.push("")
           }
           
-
           if(data[key].payment){
             cells.push(data[key].payment.id)
             cells.push(data[key].payment.status)
-            cells.push(data[key].payment.amount.amount)
+            cells.push(data[key].payment.amount.amount/100)
             cells.push(data[key].payment.fee/100)
-            const creationDate = data[key].payment.creationDate.split(/\D+/)
-            const updateDate = data[key].payment.updateDate.split(/\D+/)
-            cells.push(new Date(Date.UTC(creationDate[0], --creationDate[1], creationDate[2], creationDate[3], creationDate[4], creationDate[5], creationDate[6])).toDateString())
-            cells.push(new Date(Date.UTC(updateDate[0], --updateDate[1], updateDate[2], updateDate[3], updateDate[4], updateDate[5], updateDate[6])).toDateString())
+            cells.push(new Date(data[key].payment.createdAt.toDate()).toDateString())
+            cells.push(new Date(data[key].payment.updatedAt.toDate()).toDateString())
             
           }
           else{
