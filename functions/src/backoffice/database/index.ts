@@ -20,6 +20,7 @@ export const CommonCollection = db.collection(Collections.Commons)
     }
 });
 
+
 export const PaymentsCollection = db.collection(Collections.Payments)
   .withConverter<IPaymentEntity>({
     fromFirestore(snapshot: FirebaseFirestore.QueryDocumentSnapshot): IPaymentEntity {

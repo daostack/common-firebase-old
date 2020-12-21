@@ -2,12 +2,13 @@ import { PaymentsCollection, ProposalsCollection, CommonCollection, UsersCollect
 
 export async function getPayin():Promise<any> {
 
-    const paymentsQuery: any = PaymentsCollection;
-    paymentsQuery.orderBy("createdAt", "asc").where("status", "==", "confirmed");
 
     
-    const payments = (await paymentsQuery.get()).docs
-    .map(payment => payment.data()) || [];
+    const payments = (await PaymentsCollection
+        .orderBy("createdAt", "asc")
+        .where("status", "==", "confirmed")
+        .get()
+    ).docs.map(p => p.data());
 
 
     let key = 0;

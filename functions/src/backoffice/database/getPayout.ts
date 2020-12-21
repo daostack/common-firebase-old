@@ -2,14 +2,11 @@ import { ProposalsCollection, UsersCollection, CommonCollection, PaymentsCollect
 
 export async function getPayout():Promise<any> {
 
-    const proposalsQuery: any = ProposalsCollection;
+    const proposals: any = (await ProposalsCollection
+        .orderBy("createdAt", "asc")
+        .get()
+    ).docs.map(p => p.data());
 
-    proposalsQuery
-    .orderBy("createdAt", "asc")
-
-
-    const proposals = (await proposalsQuery.get()).docs
-    .map(payment => payment.data()) || [];
 
 
     const filterProposals = {};
