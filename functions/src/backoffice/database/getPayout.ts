@@ -9,7 +9,7 @@ export async function getPayout():Promise<any> {
 
 
 
-    const filterProposals = {};
+    const payOutCollection = {};
     let key = 0;
     for (const property in proposals) {
 
@@ -21,7 +21,7 @@ export async function getPayout():Promise<any> {
         if(proposal.type !== "fundingRequest") continue;
         if(!proposal.proposerId) continue;
 
-        filterProposals[key] = { proposal: proposal}
+        payOutCollection[key] = { proposal: proposal}
 
         const usersQuery: any = UsersCollection;
 
@@ -29,7 +29,7 @@ export async function getPayout():Promise<any> {
         const user = await usersQuery.doc(proposal.proposerId).get()
         const userData = user.data()
         if(userData){
-            filterProposals[key] = {...filterProposals[key], user: userData}
+            payOutCollection[key] = {...payOutCollection[key], user: userData}
         }
 
         const commonsQuery: any = CommonCollection;
@@ -37,7 +37,7 @@ export async function getPayout():Promise<any> {
         const dao = await commonsQuery.doc(proposal.commonId).get()
         const daoData = dao.data()
         if(daoData){
-            filterProposals[key] = {...filterProposals[key], common: daoData}
+            payOutCollection[key] = {...payOutCollection[key], common: daoData}
         }
 
         const paymentsQuery: any = PaymentsCollection;
@@ -47,12 +47,12 @@ export async function getPayout():Promise<any> {
 
         if(!payment.empty){
             const paymentData = payment.docs[0].data();
-            filterProposals[key] = {...filterProposals[key], payment: paymentData}
+            payOutCollection[key] = {...payOutCollection[key], payment: paymentData}
         }
         
         key++;
     }
     
 
-    return filterProposals
+    return payOutCollection
 }
