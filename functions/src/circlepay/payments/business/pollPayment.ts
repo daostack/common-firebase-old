@@ -1,17 +1,17 @@
 import axios from 'axios';
 
-import { externalRequestExecutor, poll } from '../../../util';
-import { CirclePaymentStatus } from '../../../util/types';
+import { db, externalRequestExecutor, poll } from '../../../util';
 import { ArgumentError, CommonError } from '../../../util/errors';
-import { circlePayApi } from '../../../settings';
 import { createEvent } from '../../../util/db/eventDbService';
 import { EVENT_TYPES } from '../../../event/event';
+import { circlePayApi } from '../../../settings';
 import { ErrorCodes } from '../../../constants';
 
+import { getCircleHeaders } from '../../index';
 import { ICirclePayment } from '../../types';
 import { IPaymentEntity } from '../types';
 import { paymentDb } from '../database';
-import { getCircleHeaders } from '../../index';
+import { failureHelper, feesHelper } from '../helpers';
 
 interface IPollPaymentOptions {
   interval?: number;
@@ -40,10 +40,10 @@ const defaultPaymentOptions: IPollPaymentOptions = {
 /**
  * Polls payment until the payment reaches desired state
  *
- * @param payment
- * @param pollPaymentOptions
+ * @param payment - The entity of the payment we want to poll
+ * @param pollPaymentOptions - *Optional* options for the polling
  */
-export const pollPaymentStatus = async (payment: IPaymentEntity, pollPaymentOptions?: IPollPaymentOptions): Promise<IPaymentEntity> => {
+export const pollPayment = async (payment: IPaymentEntity, pollPaymentOptions?: IPollPaymentOptions): Promise<IPaymentEntity> => {
   if (!payment) {
     throw new ArgumentError('payment', payment);
   }
@@ -54,31 +54,52 @@ export const pollPaymentStatus = async (payment: IPaymentEntity, pollPaymentOpti
     ...pollPaymentOptions
   };
 
-  const pollFn = async (): Promise<CirclePaymentStatus> => {
-    const response = await externalRequestExecutor<ICirclePayment>(async () => {
+  const pollFn = async (): Promise<ICirclePayment> => {
+    return externalRequestExecutor<ICirclePayment>(async () => {
       return (await axios.get<ICirclePayment>(`${circlePayApi}/payments/${payment.circlePaymentId}`, headers)).data;
     }, {
       errorCode: ErrorCodes.CirclePayError,
       message: 'Polling circle call failed'
     });
-
-    return response.data.status;
   };
 
-  const validateFn = (status: CirclePaymentStatus): boolean => {
-    return options.desiredStatus.some(s => s === status);
+  const validateFn = (payment: ICirclePayment): boolean => {
+    return options.desiredStatus.some(s => s === payment.data.status);
   };
 
-  const status = await poll<CirclePaymentStatus>(pollFn, validateFn, options.interval, options.maxRetries);
+  const circlePaymentObj = await poll<ICirclePayment>(pollFn, validateFn, options.interval, options.maxRetries);
 
-  // Update payment
-  payment = await paymentDb.update({
-    ...payment,
+  await db.collection('test').add(circlePaymentObj);
 
-    status
-  });
+  let updatedPaymentObj: IPaymentEntity;
 
-  if (options.throwOnPaymentFailed && payment.status === 'failed') {
+  switch (circlePaymentObj.data.status) {
+    case 'failed':
+      updatedPaymentObj = {
+        ...payment,
+
+        status: circlePaymentObj.data.status,
+        failure: failureHelper.processFailedPayment(circlePaymentObj)
+      };
+
+      break;
+    case 'confirmed':
+    case 'paid':
+      updatedPaymentObj = {
+        ...payment,
+
+        status: circlePaymentObj.data.status,
+        fees: feesHelper.processCircleFee(circlePaymentObj)
+      }
+
+      break;
+    default:
+
+  }
+
+  updatedPaymentObj = await paymentDb.update(updatedPaymentObj);
+
+  if (options.throwOnPaymentFailed && updatedPaymentObj.status === 'failed') {
     await createEvent({
       type: EVENT_TYPES.PAYMENT_FAILED,
       objectId: payment.id,
@@ -89,5 +110,5 @@ export const pollPaymentStatus = async (payment: IPaymentEntity, pollPaymentOpti
   }
 
   // Return the updated payment
-  return payment;
+  return updatedPaymentObj;
 };
