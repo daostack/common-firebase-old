@@ -205,10 +205,10 @@ export const notifyData: Record<string, IEventData> = {
       ];
     }
   },
-  [EVENT_TYPES.REQUEST_TO_JOIN_ACCEPTED]: {
+  [EVENT_TYPES.REQUEST_TO_JOIN_EXECUTED]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    data: async (objectId: string) => {
-      const proposalData = (await proposalDb.getProposal(objectId));
+    data: async (proposalId: string) => {
+      const proposalData = (await proposalDb.getProposal(proposalId));
       return {
         commonData: (await commonDb.getCommon(proposalData.commonId)),
         userData: (await getUserById(proposalData.proposerId)).data()
