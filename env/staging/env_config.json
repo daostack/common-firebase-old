@@ -12,11 +12,11 @@
   },
   "durations": {
     "funding": {
-      "countdownPeriod": 86400,
-      "quietEndingPeriod": 3600
+      "countdownPeriod": 259200,
+      "quietEndingPeriod": 10800
     },
     "join": {
-      "countdownPeriod": 7200,
+      "countdownPeriod": 57600,
       "quietEndingPeriod": 3600
     }
   },
@@ -29,5 +29,8 @@
     "approvers": ["alexander2001ivanov@gmail.com", "enrico@piramid.studio", "jelle@daostack.io"],
     "neededApprovals": 1
   },
-  "local": "http://localhost:5003/common-staging-50741/us-central1"
+  "local": "http://localhost:5003/common-staging-50741/us-central1",
+  "backoffice":{
+    "sheetUrl": "1muC-dGhS_MOEZYKSTNyMthG1NHlo8-4mlb_K5ExD7QM"
+  }
 }
