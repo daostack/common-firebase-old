@@ -2,7 +2,7 @@ import { IPaymentEntity } from '../types';
 import { ICirclePayment } from '../../types';
 import { failureHelper, feesHelper } from '../helpers';
 import { paymentDb } from '../database';
-import { CommonError, NotImplementedError } from '../../../util/errors';
+import { CommonError } from '../../../util/errors';
 
 /**
  * Handles update from circle and saves it to the database

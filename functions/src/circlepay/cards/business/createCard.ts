@@ -4,7 +4,7 @@ import * as yup from 'yup';
 import { ErrorCodes } from '../../../constants';
 import { circlePayApi } from '../../../settings';
 import { validate } from '../../../util/validate';
-import { db, externalRequestExecutor } from '../../../util';
+import { externalRequestExecutor } from '../../../util';
 import { billingDetailsValidationSchema } from '../../../util/schemas';
 
 import { ICircleCreateCardPayload, ICircleCreateCardResponse } from '../../types';

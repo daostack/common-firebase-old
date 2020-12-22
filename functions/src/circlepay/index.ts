@@ -19,7 +19,6 @@ import { approvePayout } from './payouts/business/approvePayout';
 import { createIndependentPayout } from './payouts/business/createIndependentPayout';
 import { chargeSubscription, chargeSubscriptions, revokeMemberships } from '../subscriptions/business';
 import { subscriptionDb } from '../subscriptions/database';
-import { updatePayment } from './payments/business/updatePayment';
 import { updatePaymentFromCircle } from './payments/business/updatePaymentFromCircle';
 
 const runtimeOptions = {

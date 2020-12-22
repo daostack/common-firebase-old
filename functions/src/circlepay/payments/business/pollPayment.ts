@@ -1,17 +1,13 @@
 import axios from 'axios';
 
-import { db, externalRequestExecutor, poll } from '../../../util';
+import { externalRequestExecutor, poll } from '../../../util';
 import { ArgumentError, CommonError } from '../../../util/errors';
-import { createEvent } from '../../../util/db/eventDbService';
-import { EVENT_TYPES } from '../../../event/event';
 import { circlePayApi } from '../../../settings';
 import { ErrorCodes } from '../../../constants';
 
 import { getCircleHeaders } from '../../index';
 import { ICirclePayment } from '../../types';
 import { IPaymentEntity } from '../types';
-import { paymentDb } from '../database';
-import { failureHelper, feesHelper } from '../helpers';
 import { updatePayment } from './updatePayment';
 
 interface IPollPaymentOptions {
