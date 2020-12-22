@@ -105,7 +105,7 @@ export async function fillPayInSheet():Promise<any> {
           if(data[key].proposal){
             cells.push(data[key].proposal.id)
             cells.push(data[key].proposal.join.funding/100)
-            cells.push("data[key].proposal.description.title")
+            cells.push(data[key].proposal.description.title)
             cells.push(`${date(new Date(data[key].proposal.createdAt.toDate()))}`)
             cells.push(`${date(new Date(data[key].proposal.updatedAt.toDate()))}`)
             cells.push(data[key].proposal.proposerId)
