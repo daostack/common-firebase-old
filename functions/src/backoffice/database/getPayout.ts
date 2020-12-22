@@ -39,16 +39,6 @@ export async function getPayout():Promise<any> {
         if(daoData){
             payOutCollection[key] = {...payOutCollection[key], common: daoData}
         }
-
-        const paymentsQuery: any = PaymentsCollection;
-
-        // eslint-disable-next-line no-await-in-loop
-        const payment = await paymentsQuery.where("proposalId", "==", proposal.id).limit(1).get()
-
-        if(!payment.empty){
-            const paymentData = payment.docs[0].data();
-            payOutCollection[key] = {...payOutCollection[key], payment: paymentData}
-        }
         
         key++;
     }
