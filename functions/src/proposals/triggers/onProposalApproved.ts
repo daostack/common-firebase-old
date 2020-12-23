@@ -57,7 +57,6 @@ export const onProposalApproved = functions.firestore
 
           // Add the user as member
           await addCommonMemberByProposalId(proposal.id);
-
         }
       }
     }
