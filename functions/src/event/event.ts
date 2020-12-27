@@ -5,9 +5,10 @@ import { getAllUsers } from '../util/db/userDbService';
 import { subscriptionDb } from '../subscriptions/database';
 import { paymentDb } from '../circlepay/payments/database';
 import { ISubscriptionPayment } from '../circlepay/payments/types';
-
 import { discussionDb } from '../discussion/database';
 import { discussionMessageDb } from '../discussionMessage/database';
+import { IDiscussionMessage } from '../discussionMessage/types';
+import { Notifications } from '../constants';
 
 interface IEventData {
   eventObject: (eventObjId: string) => any;
@@ -21,34 +22,53 @@ interface IEventData {
  * 
  * @param  discussionOwner        - owner of the discussion/proposal
  * @param  discussionId           - id of the discussion/proposal
- * @param  discussionMessageOwner - onwer of the last message that triggered this notification
  * @return userFilter             - array of users that should be notified about this comment
  */
-const limitRecipients = async (discussionOwner: string, discussionId: string) : Promise<string[]> => {
-    // get messages from db in a descending order
-    const discussionMessages = await discussionMessageDb.getAllMessagesOfDiscussion(discussionId);
-    const users = discussionMessages.map((message) => message.ownerId);
-    
-    // when this is the first comment, users will be empty, discussionOwner should get this notification, 
-    users.push(discussionOwner);
-    
-    const userFilter = [];
-    const discussionMessageOwner = users[0]; // this is the user that just commented that created this notification
+const limitRecipients = async (discussionOwner: string, discussionId: string) : Promise<string[]> => {   
+    let users = [], lastDoc = null, didBreak = false; 
+    const userFilter = []
 
-    for (let i = 1, limitCounter = 0; i < users.length && limitCounter < 5; i++) {
-        if (discussionMessageOwner === users[1]) {
-            // don't notify any users, this is a consecutive comment of the same user
-            break;
-        }
-        if (!userFilter.includes(users[i]) && users[i] !== discussionMessageOwner) {
-            userFilter.push(users[i]);
-        }
-        // increment counter for each messageOwner in users, including duplicates, but excluding consecutive duplicates 
-        if (users[i] !== users[i - 1]) {
-            limitCounter ++;
-        }
-    }
+    do {
+      // eslint-disable-next-line no-await-in-loop
+      const messages = await discussionMessageDb.getDiscussionMessagsSnapshot(discussionId, Notifications.messageLimit, lastDoc);
+      // the last doc from which to start counting the next batch of messages
+      lastDoc = messages[messages.length - 1];
+      users = messages.map(message => (message.data() as IDiscussionMessage).ownerId);
+      // when this is the first comment, users will be empty, discussionOwner should get this notification, 
+      users.push(discussionOwner);
+      didBreak = handleUserFilter(users, userFilter);
+
+    } while (userFilter.length < Notifications.maxNotifications
+        && users.length === Notifications.messageLimit + 1
+        && !didBreak);
+
     return userFilter;
+}
+
+/**
+ * [handleUserFilter description]
+ * @param userIDs         - IDs of the owners of the last X messages
+ * @param userFilter      - the array of userId of the users that need to recieve the notification
+ * @return                - true: the loop got to break; in this scenario we want to stop the loop in 'limitRecipients' as well
+ *                          false: when we didn't hit 'break' and we need 'limitRecipients' to keep running
+ */
+const handleUserFilter = (userIDs: string[], userFilter: string[]) : boolean => {
+    //const userFilter = [];
+    const discussionMessageOwner = userIDs[0];
+    for (let i = 1, limitCounter = 0; i < userIDs.length && limitCounter < 5; i++) {
+      if (discussionMessageOwner === userIDs[1]) {
+          // don't notify any users, this is a consecutive comment of the same user
+          return true;
+      }
+      if (!userFilter.includes(userIDs[i]) && userIDs[i] !== discussionMessageOwner) {
+          userFilter.push(userIDs[i]);
+      }
+      // increment counter for each messageOwner in users, including duplicates, but excluding consecutive duplicates 
+      if (userIDs[i] !== userIDs[i - 1]) {
+          limitCounter ++;
+      }
+  }
+  return false;
 }
 
 // excluding event owner (message creator, etc) from userFilter so she wouldn't get notified

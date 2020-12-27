@@ -98,5 +98,6 @@ export const ProposalFinalStates = [
 // ---- Reexports
 export { runtimeOptions } from './runtimeOptions';
 export { Collections } from './collections';
+export { Notifications } from './notifications';
 
 export { adminKeys };
