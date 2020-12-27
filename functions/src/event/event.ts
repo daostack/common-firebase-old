@@ -24,9 +24,9 @@ interface IEventData {
  * @param  discussionId           - id of the discussion/proposal
  * @return userFilter             - array of users that should be notified about this comment
  */
-const limitRecipients = async (discussionOwner: string, discussionId: string) : Promise<string[]> => {   
-    let users = [], lastDoc = null, didBreak = false; 
-    const userFilter = []
+const limitRecipients = async (discussionOwner: string, discussionId: string, discussionMessageOwner: string) : Promise<string[]> => {   
+    let users = [], lastDoc = null, didBreak = false;
+    const userFilter = [];
 
     do {
       // eslint-disable-next-line no-await-in-loop
@@ -34,15 +34,14 @@ const limitRecipients = async (discussionOwner: string, discussionId: string) : 
       // the last doc from which to start counting the next batch of messages
       lastDoc = messages[messages.length - 1];
       users = messages.map(message => (message.data() as IDiscussionMessage).ownerId);
-      // when this is the first comment, users will be empty, discussionOwner should get this notification, 
-      users.push(discussionOwner);
+      // when this is the first comment, users will be empty, discussionOwner should get this notification, if we get here after a few baches, it's fine
+      messages.length < Notifications.messageLimit && users.push(discussionOwner);
       didBreak = handleUserFilter(users, userFilter);
-
-    } while (userFilter.length < Notifications.maxNotifications
-        && users.length === Notifications.messageLimit + 1
+    } while (userFilter.length <= Notifications.maxNotifications
+        && users.length >= Notifications.messageLimit
         && !didBreak);
 
-    return userFilter;
+    return excludeOwner(userFilter, discussionMessageOwner);
 }
 
 /**
@@ -53,19 +52,19 @@ const limitRecipients = async (discussionOwner: string, discussionId: string) : 
  *                          false: when we didn't hit 'break' and we need 'limitRecipients' to keep running
  */
 const handleUserFilter = (userIDs: string[], userFilter: string[]) : boolean => {
-    //const userFilter = [];
     const discussionMessageOwner = userIDs[0];
-    for (let i = 1, limitCounter = 0; i < userIDs.length && limitCounter < 5; i++) {
-      if (discussionMessageOwner === userIDs[1]) {
-          // don't notify any users, this is a consecutive comment of the same user
-          return true;
+    for (let i = 1, limitCounter = userFilter.length; i < userIDs.length && limitCounter <= Notifications.maxNotifications; i++) {
+      if (discussionMessageOwner === userIDs[1] && limitCounter === 0) {
+        // don't notify any users, this is a consecutive comment of the same user
+        return true;
       }
-      if (!userFilter.includes(userIDs[i]) && userIDs[i] !== discussionMessageOwner) {
+      if (!userFilter.includes(userIDs[i])
+          && userIDs[i] !== discussionMessageOwner) {
           userFilter.push(userIDs[i]);
       }
       // increment counter for each messageOwner in users, including duplicates, but excluding consecutive duplicates 
       if (userIDs[i] !== userIDs[i - 1]) {
-          limitCounter ++;
+        limitCounter ++;
       }
   }
   return false;
@@ -183,7 +182,7 @@ export const eventData: Record<string, IEventData> = {
                 || (await proposalDb.getProposal(discussionId));
 
             const discussionOwner = discussion.proposerId || discussion.ownerId;
-            return await limitRecipients(discussionOwner, discussionId);
+            return await limitRecipients(discussionOwner, discussionId, discussionMessage.ownerId);
         }
   },
   [EVENT_TYPES.COMMON_WHITELISTED]: {
