@@ -36,7 +36,7 @@ const memberAddedNotification = (commonData) => ({
     path: `CommonProfile/${commonData.id}`
   });
 
-const getTemplate = (country: string, amount) => {
+const getTemplate = (country: string, amount: number) => {
   if (amount) {
     return !country
         ? 'userFundingRequestAcceptedUnknown'
@@ -45,7 +45,6 @@ const getTemplate = (country: string, amount) => {
             : 'userFundingRequestAcceptedForeign')
   }
   return 'userFundingRequestAcceptedZeroAmount'
-      
 }
 
 interface IEventData {
@@ -175,12 +174,12 @@ export const notifyData: Record<string, IEventData> = {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
       const proposalData = (await proposalDb.getProposal(objectId));
+      const cards = (await cardDb.getMany({ownerId: proposalData.proposerId}));
       return {
         proposalData,
         commonData: (await commonDb.getCommon(proposalData.commonId)),
-        userData: (await getUserById(proposalData.proposerId)).data()
-        //paymentData: (await Utils.getPaymentByProposalId(proposalData.id))?.data() //@question funding request has no
-        // payment though
+        userData: (await getUserById(proposalData.proposerId)).data(),
+        cardMetadata: cards[0]?.metadata // getting the first card, but we need a way to know the user's most recent and active card
       };
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -193,8 +192,8 @@ export const notifyData: Record<string, IEventData> = {
       };
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ({ userData, proposalData, commonData}) : ISendTemplatedEmailData[] => {
-      const userTemplate = getTemplate(userData.country, proposalData.fundingRequest.amount)
+    email: ({ userData, proposalData, commonData, cardMetadata}) : ISendTemplatedEmailData[] => {
+      const userTemplate = getTemplate(cardMetadata?.billingDetails?.country, proposalData.fundingRequest.amount);
       return [
         {
           to: userData.email,
