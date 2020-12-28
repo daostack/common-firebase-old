@@ -30,8 +30,8 @@ export const getCircleHeaders = async (): Promise<any> => (
   getSecret(CIRCLEPAY_APIKEY).then((apiKey) => (
     {
       headers: {
-        accept: 'application/json',
-        authorization: `Bearer ${apiKey}`,
+        Accept: 'application/json',
+        Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       }
     })
@@ -83,7 +83,7 @@ circlepay.get('/encryption', async (req, res, next) => {
 circlepay.get('/payments/update', async (req, res, next) => {
   await responseExecutor(async () => {
     logger.notice(`User requested update for payment from circle`, {
-      userId: req.user.uid,
+      userId: req.user?.uid,
       paymentId: req.query.paymentId
     });
 
@@ -223,15 +223,6 @@ circlepay.get('/payouts/approve', async (req, res, next) => {
   });
 });
 
-circlepay.get('/test', async (req, res) => {
-  await Promise.all([
-    chargeSubscriptions(),
-    revokeMemberships()
-  ]);
-
-  res.send('done');
-});
-
 circlepay.get('/charge/subscription', async (req, res) => {
   const subscription = await subscriptionDb.get(req.query.id as string);
 
@@ -254,8 +245,9 @@ export const circlePayApp = functions
   .runWith(runtimeOptions)
   .https.onRequest(commonApp(circlepay, {
     unauthenticatedRoutes: [
+      '/payments/update',
       '/payouts/approve',
       '/charge/subscription',
-      '/test'
+      '/testIP'
     ]
   }));
