@@ -36,6 +36,18 @@ const memberAddedNotification = (commonData) => ({
     path: `CommonProfile/${commonData.id}`
   });
 
+const getTemplate = (country: string, amount) => {
+  if (amount) {
+    return !country
+        ? 'userFundingRequestAcceptedUnknown'
+        : (country === 'IL'
+            ? 'userFundingRequestAcceptedIsraeli'
+            : 'userFundingRequestAcceptedForeign')
+  }
+  return 'userFundingRequestAcceptedZeroAmount'
+      
+}
+
 interface IEventData {
   data: (eventObj: string) => any;
   email?: (notifyData: any) => any;
@@ -181,14 +193,17 @@ export const notifyData: Record<string, IEventData> = {
       };
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ({ userData, proposalData, commonData /*paymentData*/ }) : ISendTemplatedEmailData[] => {
+    email: ({ userData, proposalData, commonData}) : ISendTemplatedEmailData[] => {
+      const userTemplate = getTemplate(userData.country, proposalData.fundingRequest.amount)
       return [
         {
           to: userData.email,
-          templateKey: 'userFundingRequestAccepted',
+          templateKey: userTemplate,
           emailStubs: {
             userName: getNameString(userData),
-            proposal: proposalData.description.title
+            proposal: proposalData.description.title,
+            fundingAmount: (proposalData.fundingRequest.amount / 100).toLocaleString('en-US', {style: 'currency', currency: 'USD'}),
+            commonName: commonData.name
           }
         },
         {
