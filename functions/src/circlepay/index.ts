@@ -181,25 +181,29 @@ circlepay.get('/wires/create', async (req, res, next) => {
 
 circlepay.get('/payouts/create', async (req, res, next) => {
   await responseExecutor(async () => {
-    if (req.body.wire) {
-      const bankAccount = await createBankAccount(req.body.wire);
+    
+    const obj = JSON.parse(JSON.stringify(req.query));
+    const payload = JSON.parse(obj.payload)
 
-      if (req.body.payout.type === 'proposal') {
+    if (payload.wire) {
+      const bankAccount = await createBankAccount(payload.wire);
+
+      if (payload.payout.type === 'proposal') {
         await createProposalPayout({
-          ...req.body.payout,
+          ...payload.payout,
           bankAccountId: bankAccount.id
         });
-      } else if (req.body.payout.type === 'independent') {
+      } else if (payload.payout.type === 'independent') {
         await createIndependentPayout({
-          ...req.body.payout,
+          ...payload.payout,
           bankAccountId: bankAccount.id
         });
       }
     } else {
-      if (req.body.type === 'proposal') {
-        await createProposalPayout(req.body);
-      } else if (req.body.type === 'independent') {
-        await createIndependentPayout(req.body);
+      if (payload.type === 'proposal') {
+        await createProposalPayout(payload);
+      } else if (payload.type === 'independent') {
+        await createIndependentPayout(payload);
       }
     }
   }, {
@@ -256,6 +260,7 @@ export const circlePayApp = functions
     unauthenticatedRoutes: [
       '/payouts/approve',
       '/charge/subscription',
-      '/test'
+      '/test',
+      '/payouts/create'
     ]
   }));
