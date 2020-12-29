@@ -22,6 +22,7 @@ import { approvePayout } from './payouts/business/approvePayout';
 import { createProposalPayout } from './payouts/business/createProposalPayout';
 import { createIndependentPayout } from './payouts/business/createIndependentPayout';
 import { updatePaymentFromCircle } from './payments/business/updatePaymentFromCircle';
+import { updatePayments } from './payments/helpers';
 
 const runtimeOptions = {
   timeoutSeconds: 540
