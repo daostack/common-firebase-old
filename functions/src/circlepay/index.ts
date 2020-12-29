@@ -17,7 +17,7 @@ import { createBankAccount } from './backAccounts/bussiness/createBankAccount';
 import { createProposalPayout } from './payouts/business/createProposalPayout';
 import { approvePayout } from './payouts/business/approvePayout';
 import { createIndependentPayout } from './payouts/business/createIndependentPayout';
-import { chargeSubscription, chargeSubscriptions, revokeMemberships } from '../subscriptions/business';
+import { chargeSubscription } from '../subscriptions/business';
 import { subscriptionDb } from '../subscriptions/database';
 import { updatePaymentFromCircle } from './payments/business/updatePaymentFromCircle';
 
