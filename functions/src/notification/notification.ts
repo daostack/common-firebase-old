@@ -76,8 +76,8 @@ export const notifyData: Record<string, IEventData> = {
             log: 'Successfully created common',
             commonId: commonData.id,
             commonName: commonData.name,
-            description: commonData.metadata.description,
-            about: commonData.metadata.byline,
+            tagline: commonData.metadata.byline,
+            about: commonData.metadata.description,
             paymentType: 'one-time',
             minContribution: commonData.metadata.minFeeToJoin
           }
@@ -362,7 +362,7 @@ export const notifyData: Record<string, IEventData> = {
     data: async (paymentId) => {
       const payment = await paymentDb.get(paymentId);
       const card = await cardDb.get(payment.source.id);
-      const subscription = await subscriptionDb.get(payment.objectId);
+      const subscription = await subscriptionDb.get(payment.subscriptionId);
       const user = await userDb.get(subscription.userId);
       const commonData = subscription.metadata.common;
 
