@@ -20,6 +20,7 @@ import { createIndependentPayout } from './payouts/business/createIndependentPay
 import { chargeSubscription, chargeSubscriptions, revokeMemberships } from '../subscriptions/business';
 import { subscriptionDb } from '../subscriptions/database';
 import { updatePaymentFromCircle } from './payments/business/updatePaymentFromCircle';
+import { updatePaymentsFromCircle } from './payments/business/updatePaymentsFromCircle';
 
 const runtimeOptions = {
   timeoutSeconds: 540
@@ -82,12 +83,20 @@ circlepay.get('/encryption', async (req, res, next) => {
 // ----- Payment Related requests
 circlepay.get('/payments/update', async (req, res, next) => {
   await responseExecutor(async () => {
-    logger.notice(`User requested update for payment from circle`, {
-      userId: req.user.uid,
-      paymentId: req.query.paymentId
-    });
+    if (req.query.paymentId) {
+      logger.notice(`User requested update for payment from circle`, {
+        userId: req.user.uid,
+        paymentId: req.query.paymentId
+      });
 
-    await updatePaymentFromCircle(req.query.paymentId as string);
+      await updatePaymentFromCircle(req.query.paymentId as string);
+    } else {
+      logger.notice('User requested update for all payments from circle', {
+        userId: req.user.uid
+      });
+
+      await updatePaymentsFromCircle();
+    }
   }, {
     req,
     res,
