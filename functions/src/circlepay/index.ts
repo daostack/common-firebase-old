@@ -238,19 +238,6 @@ circlepay.get('/payouts/approve', async (req, res, next) => {
   });
 });
 
-circlepay.get('/test', async (req, res, next) => {
-  await responseExecutor(async () => {
-    const payment = await paymentDb.get(req.query.paymentId as string);
-
-    await updatePaymentStructure(payment);
-  }, {
-    req,
-    res,
-    next,
-    successMessage: 'Success'
-  });
-})
-
 export const circlePayCrons = {
   ...payoutCrons
 };
@@ -259,9 +246,8 @@ export const circlePayApp = functions
   .runWith(runtimeOptions)
   .https.onRequest(commonApp(circlepay, {
     unauthenticatedRoutes: [
-      // '/payments/update',
+      '/payments/update',
       '/payouts/approve',
-      '/testIP',
-      '/test'
+      '/testIP'
     ]
   }));
