@@ -30,8 +30,17 @@ export async function fillPayOutSheet():Promise<any> {
         'Last name',
         'Common id',
         'Common name',
-        'Status'
+        'Init Link',
+        'Payment id',
+        'Payment status',
+        'Payment amount',
+        'Fees',
+        'Payment creation date',
+        'Payment updated',
+
       ]];
+
+      let row = 2;
       for (const key in data) {
           // eslint-disable-next-line no-prototype-builtins
           if (data.hasOwnProperty(key)) {
@@ -46,8 +55,15 @@ export async function fillPayOutSheet():Promise<any> {
               cells.push(data[key].user.lastName)
               cells.push(data[key].common.id)
               cells.push(data[key].common.name)
+              
+              cells.push(`=createInitLink(R${row}:AG${row}, A${row})`);
+
 
               if(data[key].payout){
+                //this is init link, must be empty
+
+                cells.push(data[key].payout.id);
+
                 let status = '';
                 if(!data[key].payout.executed){
                   status = 'initiated';
@@ -66,10 +82,17 @@ export async function fillPayOutSheet():Promise<any> {
                   }
                 }
                 cells.push(status);
+                cells.push(data[key].payout.amount);
+                //this is fees
+                cells.push("");
+                cells.push(date(new Date(data[key].payout.createdAt.toDate())))
+                cells.push(date(new Date(data[key].payout.updatedAt.toDate())))
+
               }
               
               values.push(cells);
           }
+          row++;
       }
       const resource = {
         values,
@@ -163,7 +186,7 @@ export async function fillPayInSheet():Promise<any> {
             cells.push(data[key].payment.id)
             cells.push(data[key].payment.status)
             cells.push(data[key].payment.amount.amount/100)
-            cells.push(data[key].payment.fee/100)
+            cells.push(data[key].payment.fees.amount/100)
             cells.push(`${date(new Date(data[key].payment.createdAt.toDate()))}`)
             cells.push(`${date(new Date(data[key].payment.updatedAt.toDate()))}`)            
           }

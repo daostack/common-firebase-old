@@ -44,7 +44,6 @@ export async function getPayout():Promise<any> {
         //eslint-disable-next-line no-await-in-loop
         const payout = (await payoutsQuery
         .where("proposalId", "==", proposal.id)
-        .where("executed", "==", true)
         .get()).docs.map(p => p.data());
         
         if(payout){

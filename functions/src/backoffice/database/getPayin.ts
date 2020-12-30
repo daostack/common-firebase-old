@@ -18,14 +18,14 @@ export async function getPayin():Promise<any> {
 
         const payment = payments[property];
 
-        if(!payment.objectId) continue;
+        if(!payment.proposalId) continue;
 
 
         const proposalsQuery: any = ProposalsCollection;
         proposalsQuery.orderBy("createdAt", "asc")
 
         // eslint-disable-next-line no-await-in-loop
-        const proposal = (await proposalsQuery.doc(payment.objectId).get())
+        const proposal = (await proposalsQuery.doc(payment.proposalId).get())
         const proposalData = proposal.data()
 
         if(proposalData){
