@@ -5,22 +5,25 @@ import axios from 'axios';
 import * as payoutCrons from './payouts/crons';
 
 import { commonApp, commonRouter, externalRequestExecutor } from '../util';
-import { ICircleNotification } from '../util/types';
 import { responseExecutor } from '../util/responseExecutor';
+import { ICircleNotification } from '../util/types';
 import { CommonError } from '../util/errors';
+import { circlePayApi, getSecret } from '../settings';
+import { ErrorCodes } from '../constants';
+
+
 import { handleNotification } from './notifications/bussiness/handleNotification';
 import { subscribeToNotifications } from './notifications/bussiness/subscribeToNotifications';
-import { circlePayApi, getSecret } from '../settings';
+
 import { createCard } from './cards/business/createCard';
-import { ErrorCodes } from '../constants';
 import { createBankAccount } from './backAccounts/bussiness/createBankAccount';
-import { createProposalPayout } from './payouts/business/createProposalPayout';
+
 import { approvePayout } from './payouts/business/approvePayout';
+import { createProposalPayout } from './payouts/business/createProposalPayout';
 import { createIndependentPayout } from './payouts/business/createIndependentPayout';
-import { chargeSubscription, chargeSubscriptions, revokeMemberships } from '../subscriptions/business';
-import { subscriptionDb } from '../subscriptions/database';
 import { updatePaymentFromCircle } from './payments/business/updatePaymentFromCircle';
 import { updatePaymentsFromCircle } from './payments/business/updatePaymentsFromCircle';
+import { updatePayments } from './payments/helpers';
 
 const runtimeOptions = {
   timeoutSeconds: 540
@@ -31,8 +34,8 @@ export const getCircleHeaders = async (): Promise<any> => (
   getSecret(CIRCLEPAY_APIKEY).then((apiKey) => (
     {
       headers: {
-        accept: 'application/json',
-        authorization: `Bearer ${apiKey}`,
+        Accept: 'application/json',
+        Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       }
     })
@@ -102,6 +105,19 @@ circlepay.get('/payments/update', async (req, res, next) => {
     res,
     next,
     successMessage: 'Payment update succeeded'
+  });
+});
+
+circlepay.get('/payments/upgrade', async (req, res, next) => {
+  await responseExecutor(async () => {
+    logger.notice('Upgrading payment from object ID usage');
+
+    await updatePayments();
+  }, {
+    req,
+    res,
+    next,
+    successMessage: 'Payments updated successfully'
   });
 });
 
@@ -232,29 +248,6 @@ circlepay.get('/payouts/approve', async (req, res, next) => {
   });
 });
 
-circlepay.get('/test', async (req, res) => {
-  await Promise.all([
-    chargeSubscriptions(),
-    revokeMemberships()
-  ]);
-
-  res.send('done');
-});
-
-circlepay.get('/charge/subscription', async (req, res) => {
-  const subscription = await subscriptionDb.get(req.query.id as string);
-
-  try {
-    await chargeSubscription(subscription);
-
-    res.status(200)
-      .send('done');
-  } catch (e) {
-    res.status(500)
-      .send(e);
-  }
-});
-
 export const circlePayCrons = {
   ...payoutCrons
 };
@@ -263,8 +256,8 @@ export const circlePayApp = functions
   .runWith(runtimeOptions)
   .https.onRequest(commonApp(circlepay, {
     unauthenticatedRoutes: [
+      '/payments/update',
       '/payouts/approve',
-      '/charge/subscription',
-      '/test'
+      '/testIP'
     ]
   }));
