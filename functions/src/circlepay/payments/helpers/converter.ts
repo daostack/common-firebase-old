@@ -1,4 +1,3 @@
-import { v4 } from 'uuid';
 import { paymentDb } from '../database';
 import { IPaymentEntity } from '../types';
 
@@ -127,6 +126,8 @@ export const updatePaymentStructure = async (payment: IPaymentEntity | any): Pro
     logger.info('Skipping payment update', {
       payment
     });
+
+    return null;
   }
 };
 

@@ -6,8 +6,6 @@ import { Nullable } from '../../util/types';
 import { ArgumentError } from '../../util/errors';
 import { CommonCollection } from '../../backoffice/database';
 
-const db = admin.firestore();
-
 /**
  * Deletes common. Use carefully. If you want to cleanly delete the
  * common use `deleteCommon` from the common business folder
