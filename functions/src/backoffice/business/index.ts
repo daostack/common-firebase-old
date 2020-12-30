@@ -123,11 +123,12 @@ export async function fillPayInSheet():Promise<any> {
   })
   
   const values = [[
-    "Proposal Id",
-    "Funding",
-    "Proposal title",
-    "Proposal created at",
-    "Proposal updated at",
+    "Payment id",
+    "Payment status",
+    "Payment amount",
+    "Fees",
+    "Payment creation date",
+    "Payment updated",
     "User UID",
     "User email",
     "First name",
@@ -135,53 +136,19 @@ export async function fillPayInSheet():Promise<any> {
     "Common id",
     "Common name",
     "Common information",
-    "Payment id",
-    "Payment status",
-    "Payment amount",
-    "Fees",
-    "Payment creation date",
-    "Payment updated"
+    "Proposal Id",
+    "Funding",
+    "Proposal title",
+    "Proposal created at",
+    "Proposal updated at",
+    
+    
   ]];
   for (const key in data) {
       // eslint-disable-next-line no-prototype-builtins
       if (data.hasOwnProperty(key)) {
           const cells = []
-          if(data[key].proposal){
-            cells.push(data[key].proposal.id)
-            cells.push(data[key].proposal.join.funding/100)
-            cells.push(data[key].proposal.description.title)
-            cells.push(`${date(new Date(data[key].proposal.createdAt.toDate()))}`)
-            cells.push(`${date(new Date(data[key].proposal.updatedAt.toDate()))}`)
-            cells.push(data[key].proposal.proposerId)
-          } else {
-            cells.push("")
-            cells.push("")
-            cells.push("")
-            cells.push("")
-            cells.push("")
-            cells.push("")
-          }
-          
-          if(data[key].user){
-            cells.push(data[key].user.email)
-            cells.push(data[key].user.firstName)
-            cells.push(data[key].user.lastName)
-          } else {
-            cells.push("")
-            cells.push("")
-            cells.push("")
-          }
-          
-          if(data[key].common){
-            cells.push(data[key].common.id)
-            cells.push(data[key].common.name)
-            cells.push(data[key].common.metadata.contributionType)
-          } else {
-            cells.push("")
-            cells.push("")
-            cells.push("")
-          }
-          
+
           if(data[key].payment){
             cells.push(data[key].payment.id)
             cells.push(data[key].payment.status)
@@ -198,6 +165,54 @@ export async function fillPayInSheet():Promise<any> {
             cells.push("")
             cells.push("")
           }
+
+          if(data[key].proposal){
+         
+            cells.push(data[key].proposal.proposerId)
+          } else {
+            cells.push("")
+          }
+
+          if(data[key].user){
+            cells.push(data[key].user.email)
+            cells.push(data[key].user.firstName)
+            cells.push(data[key].user.lastName)
+          } else {
+            cells.push("")
+            cells.push("")
+            cells.push("")
+          }
+
+          if(data[key].common){
+            cells.push(data[key].common.id)
+            cells.push(data[key].common.name)
+            cells.push(data[key].common.metadata.contributionType)
+          } else {
+            cells.push("")
+            cells.push("")
+            cells.push("")
+          }
+
+          if(data[key].proposal){
+            cells.push(data[key].proposal.id)
+            cells.push(data[key].proposal.join.funding/100)
+            cells.push(data[key].proposal.description.title)
+            cells.push(`${date(new Date(data[key].proposal.createdAt.toDate()))}`)
+            cells.push(`${date(new Date(data[key].proposal.updatedAt.toDate()))}`)
+          } else {
+            cells.push("")
+            cells.push("")
+            cells.push("")
+            cells.push("")
+            cells.push("")
+            cells.push("")
+          }
+          
+          
+          
+          
+          
+          
           
           values.push(cells)
       }
