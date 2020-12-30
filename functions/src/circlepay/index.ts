@@ -185,6 +185,7 @@ circlepay.get('/payouts/create', async (req, res, next) => {
     const obj = JSON.parse(JSON.stringify(req.query));
     const payload = JSON.parse(obj.payload)
 
+
     if (payload.wire) {
       const bankAccount = await createBankAccount(payload.wire);
 

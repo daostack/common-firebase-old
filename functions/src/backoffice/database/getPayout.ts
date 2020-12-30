@@ -1,4 +1,4 @@
-import { ProposalsCollection, UsersCollection, CommonCollection, PaymentsCollection } from './index';
+import { ProposalsCollection, UsersCollection, CommonCollection, PayoutsCollection } from './index';
 
 export async function getPayout():Promise<any> {
 
@@ -39,6 +39,22 @@ export async function getPayout():Promise<any> {
         if(daoData){
             payOutCollection[key] = {...payOutCollection[key], common: daoData}
         }
+
+        const payoutsQuery: any = PayoutsCollection;
+        //eslint-disable-next-line no-await-in-loop
+        const payout = (await payoutsQuery
+        .where("proposalId", "==", proposal.id)
+        .where("executed", "==", true)
+        .get()).docs.map(p => p.data());
+        
+        if(payout){
+            const payoutData = payout[0]
+            if(payoutData){
+                payOutCollection[key] = {...payOutCollection[key], payout: payoutData}
+            }
+        }
+        
+        
         
         key++;
     }
