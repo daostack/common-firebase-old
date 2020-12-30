@@ -24,6 +24,8 @@ import { createIndependentPayout } from './payouts/business/createIndependentPay
 import { updatePaymentFromCircle } from './payments/business/updatePaymentFromCircle';
 import { updatePaymentsFromCircle } from './payments/business/updatePaymentsFromCircle';
 import { updatePayments } from './payments/helpers';
+import { paymentDb } from './payments/database';
+import { updatePaymentStructure } from './payments/helpers/converter';
 
 const runtimeOptions = {
   timeoutSeconds: 540
@@ -88,16 +90,17 @@ circlepay.get('/payments/update', async (req, res, next) => {
   await responseExecutor(async () => {
     if (req.query.paymentId) {
       logger.notice(`User requested update for payment from circle`, {
-        userId: req.user.uid,
+        userId: req.user?.uid,
         paymentId: req.query.paymentId
       });
 
       await updatePaymentFromCircle(req.query.paymentId as string);
     } else {
       logger.notice('User requested update for all payments from circle', {
-        userId: req.user.uid
+        userId: req.user?.uid
       });
 
+      await updatePayments();
       await updatePaymentsFromCircle();
     }
   }, {
@@ -105,19 +108,6 @@ circlepay.get('/payments/update', async (req, res, next) => {
     res,
     next,
     successMessage: 'Payment update succeeded'
-  });
-});
-
-circlepay.get('/payments/upgrade', async (req, res, next) => {
-  await responseExecutor(async () => {
-    logger.notice('Upgrading payment from object ID usage');
-
-    await updatePayments();
-  }, {
-    req,
-    res,
-    next,
-    successMessage: 'Payments updated successfully'
   });
 });
 
@@ -248,6 +238,19 @@ circlepay.get('/payouts/approve', async (req, res, next) => {
   });
 });
 
+circlepay.get('/test', async (req, res, next) => {
+  await responseExecutor(async () => {
+    const payment = await paymentDb.get(req.query.paymentId as string);
+
+    await updatePaymentStructure(payment);
+  }, {
+    req,
+    res,
+    next,
+    successMessage: 'Success'
+  });
+})
+
 export const circlePayCrons = {
   ...payoutCrons
 };
@@ -256,8 +259,9 @@ export const circlePayApp = functions
   .runWith(runtimeOptions)
   .https.onRequest(commonApp(circlepay, {
     unauthenticatedRoutes: [
-      '/payments/update',
+      // '/payments/update',
       '/payouts/approve',
-      '/testIP'
+      '/testIP',
+      '/test'
     ]
   }));
