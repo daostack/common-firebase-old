@@ -29,7 +29,8 @@ export async function fillPayOutSheet():Promise<any> {
         'First name',
         'Last name',
         'Common id',
-        'Common name'
+        'Common name',
+        'Status'
       ]];
       for (const key in data) {
           // eslint-disable-next-line no-prototype-builtins
@@ -46,8 +47,28 @@ export async function fillPayOutSheet():Promise<any> {
               cells.push(data[key].common.id)
               cells.push(data[key].common.name)
 
+              if(data[key].payout){
+                let status = '';
+                if(!data[key].payout.executed){
+                  status = 'initiated';
+                } else {
+                  if(data[key].payout.status === 'pending'){
+                    status = 'pending';
+  
+                  }
+                  if(data[key].payout.status === 'complete'){
+                    status = 'complete';
+  
+                  }
+                  if(data[key].payout.status === 'failed'){
+                    status = 'failed';
+  
+                  }
+                }
+                cells.push(status);
+              }
               
-              values.push(cells)
+              values.push(cells);
           }
       }
       const resource = {
