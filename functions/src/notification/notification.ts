@@ -196,7 +196,7 @@ export const notifyData: Record<string, IEventData> = {
       return [
         {
           to: userData.email,
-          templateKey: userTemplate,
+          templateKey: (userTemplate as any),
           emailStubs: {
             userName: getNameString(userData),
             proposal: proposalData.description.title,
