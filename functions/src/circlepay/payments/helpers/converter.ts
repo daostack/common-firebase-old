@@ -68,8 +68,6 @@ const convertOlderPaymentFormat = async (payment: any): Promise<IPaymentEntity> 
     return null;
   }
 
-  console.log(payment);
-
   const subscription = payment.type === 'SubscriptionPayment'
     ? await subscriptionDb.get(payment.subscriptionId)
     : null;

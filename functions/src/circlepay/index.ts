@@ -31,6 +31,7 @@ const runtimeOptions = {
 };
 
 const CIRCLEPAY_APIKEY = 'CIRCLEPAY_APIKEY';
+
 export const getCircleHeaders = async (): Promise<any> => (
   getSecret(CIRCLEPAY_APIKEY).then((apiKey) => (
     {
@@ -94,7 +95,7 @@ circlepay.get('/payments/update', async (req, res, next) => {
       });
 
       await updatePaymentStructure(req.query.paymentId as string);
-      // await updatePaymentFromCircle(req.query.paymentId as string);
+      await updatePaymentFromCircle(req.query.paymentId as string);
     } else {
       logger.notice('User requested update for all payments from circle', {
         userId: req.user?.uid

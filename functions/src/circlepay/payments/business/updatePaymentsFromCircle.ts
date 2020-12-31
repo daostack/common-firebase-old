@@ -24,10 +24,10 @@ export const updatePaymentsFromCircle = async (): Promise<void> => {
               message: e.message,
               response: JSON.parse(e.data?.response)
             };
-          } catch (e) {
+          } catch (ex) {
             payment['updateFailedData'] = {
-              message: e.message,
-              response: e.data?.response
+              message: ex.message,
+              response: ex.data?.response
             };
           }
 
