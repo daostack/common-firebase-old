@@ -4,10 +4,10 @@ import { commonDb } from '../common/database';
 import { getAllUsers } from '../util/db/userDbService';
 import { subscriptionDb } from '../subscriptions/database';
 import { paymentDb } from '../circlepay/payments/database';
-import { ISubscriptionPayment } from '../circlepay/payments/types';
 
 import { discussionDb } from '../discussion/database';
 import { discussionMessageDb } from '../discussionMessage/database';
+import { IPaymentEntity } from '../circlepay/payments/types';
 
 interface IEventData {
   eventObject: (eventObjId: string) => any;
@@ -120,14 +120,14 @@ export enum EVENT_TYPES {
 
 export const eventData: Record<string, IEventData> = {
   [EVENT_TYPES.COMMON_CREATED]: {
-    eventObject: async (commonId: string): Promise<any> => (await commonDb.getCommon(commonId)),
+    eventObject: async (commonId: string): Promise<any> => (await commonDb.get(commonId)),
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     notifyUserFilter: (common: any): string[] => {
       return [common.members[0].userId];
     }
   },
   [EVENT_TYPES.COMMON_CREATION_FAILED]: {
-    eventObject: async (commonId: string): Promise<any> => (await commonDb.getCommon(commonId)),
+    eventObject: async (commonId: string): Promise<any> => (await commonDb.get(commonId)),
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     notifyUserFilter: (common: any): string[] => {
       return [common.members[0].userId];
@@ -137,7 +137,7 @@ export const eventData: Record<string, IEventData> = {
     eventObject: async (proposalId: string): Promise<any> => (await proposalDb.getProposal(proposalId)),
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     notifyUserFilter: async (proposal: any): Promise<string[]> => {
-      const proposalDao = (await commonDb.getCommon(proposal.commonId));
+      const proposalDao = (await commonDb.get(proposal.commonId));
       const userFilter = proposalDao.members.map(member => {
         return member.userId;
       });
@@ -167,7 +167,7 @@ export const eventData: Record<string, IEventData> = {
         }
   },
   [EVENT_TYPES.COMMON_WHITELISTED]: {
-    eventObject: async (commonId: string): Promise<any> => (await commonDb.getCommon(commonId)),
+    eventObject: async (commonId: string): Promise<any> => (await commonDb.get(commonId)),
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     notifyUserFilter: async (dao: any): Promise<string[]> => {
       const allUsers = await getAllUsers();
@@ -213,7 +213,7 @@ export const eventData: Record<string, IEventData> = {
   [EVENT_TYPES.SUBSCRIPTION_PAYMENT_CONFIRMED]: {
     eventObject: async (paymentId: string): Promise<any> => (await paymentDb.get(paymentId)),
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    notifyUserFilter: async (payment: ISubscriptionPayment): Promise<string[]> => {
+    notifyUserFilter: async (payment: IPaymentEntity): Promise<string[]> => {
       return [payment.userId];
     }
   },

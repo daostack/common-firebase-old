@@ -22,10 +22,6 @@ const createCommonDataValidationScheme = yup.object({
     .url()
     .required(),
 
-  action: yup
-    .string()
-    .required(),
-
   byline: yup
     .string()
     .min(10)
@@ -77,7 +73,6 @@ export const createCommon = async (payload: CreateCommonPayload): Promise<ICommo
     rules,
     links,
     userId,
-    action,
     byline,
     description,
     contributionType,
@@ -87,7 +82,7 @@ export const createCommon = async (payload: CreateCommonPayload): Promise<ICommo
 
   // @todo Check if user exists
 
-  const common = await commonDb.addCommon({
+  const common = await commonDb.add({
     name,
     image,
     fundingGoalDeadline,
@@ -100,7 +95,6 @@ export const createCommon = async (payload: CreateCommonPayload): Promise<ICommo
     }],
 
     metadata: {
-      action,
       byline,
       description,
       contributionType,

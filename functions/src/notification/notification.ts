@@ -15,6 +15,7 @@ import { paymentDb } from '../circlepay/payments/database';
 import { cardDb } from '../circlepay/cards/database';
 import { ICardEntity } from '../circlepay/cards/types';
 import moment from 'moment';
+import { getFundingRequestAcceptedTemplate } from './helpers';
 
 const messaging = admin.messaging();
 
@@ -30,11 +31,12 @@ export interface INotification {
 }
 
 const memberAddedNotification = (commonData) => ({
-    title: 'Congrats!',
-    body: `Your request to join "${commonData.name}" was accepted, you are now a member!`,
-    image: commonData.image || '',
-    path: `CommonProfile/${commonData.id}`
-  });
+  title: 'Congrats!',
+  body: `Your request to join "${commonData.name}" was accepted, you are now a member!`,
+  image: commonData.image || '',
+  path: `CommonProfile/${commonData.id}`
+});
+
 
 interface IEventData {
   data: (eventObj: string) => any;
@@ -46,14 +48,14 @@ export const notifyData: Record<string, IEventData> = {
   [EVENT_TYPES.COMMON_CREATED]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
-      const commonData = (await commonDb.getCommon(objectId));
+      const commonData = (await commonDb.get(objectId));
       return {
         commonData,
         userData: (await getUserById(commonData.members[0].userId)).data()
       };
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ({ commonData, userData }) : ISendTemplatedEmailData[] => {
+    email: ({ commonData, userData }): ISendTemplatedEmailData[] => {
       return [
         {
           to: userData.email,
@@ -76,8 +78,8 @@ export const notifyData: Record<string, IEventData> = {
             log: 'Successfully created common',
             commonId: commonData.id,
             commonName: commonData.name,
-            description: commonData.metadata.description,
-            about: commonData.metadata.byline,
+            tagline: commonData.metadata.byline,
+            about: commonData.metadata.description,
             paymentType: 'one-time',
             minContribution: commonData.metadata.minFeeToJoin
           }
@@ -90,12 +92,12 @@ export const notifyData: Record<string, IEventData> = {
     data: async (proposalId: string) => {
       const proposalData = (await proposalDb.getProposal(proposalId));
       return {
-        commonData: (await commonDb.getCommon(proposalData.commonId)),
+        commonData: (await commonDb.get(proposalData.commonId)),
         userData: (await getUserById(proposalData.proposerId)).data()
       };
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ({ commonData, userData }) : ISendTemplatedEmailData => {
+    email: ({ commonData, userData }): ISendTemplatedEmailData => {
       return {
         to: userData.email,
         templateKey: 'requestToJoinSubmitted',
@@ -113,7 +115,7 @@ export const notifyData: Record<string, IEventData> = {
       const proposalData = (await proposalDb.getProposal(objectId));
       return {
         proposalData,
-        commonData: (await commonDb.getCommon(proposalData.commonId)),
+        commonData: (await commonDb.get(proposalData.commonId)),
         userData: (await getUserById(proposalData.proposerId)).data()
       };
     },
@@ -131,7 +133,7 @@ export const notifyData: Record<string, IEventData> = {
   [EVENT_TYPES.COMMON_WHITELISTED]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (commonId: string) => {
-      const commonData = (await commonDb.getCommon(commonId));
+      const commonData = (await commonDb.get(commonId));
       return {
         commonData,
         userData: (await getUserById(commonData.metadata.founderId)).data()
@@ -147,7 +149,7 @@ export const notifyData: Record<string, IEventData> = {
       };
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ({ commonData, userData }) : ISendTemplatedEmailData => {
+    email: ({ commonData, userData }): ISendTemplatedEmailData => {
       return {
         to: userData.email,
         templateKey: 'userCommonFeatured',
@@ -163,12 +165,20 @@ export const notifyData: Record<string, IEventData> = {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (objectId: string) => {
       const proposalData = (await proposalDb.getProposal(objectId));
+      const cards = await cardDb.getMany({
+        ownerId: proposalData.proposerId,
+
+        sort: {
+          orderByDesc: 'updatedAt',
+          limit: 1
+        }
+      });
+
       return {
         proposalData,
-        commonData: (await commonDb.getCommon(proposalData.commonId)),
-        userData: (await getUserById(proposalData.proposerId)).data()
-        //paymentData: (await Utils.getPaymentByProposalId(proposalData.id))?.data() //@question funding request has no
-        // payment though
+        commonData: (await commonDb.get(proposalData.commonId)),
+        userData: (await getUserById(proposalData.proposerId)).data(),
+        cardMetadata: cards[0]?.metadata
       };
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -181,14 +191,20 @@ export const notifyData: Record<string, IEventData> = {
       };
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ({ userData, proposalData, commonData /*paymentData*/ }) : ISendTemplatedEmailData[] => {
+    email: ({ userData, proposalData, commonData, cardMetadata }): ISendTemplatedEmailData[] => {
+      const userTemplate = getFundingRequestAcceptedTemplate(cardMetadata?.billingDetails?.country, proposalData.fundingRequest.amount);
       return [
         {
           to: userData.email,
-          templateKey: 'userFundingRequestAccepted',
+          templateKey: (userTemplate as any),
           emailStubs: {
             userName: getNameString(userData),
-            proposal: proposalData.description.title
+            proposal: proposalData.description.title,
+            fundingAmount: (proposalData.fundingRequest.amount / 100).toLocaleString('en-US', {
+              style: 'currency',
+              currency: 'USD'
+            }),
+            commonName: commonData.name
           }
         },
         {
@@ -197,13 +213,16 @@ export const notifyData: Record<string, IEventData> = {
           emailStubs: {
             commonName: commonData.name,
             commonLink: Utils.getCommonLink(commonData.id),
-            commonBalance: (commonData.balance / 100).toLocaleString('en-US', {style: 'currency', currency: 'USD'}),
+            commonBalance: (commonData.balance / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' }),
             commonId: commonData.id,
             proposalId: proposalData.id,
             userName: getNameString(userData),
             userEmail: userData.email,
             userId: userData.uid,
-            fundingAmount: (proposalData.fundingRequest.amount / 100).toLocaleString('en-US', {style: 'currency', currency: 'USD'}),
+            fundingAmount: (proposalData.fundingRequest.amount / 100).toLocaleString('en-US', {
+              style: 'currency',
+              currency: 'USD'
+            }),
             submittedOn: proposalData.createdAt.toDate(),
             passedOn: new Date(),
             log: 'Funding request accepted'
@@ -217,14 +236,14 @@ export const notifyData: Record<string, IEventData> = {
     data: async (proposalId: string) => {
       const proposalData = (await proposalDb.getProposal(proposalId));
       return {
-        commonData: (await commonDb.getCommon(proposalData.commonId)),
+        commonData: (await commonDb.get(proposalData.commonId)),
         userData: (await getUserById(proposalData.proposerId)).data()
       };
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     notification: async ({ commonData }) => memberAddedNotification(commonData),
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ({ commonData, userData }) : ISendTemplatedEmailData => {
+    email: ({ commonData, userData }): ISendTemplatedEmailData => {
       return {
         to: userData.email,
         templateKey: 'userJoinedSuccess',
@@ -242,7 +261,7 @@ export const notifyData: Record<string, IEventData> = {
     data: async (objectId: string) => {
       const proposalData = (await proposalDb.getProposal(objectId));
       return {
-        commonData: (await commonDb.getCommon(proposalData.commonId))
+        commonData: (await commonDb.get(proposalData.commonId))
       };
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -268,7 +287,7 @@ export const notifyData: Record<string, IEventData> = {
 
       return {
         sender: (await getUserById(discussionMessage.ownerId)).data(),
-        commonData: (await commonDb.getCommon(commonId)),
+        commonData: (await commonDb.get(commonId)),
         path
       };
     },
@@ -287,12 +306,12 @@ export const notifyData: Record<string, IEventData> = {
     data: async (proposalId: string) => {
       const proposalData = (await proposalDb.getProposal(proposalId));
       return {
-        commonData: (await commonDb.getCommon(proposalData.commonId)),
+        commonData: (await commonDb.get(proposalData.commonId)),
         userData: (await getUserById(proposalData.proposerId)).data()
       };
     },
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    email: ({ commonData, userData }) : ISendTemplatedEmailData => {
+    email: ({ commonData, userData }): ISendTemplatedEmailData => {
       return {
         to: userData.email,
         templateKey: 'userJoinedButFailedPayment',
@@ -362,7 +381,7 @@ export const notifyData: Record<string, IEventData> = {
     data: async (paymentId) => {
       const payment = await paymentDb.get(paymentId);
       const card = await cardDb.get(payment.source.id);
-      const subscription = await subscriptionDb.get(payment.objectId);
+      const subscription = await subscriptionDb.get(payment.subscriptionId);
       const user = await userDb.get(subscription.userId);
       const commonData = subscription.metadata.common;
 
@@ -376,8 +395,8 @@ export const notifyData: Record<string, IEventData> = {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     notification: async ({ commonData, subscription }) => (
       subscription.charges === 1
-      ? memberAddedNotification(commonData)
-      : null
+        ? memberAddedNotification(commonData)
+        : null
     ),
     email: ({ subscription, user, card }: {
       subscription: ISubscriptionEntity,
@@ -387,7 +406,7 @@ export const notifyData: Record<string, IEventData> = {
       to: user.email,
       templateKey: 'subscriptionCharged',
       subjectStubs: {
-        commonName: subscription.metadata.common.name,
+        commonName: subscription.metadata.common.name
       },
       emailStubs: {
         firstName: user.firstName,
