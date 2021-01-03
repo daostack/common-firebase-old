@@ -144,12 +144,13 @@ export interface ISendTemplatedEmailData {
   templateKey: keyof typeof templates,
   emailStubs?: any,
   subjectStubs?: any,
-  to: string | string[]
+  to: string | string[],
+  from?: string,
 }
 
 type SendTemplatedEmail = (data: ISendTemplatedEmailData) => Promise<void>;
 
-export const sendTemplatedEmail: SendTemplatedEmail = async ({ templateKey, emailStubs, subjectStubs, to }) => {
+export const sendTemplatedEmail: SendTemplatedEmail = async ({ templateKey, emailStubs, subjectStubs, to, from }) => {
   to === 'admin' && (to = env.mail.adminMail);
 
   const { body, subject } = getTemplatedEmail(templateKey, { emailStubs, subjectStubs });
@@ -164,7 +165,8 @@ export const sendTemplatedEmail: SendTemplatedEmail = async ({ templateKey, emai
       emailPromises.push(sendMail(
         emailTo,
         subject,
-        body
+        body,
+        from,
       ));
     });
 
@@ -176,7 +178,8 @@ export const sendTemplatedEmail: SendTemplatedEmail = async ({ templateKey, emai
     await sendMail(
       to,
       subject,
-      body
+      body,
+      from,
     );
   }
 

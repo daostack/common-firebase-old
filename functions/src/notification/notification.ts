@@ -196,6 +196,7 @@ export const notifyData: Record<string, IEventData> = {
       return [
         {
           to: userData.email,
+          from: proposalData.fundingRequest.amount === 0 ? env.mail.sender : 'payout@common.io', // move this to env or constants
           templateKey: (userTemplate as any),
           emailStubs: {
             userName: getNameString(userData),
