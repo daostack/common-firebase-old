@@ -2,9 +2,12 @@ const template = `
 Hello {{userName}},
 <br /><br />
 Congratulations! <br />
-Your proposal: {{proposal}} to {{commonName}} has been approved. To receive the funds ({{fundingAmount}}) you will need to provide your bank account details, as well as some identification information.
+Your proposal "{{proposal}}" to {{commonName}} has been approved. To send you the funds ({{fundingAmount}}), we first need you to complete some missing information.
 <br /><br />
-Please fill all the required information on the attached form and send it back to us at: payout@common.io
+Please include the following details in a return email:
+Street address, town/city, state, country, zip code.
+<br /><br />
+Once received, we will send you another email with instructions on how to proceed and get the funds.
 <br /><br />
 For more information you can contact us any time using our  <a href="{{supportChatLink}}">support chat</a>
 <br /><br />
