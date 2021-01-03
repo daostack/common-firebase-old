@@ -44,7 +44,7 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
 
   // Acquire the required data
   const card = await cardDb.get(proposal.join.cardId);
-  const common = await commonDb.getCommon(proposal.commonId);
+  const common = await commonDb.get(proposal.commonId);
 
   // Save the created subscription
   const subscription: ISubscriptionEntity = await subscriptionDb.add({
@@ -89,6 +89,13 @@ export const createSubscription = async (proposal: IProposalEntity): Promise<ISu
   if (isSuccessful(payment)) {
     // Add the member to the common
     await addCommonMemberByProposalId(proposal.id);
+
+    // Broadcast the event for the join proposal executed
+    await createEvent({
+      type: EVENT_TYPES.REQUEST_TO_JOIN_EXECUTED,
+      userId: proposal.proposerId,
+      objectId: proposal.id
+    });
   } else {
     logger.warn('Initial subscription payment for subscription failed!', { subscription, payment });
 
