@@ -205,6 +205,7 @@ export const notifyData: Record<string, IEventData> = {
               style: 'currency',
               currency: 'USD'
             }),
+            profileLink: `https://app.common.io/profile/${userData.uid}`,
             commonName: commonData.name
           }
         },

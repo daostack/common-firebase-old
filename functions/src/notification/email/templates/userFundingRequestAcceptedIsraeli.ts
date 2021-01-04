@@ -1,13 +1,12 @@
 const template = `<div dir="auto">
 היי {{userName}}, ברכות!
 <br /><br />
-ההצעה שלך, “{{proposal}}”, ב “{{commonName}}” - אושרה.
+ההצעה שלך, “{{proposal}}”, ב“{{commonName}}” - אושרה.
 <br /><br />
 כדי להעביר את הכסף לחשבון הבנק שלך בשקלים, נצטרך את עזרתך בהשלמת הפעולות הבאות:
 <br /><br />
-1) רישום באתר “ביטס אוף גולד” בלינק הבא
-<br /><br />
-2) הוספת פרטי חשבון הבנק תחת “הפרופיל שלי”
+1) רישום באתר <a href="https://www.bitsofgold.co.il/signup">“ביטס אוף גולד”</a>
+<br /><br />2) הוספת פרטי חשבון הבנק תחת <a href={{profileLink}}>“הפרופיל שלי”</a>
 <br /><br />
 <sub>*ביטס אוף גולד הוא נותן שירותים פיננסיים המטפל בתשלומים של קומון בישראל.</sub>
 <br /><br />
@@ -39,6 +38,9 @@ const emailStubs = {
     required: true
   },
   supportChatLink: {
+    required: true
+  },
+  profileLink: {
     required: true
   }
 };
