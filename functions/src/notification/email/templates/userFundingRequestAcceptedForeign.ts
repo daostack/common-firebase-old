@@ -3,7 +3,7 @@ Hello {{userName}},
 <br /><br />
 Congratulations!
 <br /><br />
-Your proposal {{proposal}} to {{commonName}} has been approved. To receive the funds ({{fundingAmount}}) you will need to provide your bank account details, as well as some identification information.
+Your proposal "{{proposal}}" to "{{commonName}}" has been approved. To receive the funds ({{fundingAmount}}) you will need to provide your bank account details, as well as some identification information.
 <br /><br />
 We will reach out soon with further instructions on how to submit those details.
 <br /><br />

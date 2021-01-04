@@ -20,6 +20,7 @@ const template = `<div dir="auto">
 <br /><br />
 <br /><br />
 תודה,
+<br />
 צוות Common
 </div>
 `;

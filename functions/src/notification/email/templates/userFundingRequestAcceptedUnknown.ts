@@ -3,7 +3,7 @@ Hello {{userName}},
 <br /><br />
 Congratulations!
 <br /><br />
-Your proposal "{{proposal}}" to {{commonName}} has been approved. To send you the funds ({{fundingAmount}}), we first need you to complete some missing information.
+Your proposal "{{proposal}}" to "{{commonName}}" has been approved. To send you the funds ({{fundingAmount}}), we first need you to complete some missing information.
 <br /><br />
 Please include the following details in a return email:
 <br /><br />
