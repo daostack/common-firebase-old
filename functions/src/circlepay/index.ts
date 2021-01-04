@@ -178,7 +178,7 @@ circlepay.post('/notification/register', async (req, res, next) => {
 
 // ----- Bank Accounts
 
-circlepay.get('/wires/create', async (req, res, next) => {
+circlepay.post('/wires/create', async (req, res, next) => {
   await responseExecutor(async () => {
     const data = await createBankAccount(req.body);
 
@@ -195,32 +195,27 @@ circlepay.get('/wires/create', async (req, res, next) => {
 
 // ----- Payouts
 
-circlepay.get('/payouts/create', async (req, res, next) => {
+circlepay.post('/payouts/create', async (req, res, next) => {
   await responseExecutor(async () => {
-    
-    const obj = JSON.parse(JSON.stringify(req.query));
-    const payload = JSON.parse(obj.payload)
+    if (req.body.wire) {
+      const bankAccount = await createBankAccount(req.body.wire);
 
-
-    if (payload.wire) {
-      const bankAccount = await createBankAccount(payload.wire);
-
-      if (payload.payout.type === 'proposal') {
+      if (req.body.payout.type === 'proposal') {
         await createProposalPayout({
-          ...payload.payout,
+          ...req.body.payout,
           bankAccountId: bankAccount.id
         });
-      } else if (payload.payout.type === 'independent') {
+      } else if (req.body.payout.type === 'independent') {
         await createIndependentPayout({
-          ...payload.payout,
+          ...req.body.payout,
           bankAccountId: bankAccount.id
         });
       }
     } else {
-      if (payload.type === 'proposal') {
-        await createProposalPayout(payload);
-      } else if (payload.type === 'independent') {
-        await createIndependentPayout(payload);
+      if (req.body.type === 'proposal') {
+        await createProposalPayout(req.body);
+      } else if (req.body.type === 'independent') {
+        await createIndependentPayout(req.body);
       }
     }
   }, {
@@ -254,7 +249,6 @@ export const circlePayApp = functions
     unauthenticatedRoutes: [
       '/payments/update',
       '/payouts/approve',
-      '/charge/subscription',
       '/payouts/create',
       '/testIP'
     ]
