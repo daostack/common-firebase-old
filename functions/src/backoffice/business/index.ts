@@ -141,8 +141,10 @@ export async function fillPayInSheet():Promise<any> {
     "Proposal title",
     "Proposal created at",
     "Proposal updated at",
-    
-    
+    "Subscription Id",
+    "Subscription amount",
+    "Subscription created at",
+    "Subscription updated at" 
   ]];
   for (const key in data) {
       // eslint-disable-next-line no-prototype-builtins
@@ -153,7 +155,11 @@ export async function fillPayInSheet():Promise<any> {
             cells.push(data[key].payment.id)
             cells.push(data[key].payment.status)
             cells.push(data[key].payment.amount.amount/100)
-            cells.push(data[key].payment.fees.amount/100)
+            if(data[key].payment.fees){
+              cells.push(data[key].payment.fees.amount/100)
+            } else{
+              cells.push("")
+            }
             cells.push(`${date(new Date(data[key].payment.createdAt.toDate()))}`)
             cells.push(`${date(new Date(data[key].payment.updatedAt.toDate()))}`)            
           }
@@ -207,7 +213,19 @@ export async function fillPayInSheet():Promise<any> {
             cells.push("")
             cells.push("")
           }
-          
+
+          if(data[key].subscription){
+            cells.push(data[key].subscription.id)
+            cells.push(data[key].subscription.amount/100)
+            cells.push(`${date(new Date(data[key].subscription.createdAt.toDate()))}`)
+            cells.push(`${date(new Date(data[key].subscription.updatedAt.toDate()))}`)
+          } else {
+            cells.push("")
+            cells.push("")
+            cells.push("")
+            cells.push("")
+            cells.push("")
+          }
           
           
           
