@@ -37,7 +37,22 @@ export async function fillPayOutSheet():Promise<any> {
         'Fees',
         'Payment creation date',
         'Payment updated',
-
+        'IBAN',
+        'Name',
+        'City',
+        'Country',
+        'Line 1',
+        'Line 2',
+        'District',
+        'Postal code',
+        'Name',
+        'City',
+        'Country',
+        'Line 1',
+        'Line 2',
+        'District',
+        'Postal code',
+        'Type'
       ]];
 
       let row = 2;
