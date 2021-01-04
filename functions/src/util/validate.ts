@@ -3,9 +3,7 @@ import * as _ from 'lodash';
 
 import { ObjectSchema } from 'yup';
 
-import { CommonError } from './errors';
-import { ValidationError } from './errors/ValidationError';
-
+import { CommonError, ValidationError } from './errors';
 
 /**
  * Validates the provided payload against the schema and throw formatted
@@ -19,12 +17,7 @@ import { ValidationError } from './errors/ValidationError';
  *
  * @returns Promise
  */
-export const validate = async <T extends any>(payload: T, schema: ObjectSchema): Promise<void> => {
-  const validatorPayload = {
-    schema,
-    payload
-  };
-
+export const validate = async <T extends Record<string, any>>(payload: T, schema: ObjectSchema<T>): Promise<void> => {
   try {
     await schema
       .test('no-unknown', 'No unknown keys are allowed', function (value) {
@@ -45,18 +38,19 @@ export const validate = async <T extends any>(payload: T, schema: ObjectSchema):
       .validate(payload, {
         abortEarly: false
       });
-
-    console.trace('Validation succeeded', validatorPayload);
   } catch (e) {
     if (!(e instanceof yup.ValidationError)) {
       throw new CommonError('Unknown error occurred while doing the validation', {
         error: e,
-        validatorPayload
+        validatorPayload: {
+          schema,
+          payload
+        }
       });
     }
-    console.trace('Validation failed', validatorPayload);
 
-    console.log('Validation Errors:', e.errors);
+    logger.debug('Validation failed with payload', payload);
+    logger.info('Validation Errors:', e.errors);
 
     throw new ValidationError(e);
   }

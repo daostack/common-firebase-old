@@ -1,6 +1,6 @@
 import { IBaseEntity } from '../util/types';
 
-export interface ICommonEntity extends IBaseEntity{
+export interface ICommonEntity extends IBaseEntity {
   /**
    * The name of the common showed in the app and
    * other places (email, notification etc.)
@@ -87,7 +87,6 @@ export interface ICommonLink {
 }
 
 export interface ICommonMetadata {
-  action: string;
   byline: string;
   description: string;
 

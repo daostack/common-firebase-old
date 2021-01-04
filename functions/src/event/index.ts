@@ -29,7 +29,7 @@ const processEvent = async (event: IEventModel) => {
   }   
 }
 
-exports.commonEventListener = functions
+exports.commonEventListeners = functions
   .firestore
   .document('/event/{id}')
   .onCreate(async (snap) => {

@@ -35,7 +35,22 @@ interface Env {
     };
   }
 
+  endpoints: {
+    base: string;
+    notifications: string;
+  }
+
   secretManagerProject: string;
+  local: string;
+
+  payouts: {
+    approvers: string[];
+    neededApprovals: number;
+  }
+  
+  backoffice: {
+    sheetUrl: string;
+  }
 }
 
 export const env = merge(envConfig, envSecrets) as Env;
@@ -61,6 +76,8 @@ export const ErrorCodes = {
   ArgumentError: 'ArgumentError',
   ArgumentNullError: 'ArgumentNullError',
   AuthenticationError: 'AuthenticationError',
+
+  CvvVerificationFail: 'CvvVerificationFail',
 
   // ---- External providers errors
   CirclePayError: 'External.CirclePayError'

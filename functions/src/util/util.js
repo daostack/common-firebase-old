@@ -9,7 +9,6 @@ const { env } = require('../constants');
 const CFError = {
   invalidIdToken: 'invalidIdToken',
   emptyPaymentData: 'emptyPaymentData',
-  emptyCardData: 'emptyCardData',
   emptyUserData: 'emptyUserData'
 }
 
@@ -48,42 +47,22 @@ class Utils {
     }
   }
 
-  async getCardById(cardId) {
-    const cardRef = admin.firestore().collection('cards').doc(cardId);
-    const cardData = await cardRef.get().then(doc => doc.data());
-    if (!cardData) {
-      throw new CommonError(`Could not find card with id ${cardId}.`)
-    }
-    return cardData;
-  }
-
-  async getCardByUserId(userId) {
-    const cardRef = await admin.firestore().collection('cards')
-      .where('userId', '==', userId)
-      .get();
-        if (cardRef.docs.length === 0) {
-          throw new CommonError(`Could not find user with id ${userId} associated with a CirclePay card.`);
-        }
-    const cardData = cardRef.docs.map(doc => doc.data())[0];
-    return cardData;
-  }
-
-  async getCardByProposalId(proposalId) {
+  async getPaymentById(paymentId) {
     try {
-      const cardRef = await admin.firestore().collection('cards')
-        .where('proposals', 'array-contains', proposalId)
+      const paymentRef = await admin.firestore().collection('payments')
+        .where('id', '==', paymentId)
         .get();
-      const cardData = cardRef.docs.map(doc => doc.data())[0];
-      return cardData;
+      const paymentData = paymentRef.docs.map(doc => doc.data())[0];
+      return paymentData;
     } catch (err) {
       throw new CommonError(CFError.emptyUserData)
     }
   }
 
-  async getPaymentById(paymentId) {
+  async getPaymentByProposalId(proposalId) {
     try {
       const paymentRef = await admin.firestore().collection('payments')
-        .where('id', '==', paymentId)
+        .where('proposalId', '==', proposalId)
         .get();
       const paymentData = paymentRef.docs.map(doc => doc.data())[0];
       return paymentData;

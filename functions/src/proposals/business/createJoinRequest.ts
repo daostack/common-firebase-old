@@ -11,8 +11,7 @@ import { commonDb } from '../../common/database';
 import { IJoinRequestProposal, IProposalLink } from '../proposalTypes';
 import { linkValidationSchema } from '../../util/schemas';
 import { proposalDb } from '../database';
-import { isCardOwner } from '../../circlepay/business/isCardOnwer';
-import { assignCardToProposal } from '../../circlepay/createCirclePayCard';
+import { isCardOwner } from '../../circlepay/cards/business/isCardOnwer';
 import { createEvent } from '../../util/db/eventDbService';
 import { EVENT_TYPES } from '../../event/event';
 import { isTest } from '../../util/environment';
@@ -58,7 +57,7 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
   await validate(payload, createRequestToJoinValidationSchema);
 
   // Acquire the required data
-  const common = await commonDb.getCommon(payload.commonId);
+  const common = await commonDb.get(payload.commonId);
 
   // @todo Make it work without difference for running in test mode (tests are needed for circlepay)
   // Check if the card is owned by the user (only if not in tests)
@@ -119,7 +118,8 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
     join: {
       cardId: payload.cardId,
       funding: payload.funding,
-      fundingType: common.metadata.contributionType
+      fundingType: common.metadata.contributionType,
+      payments: []
     },
 
     countdownPeriod: env.durations.join.countdownPeriod,
@@ -128,7 +128,8 @@ export const createJoinRequest = async (payload: CreateRequestToJoinPayload): Pr
 
   // Link the card to the proposal
   if(!isTest) {
-    await assignCardToProposal(joinRequest.join.cardId, joinRequest.id);
+    // await assignCardToProposal(joinRequest.join.cardId, joinRequest.id);
+    // @todo Do the opposite: add the card id to the proposal
   }
 
   // Create event

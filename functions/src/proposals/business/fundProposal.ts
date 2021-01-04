@@ -2,6 +2,8 @@ import { CommonError } from '../../util/errors';
 
 import { proposalDb } from '../database';
 import { commonDb } from '../../common/database';
+import admin from 'firebase-admin';
+import FieldValue = admin.firestore.FieldValue;
 
 /**
  * Changes the status of the proposal and updates the common. If the common currently has
@@ -14,7 +16,7 @@ import { commonDb } from '../../common/database';
  */
 export const fundProposal = async (proposalId: string): Promise<void> => {
   const proposal = await proposalDb.getProposal(proposalId);
-  const common = await commonDb.getCommon(proposal.commonId);
+  const common = await commonDb.get(proposal.commonId);
 
   if (proposal.type !== 'fundingRequest') {
     throw new CommonError('Only funding proposal can be funded');
@@ -29,7 +31,7 @@ export const fundProposal = async (proposalId: string): Promise<void> => {
   }
 
   if (common.balance < proposal.fundingRequest.amount) {
-    console.warn(`Proposal with id ${proposal.id} cannot be funded, because the common does not have enough balance!`);
+    logger.warn(`Proposal with id ${proposal.id} cannot be funded, because the common does not have enough balance!`);
 
     throw new CommonError(`Proposal with id ${proposal.id} cannot be funded, because the common does not have enough balance!`);
 
@@ -38,12 +40,13 @@ export const fundProposal = async (proposalId: string): Promise<void> => {
 
   // Change the commons balance and
   // update the funding proposal
-  common.balance -= proposal.fundingRequest.amount;
+  common.balance = FieldValue.increment(proposal.fundingRequest.amount * -1) as any;
+
   proposal.fundingRequest.funded = true;
 
   // Persist the changes asynchronously
   await Promise.all([
-    commonDb.updateCommon(common),
-    proposalDb.updateProposal(proposal)
+    commonDb.update(common),
+    proposalDb.update(proposal)
   ]);
 };

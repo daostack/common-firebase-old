@@ -3,13 +3,13 @@ import * as functions from 'firebase-functions';
 import { Collections } from '../../constants';
 import { IEventEntity } from '../../event/type';
 import { EVENT_TYPES } from '../../event/event';
-import { addCommonMemberByProposalId } from '../../common/business/addCommonMember';
 import { fundProposal } from '../business/fundProposal';
-import { createPayment } from '../../circlepay/createPayment';
-import { CommonError } from '../../util/errors';
+import { createSubscription } from '../../subscriptions/business';
 import { commonDb } from '../../common/database';
 import { proposalDb } from '../database';
 import { createEvent } from '../../util/db/eventDbService';
+import { createProposalPayment } from '../../circlepay/payments/business/createProposalPayment';
+import { addCommonMemberByProposalId } from '../../common/business/addCommonMember';
 
 
 export const onProposalApproved = functions.firestore
@@ -18,7 +18,7 @@ export const onProposalApproved = functions.firestore
       const event = eventSnap.data() as IEventEntity;
 
       if (event.type === EVENT_TYPES.FUNDING_REQUEST_ACCEPTED) {
-        console.info('Funding request was approved. Crunching some numbers');
+        logger.info('Funding request was approved. Crunching some numbers');
 
         await fundProposal(event.objectId);
 
@@ -32,44 +32,32 @@ export const onProposalApproved = functions.firestore
 
       // @refactor
       if (event.type === EVENT_TYPES.REQUEST_TO_JOIN_ACCEPTED) {
-        console.info('Join request was approved. Adding new members to common');
+        logger.info('Join request was approved. Starting to process payment');
 
-        // Create payment
-        const proposal = await proposalDb.getProposal(event.objectId);
+        const proposal = await proposalDb.getJoinRequest(event.objectId);
 
-        if (proposal.type !== 'join') {
-          throw new CommonError(`Cannot process REQUEST_TO_JOIN_ACCEPTED because the associated object (${event.objectId}) is not a join proposal`);
+        // If the proposal is monthly create subscription. Otherwise charge
+        if (proposal.join.fundingType === 'monthly') {
+          await createSubscription(proposal);
+        } else {
+          // Create the payment
+          await createProposalPayment({
+            proposalId: proposal.id,
+            sessionId: context.eventId,
+            ipAddress: '127.0.0.1' // @todo Get ip, but what IP?
+          }, { throwOnFailure: true });
+
+          // Update common funding info
+          const common = await commonDb.get(proposal.commonId);
+
+          common.raised += proposal.join.funding;
+          common.balance += proposal.join.funding;
+
+          await commonDb.update(common);
+
+          // Add the user as member
+          await addCommonMemberByProposalId(proposal.id);
         }
-
-        await createPayment({
-          ipAddress: '127.0.0.1',
-          proposalId: proposal.id,
-          proposerId: proposal.proposerId,
-          funding: proposal.join.funding,
-          sessionId: context.eventId
-        });
-
-        if(proposal.join.fundingType === 'monthly') {
-          // @todo Create subscription
-        }
-
-        // Update common funding info
-        const common = await commonDb.getCommon(proposal.commonId);
-
-        common.raised += proposal.join.funding;
-        common.balance += proposal.join.funding;
-
-        await commonDb.updateCommon(common);
-
-        // Add member to the common
-        await addCommonMemberByProposalId(event.objectId);
-
-        // Everything went fine so it is event time
-        await createEvent({
-          userId: proposal.proposerId,
-          objectId: proposal.id,
-          type: EVENT_TYPES.REQUEST_TO_JOIN_EXECUTED
-        });
       }
     }
   );

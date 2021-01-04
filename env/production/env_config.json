@@ -10,15 +10,27 @@
   "circlepay": {
     "apiUrl": "https://api.circle.com/v1"
   },
+  "secretManagerProject": "common-daostack",
+  "endpoints": {
+    "base": "https://us-central1-common-daostack.cloudfunctions.net",
+    "notifications": "/notifications/ping"
+  },
   "durations": {
     "funding": {
-      "countdownPeriod": 604800,
-      "quietEndingPeriod": 86400
+      "countdownPeriod": 259200,
+      "quietEndingPeriod": 10800
     },
     "join": {
-      "countdownPeriod": 86400,
+      "countdownPeriod": 57600,
       "quietEndingPeriod": 3600
     }
   },
-  "secretManagerProject": "common-daostack"
+  "payouts": {
+    "approvers": ["jelle@daostack.io", "payout@common.io"],
+    "neededApprovals": 1
+  },
+  "local": "http://localhost:5003/common-daostack/us-central1",
+  "backoffice":{
+    "sheetUrl": "1Dvrg0nfzdLqHOlQTf_2JMhW2DMxDgq7yIA97PDUYeWU"
+  }
 }
