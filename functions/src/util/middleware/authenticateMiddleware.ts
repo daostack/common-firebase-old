@@ -37,8 +37,6 @@ export const authenticate: RequestHandler = async (req, res, next) => {
 
         const parsedUser = JSON.parse(req.headers.authorization);
 
-        console.log(typeof parsedUser)
-
         if (typeof parsedUser === 'object' && parsedUser.uid) {
           req.user = parsedUser;
         } else {
