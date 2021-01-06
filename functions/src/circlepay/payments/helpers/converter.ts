@@ -133,8 +133,6 @@ const convertOlderPaymentFormat = async (payment: any, trackId: string): Promise
     }))
   ];
 
-  console.log('lenfnngdf', payments.length)
-
   for (const ptd of payments) {
     // eslint-disable-next-line no-await-in-loop
     await paymentDb.delete(ptd.id, trackId);
