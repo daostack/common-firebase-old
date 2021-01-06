@@ -77,7 +77,7 @@ const convertOlderPaymentFormat = async (payment: any): Promise<IPaymentEntity> 
     : null;
 
   const paymentObj: IPaymentEntity = {
-    id: v4(),
+    id: payment.id,
     circlePaymentId: payment.id,
 
     amount: {
