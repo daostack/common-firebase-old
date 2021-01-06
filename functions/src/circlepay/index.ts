@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import request from 'request';
 import axios from 'axios';
+import { v4 } from 'uuid';
 
 import * as payoutCrons from './payouts/crons';
 
@@ -88,14 +89,16 @@ circlepay.get('/encryption', async (req, res, next) => {
 // ----- Payment Related requests
 circlepay.get('/payments/update', async (req, res, next) => {
   await responseExecutor(async () => {
+    const trackId = req.requestId || v4();
+
     if (req.query.paymentId) {
       logger.notice(`User requested update for payment from circle`, {
         userId: req.user?.uid,
         paymentId: req.query.paymentId
       });
 
-      const paymentWithUpdatedStructure = await updatePaymentStructure(req.query.paymentId as string);
-      const finalUpdatedStructure = await updatePaymentFromCircle(paymentWithUpdatedStructure.id as string);
+      const paymentWithUpdatedStructure = await updatePaymentStructure(req.query.paymentId as string, trackId);
+      const finalUpdatedStructure = await updatePaymentFromCircle(paymentWithUpdatedStructure.id as string, trackId);
 
       logger.info('Upgraded and updated payment', {
         initialPaymentId: req.query.paymentId,
@@ -107,8 +110,8 @@ circlepay.get('/payments/update', async (req, res, next) => {
         userId: req.user?.uid
       });
 
-      await updatePayments();
-      await updatePaymentsFromCircle();
+      await updatePayments(trackId);
+      await updatePaymentsFromCircle(trackId);
     }
   }, {
     req,
