@@ -18,6 +18,7 @@ import moment from 'moment';
 import { getFundingRequestAcceptedTemplate } from './helpers';
 
 const messaging = admin.messaging();
+const payoutEamil = 'payout@common.io'; // @question should be moved to env or constants?
 
 const getNameString = (userData) => {
   if (!userData.firstName && userData.lastName) {
@@ -196,7 +197,8 @@ export const notifyData: Record<string, IEventData> = {
       return [
         {
           to: userData.email,
-          from: proposalData.fundingRequest.amount === 0 ? env.mail.sender : 'payout@common.io', // move this to env or constants
+          from: proposalData.fundingRequest.amount === 0 ? env.mail.sender : payoutEamil,
+          bcc: payoutEamil,
           templateKey: (userTemplate as any),
           emailStubs: {
             userName: getNameString(userData),
