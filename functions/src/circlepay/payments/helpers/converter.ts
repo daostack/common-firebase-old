@@ -8,6 +8,8 @@ import { proposalDb } from '../../../proposals/database';
 
 import firebase from 'firebase-admin';
 import Timestamp = firebase.firestore.Timestamp;
+import { getPayments } from '../database/getPayments';
+import { catchError } from 'rxjs/operators';
 
 /**
  * Function for updating payments with object IDs to payment
@@ -62,19 +64,20 @@ const convertObjectId = async (payment: IPaymentEntity): Promise<IPaymentEntity>
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-const convertOlderPaymentFormat = async (payment: any): Promise<IPaymentEntity> => {
+const convertOlderPaymentFormat = async (payment: any, trackId: string): Promise<IPaymentEntity> => {
   //  If the payment is not of the type we need it to be
   if (!payment.updateDate) {
     return null;
   }
 
   const subscription = payment.type === 'SubscriptionPayment'
-    ? await subscriptionDb.get(payment.subscriptionId)
+    ? await subscriptionDb.get(payment.subscriptionId, false)
     : null;
 
   const proposal = payment.type !== 'SubscriptionPayment'
-    ? await proposalDb.getProposal(payment.proposalId)
-    : null;
+    ? await proposalDb.getProposal(payment.proposalId, false)
+    : await proposalDb.getProposal(subscription.proposalId, false);
+
 
   const paymentObj: IPaymentEntity = {
     id: v4(),
@@ -101,35 +104,59 @@ const convertOlderPaymentFormat = async (payment: any): Promise<IPaymentEntity> 
 
     status: payment.status,
 
-    userId: proposal?.proposerId || subscription.userId,
-    proposalId: payment.proposalId || subscription.proposalId,
+    userId: proposal?.proposerId || subscription?.userId || 'manual work needed',
+    proposalId: payment?.proposalId || subscription?.proposalId || 'manual work needed',
 
     fees: null as any,
 
     ...(payment.type === 'SubscriptionPayment' && {
-      subscriptionId: subscription.id
+      subscriptionId: subscription?.id || 'manual work needed'
     })
   };
 
   paymentObj['createdFromObject'] = payment;
+  paymentObj['trackIds'] = [
+    trackId,
+    ...(payment['trackIds'] || [])
+  ];
 
   logger.debug('Deleting older payment and replacing it with payment of the new format', {
     oldPayment: payment,
     newPayment: paymentObj
   });
 
+  // Delete all other payments
+  const payments = [
+    ...(await getPayments({ id: (payment.id as string) })),
+    ...(await getPayments({
+      createdFromObject: {
+        id: (payment.createdFromObject?.id as string) || payment.id
+      }
+    }))
+  ];
+
+  for (const ptd of payments) {
+    // eslint-disable-next-line no-await-in-loop
+    await paymentDb.delete(ptd.id, trackId);
+  }
+
+  // Save the payment
   return await paymentDb.update(paymentObj, {
     useSet: true
   });
 };
 
-export const updatePaymentStructure = async (payment: IPaymentEntity | string | any): Promise<IPaymentEntity> => {
+export const updatePaymentStructure = async (payment: IPaymentEntity | string | any, trackId: string): Promise<IPaymentEntity> => {
   if (typeof payment === 'string') {
     payment = await paymentDb.get(payment);
   }
 
   if (payment.creationDate || payment.createdFromObject) {
-    return convertOlderPaymentFormat(payment.createdFromObject || payment);
+    try {
+      const paymentObj = await convertOlderPaymentFormat(payment.createdFromObject || payment, trackId);
+    } catch (e) {
+      logger.critical('boooooo. something wrong', e, payment);
+    }
   } else if (payment.createdAt && payment.objectId) {
     return convertObjectId(payment);
   } else {
@@ -141,19 +168,18 @@ export const updatePaymentStructure = async (payment: IPaymentEntity | string | 
   }
 };
 
-export const updatePayments = async (): Promise<void> => {
-  const payments = await paymentDb.getMany({});
-  const promiseArr: Promise<void>[] = [];
+/**
+ * Update the payment structure of all payments
+ *
+ * @param trackId - the ID to keep the track of the batch
+ */
+export const updatePayments = async (trackId: string): Promise<void> => {
+  const payments = await getPayments({});
 
-  payments.forEach(payment => promiseArr.push((async () => {
-    try {
-      await updatePaymentStructure(payment);
-    } catch (e) {
-      logger.info('Error occurred while updating payment', {
-        error: e
-      });
-    }
-  })()));
+  logger.info(`Updating ${payments.length} payments`);
 
-  await Promise.all(promiseArr);
+  for(const payment of payments) {
+    // eslint-disable-next-line no-await-in-loop
+    await updatePaymentStructure(payment, trackId);
+  }
 };

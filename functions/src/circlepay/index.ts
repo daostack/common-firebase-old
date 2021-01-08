@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import request from 'request';
 import axios from 'axios';
+import { v4 } from 'uuid';
 
 import * as payoutCrons from './payouts/crons';
 
@@ -86,24 +87,15 @@ circlepay.get('/encryption', async (req, res, next) => {
 });
 
 // ----- Payment Related requests
-circlepay.get('/payments/update', async (req, res, next) => {
+circlepay.get('/payments/update/structure', async (req, res, next) => {
   await responseExecutor(async () => {
-    if (req.query.paymentId) {
-      logger.notice(`User requested update for payment from circle`, {
-        userId: req.user?.uid,
-        paymentId: req.query.paymentId
-      });
+    const trackId = req.requestId || v4();
 
-      await updatePaymentStructure(req.query.paymentId as string);
-      await updatePaymentFromCircle(req.query.paymentId as string);
-    } else {
-      logger.notice('User requested update for all payments from circle', {
-        userId: req.user?.uid
-      });
+    logger.notice('User requested update for all payments structure', {
+      userId: req.user?.uid
+    });
 
-      await updatePayments();
-      await updatePaymentsFromCircle();
-    }
+    await updatePayments(trackId);
   }, {
     req,
     res,
@@ -111,6 +103,24 @@ circlepay.get('/payments/update', async (req, res, next) => {
     successMessage: 'Payment update succeeded'
   });
 });
+
+circlepay.get('/payments/update/data', async (req, res, next) => {
+  await responseExecutor(async () => {
+    const trackId = req.requestId || v4();
+
+    logger.notice('User requested update for all payments from circle', {
+      userId: req.user?.uid
+    });
+
+    await updatePaymentsFromCircle(trackId);
+  }, {
+    req,
+    res,
+    next,
+    successMessage: 'Payment update succeeded'
+  });
+});
+
 
 circlepay.get('/testIP', async (req, res, next) => {
   await responseExecutor(
@@ -178,7 +188,7 @@ circlepay.post('/notification/register', async (req, res, next) => {
 
 // ----- Bank Accounts
 
-circlepay.get('/wires/create', async (req, res, next) => {
+circlepay.post('/wires/create', async (req, res, next) => {
   await responseExecutor(async () => {
     const data = await createBankAccount(req.body);
 
@@ -197,9 +207,9 @@ circlepay.get('/wires/create', async (req, res, next) => {
 
 circlepay.get('/payouts/create', async (req, res, next) => {
   await responseExecutor(async () => {
-    
+
     const obj = JSON.parse(JSON.stringify(req.query));
-    const payload = JSON.parse(obj.payload)
+    const payload = JSON.parse(obj.payload);
 
 
     if (payload.wire) {
@@ -252,7 +262,8 @@ export const circlePayApp = functions
   .runWith(runtimeOptions)
   .https.onRequest(commonApp(circlepay, {
     unauthenticatedRoutes: [
-      '/payments/update',
+      '/payments/update/structure',
+      '/payments/update/data',
       '/payouts/approve',
       '/charge/subscription',
       '/payouts/create',
