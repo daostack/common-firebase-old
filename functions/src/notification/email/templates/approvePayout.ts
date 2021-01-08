@@ -5,7 +5,7 @@ const template = `
   New payout was requested with the following parameters:
   <br /> <hr /> <br />
   
-  Beneficent: <b>{{beneficent}}</b> <br />
+  Beneficiary: <b>{{beneficiary}}</b> <br />
   Proposal: <b>{{proposal}}</b>  <br />
   Common: <b>{{common}}</b>  <br />
   
@@ -35,7 +35,7 @@ const emailStubs = {
   url: {
     required: true
   },
-  beneficent: {
+  beneficiary: {
     required: true
   },
   proposal: {

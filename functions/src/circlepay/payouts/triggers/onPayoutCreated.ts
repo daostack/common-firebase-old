@@ -35,7 +35,7 @@ export const onPayoutCreated: IEventTrigger = async (eventObj) => {
       to: approver,
       subjectStubs: null,
       emailStubs: {
-        beneficent: `${wire.billingDetails.name}`,
+        beneficiary: `${wire.billingDetails.name}`,
         proposal: proposal
           ? `${(proposal.description as any).title} (${proposal.id})`
           : 'Independent Payout',
