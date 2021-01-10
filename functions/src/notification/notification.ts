@@ -193,7 +193,6 @@ export const notifyData: Record<string, IEventData> = {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     email: ({ userData, proposalData, commonData, cardMetadata }): ISendTemplatedEmailData[] => {
       const userTemplate = getFundingRequestAcceptedTemplate(cardMetadata?.billingDetails?.country, proposalData.fundingRequest.amount);
-      console.log('env.mail.payoutEmail', env.mail.payoutEmail)
       return [
         {
           to: userData.email,
