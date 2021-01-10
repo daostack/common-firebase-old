@@ -109,6 +109,56 @@ export interface ICommonMetadata {
   contributionType: ContributionType;
 }
 
+/**
+ * 
+ */
+export interface ICommonUpdate {
+  /**
+   * ID of the common that needs to be updated
+   */
+  common: ICommonEntity;
+
+  /**
+   * ID of the common owner
+   */
+  userId: string;
+
+  /**
+   * Changes of the common
+   */
+  commonChanges: {
+    /**
+     * The new name of the Common
+     */
+    name?: string;
+
+    /**
+     * The URL of the new image, used as header for
+     * the common profile page
+     */
+    image?: string;
+
+    metadata?: {
+      /**
+      * The new byline of the common; Tagline in the UI
+      */
+      byline?: string;
+
+      /**
+       * The new description of the common; About in the UI
+       * 
+       */
+      description?: string;
+    }
+    
+    /**
+     * List of the rules, that a member must agree
+     * to be a part if the common
+     */
+    rules?: ICommonRule[];
+  }
+}
+
 export type ContributionType = 'one-time' | 'monthly';
 
 /**
