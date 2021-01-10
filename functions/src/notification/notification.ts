@@ -18,7 +18,6 @@ import moment from 'moment';
 import { getFundingRequestAcceptedTemplate } from './helpers';
 
 const messaging = admin.messaging();
-const payoutEamil = 'payout@common.io'; // @question should be moved to env or constants?
 
 const getNameString = (userData) => {
   if (!userData.firstName && userData.lastName) {
@@ -194,11 +193,12 @@ export const notifyData: Record<string, IEventData> = {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     email: ({ userData, proposalData, commonData, cardMetadata }): ISendTemplatedEmailData[] => {
       const userTemplate = getFundingRequestAcceptedTemplate(cardMetadata?.billingDetails?.country, proposalData.fundingRequest.amount);
+      console.log('env.mail.payoutEmail', env.mail.payoutEmail)
       return [
         {
           to: userData.email,
-          from: proposalData.fundingRequest.amount === 0 ? env.mail.sender : payoutEamil,
-          bcc: payoutEamil,
+          from: proposalData.fundingRequest.amount === 0 ? env.mail.sender : env.mail.payoutEmail,
+          bcc: env.mail.payoutEmail,
           templateKey: (userTemplate as any),
           emailStubs: {
             userName: getNameString(userData),
