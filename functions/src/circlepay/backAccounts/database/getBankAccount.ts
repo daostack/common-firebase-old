@@ -2,8 +2,6 @@ import { ArgumentError, NotFoundError } from '../../../util/errors';
 
 import { BankAccountCollection } from './index';
 import { IBankAccountEntity } from '../types';
-import { circleClient } from '../../client';
-import { updateBankAccountInDatabase } from './updateBankAccount';
 
 /**
  * Gets bankAccount by id
@@ -27,15 +25,5 @@ export const getBankAccount = async (bankAccountId: string): Promise<IBankAccoun
   if(!bankAccount) {
     throw new NotFoundError(bankAccountId, 'bankAccount');
   }
-
-  // Update the bank account description if needed
-  if (!bankAccount.description) {
-    const circleBankAccount = await circleClient.getBankAccount(bankAccount.circleId);
-
-    bankAccount.description = circleBankAccount.data.description;
-
-    await updateBankAccountInDatabase(bankAccount);
-  }
-
   return bankAccount;
 }

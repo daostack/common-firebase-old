@@ -44,7 +44,7 @@ export const onPayoutCreated: IEventTrigger = async (eventObj) => {
           ? `${common.name} (${common.id})`
           : 'Independent Payout',
 
-        bankDescription: wire.description,
+        bankDescription: wire.description || 'The bank account has no description',
         bank: wire.bank.bankName,
 
         payoutId: payout.id,
