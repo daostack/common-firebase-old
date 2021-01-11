@@ -141,6 +141,7 @@ export async function fillPayInSheet():Promise<any> {
   
   const values = [[
     "Payment id",
+    "Circle Payment id",
     "Payment status",
     "Payment amount",
     "Fees",
@@ -170,6 +171,7 @@ export async function fillPayInSheet():Promise<any> {
 
           if(data[key].payment){
             cells.push(data[key].payment.id)
+            cells.push(data[key].payment.circlePaymentId)
             cells.push(data[key].payment.status)
             cells.push(data[key].payment.amount.amount/100)
             if(data[key].payment.fees){
