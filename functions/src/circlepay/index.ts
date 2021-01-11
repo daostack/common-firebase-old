@@ -22,10 +22,8 @@ import { createBankAccount } from './backAccounts/bussiness/createBankAccount';
 import { approvePayout } from './payouts/business/approvePayout';
 import { createProposalPayout } from './payouts/business/createProposalPayout';
 import { createIndependentPayout } from './payouts/business/createIndependentPayout';
-import { updatePaymentFromCircle } from './payments/business/updatePaymentFromCircle';
 import { updatePaymentsFromCircle } from './payments/business/updatePaymentsFromCircle';
 import { updatePayments } from './payments/helpers';
-import { updatePaymentStructure } from './payments/helpers/converter';
 
 const runtimeOptions = {
   timeoutSeconds: 540
