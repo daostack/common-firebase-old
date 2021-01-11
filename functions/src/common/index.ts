@@ -48,9 +48,7 @@ if (env.environment === 'staging' || env.environment === 'dev') {
 router.post('/update', async (req, res, next) => (
   await responseExecutor(
     async () => {
-      return await updateCommon({
-        ...req.body,
-      });
+      return await updateCommon(req.body);
     }, {
       req,
       res,
