@@ -34,15 +34,17 @@ const processNotification = async (notification: INotificationModel) => {
 
             if (currNotifyObj.notification) {
                 const {title, body, image, path} = await currNotifyObj.notification(eventNotifyData);
-                await Notification.send(userData.tokens, title, body, image, path);
+                try {
+                  // this doesn't seem to catch anything
+                  await Notification.send(userData.tokens, title, body, image, path); // try
+                } catch(err) {
+                  logger.error(err)
+                  throw err
+                }
+                
             }
 
         });
-    } else {
-        if (currNotifyObj.notification) {
-            const {title, body, image, path} = currNotifyObj.notification(eventNotifyData);
-            await Notification.sendToAllUsers(title, body, image, path);
-        }
     }
     // handling email sending separately  from notifications because we don't want to send as many emails as userFilter.length
     if (currNotifyObj.email) {
@@ -52,11 +54,7 @@ const processNotification = async (notification: INotificationModel) => {
           const template = currEmailTemplate;
           await emailClient.sendTemplatedEmail(template);
       });
-    }
-
-
-
-        
+    }  
 }
 
 exports.commonNotificationListener = functions
