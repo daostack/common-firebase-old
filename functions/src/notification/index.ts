@@ -33,17 +33,14 @@ const processNotification = async (notification: INotificationModel) => {
             const userData: any = (await getUserById(filterUserId)).data();
 
             if (currNotifyObj.notification) {
+              try {
                 const {title, body, image, path} = await currNotifyObj.notification(eventNotifyData);
-                try {
-                  // this doesn't seem to catch anything
-                  await Notification.send(userData.tokens, title, body, image, path); // try
-                } catch(err) {
-                  logger.error(err)
-                  throw err
-                }
-                
+                await Notification.send(userData.tokens, title, body, image, path);
+              } catch(err) {
+                logger.error('Notification send err -> ', err)
+                throw err
+              }
             }
-
         });
     }
     // handling email sending separately  from notifications because we don't want to send as many emails as userFilter.length
