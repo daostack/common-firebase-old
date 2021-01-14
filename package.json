@@ -32,7 +32,7 @@
     "deploy:indexes:prod": "yarn use:production && firebase deploy -only firestore:indexes"
   },
   "engines": {
-    "node": "12"
+    "node": "10"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^1.0.3",
