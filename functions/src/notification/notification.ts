@@ -81,7 +81,11 @@ export const notifyData: Record<string, IEventData> = {
             tagline: commonData.metadata.byline,
             about: commonData.metadata.description,
             paymentType: 'one-time',
-            minContribution: commonData.metadata.minFeeToJoin
+            minContribution: (commonData.metadata.minFeeToJoin / 100)
+              .toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD'
+              })
           }
         }
       ];
@@ -196,6 +200,8 @@ export const notifyData: Record<string, IEventData> = {
       return [
         {
           to: userData.email,
+          from: proposalData.fundingRequest.amount === 0 ? env.mail.sender : env.mail.payoutEmail,
+          bcc: env.mail.payoutEmail,
           templateKey: (userTemplate as any),
           emailStubs: {
             userName: getNameString(userData),
