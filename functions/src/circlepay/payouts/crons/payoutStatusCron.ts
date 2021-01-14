@@ -11,9 +11,14 @@ export const payoutStatusCron = functions.pubsub
     });
 
     if (pendingPayouts && pendingPayouts.length) {
-      for (const payout of pendingPayouts) {
-        // eslint-disable-next-line no-await-in-loop
-        await updatePayoutStatus(payout);
-      }
+      const promiseArr: Promise<void>[] = [];
+
+      pendingPayouts.forEach(payout => {
+        promiseArr.push((async () => {
+          logger.info(`Updating the status of payout ${payout.id}`);
+
+          await updatePayoutStatus(payout);
+        })());
+      });
     }
   });
