@@ -9,7 +9,10 @@ interface IBillingDetailsBase {
 
 export interface ICircleCreateBankAccountPayload {
   idempotencyKey: string;
-  iban: string;
+
+  iban?: string;
+  routingNumber?: string;
+  accountNumber?: string;
 
   billingDetails: IBillingDetailsBase & {
     name: string;
@@ -36,5 +39,22 @@ export interface ICircleCreateBankAccountResponse {
      line1?: string;
    }
  }
+}
+
+export interface ICircleGetBankAccountResponse {
+  data: {
+    id: string;
+    description: string;
+    trackingRef: string;
+    fingerprint: string;
+    billingDetails: IBillingDetailsBase & {
+      name: string;
+    };
+
+    bankAddress: IBillingDetailsBase & {
+      bankName: string;
+      line1?: string;
+    }
+  }
 }
 
