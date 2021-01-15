@@ -238,10 +238,31 @@ export const notifyData: Record<string, IEventData> = {
     }
   },
   [EVENT_TYPES.FUNDING_REQUEST_ACCEPTED_INSUFFICIENT_FUNDS]: {
-    data: (): void => {
-      // @todo Implement this one you have the details
-      logger.warn('Not Implemented: Insufficient funds for funding request notification and email');
-    }
+    data: async (objectId: string): Promise<any> => {
+      const proposal = await proposalDb.getProposal(objectId);
+      const common = await commonDb.get(proposal.commonId);
+      const user = (await getUserById(proposal.proposerId)).data();
+
+      return {
+        user,
+        common,
+        proposal
+      };
+    },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    email: ({ user, proposal, common }): ISendTemplatedEmailData => ({
+      to: user.email,
+      templateKey: 'userFundingRequestAcceptedInsufficientFunds',
+      emailStubs: {
+        firstName: user.firstName,
+        commonName: common.name,
+        proposalName: proposal.description.title,
+        amountRequested: (proposal.fundingRequest.amount / 100)
+          .toLocaleString('en-US', { style: 'currency', currency: 'USD' }),
+        commonBalance: (common.balance / 100)
+          .toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+      }
+    })
   },
   [EVENT_TYPES.REQUEST_TO_JOIN_EXECUTED]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
