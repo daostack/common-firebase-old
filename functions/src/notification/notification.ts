@@ -237,6 +237,12 @@ export const notifyData: Record<string, IEventData> = {
       ];
     }
   },
+  [EVENT_TYPES.FUNDING_REQUEST_ACCEPTED_INSUFFICIENT_FUNDS]: {
+    data: (): void => {
+      // @todo Implement this one you have the details
+      logger.warn('Not Implemented: Insufficient funds for funding request notification and email');
+    }
+  },
   [EVENT_TYPES.REQUEST_TO_JOIN_EXECUTED]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     data: async (proposalId: string) => {
