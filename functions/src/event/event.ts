@@ -82,6 +82,7 @@ export enum EVENT_TYPES {
   COMMON_WHITELISTED = 'commonWhitelisted',
   COMMON_MEMBER_ADDED = 'commonMemberAdded',
   COMMON_MEMBER_REMOVED = 'commonMemberRemoved',
+  COMMON_UPDATED = 'commonUpdated',
 
 
   // Request to join related events
@@ -93,9 +94,10 @@ export enum EVENT_TYPES {
 
   // Funding request related event
   FUNDING_REQUEST_CREATED = 'fundingRequestCreated',
-  FUNDING_REQUEST_ACCEPTED = 'fundingRequestAccepted',
   FUNDING_REQUEST_REJECTED = 'fundingRequestRejected',
   FUNDING_REQUEST_EXECUTED = 'fundingRequestExecuted',
+  FUNDING_REQUEST_ACCEPTED = 'fundingRequestAccepted',
+  FUNDING_REQUEST_ACCEPTED_INSUFFICIENT_FUNDS = 'fundingRequestAcceptedInsufficientFunds',
 
 
   // Voting related events
@@ -195,6 +197,13 @@ export const eventData: Record<string, IEventData> = {
     }
   },
   [EVENT_TYPES.FUNDING_REQUEST_ACCEPTED]: {
+    eventObject: async (proposalId: string): Promise<any> => (await proposalDb.getProposal(proposalId)),
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    notifyUserFilter: async (proposal: any): Promise<string[]> => {
+      return [proposal.proposerId];
+    }
+  },
+  [EVENT_TYPES.FUNDING_REQUEST_ACCEPTED_INSUFFICIENT_FUNDS]: {
     eventObject: async (proposalId: string): Promise<any> => (await proposalDb.getProposal(proposalId)),
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     notifyUserFilter: async (proposal: any): Promise<string[]> => {
