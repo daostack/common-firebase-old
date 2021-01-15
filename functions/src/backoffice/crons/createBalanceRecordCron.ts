@@ -1,5 +1,4 @@
 import * as functions from 'firebase-functions';
-import { backofficeDb } from '../database';
 import { addCircleBalance } from '../database/addCircleBalance';
 
 

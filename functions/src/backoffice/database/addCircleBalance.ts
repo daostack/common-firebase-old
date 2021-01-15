@@ -3,7 +3,7 @@ import admin from 'firebase-admin';
 import Timestamp = admin.firestore.Timestamp;
 
 
-import { ICircleBalanceBase, ICircleBalancePayload } from '../types';
+import { ICircleBalanceBase } from '../types';
 import { CircleBalancesCollection } from '.';
 import { getCircleBalance } from './getCircleBalance';
 

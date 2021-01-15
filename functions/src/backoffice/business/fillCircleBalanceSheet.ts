@@ -1,20 +1,15 @@
 import { backofficeDb } from '../database';
-import { getSecret } from '../../settings';
 import { env } from '../../constants';
 import { google } from 'googleapis'
 import { date } from '../helper'
+import { jwt } from './jwtClient'
 
 
-const SERVICE_ACCOUNT = 'SERVICE_ACCOUNT' 
-const SERVICE_ACCOUNT_PRIVATE_KEY = 'SERVICE_ACCOUNT_PRIVATE_KEY'
 
 export async function fillCircleBalanceSheet():Promise<any> {
+  const jwtClient = await jwt();
   const sheets = google.sheets('v4')
-  const jwtClient = new google.auth.JWT({
-      email: await getSecret(SERVICE_ACCOUNT),
-      key: await getSecret(SERVICE_ACCOUNT_PRIVATE_KEY),
-      scopes: [ 'https://www.googleapis.com/auth/spreadsheets' ],  // read and write sheets
-  })
+
   const data = (await backofficeDb.getCircleBalance()).data.data;
   const values = [[
     'Account',
