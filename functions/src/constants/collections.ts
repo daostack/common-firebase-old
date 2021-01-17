@@ -7,6 +7,7 @@ export const Collections = {
   Commons: 'daos',
   Votes: 'votes',
   DiscussionMessage: 'discussionMessage',
+  CommonEditHistory: 'commonEditHistory',
   // @todo Make this plural
   Event: 'event',
   Cards: 'cards',
