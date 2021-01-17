@@ -20,6 +20,7 @@ import { adminJoinedButPaymentFailed } from './templates/adminJoinedButFailedPay
 import { subscriptionCanceled } from './templates/subscriptionCanceled';
 import { subscriptionChargeFailed } from './templates/subscriptionChargeFailed';
 import { subscriptionCharged } from './templates/subscriptionCharged';
+import { userFundingRequestAcceptedInsufficientFunds } from './templates/userFundingRequestAcceptedInsufficientFunds';
 
 const templates = {
   requestToJoinSubmitted,
@@ -39,7 +40,8 @@ const templates = {
   approvePayout,
   subscriptionCanceled,
   subscriptionCharged,
-  subscriptionChargeFailed
+  subscriptionChargeFailed,
+  userFundingRequestAcceptedInsufficientFunds
 };
 
 const globalDefaultStubs = {
@@ -144,12 +146,14 @@ export interface ISendTemplatedEmailData {
   templateKey: keyof typeof templates,
   emailStubs?: any,
   subjectStubs?: any,
-  to: string | string[]
+  to: string | string[],
+  from?: string,
+  bcc?: string,
 }
 
 type SendTemplatedEmail = (data: ISendTemplatedEmailData) => Promise<void>;
 
-export const sendTemplatedEmail: SendTemplatedEmail = async ({ templateKey, emailStubs, subjectStubs, to }) => {
+export const sendTemplatedEmail: SendTemplatedEmail = async ({ templateKey, emailStubs, subjectStubs, to, from, bcc }) => {
   to === 'admin' && (to = env.mail.adminMail);
 
   const { body, subject } = getTemplatedEmail(templateKey, { emailStubs, subjectStubs });
@@ -164,7 +168,9 @@ export const sendTemplatedEmail: SendTemplatedEmail = async ({ templateKey, emai
       emailPromises.push(sendMail(
         emailTo,
         subject,
-        body
+        body,
+        from,
+        bcc
       ));
     });
 
@@ -176,7 +182,9 @@ export const sendTemplatedEmail: SendTemplatedEmail = async ({ templateKey, emai
     await sendMail(
       to,
       subject,
-      body
+      body,
+      from,
+      bcc
     );
   }
 

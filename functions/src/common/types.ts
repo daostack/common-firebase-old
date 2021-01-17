@@ -1,4 +1,6 @@
 import { IBaseEntity } from '../util/types';
+import admin from 'firebase-admin';
+import Timestamp = admin.firestore.Timestamp;
 
 export interface ICommonEntity extends IBaseEntity {
   /**
@@ -60,6 +62,7 @@ export interface ICommonEntity extends IBaseEntity {
 
 export interface ICommonMember {
   userId: string;
+  joinedAt?: Timestamp;
 }
 
 export interface ICommonRule {

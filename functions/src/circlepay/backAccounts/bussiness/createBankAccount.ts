@@ -82,7 +82,13 @@ export const createBankAccount = async (payload: CreateBankAccountPayload): Prom
   const headers = await getCircleHeaders();
   const data: ICircleCreateBankAccountPayload = {
     idempotencyKey: v4(),
-    iban: normalizeIban(payload.iban),
+
+    ...(payload.iban ? {
+      iban: normalizeIban(payload.iban),
+    } : {
+      routingNumber: payload.routingNumber,
+      accountNumber: payload.accountNumber
+    }),
 
     billingDetails: payload.billingDetails as any,
     bankAddress: {
@@ -93,6 +99,10 @@ export const createBankAccount = async (payload: CreateBankAccountPayload): Prom
 
   // Create the account on Circle
   const { data: response } = await externalRequestExecutor<ICircleCreateBankAccountResponse>(async () => {
+    logger.debug('Trying to create new bank account with circle', {
+      data
+    });
+
     return (await axios.post<ICircleCreateBankAccountResponse>(`${circlePayApi}/banks/wires`,
       data,
       headers
@@ -103,19 +113,18 @@ export const createBankAccount = async (payload: CreateBankAccountPayload): Prom
   });
 
   // Check if the account exists
-  const existingBankAccounts = await bankAccountDb.getMany({
-    fingerprint: response.fingerprint
-  });
-
-  // If there is entity for that bank account just return it
-  if (existingBankAccounts.length) {
-    return existingBankAccounts[0];
+  const existingBankAccount = await bankAccountDb.get(response?.id, false);
+  
+  if(existingBankAccount) {
+    return existingBankAccount;
   }
 
   // If there are no entities for this account - create it
   const bankAccount = await bankAccountDb.add({
     circleId: response.id,
     circleFingerprint: response.fingerprint,
+
+    description: response.description,
 
     bank: response.bankAddress as any,
     billingDetails: response.billingDetails as any

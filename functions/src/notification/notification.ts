@@ -81,7 +81,11 @@ export const notifyData: Record<string, IEventData> = {
             tagline: commonData.metadata.byline,
             about: commonData.metadata.description,
             paymentType: 'one-time',
-            minContribution: commonData.metadata.minFeeToJoin
+            minContribution: (commonData.metadata.minFeeToJoin / 100)
+              .toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD'
+              })
           }
         }
       ];
@@ -196,6 +200,8 @@ export const notifyData: Record<string, IEventData> = {
       return [
         {
           to: userData.email,
+          from: proposalData.fundingRequest.amount === 0 ? env.mail.sender : env.mail.payoutEmail,
+          bcc: env.mail.payoutEmail,
           templateKey: (userTemplate as any),
           emailStubs: {
             userName: getNameString(userData),
@@ -230,6 +236,33 @@ export const notifyData: Record<string, IEventData> = {
         }
       ];
     }
+  },
+  [EVENT_TYPES.FUNDING_REQUEST_ACCEPTED_INSUFFICIENT_FUNDS]: {
+    data: async (objectId: string): Promise<any> => {
+      const proposal = await proposalDb.getProposal(objectId);
+      const common = await commonDb.get(proposal.commonId);
+      const user = (await getUserById(proposal.proposerId)).data();
+
+      return {
+        user,
+        common,
+        proposal
+      };
+    },
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    email: ({ user, proposal, common }): ISendTemplatedEmailData => ({
+      to: user.email,
+      templateKey: 'userFundingRequestAcceptedInsufficientFunds',
+      emailStubs: {
+        firstName: user.firstName,
+        commonName: common.name,
+        proposalName: proposal.description.title,
+        amountRequested: (proposal.fundingRequest.amount / 100)
+          .toLocaleString('en-US', { style: 'currency', currency: 'USD' }),
+        commonBalance: (common.balance / 100)
+          .toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+      }
+    })
   },
   [EVENT_TYPES.REQUEST_TO_JOIN_EXECUTED]: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -443,30 +476,5 @@ export default new class Notification implements INotification {
     const messageSent: admin.messaging.MessagingDevicesResponse = tokens.length > 0 && await messaging.sendToDevice(tokens, payload, options);
 
     logger.debug('Send Success', messageSent);
-  }
-
-  async sendToAllUsers(title: string, body: string, image = '', path: string) {
-    const payload = {
-      topic: 'notification',
-      android: {
-        priority: 'high'
-      },
-      data: {
-        path
-      },
-      notification: {
-        title,
-        body,
-        image
-      }
-    } as admin.messaging.Message;
-
-    //console.info('payload -> ', payload);
-
-    // @question Ask about this rule "promise/always-return". It is kinda useless so we may disable it globally?
-    // eslint-disable-next-line promise/always-return
-    const messageSent: string = await messaging.send(payload);
-
-    logger.debug('Send Success', { messageSent });
   }
 };
