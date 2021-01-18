@@ -1,7 +1,7 @@
 import { IPaymentEntity, PaymentStatus } from '../types';
 import { PaymentsCollection } from './index';
 
-interface IGetPaymentsOptions {
+export interface IGetPaymentsOptions {
   /**
    * Get all payments with ID (should be only one)
    */
@@ -16,7 +16,7 @@ interface IGetPaymentsOptions {
   /**
    * Filter by the status of the payment
    */
-  status?: PaymentStatus;
+  status?: PaymentStatus | PaymentStatus[];
 
   createdFromObject?: {
     id?: string;
@@ -42,8 +42,9 @@ export const getPayments = async (options: IGetPaymentsOptions): Promise<IPaymen
   }
 
   if (options.status) {
-    paymentsQuery = paymentsQuery
-      .where('status', '==', options.status);
+    paymentsQuery = Array.isArray(options.status)
+      ? paymentsQuery.where('status', 'in', options.status)
+      : paymentsQuery.where('status', '==', options.status);
   }
 
   if (options.createdFromObject) {
