@@ -1,4 +1,6 @@
 import { firestore } from 'firebase-admin';
+import { v4 } from 'uuid';
+
 import { ICommonUpdate } from '../../common/types';
 import { commonDb } from '../../common/database';
 import { commonHistoryCollection } from './index';
@@ -16,8 +18,10 @@ export const addCommonHistory = async (commonUpdate: ICommonUpdate): Promise<ICo
   const {newCommon, changedBy} = commonUpdate;
   const originalCommon = await commonDb.get(newCommon.id)
 
-  const commonHistoryRecord = {
-    changedAt: firestore.Timestamp.fromDate(new Date()),
+  const commonHistoryRecord: ICommonEditHistory = {
+    id: v4(),
+    createdAt: firestore.Timestamp.now(),
+    updatedAt: firestore.Timestamp.now(),
     commonId: originalCommon.id,
     changedBy,
     originalDocument: originalCommon,
