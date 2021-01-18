@@ -1,6 +1,6 @@
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 
-import { ErrorCodes, StatusCodes } from '../../constants';
+import {ErrorCodes, StatusCodes} from '../../constants';
 
 interface IErrorData {
   userMessage?: string;
@@ -39,17 +39,14 @@ export class CommonError extends Error implements ICommonError {
    * @param message - the error message (required)
    * @param data - more data, related to the error (optional)
    */
-  constructor(
-    message: string,
-    data: IErrorData = {}
-  ) {
+  constructor(message: string, data: IErrorData = {}) {
     const errorId = uuidv4();
     super(`${message} (${errorId})`);
     Error.captureStackTrace(this, this.constructor);
 
     this.errorId = errorId;
 
-    this.name = "Common Error";
+    this.name = 'Common Error';
 
     this.errorCode = data.errorCode || ErrorCodes.GenericError;
     this.statusCode = data.statusCode || StatusCodes.InternalServerError;

@@ -1,20 +1,25 @@
-import { db } from '../../../util';
-import { Collections } from '../../../constants';
-import { ICardEntity } from '../types';
+import {db} from '../../../util';
+import {Collections} from '../../../constants';
+import {ICardEntity} from '../types';
 
-import { addCard } from './addCard';
-import { getCard } from './getCard';
-import { getCards } from './getCards';
-import { updateCardInDatabase } from './updateCard';
+import {addCard} from './addCard';
+import {getCard} from './getCard';
+import {getCards} from './getCards';
+import {updateCardInDatabase} from './updateCard';
 
-export const CardCollection = db.collection(Collections.Cards)
+export const CardCollection = db
+  .collection(Collections.Cards)
   .withConverter<ICardEntity>({
-    fromFirestore(snapshot: FirebaseFirestore.QueryDocumentSnapshot): ICardEntity {
+    fromFirestore(
+      snapshot: FirebaseFirestore.QueryDocumentSnapshot,
+    ): ICardEntity {
       return snapshot.data() as ICardEntity;
     },
-    toFirestore(object: ICardEntity | Partial<ICardEntity>): FirebaseFirestore.DocumentData {
+    toFirestore(
+      object: ICardEntity | Partial<ICardEntity>,
+    ): FirebaseFirestore.DocumentData {
       return object;
-    }
+    },
   });
 
 export const cardDb = {
@@ -38,5 +43,5 @@ export const cardDb = {
    */
   getMany: getCards,
 
-  update: updateCardInDatabase
+  update: updateCardInDatabase,
 };

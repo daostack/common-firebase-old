@@ -1,11 +1,11 @@
-import { v4 } from 'uuid';
+import {v4} from 'uuid';
 import admin from 'firebase-admin';
 import Timestamp = admin.firestore.Timestamp;
 
-import { BaseEntityType, SharedOmit } from '../../../util/types';
+import {BaseEntityType, SharedOmit} from '../../../util/types';
 
-import { IPayoutEntity } from '../types';
-import { PayoutsCollection } from './index';
+import {IPayoutEntity} from '../types';
+import {PayoutsCollection} from './index';
 
 /**
  * Prepares the passed payout for saving and saves it. Please note that
@@ -13,23 +13,23 @@ import { PayoutsCollection } from './index';
  *
  * @param payout - the payout to be saved
  */
-export const addPayout = async (payout: SharedOmit<IPayoutEntity, BaseEntityType>): Promise<IPayoutEntity> => {
+export const addPayout = async (
+  payout: SharedOmit<IPayoutEntity, BaseEntityType>,
+): Promise<IPayoutEntity> => {
   const payoutDoc: IPayoutEntity = {
     id: v4(),
 
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
 
-    ...payout
+    ...payout,
   };
 
   if (process.env.NODE_ENV === 'test') {
     payoutDoc['testCreated'] = true;
   }
 
-  await PayoutsCollection
-    .doc(payoutDoc.id)
-    .set(payoutDoc);
+  await PayoutsCollection.doc(payoutDoc.id).set(payoutDoc);
 
   return payoutDoc;
 };

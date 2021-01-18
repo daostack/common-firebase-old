@@ -1,6 +1,6 @@
-import { CommonError } from './CommonError';
+import {CommonError} from './CommonError';
 
-export const UnsupportedVersionErrorCode = "UnsupportedVersion";
+export const UnsupportedVersionErrorCode = 'UnsupportedVersion';
 
 export class UnsupportedVersionError extends CommonError {
   constructor(errorMsg: string) {

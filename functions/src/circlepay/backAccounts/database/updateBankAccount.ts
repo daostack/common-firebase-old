@@ -1,8 +1,7 @@
-import { firestore } from 'firebase-admin';
+import {firestore} from 'firebase-admin';
 
-import { IBankAccountEntity } from '../types';
-import { BankAccountCollection } from './index';
-
+import {IBankAccountEntity} from '../types';
+import {BankAccountCollection} from './index';
 
 /**
  * Updates the passed entity in the database. Reference
@@ -13,20 +12,20 @@ import { BankAccountCollection } from './index';
  *
  * @returns - The updated bank account entity
  */
-export const updateBankAccountInDatabase = async (bankAccount: IBankAccountEntity): Promise<IBankAccountEntity> => {
+export const updateBankAccountInDatabase = async (
+  bankAccount: IBankAccountEntity,
+): Promise<IBankAccountEntity> => {
   const bankAccountDoc = {
     ...bankAccount,
 
-    updatedAt: firestore.Timestamp.now()
+    updatedAt: firestore.Timestamp.now(),
   };
 
   logger.debug('Updating bank account', {
-    bankAccount
+    bankAccount,
   });
 
-  await BankAccountCollection
-    .doc(bankAccountDoc.id)
-    .update(bankAccountDoc);
+  await BankAccountCollection.doc(bankAccountDoc.id).update(bankAccountDoc);
 
   return bankAccountDoc;
 };

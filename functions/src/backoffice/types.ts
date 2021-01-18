@@ -1,9 +1,8 @@
-
 export interface ICircleBalanceBase {
-    data: {
-        available: any;
-        unsettled: any;
-    }
+  data: {
+    available: any;
+    unsettled: any;
+  };
 }
 
-export type ICircleBalance = ICircleBalanceBase //ISubscriptionPayment | IProposalPayment;
+export type ICircleBalance = ICircleBalanceBase; //ISubscriptionPayment | IProposalPayment;

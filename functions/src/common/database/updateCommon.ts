@@ -1,23 +1,23 @@
-import { firestore } from 'firebase-admin';
+import {firestore} from 'firebase-admin';
 
-import { ICommonEntity } from '../types';
-import { commonCollection } from './index';
+import {ICommonEntity} from '../types';
+import {commonCollection} from './index';
 
 /**
  * Updates the common in the backing store
  *
  * @param common - The updated common
  */
-export const updateCommon = async (common: ICommonEntity): Promise<ICommonEntity> => {
+export const updateCommon = async (
+  common: ICommonEntity,
+): Promise<ICommonEntity> => {
   const commonEntity = {
     ...common,
 
-    updatedAt: firestore.Timestamp.now()
+    updatedAt: firestore.Timestamp.now(),
   };
 
-  await commonCollection
-    .doc(commonEntity.id)
-    .update(commonEntity);
+  await commonCollection.doc(commonEntity.id).update(commonEntity);
 
   return commonEntity;
-}
+};

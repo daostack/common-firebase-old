@@ -17,33 +17,33 @@ Log/info:
 
 const emailStubs = {
   commonId: {
-    required: true
+    required: true,
   },
   commonLink: {
-    required: true
+    required: true,
   },
   commonName: {
-    required: true
+    required: true,
   },
   proposalId: {
-    required: true
+    required: true,
   },
   userName: {
-    required: true
+    required: true,
   },
   paymentAmount: {
-    required: true
+    required: true,
   },
   submittedOn: {
-    required: true
+    required: true,
   },
   log: {
-    required: true
-  }
+    required: true,
+  },
 };
 
 export const adminJoinedButPaymentFailed = {
   subject: 'Payment could not be processed',
   emailStubs,
-  template
+  template,
 };

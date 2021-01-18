@@ -27,24 +27,24 @@ const template = `<div dir="auto">
 
 const emailStubs = {
   userName: {
-    required: true
+    required: true,
   },
   proposal: {
-    required: true
+    required: true,
   },
   fundingAmount: {
-    required: true
+    required: true,
   },
   commonName: {
-    required: true
+    required: true,
   },
   supportChatLink: {
-    required: true
-  }
+    required: true,
+  },
 };
 
 export const userFundingRequestAcceptedIsraeli = {
   subject: 'ההצעה שלך ב- Common אושרה!',
   emailStubs,
-  template
+  template,
 };

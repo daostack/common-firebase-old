@@ -4,12 +4,12 @@ interface IRouteBasedMiddlewareOptions {
   /**
    * Only those routes will have the passed middleware
    */
-  include?: string[],
+  include?: string[];
 
   /**
    * Only those routes will not have the passed middleware
    */
-  exclude?: string[],
+  exclude?: string[];
 
   /**
    * Whether the middleware will be applied if both the include
@@ -21,18 +21,21 @@ interface IRouteBasedMiddlewareOptions {
 const defaultOptions: IRouteBasedMiddlewareOptions = {
   applyByDefault: true,
   exclude: [],
-  include: []
+  include: [],
 };
 
-export const routeBasedMiddleware = (middleware: express.RequestHandler, middlewareOptions: IRouteBasedMiddlewareOptions): express.RequestHandler => {
+export const routeBasedMiddleware = (
+  middleware: express.RequestHandler,
+  middlewareOptions: IRouteBasedMiddlewareOptions,
+): express.RequestHandler => {
   const options = {
     ...defaultOptions,
-    ...middlewareOptions
+    ...middlewareOptions,
   };
 
   return (req, res, next) => {
     if (options.include?.length) {
-      if (options.include.some(x => x === req.path)) {
+      if (options.include.some((x) => x === req.path)) {
         return middleware(req, res, next);
       } else {
         return next();
@@ -40,15 +43,13 @@ export const routeBasedMiddleware = (middleware: express.RequestHandler, middlew
     }
 
     if (options.exclude?.length) {
-      if (options.exclude.some(x => x === req.path)) {
+      if (options.exclude.some((x) => x === req.path)) {
         return next();
       } else {
         return middleware(req, res, next);
       }
     }
 
-    return options.applyByDefault
-      ? middleware(req, res, next)
-      : next();
+    return options.applyByDefault ? middleware(req, res, next) : next();
   };
 };

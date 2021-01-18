@@ -1,9 +1,9 @@
-import { ArgumentError, CommonError } from '../../util/errors';
-import { NotFoundError } from '../../util/errors';
-import { Nullable } from '../../util/types';
+import {ArgumentError, CommonError} from '../../util/errors';
+import {NotFoundError} from '../../util/errors';
+import {Nullable} from '../../util/types';
 
-import { ProposalsCollection } from './index';
-import { IFundingRequestProposal, IProposalEntity } from '../proposalTypes';
+import {ProposalsCollection} from './index';
+import {IFundingRequestProposal, IProposalEntity} from '../proposalTypes';
 
 /**
  * Gets funding request by id
@@ -16,14 +16,16 @@ import { IFundingRequestProposal, IProposalEntity } from '../proposalTypes';
  *
  * @returns - The found proposal
  */
-export const getFundingRequest = async (proposalId: string): Promise<IFundingRequestProposal> => {
+export const getFundingRequest = async (
+  proposalId: string,
+): Promise<IFundingRequestProposal> => {
   if (!proposalId) {
     throw new ArgumentError('proposalId', proposalId);
   }
 
-  const proposal = (await ProposalsCollection
-    .doc(proposalId)
-    .get()).data() as Nullable<IProposalEntity>;
+  const proposal = (
+    await ProposalsCollection.doc(proposalId).get()
+  ).data() as Nullable<IProposalEntity>;
 
   if (!proposal) {
     throw new NotFoundError(proposalId, 'proposal');
@@ -31,7 +33,7 @@ export const getFundingRequest = async (proposalId: string): Promise<IFundingReq
 
   if (proposal.type !== 'fundingRequest') {
     throw new CommonError('Proposal found, but is not funding request', {
-      proposal
+      proposal,
     });
   }
 

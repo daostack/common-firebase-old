@@ -6,13 +6,13 @@ import * as notification from './notification';
 import * as messageTriggers from './discussionMessage/triggers';
 import * as commonTriggers from './common/triggers';
 
-import { circlePayApp, circlePayCrons } from './circlepay';
-import { commonsApp } from './common';
-import { proposalCrons, proposalTriggers, proposalsApp } from './proposals';
-import { subscriptionsApp } from './subscriptions';
-import { payoutTriggers } from './circlepay/payouts/triggers';
-import { backofficeApp } from './backoffice';
-import { metadataApp } from './metadata';
+import {circlePayApp, circlePayCrons} from './circlepay';
+import {commonsApp} from './common';
+import {proposalCrons, proposalTriggers, proposalsApp} from './proposals';
+import {subscriptionsApp} from './subscriptions';
+import {payoutTriggers} from './circlepay/payouts/triggers';
+import {backofficeApp} from './backoffice';
+import {metadataApp} from './metadata';
 
 // --- Express apps
 export const commons = commonsApp;

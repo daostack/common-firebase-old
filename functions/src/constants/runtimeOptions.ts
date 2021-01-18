@@ -1,3 +1,3 @@
 export const runtimeOptions = {
-  timeoutSeconds: 540
+  timeoutSeconds: 540,
 };

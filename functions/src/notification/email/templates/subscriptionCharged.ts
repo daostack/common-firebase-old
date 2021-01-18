@@ -1,4 +1,4 @@
-import { IEmailTemplate } from '../index';
+import {IEmailTemplate} from '../index';
 import moment from 'moment';
 
 const template = `
@@ -17,36 +17,35 @@ const template = `
   </div>
 `;
 
-
 export const subscriptionCharged: IEmailTemplate = {
   subject: 'Payment confirmation - your monthly contribution to {{commonName}}',
   template: template,
 
   subjectStubs: {
     commonName: {
-      required: true
-    }
+      required: true,
+    },
   },
 
   emailStubs: {
     firstName: {
-      required: true
+      required: true,
     },
     commonLink: {
-      required: true
+      required: true,
     },
     commonName: {
-      required: true
+      required: true,
     },
     lastDigits: {
-      required: true
+      required: true,
     },
     chargeDate: {
       required: false,
-      default: moment(new Date()).format('MMMM D, YYYY')
+      default: moment(new Date()).format('MMMM D, YYYY'),
     },
     chargeAmount: {
-      required: true
-    }
-  }
+      required: true,
+    },
+  },
 };

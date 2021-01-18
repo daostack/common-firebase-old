@@ -1,11 +1,11 @@
-import { circleClient } from '../../client';
+import {circleClient} from '../../client';
 
-import { IPaymentEntity } from '../types';
-import { isFinalized } from '../helpers';
-import { paymentDb } from '../database';
+import {IPaymentEntity} from '../types';
+import {isFinalized} from '../helpers';
+import {paymentDb} from '../database';
 
-import { updatePayment } from './updatePayment';
-import { ArgumentError } from '../../../util/errors';
+import {updatePayment} from './updatePayment';
+import {ArgumentError} from '../../../util/errors';
 
 interface IUpdatePaymentFromCircleOptions {
   /**
@@ -17,7 +17,7 @@ interface IUpdatePaymentFromCircleOptions {
 }
 
 const defaultOptions: IUpdatePaymentFromCircleOptions = {
-  skipIfFinalized: false
+  skipIfFinalized: false,
 };
 
 /**
@@ -29,7 +29,11 @@ const defaultOptions: IUpdatePaymentFromCircleOptions = {
  *
  * @returns - The updated payment entity
  */
-export const updatePaymentFromCircle = async (paymentId: string, trackId: string, customOptions?: Partial<IUpdatePaymentFromCircleOptions>,): Promise<IPaymentEntity> => {
+export const updatePaymentFromCircle = async (
+  paymentId: string,
+  trackId: string,
+  customOptions?: Partial<IUpdatePaymentFromCircleOptions>,
+): Promise<IPaymentEntity> => {
   // Verify the required arguments
   if (typeof paymentId !== 'string') {
     throw new ArgumentError('paymentId', paymentId);
@@ -38,7 +42,7 @@ export const updatePaymentFromCircle = async (paymentId: string, trackId: string
   // Create the final options
   const options = {
     ...defaultOptions,
-    ...customOptions
+    ...customOptions,
   };
 
   // Find the payment in the database
@@ -54,10 +58,7 @@ export const updatePaymentFromCircle = async (paymentId: string, trackId: string
   const circlePayment = await circleClient.getPayment(payment.circlePaymentId);
 
   // Add the track ID to the list
-  payment['trackIds'] = [
-    trackId,
-    ...(payment['trackIds'] || [])
-  ];
+  payment['trackIds'] = [trackId, ...(payment['trackIds'] || [])];
 
   // Update the payment and return it
   return updatePayment(payment, circlePayment);

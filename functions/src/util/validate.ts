@@ -1,9 +1,9 @@
 import * as yup from 'yup';
 import * as _ from 'lodash';
 
-import { ObjectSchema } from 'yup';
+import {ObjectSchema} from 'yup';
 
-import { CommonError, ValidationError } from './errors';
+import {CommonError, ValidationError} from './errors';
 
 /**
  * Validates the provided payload against the schema and throw formatted
@@ -17,7 +17,10 @@ import { CommonError, ValidationError } from './errors';
  *
  * @returns Promise
  */
-export const validate = async <T extends Record<string, any>>(payload: T, schema: ObjectSchema<T>): Promise<void> => {
+export const validate = async <T extends Record<string, any>>(
+  payload: T,
+  schema: ObjectSchema<T>,
+): Promise<void> => {
   try {
     await schema
       .test('no-unknown', 'No unknown keys are allowed', function (value) {
@@ -29,24 +32,29 @@ export const validate = async <T extends Record<string, any>>(payload: T, schema
 
         if (unknownKeys.length) {
           return this.createError({
-            message: `No unknown keys are allowed. Unknown keys: ${unknownKeys.join(', ')}`
+            message: `No unknown keys are allowed. Unknown keys: ${unknownKeys.join(
+              ', ',
+            )}`,
           });
         }
 
         return true;
       })
       .validate(payload, {
-        abortEarly: false
+        abortEarly: false,
       });
   } catch (e) {
     if (!(e instanceof yup.ValidationError)) {
-      throw new CommonError('Unknown error occurred while doing the validation', {
-        error: e,
-        validatorPayload: {
-          schema,
-          payload
-        }
-      });
+      throw new CommonError(
+        'Unknown error occurred while doing the validation',
+        {
+          error: e,
+          validatorPayload: {
+            schema,
+            payload,
+          },
+        },
+      );
     }
 
     logger.debug('Validation failed with payload', payload);

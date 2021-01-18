@@ -1,5 +1,5 @@
-import { ICardEntity } from '../types';
-import { CardCollection } from './index';
+import {ICardEntity} from '../types';
+import {CardCollection} from './index';
 
 interface IGetCardOptions {
   /**
@@ -31,7 +31,7 @@ interface IGetCardOptions {
      * be returned
      */
     limit?: number;
-  }
+  };
 }
 
 /**
@@ -39,7 +39,9 @@ interface IGetCardOptions {
  *
  * @param options - The options for filtering the cards
  */
-export const getCards = async (options: IGetCardOptions): Promise<ICardEntity[]> => {
+export const getCards = async (
+  options: IGetCardOptions,
+): Promise<ICardEntity[]> => {
   let cardsQuery: any = CardCollection;
 
   if (options.ownerId) {
@@ -51,7 +53,7 @@ export const getCards = async (options: IGetCardOptions): Promise<ICardEntity[]>
   }
 
   if (options.sort) {
-    const { sort } = options;
+    const {sort} = options;
 
     if (sort.orderByAsc) {
       cardsQuery = cardsQuery.orderBy(sort.orderByAsc);
@@ -64,6 +66,5 @@ export const getCards = async (options: IGetCardOptions): Promise<ICardEntity[]>
     }
   }
 
-  return (await cardsQuery.get()).docs
-    .map(card => card.data());
+  return (await cardsQuery.get()).docs.map((card) => card.data());
 };

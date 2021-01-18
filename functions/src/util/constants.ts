@@ -3,7 +3,7 @@ export const StatusCodes = {
 
   NotFound: 404,
 
-  Ok: 200
+  Ok: 200,
 };
 
 export const ErrorCodes = {
@@ -13,7 +13,7 @@ export const ErrorCodes = {
   UncaughtError: 'UncaughtError',
 
   // ---- External providers errors
-  CirclePayError: 'External.CirclePayError'
+  CirclePayError: 'External.CirclePayError',
 };
 
 export const Collections = {
@@ -22,9 +22,9 @@ export const Collections = {
   Payments: 'payments',
   Commons: 'daos',
   Event: 'event',
-  Cards: 'cards'
+  Cards: 'cards',
 };
 
 export const runtimeOptions = {
-  timeoutSeconds: 540
+  timeoutSeconds: 540,
 };

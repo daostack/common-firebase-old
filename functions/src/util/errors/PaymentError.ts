@@ -1,4 +1,4 @@
-import { CommonError } from './CommonError';
+import {CommonError} from './CommonError';
 
 /**
  * The exception that is thrown when something goes
@@ -8,7 +8,7 @@ export class PaymentError extends CommonError {
   constructor(paymentId: string, circlePaymentId: string) {
     super('The payment failed', {
       paymentId,
-      circlePaymentId
+      circlePaymentId,
     });
   }
 }

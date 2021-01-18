@@ -1,4 +1,4 @@
-import { IBaseEntity } from '../../util/types';
+import {IBaseEntity} from '../../util/types';
 
 export type PayoutStatus = 'pending' | 'complete' | 'failed';
 export type PayoutType = 'independent' | 'proposal';
@@ -54,7 +54,6 @@ interface IUnexecutedPayout extends IPayoutBaseEntity {
 
 type IExecutablePayoutEntity = IUnexecutedPayout | IExecutedPayout;
 
-
 /**
  * Security details about the payout, needed for the
  * execution of it
@@ -100,14 +99,14 @@ export interface IPayoutDestination {
 }
 
 export type IProposalPayoutEntity = IExecutablePayoutEntity & {
-  type: 'proposal'
+  type: 'proposal';
 
   /**
    * The ID of the proposal, for witch the payout
    * is made
    */
   proposalId: string;
-}
+};
 
 type IIndependentPayoutEntity = IExecutablePayoutEntity;
 

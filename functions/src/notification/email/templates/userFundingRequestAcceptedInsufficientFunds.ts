@@ -1,4 +1,4 @@
-import { IEmailTemplate } from '..';
+import {IEmailTemplate} from '..';
 
 const template = `
   <div>
@@ -33,19 +33,19 @@ export const userFundingRequestAcceptedInsufficientFunds: IEmailTemplate = {
   template: template,
   emailStubs: {
     firstName: {
-      required: true
+      required: true,
     },
     commonName: {
-      required: true
+      required: true,
     },
     proposalName: {
-      required: true
+      required: true,
     },
     amountRequested: {
-      required: true
+      required: true,
     },
     commonBalance: {
-      required: true
-    }
-  }
+      required: true,
+    },
+  },
 };

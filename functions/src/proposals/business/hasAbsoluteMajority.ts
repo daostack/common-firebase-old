@@ -1,10 +1,10 @@
-import { ArgumentError } from '../../util/errors';
+import {ArgumentError} from '../../util/errors';
 
-import { ICommonEntity } from '../../common/types';
-import { commonDb } from '../../common/database';
+import {ICommonEntity} from '../../common/types';
+import {commonDb} from '../../common/database';
 
-import { IProposalEntity } from '../proposalTypes';
-import { countVotes } from './countVotes';
+import {IProposalEntity} from '../proposalTypes';
+import {countVotes} from './countVotes';
 
 /**
  * Checks if proposal has majority for any of the vote options
@@ -16,18 +16,23 @@ import { countVotes } from './countVotes';
  *
  * @returns - Boolean specifying if the proposal has majority in either of the votes
  */
-export const hasAbsoluteMajority = async (proposal: IProposalEntity, common?: ICommonEntity): Promise<boolean> => {
-  if(!proposal) {
+export const hasAbsoluteMajority = async (
+  proposal: IProposalEntity,
+  common?: ICommonEntity,
+): Promise<boolean> => {
+  if (!proposal) {
     throw new ArgumentError('proposal', proposal);
   }
 
-  if(!common) {
+  if (!common) {
     common = await commonDb.get(proposal.commonId);
   }
 
   const votes = countVotes(proposal);
   const votesNeededForMajority = Math.floor(common.members.length / 2) + 1;
 
-  return votes.votesAgainst >= votesNeededForMajority
-    || votes.votesFor >= votesNeededForMajority;
-}
+  return (
+    votes.votesAgainst >= votesNeededForMajority ||
+    votes.votesFor >= votesNeededForMajority
+  );
+};

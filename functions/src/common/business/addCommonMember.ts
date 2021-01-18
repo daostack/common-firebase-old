@@ -1,9 +1,9 @@
-import { ICommonEntity } from '../types';
-import { commonDb } from '../database';
-import { proposalDb } from '../../proposals/database';
-import { CommonError } from '../../util/errors';
-import { createEvent } from '../../util/db/eventDbService';
-import { EVENT_TYPES } from '../../event/event';
+import {ICommonEntity} from '../types';
+import {commonDb} from '../database';
+import {proposalDb} from '../../proposals/database';
+import {CommonError} from '../../util/errors';
+import {createEvent} from '../../util/db/eventDbService';
+import {EVENT_TYPES} from '../../event/event';
 import admin from 'firebase-admin';
 import Timestamp = admin.firestore.Timestamp;
 
@@ -14,13 +14,18 @@ import Timestamp = admin.firestore.Timestamp;
  *
  * @throws { CommonError } - If the passed proposal is not approved
  */
-export const addCommonMemberByProposalId = async (proposalId: string): Promise<void> => {
+export const addCommonMemberByProposalId = async (
+  proposalId: string,
+): Promise<void> => {
   const proposal = await proposalDb.getProposal(proposalId);
 
-  if(proposal.state !== 'passed') {
-    throw new CommonError('Cannot add user from proposal, for witch the proposal is not approved', {
-      proposalId
-    });
+  if (proposal.state !== 'passed') {
+    throw new CommonError(
+      'Cannot add user from proposal, for witch the proposal is not approved',
+      {
+        proposalId,
+      },
+    );
   }
 
   const common = await commonDb.get(proposal.commonId);
@@ -28,7 +33,7 @@ export const addCommonMemberByProposalId = async (proposalId: string): Promise<v
   logger.info('Adding new member to common', {
     common,
     proposal,
-    newMemberId: proposal.proposerId
+    newMemberId: proposal.proposerId,
   });
 
   await addCommonMember(common, proposal.proposerId);
@@ -41,11 +46,14 @@ export const addCommonMemberByProposalId = async (proposalId: string): Promise<v
  * @param common - The common, to which the user will be added
  * @param userId - The ID of the user, that will be added
  */
-const addCommonMember = async (common: ICommonEntity, userId: string): Promise<ICommonEntity> => {
-  if(!common.members.includes({ userId })) {
+const addCommonMember = async (
+  common: ICommonEntity,
+  userId: string,
+): Promise<ICommonEntity> => {
+  if (!common.members.includes({userId})) {
     common.members.push({
-      userId, 
-      joinedAt: Timestamp.now()
+      userId,
+      joinedAt: Timestamp.now(),
     });
 
     await commonDb.update(common);
@@ -54,8 +62,8 @@ const addCommonMember = async (common: ICommonEntity, userId: string): Promise<I
     await createEvent({
       userId,
       objectId: common.id,
-      type: EVENT_TYPES.COMMON_MEMBER_ADDED
-    })
+      type: EVENT_TYPES.COMMON_MEMBER_ADDED,
+    });
   }
 
   return common;

@@ -1,9 +1,9 @@
-import { ISubscriptionEntity } from '../types';
-import { CommonError } from '../../util/errors';
-import { updateSubscription } from '../database/updateSubscription';
-import { revokeMembership } from './revokeMembership';
-import { IPaymentEntity } from '../../circlepay/payments/types';
-import { proposalDb } from '../../proposals/database';
+import {ISubscriptionEntity} from '../types';
+import {CommonError} from '../../util/errors';
+import {updateSubscription} from '../database/updateSubscription';
+import {revokeMembership} from './revokeMembership';
+import {IPaymentEntity} from '../../circlepay/payments/types';
+import {proposalDb} from '../../proposals/database';
 
 /**
  * Handles update for the subscription document on payment failure
@@ -13,10 +13,13 @@ import { proposalDb } from '../../proposals/database';
  *
  * @throws { CommonError } - If the subscription status is not 'Active' or 'PaymentFailed'
  */
-export const handleFailedSubscriptionPayment = async (subscription: ISubscriptionEntity, payment: IPaymentEntity): Promise<void> => {
+export const handleFailedSubscriptionPayment = async (
+  subscription: ISubscriptionEntity,
+  payment: IPaymentEntity,
+): Promise<void> => {
   const failedPayment = {
     paymentStatus: payment.status,
-    paymentId: payment.id
+    paymentId: payment.id,
   };
 
   if (subscription.status === 'Active') {
@@ -46,7 +49,7 @@ export const handleFailedSubscriptionPayment = async (subscription: ISubscriptio
     updateSubscription(subscription),
     await proposalDb.update({
       id: subscription.proposalId,
-      paymentState: 'failed'
-    })
+      paymentState: 'failed',
+    }),
   ]);
 };

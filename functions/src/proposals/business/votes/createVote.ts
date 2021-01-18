@@ -1,30 +1,25 @@
 import * as yup from 'yup';
 
-import { IVoteEntity, VoteOutcome } from '../../voteTypes';
-import { commonDb } from '../../../common/database';
-import { isCommonMember } from '../../../common/business';
-import { proposalDb, voteDb } from '../../database';
-import { ProposalFinalStates, StatusCodes } from '../../../constants';
-import { validate } from '../../../util/validate';
-import { CommonError } from '../../../util/errors';
-import { hasVoted } from './hasVoted';
-import { isExpired } from '../isExpired';
-import { createEvent } from '../../../util/db/eventDbService';
-import { EVENT_TYPES } from '../../../event/event';
-import { processVote } from './processVotes';
-import { finalizeProposal } from '../finalizeProposal';
+import {IVoteEntity, VoteOutcome} from '../../voteTypes';
+import {commonDb} from '../../../common/database';
+import {isCommonMember} from '../../../common/business';
+import {proposalDb, voteDb} from '../../database';
+import {ProposalFinalStates, StatusCodes} from '../../../constants';
+import {validate} from '../../../util/validate';
+import {CommonError} from '../../../util/errors';
+import {hasVoted} from './hasVoted';
+import {isExpired} from '../isExpired';
+import {createEvent} from '../../../util/db/eventDbService';
+import {EVENT_TYPES} from '../../../event/event';
+import {processVote} from './processVotes';
+import {finalizeProposal} from '../finalizeProposal';
 
 const createVoteValidationScheme = yup.object({
-  voterId: yup.string()
-    .required(),
+  voterId: yup.string().required(),
 
-  proposalId: yup.string()
-    .required()
-    .uuid(),
+  proposalId: yup.string().required().uuid(),
 
-  outcome: yup.string()
-    .required()
-    .oneOf(['rejected', 'approved'])
+  outcome: yup.string().required().oneOf(['rejected', 'approved']),
 });
 
 type CreateVotePayload = yup.InferType<typeof createVoteValidationScheme>;
@@ -42,7 +37,9 @@ type CreateVotePayload = yup.InferType<typeof createVoteValidationScheme>;
  *
  * @returns - The created vote entity as is in the *Votes* collection
  */
-export const createVote = async (payload: CreateVotePayload): Promise<IVoteEntity> => {
+export const createVote = async (
+  payload: CreateVotePayload,
+): Promise<IVoteEntity> => {
   // Validate the data
   await validate(payload, createVoteValidationScheme);
 
@@ -52,30 +49,36 @@ export const createVote = async (payload: CreateVotePayload): Promise<IVoteEntit
 
   // Check if the user is in that common
   if (!isCommonMember(common, payload.voterId)) {
-    throw new CommonError('Cannot vote for proposals in commons that you are not member of', {
-      statusCode: StatusCodes.Forbidden,
+    throw new CommonError(
+      'Cannot vote for proposals in commons that you are not member of',
+      {
+        statusCode: StatusCodes.Forbidden,
 
-      payload,
-      common
-    });
+        payload,
+        common,
+      },
+    );
   }
 
   // Check if the user has voted
   if (await hasVoted(proposal, payload.voterId)) {
-    throw new CommonError('Only one vote from one user is allowed on one proposal', {
-      userMessage: 'You can only cast one vote per proposal',
-      statusCode: StatusCodes.UnprocessableEntity,
+    throw new CommonError(
+      'Only one vote from one user is allowed on one proposal',
+      {
+        userMessage: 'You can only cast one vote per proposal',
+        statusCode: StatusCodes.UnprocessableEntity,
 
-      common,
-      payload,
-      proposal
-    });
+        common,
+        payload,
+        proposal,
+      },
+    );
   }
 
   // Check if the proposal is expired
   if (await isExpired(proposal)) {
     // If the proposal is not in final state finalize it
-    if(!ProposalFinalStates.includes(proposal.state)) {
+    if (!ProposalFinalStates.includes(proposal.state)) {
       await finalizeProposal(proposal);
     }
 
@@ -83,7 +86,7 @@ export const createVote = async (payload: CreateVotePayload): Promise<IVoteEntit
       userMessage: 'Cannot vote on expired proposals!',
       statusCode: StatusCodes.UnprocessableEntity,
 
-      proposal
+      proposal,
     });
   }
 
@@ -92,7 +95,7 @@ export const createVote = async (payload: CreateVotePayload): Promise<IVoteEntit
     commonId: common.id,
     proposalId: proposal.id,
     voterId: payload.voterId,
-    outcome: payload.outcome as VoteOutcome
+    outcome: payload.outcome as VoteOutcome,
   });
 
   // Process the vote
@@ -102,7 +105,7 @@ export const createVote = async (payload: CreateVotePayload): Promise<IVoteEntit
   await createEvent({
     type: EVENT_TYPES.VOTE_CREATED,
     objectId: vote.id,
-    userId: vote.voterId
+    userId: vote.voterId,
   });
 
   // Return the created vote document

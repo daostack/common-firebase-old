@@ -1,5 +1,5 @@
-import { CommonError } from './CommonError';
-import { ErrorCodes, StatusCodes } from '../../constants';
+import {CommonError} from './CommonError';
+import {ErrorCodes, StatusCodes} from '../../constants';
 
 /**
  * The exception that is thrown when one of the arguments provided to a
@@ -14,10 +14,9 @@ export class ArgumentError extends CommonError {
       argumentValue,
 
       statusCode: StatusCodes.InternalServerError,
-      errorCode:
-        argumentValue
-          ? ErrorCodes.ArgumentError
-          : ErrorCodes.ArgumentNullError
+      errorCode: argumentValue
+        ? ErrorCodes.ArgumentError
+        : ErrorCodes.ArgumentNullError,
     });
   }
 }

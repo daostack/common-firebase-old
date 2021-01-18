@@ -1,9 +1,9 @@
 import * as functions from 'firebase-functions';
-import { Collections } from '../../../constants';
-import { IEventEntity } from '../../../event/type';
-import { EVENT_TYPES } from '../../../event/event';
-import { onPayoutCreated } from './onPayoutCreated';
-import { onPayoutApproved } from './onPayoutApproved';
+import {Collections} from '../../../constants';
+import {IEventEntity} from '../../../event/type';
+import {EVENT_TYPES} from '../../../event/event';
+import {onPayoutCreated} from './onPayoutCreated';
+import {onPayoutApproved} from './onPayoutApproved';
 
 export const payoutTriggers = functions.firestore
   .document(`/${Collections.Event}/{id}`)

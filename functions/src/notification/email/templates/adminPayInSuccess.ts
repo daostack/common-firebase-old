@@ -4,12 +4,12 @@ const template = `
 
 const emailStubs = {
   proposalId: {
-    required: true
-  }
+    required: true,
+  },
 };
 
 export const adminPayInSuccess = {
   subject: 'Successful pay-in',
   emailStubs,
-  template
+  template,
 };

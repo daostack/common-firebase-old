@@ -1,4 +1,4 @@
-import { IBaseEntity } from '../util/types';
+import {IBaseEntity} from '../util/types';
 import admin from 'firebase-admin';
 import Timestamp = admin.firestore.Timestamp;
 

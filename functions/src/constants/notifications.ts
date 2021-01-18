@@ -1,4 +1,4 @@
 export const Notifications = {
-	messageLimit: 10,
-	maxNotifications: 5
-}
+  messageLimit: 10,
+  maxNotifications: 5,
+};

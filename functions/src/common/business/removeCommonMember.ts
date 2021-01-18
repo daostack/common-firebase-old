@@ -1,7 +1,7 @@
-import { ICommonEntity } from '../types';
-import { commonDb } from '../database';
-import { EVENT_TYPES } from '../../event/event';
-import { createEvent } from '../../util/db/eventDbService';
+import {ICommonEntity} from '../types';
+import {commonDb} from '../database';
+import {EVENT_TYPES} from '../../event/event';
+import {createEvent} from '../../util/db/eventDbService';
 
 /**
  * Removes user from the common
@@ -10,11 +10,14 @@ import { createEvent } from '../../util/db/eventDbService';
  * @param memberId - The id of the member to remove
  *
  */
-export const removeCommonMember = async (common: ICommonEntity, memberId: string): Promise<void> => {
-  if (!common.members.some(x => x.userId === memberId)) {
+export const removeCommonMember = async (
+  common: ICommonEntity,
+  memberId: string,
+): Promise<void> => {
+  if (!common.members.some((x) => x.userId === memberId)) {
     logger.error('Trying to remove non member from common', {
       common,
-      memberId
+      memberId,
     });
 
     return;
@@ -22,13 +25,13 @@ export const removeCommonMember = async (common: ICommonEntity, memberId: string
 
   logger.info('Removing common member', {
     common,
-    member: memberId
+    member: memberId,
   });
 
   // Remove the member
   common.members.splice(
-    common.members.findIndex(x => x.userId === memberId),
-    1
+    common.members.findIndex((x) => x.userId === memberId),
+    1,
   );
 
   // Persist the changes
@@ -38,6 +41,6 @@ export const removeCommonMember = async (common: ICommonEntity, memberId: string
   await createEvent({
     userId: memberId,
     objectId: common.id,
-    type: EVENT_TYPES.COMMON_MEMBER_REMOVED
+    type: EVENT_TYPES.COMMON_MEMBER_REMOVED,
   });
 };

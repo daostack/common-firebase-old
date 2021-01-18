@@ -22,45 +22,45 @@ Log/info:
 
 const emailStubs = {
   commonName: {
-    required: true
+    required: true,
   },
   commonLink: {
-    required: true
+    required: true,
   },
   commonBalance: {
-    required: true
+    required: true,
   },
   commonId: {
-    required: true
+    required: true,
   },
   proposalId: {
-    required: true
+    required: true,
   },
   userName: {
-    required: true
+    required: true,
   },
   userEmail: {
-    required: true
+    required: true,
   },
   userId: {
-    required: true
+    required: true,
   },
   fundingAmount: {
-    required: true
+    required: true,
   },
   submittedOn: {
-    required: true
+    required: true,
   },
   passedOn: {
-    require: true
+    require: true,
   },
   log: {
-    require: true
-  }
+    require: true,
+  },
 };
 
 export const adminFundingRequestAccepted = {
   subject: 'Funding proposal was approved',
   emailStubs,
-  template
+  template,
 };

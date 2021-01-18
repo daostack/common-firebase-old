@@ -1,7 +1,7 @@
 import express from 'express';
 
-import { ICommonError } from './errors/CommonError';
-import { StatusCodes } from '../constants';
+import {ICommonError} from './errors/CommonError';
+import {StatusCodes} from '../constants';
 
 export interface IErrorResponse {
   error: string;
@@ -13,7 +13,11 @@ export interface IErrorResponse {
   data?: any;
 }
 
-export const createErrorResponse = (req: express.Request, res: express.Response, error: ICommonError): void => {
+export const createErrorResponse = (
+  req: express.Request,
+  res: express.Response,
+  error: ICommonError,
+): void => {
   logger.info(`Error occurred at ${req.path}`);
 
   // Here `error instanceof CommonError` does not work for some
@@ -30,14 +34,12 @@ export const createErrorResponse = (req: express.Request, res: express.Response,
         id: req.requestId,
         body: req.body,
         query: req.query,
-        headers: req.headers
+        headers: req.headers,
       },
-      data: error.data
+      data: error.data,
     };
 
-    const statusCode =
-      error.statusCode ||
-      StatusCodes.InternalServerError;
+    const statusCode = error.statusCode || StatusCodes.InternalServerError;
 
     logger.info(`
       Creating error response with message '${error.message}' 
@@ -46,19 +48,19 @@ export const createErrorResponse = (req: express.Request, res: express.Response,
     `);
 
     logger.error('Error occurred', {
-      error
+      error,
     });
 
-    res
-      .status(statusCode)
-      .json(errorResponse);
+    res.status(statusCode).json(errorResponse);
   } else {
-    logger.warn(`
+    logger.warn(
+      `
         The error passed to createErrorResponse was not of
         CommonError type. This should never happen!
-      `, {
-        payload: error
-      }
+      `,
+      {
+        payload: error,
+      },
     );
 
     res

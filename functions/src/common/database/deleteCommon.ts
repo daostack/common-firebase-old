@@ -2,9 +2,9 @@ import admin from 'firebase-admin';
 
 import WriteResult = admin.firestore.WriteResult;
 
-import { Nullable } from '../../util/types';
-import { ArgumentError } from '../../util/errors';
-import { CommonCollection } from '../../backoffice/database';
+import {Nullable} from '../../util/types';
+import {ArgumentError} from '../../util/errors';
+import {CommonCollection} from '../../backoffice/database';
 
 /**
  * Deletes common. Use carefully. If you want to cleanly delete the
@@ -14,14 +14,14 @@ import { CommonCollection } from '../../backoffice/database';
  *
  * @throws { CommonError } - If the common ID is not provided
  */
-export const deleteCommonFromDatabase = async (commonId: Nullable<string>): Promise<WriteResult> => {
+export const deleteCommonFromDatabase = async (
+  commonId: Nullable<string>,
+): Promise<WriteResult> => {
   if (!commonId) {
     throw new ArgumentError('commonId');
   }
 
   logger.notice(`Deleting common with ID ${commonId}`);
 
-  return (await CommonCollection
-    .doc(commonId)
-    .delete());
+  return await CommonCollection.doc(commonId).delete();
 };

@@ -1,5 +1,5 @@
-import { CommonError } from './CommonError';
-import { ErrorCodes, StatusCodes } from '../../constants';
+import {CommonError} from './CommonError';
+import {ErrorCodes, StatusCodes} from '../../constants';
 
 /**
  * The exception that is thrown when something is wrong with the card like
@@ -12,7 +12,7 @@ export class CvvVerificationError extends CommonError {
       cardId,
 
       statusCode: StatusCodes.InternalServerError,
-      errorCode: ErrorCodes.CvvVerificationFail
+      errorCode: ErrorCodes.CvvVerificationFail,
     });
   }
 }

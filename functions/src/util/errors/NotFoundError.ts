@@ -1,5 +1,5 @@
-import { CommonError } from './CommonError';
-import { ErrorCodes, StatusCodes } from '../../constants';
+import {CommonError} from './CommonError';
+import {ErrorCodes, StatusCodes} from '../../constants';
 
 /**
  * The error that is thrown when the requested object
@@ -15,12 +15,11 @@ export class NotFoundError extends CommonError {
    */
   constructor(identifier: string, entity?: string) {
     super(`Cannot find ${entity || 'entity'} with identifier ${identifier}`, {
-      userMessage:
-        (entity)
-          ? `Ooops! We were not able to find ${entity} with id ${identifier}`
-          : 'We were unable to find the requested resource!',
+      userMessage: entity
+        ? `Ooops! We were not able to find ${entity} with id ${identifier}`
+        : 'We were unable to find the requested resource!',
       errorCode: ErrorCodes.NotFound,
-      statusCode: StatusCodes.NotFound
+      statusCode: StatusCodes.NotFound,
     });
   }
 }

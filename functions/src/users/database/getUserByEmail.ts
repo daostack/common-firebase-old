@@ -1,6 +1,6 @@
-import { IUserEntity } from '../types';
-import { ArgumentError, CommonError, NotFoundError } from '../../util/errors';
-import { UserCollection } from './index';
+import {IUserEntity} from '../types';
+import {ArgumentError, CommonError, NotFoundError} from '../../util/errors';
+import {UserCollection} from './index';
 
 /**
  * Tries to find the user by provided email address
@@ -16,18 +16,19 @@ export const getUserByEmail = async (email: string): Promise<IUserEntity> => {
     throw new ArgumentError('email', email);
   }
 
-  const user = await UserCollection
-    .where('email', '==', email)
-    .get();
+  const user = await UserCollection.where('email', '==', email).get();
 
   if (!user.docs.length) {
     throw new NotFoundError('user.email', email);
   }
 
   if (user.docs.length > 1) {
-    throw new CommonError(`There are more than one user with the email ${email}`, {
-      users: user.docs.map(u => u.data())
-    });
+    throw new CommonError(
+      `There are more than one user with the email ${email}`,
+      {
+        users: user.docs.map((u) => u.data()),
+      },
+    );
   }
 
   return user.docs[0].data();

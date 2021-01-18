@@ -1,12 +1,11 @@
 import admin from 'firebase-admin';
 import Timestamp = admin.firestore.Timestamp;
-import { v4 } from 'uuid';
+import {v4} from 'uuid';
 
-import { BaseEntityType, SharedOmit } from '../../util/types';
+import {BaseEntityType, SharedOmit} from '../../util/types';
 
-import { ISubscriptionEntity } from '../types';
-import { SubscriptionsCollection } from './index';
-
+import {ISubscriptionEntity} from '../types';
+import {SubscriptionsCollection} from './index';
 
 /**
  * Prepares the passed subscription for saving and saves it. Please note that
@@ -14,7 +13,9 @@ import { SubscriptionsCollection } from './index';
  *
  * @param subscription - the subscription to be saves
  */
-export const addSubscription = async (subscription: SharedOmit<ISubscriptionEntity, BaseEntityType>): Promise<ISubscriptionEntity> => {
+export const addSubscription = async (
+  subscription: SharedOmit<ISubscriptionEntity, BaseEntityType>,
+): Promise<ISubscriptionEntity> => {
   const subscriptionDoc: ISubscriptionEntity = {
     id: v4(),
 
@@ -23,16 +24,14 @@ export const addSubscription = async (subscription: SharedOmit<ISubscriptionEnti
 
     charges: 0,
 
-    ...(subscription as ISubscriptionEntity)
+    ...(subscription as ISubscriptionEntity),
   };
 
-  if(process.env.NODE_ENV === 'test') {
+  if (process.env.NODE_ENV === 'test') {
     subscriptionDoc['testCreated'] = true;
   }
 
-  await SubscriptionsCollection
-    .doc(subscriptionDoc.id)
-    .set(subscriptionDoc);
+  await SubscriptionsCollection.doc(subscriptionDoc.id).set(subscriptionDoc);
 
   return subscriptionDoc;
 };

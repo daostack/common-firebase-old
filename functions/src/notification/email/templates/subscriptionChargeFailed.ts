@@ -1,4 +1,4 @@
-import { IEmailTemplate } from "..";
+import {IEmailTemplate} from '..';
 
 const template = `
   <div>
@@ -12,20 +12,20 @@ const template = `
     Common,<br/>
     Collaborative Social Action.
   </div>
-`
+`;
 
 export const subscriptionChargeFailed: IEmailTemplate = {
   subject: 'Payment could not be processed',
   template: template,
   emailStubs: {
     firstName: {
-      required: true
+      required: true,
     },
     commonLink: {
-      required: true
+      required: true,
     },
     commonName: {
-      required: true
-    }
-  }
-}
+      required: true,
+    },
+  },
+};

@@ -1,4 +1,4 @@
-import { IProposalEntity } from '../../proposalTypes';
+import {IProposalEntity} from '../../proposalTypes';
 
 /**
  * Check if user is voter for proposal
@@ -6,5 +6,7 @@ import { IProposalEntity } from '../../proposalTypes';
  * @param proposal - The proposal entity
  * @param voterId - The ID of the voter that we want to verify is voter
  */
-export const hasVoted = async (proposal: IProposalEntity, voterId: string): Promise<boolean> =>
-  proposal.votes.some(x => x.voterId === voterId);
+export const hasVoted = async (
+  proposal: IProposalEntity,
+  voterId: string,
+): Promise<boolean> => proposal.votes.some((x) => x.voterId === voterId);

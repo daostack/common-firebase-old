@@ -30,45 +30,45 @@ const template = `
 
 const emailStubs = {
   commonLink: {
-    required: true
+    required: true,
   },
   userName: {
-    required: true
+    required: true,
   },
   userId: {
-    required: true
+    required: true,
   },
   userEmail: {
-    required: true
+    required: true,
   },
   commonCreatedOn: {
-    required: true
+    required: true,
   },
   log: {
-    required: true
+    required: true,
   },
   commonId: {
-    required: true
+    required: true,
   },
   commonName: {
-    required: true
+    required: true,
   },
   tagline: {
-    required: true
+    required: true,
   },
   about: {
-    required: true
+    required: true,
   },
   paymentType: {
-    required: true
+    required: true,
   },
   minContribution: {
-    required: true
-  }
+    required: true,
+  },
 };
 
 export const adminCommonCreated = {
   subject: 'New Common pending approval',
   emailStubs,
-  template
+  template,
 };

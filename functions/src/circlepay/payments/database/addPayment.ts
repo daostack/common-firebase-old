@@ -1,12 +1,11 @@
-import { v4 } from 'uuid';
+import {v4} from 'uuid';
 import admin from 'firebase-admin';
 import Timestamp = admin.firestore.Timestamp;
 
-import { BaseEntityType, SharedOmit } from '../../../util/types';
+import {BaseEntityType, SharedOmit} from '../../../util/types';
 
-import { IPaymentEntity } from '../types';
-import { PaymentsCollection } from './index';
-
+import {IPaymentEntity} from '../types';
+import {PaymentsCollection} from './index';
 
 type OmittedProperties = BaseEntityType | 'fees';
 
@@ -16,7 +15,9 @@ type OmittedProperties = BaseEntityType | 'fees';
  *
  * @param payment - the payment to be saved
  */
-export const addPayment = async (payment: SharedOmit<IPaymentEntity, OmittedProperties>): Promise<IPaymentEntity> => {
+export const addPayment = async (
+  payment: SharedOmit<IPaymentEntity, OmittedProperties>,
+): Promise<IPaymentEntity> => {
   const paymentDoc: IPaymentEntity = {
     id: v4(),
 
@@ -25,19 +26,17 @@ export const addPayment = async (payment: SharedOmit<IPaymentEntity, OmittedProp
 
     fees: {
       amount: 0,
-      currency: 'USD'
+      currency: 'USD',
     },
 
-    ...payment
+    ...payment,
   };
 
   if (process.env.NODE_ENV === 'test') {
     paymentDoc['testCreated'] = true;
   }
 
-  await PaymentsCollection
-    .doc(paymentDoc.id)
-    .set(paymentDoc);
+  await PaymentsCollection.doc(paymentDoc.id).set(paymentDoc);
 
   return paymentDoc;
 };

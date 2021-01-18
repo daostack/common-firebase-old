@@ -1,11 +1,10 @@
-import { v4 } from 'uuid';
-import { firestore } from 'firebase-admin';
+import {v4} from 'uuid';
+import {firestore} from 'firebase-admin';
 
-import { BaseEntityType } from '../../util/types';
+import {BaseEntityType} from '../../util/types';
 
-import { ICommonEntity } from '../types';
-import { commonCollection } from './index';
-
+import {ICommonEntity} from '../types';
+import {commonCollection} from './index';
 
 type OmittedCommonCreationProperties = 'raised' | 'balance';
 
@@ -15,7 +14,9 @@ type OmittedCommonCreationProperties = 'raised' | 'balance';
  *
  * @param common - The common that we want to save
  */
-export const addCommon = async (common: Omit<ICommonEntity, BaseEntityType | OmittedCommonCreationProperties>): Promise<ICommonEntity> => {
+export const addCommon = async (
+  common: Omit<ICommonEntity, BaseEntityType | OmittedCommonCreationProperties>,
+): Promise<ICommonEntity> => {
   const commonDoc: ICommonEntity = {
     id: v4(),
 
@@ -25,16 +26,14 @@ export const addCommon = async (common: Omit<ICommonEntity, BaseEntityType | Omi
     raised: 0,
     balance: 0,
 
-    ...common
+    ...common,
   };
 
-  if(process.env.NODE_ENV === 'test') {
+  if (process.env.NODE_ENV === 'test') {
     commonDoc['testCreated'] = true;
   }
 
-  await commonCollection
-    .doc(commonDoc.id)
-    .set(commonDoc);
+  await commonCollection.doc(commonDoc.id).set(commonDoc);
 
   return commonDoc;
 };

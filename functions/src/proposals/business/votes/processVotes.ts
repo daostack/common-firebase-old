@@ -1,11 +1,11 @@
-import { IVoteEntity } from '../../voteTypes';
-import { proposalDb, voteDb } from '../../database';
-import { hasAbsoluteMajority } from '../hasAbsoluteMajority';
-import { finalizeProposal } from '../finalizeProposal';
-import { commonDb } from '../../../common/database';
-import { countVotes } from '../countVotes';
-import { isInQuietEnding } from '../isInQuietEnding';
-import { updateProposal } from '../../database/updateProposal';
+import {IVoteEntity} from '../../voteTypes';
+import {proposalDb, voteDb} from '../../database';
+import {hasAbsoluteMajority} from '../hasAbsoluteMajority';
+import {finalizeProposal} from '../finalizeProposal';
+import {commonDb} from '../../../common/database';
+import {countVotes} from '../countVotes';
+import {isInQuietEnding} from '../isInQuietEnding';
+import {updateProposal} from '../../database/updateProposal';
 
 export const processVote = async (vote: IVoteEntity): Promise<void> => {
   const proposal = await proposalDb.getProposal(vote.proposalId);
@@ -17,12 +17,14 @@ export const processVote = async (vote: IVoteEntity): Promise<void> => {
   proposal.votes.push({
     voteId: vote.id,
     voterId: vote.voterId,
-    voteOutcome: vote.outcome
+    voteOutcome: vote.outcome,
   });
 
   // Check for majority and update the proposal state
   if (await hasAbsoluteMajority(proposal, common)) {
-    logger.info(`After vote (${vote.id}) proposal (${proposal.id}) has majority. Finalizing.`);
+    logger.info(
+      `After vote (${vote.id}) proposal (${proposal.id}) has majority. Finalizing.`,
+    );
 
     await finalizeProposal(proposal);
   }
@@ -37,7 +39,7 @@ export const processVote = async (vote: IVoteEntity): Promise<void> => {
       proposal.votes.push({
         voteId: voteData.id,
         voterId: voteData.voterId,
-        voteOutcome: voteData.outcome
+        voteOutcome: voteData.outcome,
       });
     });
   }

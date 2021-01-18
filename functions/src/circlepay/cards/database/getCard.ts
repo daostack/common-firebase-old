@@ -1,7 +1,7 @@
-import { ArgumentError, NotFoundError } from '../../../util/errors';
+import {ArgumentError, NotFoundError} from '../../../util/errors';
 
-import { ICardEntity } from '../types';
-import { CardCollection } from './index';
+import {ICardEntity} from '../types';
+import {CardCollection} from './index';
 
 /**
  * Gets card by id
@@ -20,9 +20,7 @@ export const getCard = async (cardId: string): Promise<ICardEntity> => {
     throw new ArgumentError('cardId', cardId);
   }
 
-  const card = (await CardCollection
-    .doc(cardId)
-    .get()).data();
+  const card = (await CardCollection.doc(cardId).get()).data();
 
   if (!card) {
     throw new NotFoundError(cardId, 'card');

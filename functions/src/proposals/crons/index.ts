@@ -1,1 +1,1 @@
-export { finalizeProposals } from './finalizeProposalsCron';
+export {finalizeProposals} from './finalizeProposalsCron';

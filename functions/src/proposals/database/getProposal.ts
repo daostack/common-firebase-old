@@ -1,9 +1,9 @@
-import { ArgumentError } from '../../util/errors';
-import { NotFoundError } from '../../util/errors';
-import { Nullable } from '../../util/types';
+import {ArgumentError} from '../../util/errors';
+import {NotFoundError} from '../../util/errors';
+import {Nullable} from '../../util/types';
 
-import { ProposalsCollection } from './index';
-import { IProposalEntity } from '../proposalTypes';
+import {ProposalsCollection} from './index';
+import {IProposalEntity} from '../proposalTypes';
 
 /**
  * Gets proposal by id
@@ -15,18 +15,21 @@ import { IProposalEntity } from '../proposalTypes';
  *
  * @returns - The found proposal
  */
-export const getProposal = async (proposalId: string, throwErr = true): Promise<IProposalEntity> => {
-  if(!proposalId) {
+export const getProposal = async (
+  proposalId: string,
+  throwErr = true,
+): Promise<IProposalEntity> => {
+  if (!proposalId) {
     throw new ArgumentError('proposalId', proposalId);
   }
 
-  const proposal = (await ProposalsCollection
-    .doc(proposalId)
-    .get()).data() as Nullable<IProposalEntity>;
+  const proposal = (
+    await ProposalsCollection.doc(proposalId).get()
+  ).data() as Nullable<IProposalEntity>;
 
-  if(!proposal && throwErr) {
+  if (!proposal && throwErr) {
     throw new NotFoundError(proposalId, 'proposal');
   }
 
   return proposal;
-}
+};

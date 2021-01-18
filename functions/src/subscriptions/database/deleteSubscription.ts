@@ -2,9 +2,9 @@ import admin from 'firebase-admin';
 
 import WriteResult = admin.firestore.WriteResult;
 
-import { Nullable } from '../../util/types';
-import { Collections } from '../../util/constants';
-import { CommonError } from '../../util/errors';
+import {Nullable} from '../../util/types';
+import {Collections} from '../../util/constants';
+import {CommonError} from '../../util/errors';
 
 const db = admin.firestore();
 
@@ -15,14 +15,17 @@ const db = admin.firestore();
  *
  * @throws { CommonError } - If the subscription ID is not provided
  */
-export const deleteSubscription = async (subscriptionId: Nullable<string>): Promise<WriteResult> => {
+export const deleteSubscription = async (
+  subscriptionId: Nullable<string>,
+): Promise<WriteResult> => {
   if (!subscriptionId) {
     throw new CommonError('Cannot get subscription without providing the id!');
   }
 
   logger.warn(`Deleting subscription with id ${subscriptionId}`);
 
-  return (await db.collection(Collections.Subscriptions)
+  return await db
+    .collection(Collections.Subscriptions)
     .doc(subscriptionId)
-    .delete());
+    .delete();
 };

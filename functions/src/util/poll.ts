@@ -1,7 +1,6 @@
-import { CommonError } from './errors';
-import { sleep } from './sleep';
-import { Promisable } from './types';
-
+import {CommonError} from './errors';
+import {sleep} from './sleep';
+import {Promisable} from './types';
 
 export type IPollAction<T> = () => Promisable<T>;
 export type IPollValidator<T> = (result: T) => Promisable<boolean>;
@@ -20,7 +19,7 @@ export const poll = async <T = any>(
   action: IPollAction<T>,
   validate: IPollValidator<T>,
   interval = 60,
-  maxAttempts = 64
+  maxAttempts = 64,
 ): Promise<T> => {
   let currentAttempt = 0;
 

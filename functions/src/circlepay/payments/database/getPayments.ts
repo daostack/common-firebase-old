@@ -1,5 +1,5 @@
-import { IPaymentEntity, PaymentStatus } from '../types';
-import { PaymentsCollection } from './index';
+import {IPaymentEntity, PaymentStatus} from '../types';
+import {PaymentsCollection} from './index';
 
 interface IGetPaymentsOptions {
   /**
@@ -20,7 +20,7 @@ interface IGetPaymentsOptions {
 
   createdFromObject?: {
     id?: string;
-  }
+  };
 }
 
 /**
@@ -28,7 +28,9 @@ interface IGetPaymentsOptions {
  *
  * @param options - The options for filtering the payments
  */
-export const getPayments = async (options: IGetPaymentsOptions): Promise<IPaymentEntity[]> => {
+export const getPayments = async (
+  options: IGetPaymentsOptions,
+): Promise<IPaymentEntity[]> => {
   let paymentsQuery: any = PaymentsCollection;
 
   if (options.id) {
@@ -42,18 +44,22 @@ export const getPayments = async (options: IGetPaymentsOptions): Promise<IPaymen
   }
 
   if (options.status) {
-    paymentsQuery = paymentsQuery
-      .where('status', '==', options.status);
+    paymentsQuery = paymentsQuery.where('status', '==', options.status);
   }
 
   if (options.createdFromObject) {
-    const { createdFromObject } = options;
+    const {createdFromObject} = options;
 
     if (createdFromObject.id) {
-      paymentsQuery = paymentsQuery.where('createdFromObject.id', '==', createdFromObject.id);
+      paymentsQuery = paymentsQuery.where(
+        'createdFromObject.id',
+        '==',
+        createdFromObject.id,
+      );
     }
   }
 
-  return (await paymentsQuery.get()).docs
-    .map(payment => payment.data()) || [];
+  return (
+    (await paymentsQuery.get()).docs.map((payment) => payment.data()) || []
+  );
 };
