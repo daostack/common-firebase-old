@@ -1,26 +1,22 @@
 import * as yup from 'yup';
 
-import { CommonError, PaymentError } from '../../../util/errors';
-import { validate } from '../../../util/validate';
-import { proposalDb } from '../../../proposals/database';
+import {CommonError, PaymentError} from '../../../util/errors';
+import {validate} from '../../../util/validate';
+import {proposalDb} from '../../../proposals/database';
 
-import { createPayment } from './createPayment';
-import { pollPayment } from './pollPayment';
-import { isFailed } from '../helpers/statusHelper';
-import { EVENT_TYPES } from '../../../event/event';
-import { createEvent } from '../../../util/db/eventDbService';
-import { IPaymentEntity } from '../types';
+import {createPayment} from './createPayment';
+import {pollPayment} from './pollPayment';
+import {isFailed} from '../helpers/statusHelper';
+import {EVENT_TYPES} from '../../../event/event';
+import {createEvent} from '../../../util/db/eventDbService';
+import {IPaymentEntity} from '../types';
 
 const createProposalPaymentValidationSchema = yup.object({
-  proposalId: yup.string()
-    .uuid()
-    .required(),
+  proposalId: yup.string().uuid().required(),
 
-  ipAddress: yup.string()
-    .required(),
+  ipAddress: yup.string().required(),
 
-  sessionId: yup.string()
-    .required()
+  sessionId: yup.string().required(),
 });
 
 interface ICreatePaymentOptions {
@@ -31,7 +27,7 @@ interface ICreatePaymentOptions {
 }
 
 const createPaymentDefaultOptions: ICreatePaymentOptions = {
-  throwOnFailure: false
+  throwOnFailure: false,
 };
 
 /**
@@ -43,10 +39,13 @@ const createPaymentDefaultOptions: ICreatePaymentOptions = {
  * @param payload
  * @param createPaymentOptions
  */
-export const createProposalPayment = async (payload: yup.InferType<typeof createProposalPaymentValidationSchema>, createPaymentOptions?: Partial<ICreatePaymentOptions>): Promise<IPaymentEntity> => {
+export const createProposalPayment = async (
+  payload: yup.InferType<typeof createProposalPaymentValidationSchema>,
+  createPaymentOptions?: Partial<ICreatePaymentOptions>,
+): Promise<IPaymentEntity> => {
   const options = {
     ...createPaymentDefaultOptions,
-    ...createPaymentOptions
+    ...createPaymentOptions,
   };
 
   // Validate the data
@@ -59,9 +58,11 @@ export const createProposalPayment = async (payload: yup.InferType<typeof create
   if (proposal.join.fundingType !== 'one-time') {
     throw new CommonError(
       'Cannot create proposal payment for proposals that are not of funding type `one-time`. ' +
-      'For charging subscription proposals you must use `createSubscriptionPayment`!', {
-        proposalId: proposal.id
-      });
+        'For charging subscription proposals you must use `createSubscriptionPayment`!',
+      {
+        proposalId: proposal.id,
+      },
+    );
   }
 
   // The cardID and if the user is the owner of that card will be validated in that function. Also the Id of the
@@ -75,7 +76,7 @@ export const createProposalPayment = async (payload: yup.InferType<typeof create
 
     type: 'one-time',
     amount: proposal.join.funding,
-    proposalId: proposal.id
+    proposalId: proposal.id,
   });
 
   // Attach the payment to the proposal
@@ -84,43 +85,41 @@ export const createProposalPayment = async (payload: yup.InferType<typeof create
     paymentState: 'pending',
     join: {
       ...proposal.join,
-      payments: [
-        ...(proposal.join.payments || []),
-        payment.id
-      ]
-    }
+      payments: [...(proposal.join.payments || []), payment.id],
+    },
   });
 
   logger.info(`Starting polling payment with ID ${payment.id}`, {
-    payment
+    payment,
   });
 
   // Poll the payment
   payment = await pollPayment(payment);
 
-  logger.info(`Polling finished for payment with ID ${payment.id} with status ${payment.status}`, {
-    payment
-  });
+  logger.info(
+    `Polling finished for payment with ID ${payment.id} with status ${payment.status}`,
+    {
+      payment,
+    },
+  );
 
   await createEvent({
-    type: payment.status === 'failed'
-      ? EVENT_TYPES.PAYMENT_FAILED
-      : payment.status === 'paid'
+    type:
+      payment.status === 'failed'
+        ? EVENT_TYPES.PAYMENT_FAILED
+        : payment.status === 'paid'
         ? EVENT_TYPES.PAYMENT_PAID
         : payment.status === 'confirmed'
-          ? EVENT_TYPES.PAYMENT_CONFIRMED
-          : EVENT_TYPES.PAYMENT_UPDATED,
+        ? EVENT_TYPES.PAYMENT_CONFIRMED
+        : EVENT_TYPES.PAYMENT_UPDATED,
     objectId: payment.id,
-    userId: payment.userId
+    userId: payment.userId,
   });
-
 
   // Update the payment status
   await proposalDb.update({
     ...proposal,
-    paymentState: payment.status === 'paid'
-      ? 'confirmed'
-      : payment.status
+    paymentState: payment.status === 'paid' ? 'confirmed' : payment.status,
   });
 
   // If the payment was confirmed execute the join request
@@ -128,7 +127,7 @@ export const createProposalPayment = async (payload: yup.InferType<typeof create
     await createEvent({
       type: EVENT_TYPES.REQUEST_TO_JOIN_EXECUTED,
       userId: proposal.proposerId,
-      objectId: proposal.id
+      objectId: proposal.id,
     });
   }
 

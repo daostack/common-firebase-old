@@ -13,21 +13,21 @@ Collaborative Social Action.
 
 const emailStubs = {
   userName: {
-    required: true
+    required: true,
   },
   commonName: {
-    required: true
+    required: true,
   },
   commonLink: {
-    required: true
+    required: true,
   },
   supportChatLink: {
-    required: true
-  }
+    required: true,
+  },
 };
 
 export const userCommonFeatured = {
   subject: 'Your Common is now featured ',
   emailStubs,
-  template
+  template,
 };

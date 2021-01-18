@@ -1,7 +1,7 @@
-import { ArgumentError, NotFoundError } from '../../../util/errors';
+import {ArgumentError, NotFoundError} from '../../../util/errors';
 
-import { IPaymentEntity } from '../types';
-import { PaymentsCollection } from './index';
+import {IPaymentEntity} from '../types';
+import {PaymentsCollection} from './index';
 
 /**
  * Gets payment by id
@@ -15,14 +15,15 @@ import { PaymentsCollection } from './index';
  *
  * @returns - The found payment
  */
-export const getPayment = async (paymentId: string, throwErr = true): Promise<IPaymentEntity> => {
+export const getPayment = async (
+  paymentId: string,
+  throwErr = true,
+): Promise<IPaymentEntity> => {
   if (!paymentId) {
     throw new ArgumentError('paymentId', paymentId);
   }
 
-  const payment = (await PaymentsCollection
-    .doc(paymentId)
-    .get()).data();
+  const payment = (await PaymentsCollection.doc(paymentId).get()).data();
 
   if (!payment && throwErr) {
     throw new NotFoundError(paymentId, 'payment');

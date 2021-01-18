@@ -1,6 +1,6 @@
-import { CommonError } from '../../util/errors';
+import {CommonError} from '../../util/errors';
 
-import { ICommonEntity } from '../types';
+import {ICommonEntity} from '../types';
 
 /**
  * Check if the user is part of the common
@@ -12,10 +12,16 @@ import { ICommonEntity } from '../types';
  *
  * @throws { CommonError } - If the user is not part of the common and the *throws* param is `true`
  */
-export const isCommonMember = (common: ICommonEntity, userId: string, throws = false): boolean => {
-  if (!common.members.find(member => member.userId === userId)) {
+export const isCommonMember = (
+  common: ICommonEntity,
+  userId: string,
+  throws = false,
+): boolean => {
+  if (!common.members.find((member) => member.userId === userId)) {
     if (throws) {
-      throw new CommonError(`User (${userId}) is not part of common (${common})`);
+      throw new CommonError(
+        `User (${userId}) is not part of common (${common})`,
+      );
     } else {
       return false;
     }

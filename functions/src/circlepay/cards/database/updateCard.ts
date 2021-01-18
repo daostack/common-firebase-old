@@ -1,8 +1,7 @@
-import { firestore } from 'firebase-admin';
+import {firestore} from 'firebase-admin';
 
-import { ICardEntity } from '../types';
-import { CardCollection } from './index';
-
+import {ICardEntity} from '../types';
+import {CardCollection} from './index';
 
 /**
  * Updates the passed entity in the database. Reference
@@ -13,16 +12,16 @@ import { CardCollection } from './index';
  *
  * @returns - The updated card entity
  */
-export const updateCardInDatabase = async (card: ICardEntity): Promise<ICardEntity> => {
+export const updateCardInDatabase = async (
+  card: ICardEntity,
+): Promise<ICardEntity> => {
   const cardDoc = {
     ...card,
 
-    updatedAt: firestore.Timestamp.now()
+    updatedAt: firestore.Timestamp.now(),
   };
 
-  await CardCollection
-    .doc(cardDoc.id)
-    .update(cardDoc);
+  await CardCollection.doc(cardDoc.id).update(cardDoc);
 
   return cardDoc;
-}
+};

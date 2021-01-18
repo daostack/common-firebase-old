@@ -1,7 +1,7 @@
 import express from 'express';
 
-import { ErrorCodes, StatusCodes } from '../../constants';
-import { CommonError } from './CommonError';
+import {ErrorCodes, StatusCodes} from '../../constants';
+import {CommonError} from './CommonError';
 
 /**
  * The error that is thrown when authentication or authorization
@@ -14,12 +14,12 @@ export class UnauthorizedError extends CommonError {
       req: {
         headers: req?.headers,
         query: req?.query,
-        body: req?.body
+        body: req?.body,
       },
       rest,
 
       statusCode: StatusCodes.Unauthorized,
-      errorCode: ErrorCodes.AuthenticationError
+      errorCode: ErrorCodes.AuthenticationError,
     });
   }
 }

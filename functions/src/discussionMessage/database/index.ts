@@ -1,10 +1,15 @@
-import { db } from '../../util';
-import { Collections } from '../../constants';
-import { getDiscussionMessages, getDiscussionMessagsSnapshot } from './getDiscussionMessages';
+import {db} from '../../util';
+import {Collections} from '../../constants';
+import {
+  getDiscussionMessages,
+  getDiscussionMessagsSnapshot,
+} from './getDiscussionMessages';
 
-export const discussionMessageCollection = db.collection(Collections.DiscussionMessage);
+export const discussionMessageCollection = db.collection(
+  Collections.DiscussionMessage,
+);
 
 export const discussionMessageDb = {
-	getDiscussionMessages,
-	getDiscussionMessagsSnapshot,
+  getDiscussionMessages,
+  getDiscussionMessagsSnapshot,
 };

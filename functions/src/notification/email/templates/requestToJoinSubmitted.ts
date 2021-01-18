@@ -13,21 +13,21 @@ const template = `
 
 const emailStubs = {
   userName: {
-    required: true
+    required: true,
   },
   link: {
-    required: true
+    required: true,
   },
   commonName: {
-    required: true
+    required: true,
   },
   supportChatLink: {
-    required: true
-  }
+    required: true,
+  },
 };
 
 export const requestToJoinSubmitted = {
   subject: 'Request to join submitted',
   emailStubs,
-  template
+  template,
 };

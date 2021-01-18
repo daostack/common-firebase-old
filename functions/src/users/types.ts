@@ -1,12 +1,12 @@
-import { IBaseEntity } from '../util/types';
+import {IBaseEntity} from '../util/types';
 
 export interface IUserEntity extends IBaseEntity {
-   uid: string;
+  uid: string;
 
-   email: string;
-   photoURL: string;
+  email: string;
+  photoURL: string;
 
-   firstName: string;
-   lastName: string;
-   displayName: string;
+  firstName: string;
+  lastName: string;
+  displayName: string;
 }

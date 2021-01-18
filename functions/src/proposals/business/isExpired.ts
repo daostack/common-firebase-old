@@ -1,5 +1,5 @@
-import { IProposalEntity } from '../proposalTypes';
-import { ArgumentError } from '../../util/errors';
+import {IProposalEntity} from '../proposalTypes';
+import {ArgumentError} from '../../util/errors';
 
 /**
  * Returns whether the passed proposal has expired or
@@ -12,7 +12,9 @@ import { ArgumentError } from '../../util/errors';
  *
  * @returns - Promise resolved in boolean, the result
  */
-export const isExpired = async (proposal: IProposalEntity): Promise<boolean> => {
+export const isExpired = async (
+  proposal: IProposalEntity,
+): Promise<boolean> => {
   if (!proposal) {
     throw new ArgumentError('proposal', proposal);
   }
@@ -22,7 +24,9 @@ export const isExpired = async (proposal: IProposalEntity): Promise<boolean> => 
   }
 
   const now = new Date();
-  const expiration = new Date(proposal.createdAt.toDate().getTime() + (proposal.countdownPeriod * 1000));
+  const expiration = new Date(
+    proposal.createdAt.toDate().getTime() + proposal.countdownPeriod * 1000,
+  );
 
   // If the expiration is in the past it is therefore expired
   return expiration < now;

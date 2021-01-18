@@ -15,7 +15,7 @@ interface Env {
     app: {
       currentVersion: string;
       oldestSupportedVersion: string;
-    }
+    };
   };
 
   mail: {
@@ -41,12 +41,12 @@ interface Env {
       countdownPeriod: number;
       quietEndingPeriod: number;
     };
-  }
+  };
 
   endpoints: {
     base: string;
     notifications: string;
-  }
+  };
 
   secretManagerProject: string;
   local: string;
@@ -54,11 +54,11 @@ interface Env {
   payouts: {
     approvers: string[];
     neededApprovals: number;
-  }
+  };
 
   backoffice: {
     sheetUrl: string;
-  }
+  };
 }
 
 export const env = merge(envConfig, envSecrets) as Env;
@@ -72,7 +72,7 @@ export const StatusCodes = {
   NotFound: 404,
   UnprocessableEntity: 422,
 
-  Ok: 200
+  Ok: 200,
 };
 
 export const ErrorCodes = {
@@ -88,26 +88,21 @@ export const ErrorCodes = {
   CvvVerificationFail: 'CvvVerificationFail',
 
   // ---- External providers errors
-  CirclePayError: 'External.CirclePayError'
+  CirclePayError: 'External.CirclePayError',
 };
 
 export const ProposalTypes = {
   Join: 'join',
-  Funding: 'fundingRequest'
+  Funding: 'fundingRequest',
 };
 
-export const ProposalActiveStates = [
-  'countdown'
-];
+export const ProposalActiveStates = ['countdown'];
 
-export const ProposalFinalStates = [
-  'passed',
-  'failed'
-];
+export const ProposalFinalStates = ['passed', 'failed'];
 
 // ---- Reexports
-export { runtimeOptions } from './runtimeOptions';
-export { Collections } from './collections';
-export { Notifications } from './notifications';
+export {runtimeOptions} from './runtimeOptions';
+export {Collections} from './collections';
+export {Notifications} from './notifications';
 
-export { adminKeys };
+export {adminKeys};

@@ -1,55 +1,41 @@
 import axios from 'axios';
 import * as yup from 'yup';
 
-import { ErrorCodes } from '../../../constants';
-import { circlePayApi } from '../../../settings';
-import { validate } from '../../../util/validate';
-import { externalRequestExecutor } from '../../../util';
-import { billingDetailsValidationSchema } from '../../../util/schemas';
+import {ErrorCodes} from '../../../constants';
+import {circlePayApi} from '../../../settings';
+import {validate} from '../../../util/validate';
+import {externalRequestExecutor} from '../../../util';
+import {billingDetailsValidationSchema} from '../../../util/schemas';
 
-import { ICircleCreateCardPayload, ICircleCreateCardResponse } from '../../types';
-import { getCircleHeaders } from '../../index';
-import { ICardEntity } from '../types';
-import { userDb } from '../../../users/database';
-import { cardDb } from '../database';
-import { createEvent } from '../../../util/db/eventDbService';
-import { EVENT_TYPES } from '../../../event/event';
-import { pollCard } from './pollCard';
+import {ICircleCreateCardPayload, ICircleCreateCardResponse} from '../../types';
+import {getCircleHeaders} from '../../index';
+import {ICardEntity} from '../types';
+import {userDb} from '../../../users/database';
+import {cardDb} from '../database';
+import {createEvent} from '../../../util/db/eventDbService';
+import {EVENT_TYPES} from '../../../event/event';
+import {pollCard} from './pollCard';
 
 const createCardValidationSchema = yup.object({
-  ownerId: yup.string()
-    .required(),
+  ownerId: yup.string().required(),
 
-  billingDetails: billingDetailsValidationSchema
-    .required(),
+  billingDetails: billingDetailsValidationSchema.required(),
 
-  keyId: yup
-    .string()
-    .required(),
+  keyId: yup.string().required(),
 
-  sessionId: yup
-    .string()
-    .required(),
+  sessionId: yup.string().required(),
 
-  ipAddress: yup
-    .string()
-    .required(),
+  ipAddress: yup.string().required(),
 
-  encryptedData: yup
-    .string()
-    .required(),
+  encryptedData: yup.string().required(),
 
-  expMonth: yup
-    .number()
-    .min(1)
-    .max(12)
-    .required(),
+  expMonth: yup.number().min(1).max(12).required(),
 
   expYear: yup
     .number()
     .min(new Date().getFullYear())
     .max(new Date().getFullYear() + 50)
-    .required()
+    .required(),
 });
 
 type CreateCardPayload = yup.InferType<typeof createCardValidationSchema>;
@@ -59,7 +45,9 @@ type CreateCardPayload = yup.InferType<typeof createCardValidationSchema>;
  *
  * @param payload
  */
-export const createCard = async (payload: CreateCardPayload): Promise<ICardEntity> => {
+export const createCard = async (
+  payload: CreateCardPayload,
+): Promise<ICardEntity> => {
   // Validate the passed data
   await validate(payload, createCardValidationSchema);
 
@@ -78,30 +66,38 @@ export const createCard = async (payload: CreateCardPayload): Promise<ICardEntit
     metadata: {
       email: user.email,
       ipAddress: payload.ipAddress,
-      sessionId: payload.sessionId
-    }
+      sessionId: payload.sessionId,
+    },
   };
 
   // @todo Move this to the circle client
   // Create the card on Circle
-  const { data: response } = await externalRequestExecutor<ICircleCreateCardResponse>(async () => {
-    logger.debug('Trying to create new card with circle', {
-      data
-    });
+  const {
+    data: response,
+  } = await externalRequestExecutor<ICircleCreateCardResponse>(
+    async () => {
+      logger.debug('Trying to create new card with circle', {
+        data,
+      });
 
-    return (await axios.post<ICircleCreateCardResponse>(`${circlePayApi}/cards`,
-      data,
-      headers
-    )).data;
-  }, {
-    errorCode: ErrorCodes.CirclePayError,
-    userMessage: 'Cannot create the card, because it was rejected by Circle'
-  });
+      return (
+        await axios.post<ICircleCreateCardResponse>(
+          `${circlePayApi}/cards`,
+          data,
+          headers,
+        )
+      ).data;
+    },
+    {
+      errorCode: ErrorCodes.CirclePayError,
+      userMessage: 'Cannot create the card, because it was rejected by Circle',
+    },
+  );
 
   // Check if the use already has the same card
   const existingCards = await cardDb.getMany({
     ownerId: user.uid,
-    circleCardId: response.id
+    circleCardId: response.id,
   });
 
   if (existingCards.length) {
@@ -120,7 +116,6 @@ export const createCard = async (payload: CreateCardPayload): Promise<ICardEntit
     return existingCards[0];
   }
 
-
   // If the card was created successfully save it
   const card = await cardDb.add({
     ownerId: user.uid,
@@ -128,11 +123,11 @@ export const createCard = async (payload: CreateCardPayload): Promise<ICardEntit
     metadata: {
       billingDetails: data.billingDetails,
       digits: response.last4,
-      network: response.network
+      network: response.network,
     },
     verification: {
-      cvv: response.verification.cvv as any
-    }
+      cvv: response.verification.cvv as any,
+    },
   });
 
   // After the card is saved check the status of the card
@@ -142,7 +137,7 @@ export const createCard = async (payload: CreateCardPayload): Promise<ICardEntit
   await createEvent({
     type: EVENT_TYPES.CARD_CREATED,
     userId: user.uid,
-    objectId: card.id
+    objectId: card.id,
   });
 
   // Return the created card

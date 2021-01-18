@@ -1,8 +1,8 @@
 import admin from 'firebase-admin';
-import { v4 } from 'uuid';
+import {v4} from 'uuid';
 
-import { IDeletedEntity } from '../types';
-import { DeletionsCollection } from './index';
+import {IDeletedEntity} from '../types';
+import {DeletionsCollection} from './index';
 
 import Timestamp = admin.firestore.Timestamp;
 
@@ -13,7 +13,10 @@ import Timestamp = admin.firestore.Timestamp;
  * @param entity - The deleted entity
  * @param deletionId - ID, that can be used to track batch deletions
  */
-export const addDeletedEntity = async <T>(entity: T, deletionId: string): Promise<IDeletedEntity<T>> => {
+export const addDeletedEntity = async <T>(
+  entity: T,
+  deletionId: string,
+): Promise<IDeletedEntity<T>> => {
   // Created formatted representation of the passed data
   const deletedDoc: IDeletedEntity<T> = {
     id: v4(),
@@ -22,13 +25,11 @@ export const addDeletedEntity = async <T>(entity: T, deletionId: string): Promis
     updatedAt: Timestamp.now(),
 
     deletionId,
-    entity
+    entity,
   };
 
   // Save the deleted doc
-  await DeletionsCollection
-    .doc(deletedDoc.id)
-    .set(deletedDoc);
+  await DeletionsCollection.doc(deletedDoc.id).set(deletedDoc);
 
   // Return the saved deleted doc
   return deletedDoc;

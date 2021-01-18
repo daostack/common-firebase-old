@@ -1,4 +1,4 @@
-import { IEmailTemplate } from '../index';
+import {IEmailTemplate} from '../index';
 
 const template = `
   <div>
@@ -23,16 +23,16 @@ export const subscriptionCanceled: IEmailTemplate = {
   template: template,
   emailStubs: {
     firstName: {
-      required: true
+      required: true,
     },
     dueDate: {
-      required: true
+      required: true,
     },
     commonLink: {
-      required: true
+      required: true,
     },
     commonName: {
-      required: true
-    }
-  }
+      required: true,
+    },
+  },
 };

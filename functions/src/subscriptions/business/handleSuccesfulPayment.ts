@@ -4,14 +4,13 @@ import moment from 'moment';
 import Timestamp = admin.firestore.Timestamp;
 import FieldValue = admin.firestore.FieldValue;
 
-import { addMonth } from '../../util';
-import { CommonError } from '../../util/errors';
+import {addMonth} from '../../util';
+import {CommonError} from '../../util/errors';
 
-import { ISubscriptionEntity } from '../types';
-import { subscriptionDb } from '../database';
-import { proposalDb } from '../../proposals/database';
-import { commonDb } from '../../common/database';
-
+import {ISubscriptionEntity} from '../types';
+import {subscriptionDb} from '../database';
+import {proposalDb} from '../../proposals/database';
+import {commonDb} from '../../common/database';
 
 /**
  * Clears the state of the subscription and updates the due date on payment success
@@ -21,7 +20,9 @@ import { commonDb } from '../../common/database';
  * @throws { CommonError } - If there is no subscription passed (or is null/undefined)
  * @throws { CommonError } - If the due date for the subscription is in the future
  */
-export const handleSuccessfulSubscriptionPayment = async (subscription: ISubscriptionEntity): Promise<void> => {
+export const handleSuccessfulSubscriptionPayment = async (
+  subscription: ISubscriptionEntity,
+): Promise<void> => {
   if (!subscription) {
     throw new CommonError(`
       Cannot handle successful payment without providing subscription object!
@@ -42,9 +43,11 @@ export const handleSuccessfulSubscriptionPayment = async (subscription: ISubscri
     logger.error(
       `Trying to update due date that is in the future 
       for subscription with id (${subscription.id})! 
-    `, {
-        subscription
-      });
+    `,
+      {
+        subscription,
+      },
+    );
   }
 
   // Update metadata about the subscription
@@ -64,7 +67,7 @@ export const handleSuccessfulSubscriptionPayment = async (subscription: ISubscri
     subscriptionDb.update(subscription),
     proposalDb.update({
       id: subscription.proposalId,
-      paymentState: 'confirmed'
-    })
+      paymentState: 'confirmed',
+    }),
   ]);
 };

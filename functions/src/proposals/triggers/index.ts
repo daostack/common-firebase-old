@@ -1,1 +1,1 @@
-export { onProposalApproved } from  './onProposalApproved';
+export {onProposalApproved} from './onProposalApproved';

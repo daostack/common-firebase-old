@@ -1,14 +1,13 @@
 import * as functions from 'firebase-functions';
-import { notifyData } from '../notification/notification'
-import { createNotification } from '../util/db/notificationDbService';
-import { eventData } from './event'
-
+import {notifyData} from '../notification/notification';
+import {createNotification} from '../util/db/notificationDbService';
+import {eventData} from './event';
 
 export interface IEventModel {
-    id: string,
-    objectId: string,
-    type: string,
-    createdAt: string,
+  id: string;
+  objectId: string;
+  type: string;
+  createdAt: string;
 }
 
 const processEvent = async (event: IEventModel) => {
@@ -26,12 +25,11 @@ const processEvent = async (event: IEventModel) => {
       userFilter,
       createdAt: new Date(),
     });
-  }   
-}
+  }
+};
 
-exports.commonEventListeners = functions
-  .firestore
+exports.commonEventListeners = functions.firestore
   .document('/event/{id}')
   .onCreate(async (snap) => {
-    await processEvent(snap.data() as IEventModel)
-  })
+    await processEvent(snap.data() as IEventModel);
+  });

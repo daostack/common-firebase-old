@@ -1,7 +1,7 @@
-import { ArgumentError, NotFoundError } from '../../util/errors';
+import {ArgumentError, NotFoundError} from '../../util/errors';
 
-import { IUserEntity } from '../types';
-import { UserCollection } from './index';
+import {IUserEntity} from '../types';
+import {UserCollection} from './index';
 
 /**
  * Tries to find the user by provided user ID
@@ -16,14 +16,11 @@ export const getUser = async (userId: string): Promise<IUserEntity> => {
     throw new ArgumentError('userId', userId);
   }
 
-  const user = await UserCollection
-    .doc(userId)
-    .get();
+  const user = await UserCollection.doc(userId).get();
 
   if (!user.exists) {
     throw new NotFoundError('user.userId', userId);
   }
-
 
   return user.data();
 };

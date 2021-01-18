@@ -1,7 +1,7 @@
 // ---- Card related ---- //
 
-import { CirclePaymentStatus } from '../util/types';
-import { CircleCvvCheck } from './client/getCardFromCircle';
+import {CirclePaymentStatus} from '../util/types';
+import {CircleCvvCheck} from './client/getCardFromCircle';
 
 // ---- Shared
 
@@ -22,7 +22,7 @@ export interface ICircleCreateCardResponse {
     metadata: {
       email: string;
       phoneNumber: string;
-    }
+    };
 
     expMonth: number;
     expYear: number;
@@ -33,8 +33,8 @@ export interface ICircleCreateCardResponse {
 
     verification: {
       cvv: CircleCvvCheck;
-    }
-  }
+    };
+  };
 }
 
 export interface ICircleCreateCardPayload {
@@ -56,7 +56,7 @@ export interface ICircleCreateCardPayload {
    */
   encryptedData: string;
 
-  billingDetails: ICircleBillingDetails
+  billingDetails: ICircleBillingDetails;
 
   /**
    * Two digit number representing the card's expiration month.
@@ -67,7 +67,6 @@ export interface ICircleCreateCardPayload {
    * Four digit number representing the card's expiration year.
    */
   expYear: number;
-
 
   metadata: ICircleMetadata;
 }
@@ -146,7 +145,6 @@ interface ICircleCreatePaymentBase {
   amount: IPaymentAmount;
   source: IPaymentSource;
 
-
   idempotencyKey: string;
 }
 
@@ -161,7 +159,9 @@ interface ICircleCreatePaymentNoVerification extends ICircleCreatePaymentBase {
   verification: 'none';
 }
 
-export type ICircleCreatePaymentPayload = ICircleCreatePaymentVerification | ICircleCreatePaymentNoVerification;
+export type ICircleCreatePaymentPayload =
+  | ICircleCreatePaymentVerification
+  | ICircleCreatePaymentNoVerification;
 
 export type ICircleCreatePaymentResponse = ICirclePayment;
 
@@ -207,7 +207,6 @@ interface ICircleMetadata {
 type IPayoutAmount = IAmount;
 type IPayoutStatus = 'pending' | 'failed' | 'complete';
 
-
 interface ICirclePayoutDestination {
   type: 'wire';
 
@@ -232,7 +231,7 @@ export interface ICircleCreatePayoutResponse {
     id: string;
     status: IPayoutStatus;
     destination: ICirclePayoutDestination;
-  }
+  };
 }
 
 export interface ICircleGetPayoutResponse {
@@ -241,5 +240,5 @@ export interface ICircleGetPayoutResponse {
     destination: ICirclePayoutDestination;
     amount: IPayoutAmount;
     status: IPayoutStatus;
-  }
+  };
 }

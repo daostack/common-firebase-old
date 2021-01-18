@@ -1,8 +1,8 @@
-import { ICommonEntity } from '../types';
-import { ArgumentError } from '../../util/errors/ArgumentError';
-import { commonCollection } from './index';
-import { Nullable } from '../../util/types';
-import { NotFoundError } from '../../util/errors/NotFoundError';
+import {ICommonEntity} from '../types';
+import {ArgumentError} from '../../util/errors/ArgumentError';
+import {commonCollection} from './index';
+import {Nullable} from '../../util/types';
+import {NotFoundError} from '../../util/errors/NotFoundError';
 
 /**
  * Gets common by id
@@ -15,17 +15,17 @@ import { NotFoundError } from '../../util/errors/NotFoundError';
  * @returns - The found common
  */
 export const getCommon = async (commonId: string): Promise<ICommonEntity> => {
-  if(!commonId) {
+  if (!commonId) {
     throw new ArgumentError('commonId', commonId);
   }
 
-  const common = (await commonCollection
-    .doc(commonId)
-    .get()).data() as Nullable<ICommonEntity>;
+  const common = (
+    await commonCollection.doc(commonId).get()
+  ).data() as Nullable<ICommonEntity>;
 
-  if(!common) {
+  if (!common) {
     throw new NotFoundError(commonId, 'common');
   }
 
   return common;
-}
+};

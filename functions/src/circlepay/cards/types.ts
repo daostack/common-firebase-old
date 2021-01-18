@@ -1,4 +1,4 @@
-import { IBaseEntity } from '../../util/types';
+import {IBaseEntity} from '../../util/types';
 
 export interface ICardEntity extends IBaseEntity {
   /**

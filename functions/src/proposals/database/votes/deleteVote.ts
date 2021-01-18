@@ -2,10 +2,9 @@ import admin from 'firebase-admin';
 
 import WriteResult = admin.firestore.WriteResult;
 
-import { ArgumentError } from '../../../util/errors';
+import {ArgumentError} from '../../../util/errors';
 
-import { VotesCollection } from '../index';
-
+import {VotesCollection} from '../index';
 
 /**
  * Deletes vote. Use carefully. If you want to cleanly delete the
@@ -16,14 +15,14 @@ import { VotesCollection } from '../index';
  *
  * @throws { ArgumentError } - If the vote ID is not provided
  */
-export const deleteVoteFromDatabase = async (voteId: string): Promise<WriteResult> => {
+export const deleteVoteFromDatabase = async (
+  voteId: string,
+): Promise<WriteResult> => {
   if (!voteId) {
     throw new ArgumentError('voteId');
   }
 
   logger.notice(`Deleting vote with ID ${voteId}`);
 
-  return (await VotesCollection
-    .doc(voteId)
-    .delete());
+  return await VotesCollection.doc(voteId).delete();
 };

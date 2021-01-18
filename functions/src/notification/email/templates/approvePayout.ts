@@ -27,33 +27,33 @@ const template = `
 
 const emailStubs = {
   payoutId: {
-    required: true
+    required: true,
   },
   amount: {
-    required: true
+    required: true,
   },
   url: {
-    required: true
+    required: true,
   },
   beneficiary: {
-    required: true
+    required: true,
   },
   proposal: {
-    required: true
+    required: true,
   },
   common: {
-    required: true
+    required: true,
   },
   bankDescription: {
-    required: true
+    required: true,
   },
   bank: {
-    required: true
-  }
+    required: true,
+  },
 };
 
 export const approvePayout = {
   subject: 'Approve payout',
   emailStubs,
-  template
+  template,
 };

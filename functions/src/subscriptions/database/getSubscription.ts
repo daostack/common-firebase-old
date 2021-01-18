@@ -1,10 +1,10 @@
 import admin from 'firebase-admin';
 
-import { Nullable } from '../../util/types';
-import { Collections } from '../../util/constants';
-import { CommonError, NotFoundError } from '../../util/errors';
+import {Nullable} from '../../util/types';
+import {Collections} from '../../util/constants';
+import {CommonError, NotFoundError} from '../../util/errors';
 
-import { ISubscriptionEntity } from '../types';
+import {ISubscriptionEntity} from '../types';
 
 const db = admin.firestore();
 
@@ -18,14 +18,17 @@ const db = admin.firestore();
  *
  * @returns { ISubscriptionEntity } - The found subscription
  */
-export const getSubscription = async (subscriptionId: Nullable<string>, throwErr = true): Promise<ISubscriptionEntity> => {
+export const getSubscription = async (
+  subscriptionId: Nullable<string>,
+  throwErr = true,
+): Promise<ISubscriptionEntity> => {
   if (!subscriptionId) {
     throw new CommonError('Cannot get subscription without providing the id!');
   }
 
-  const subscription = (await db.collection(Collections.Subscriptions)
-    .doc(subscriptionId)
-    .get()).data() as Nullable<ISubscriptionEntity>;
+  const subscription = (
+    await db.collection(Collections.Subscriptions).doc(subscriptionId).get()
+  ).data() as Nullable<ISubscriptionEntity>;
 
   if (!subscription && throwErr) {
     throw new NotFoundError(subscriptionId, 'subscription');

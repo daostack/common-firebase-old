@@ -21,24 +21,24 @@ export interface ICircleCreateBankAccountPayload {
   bankAddress: IBillingDetailsBase & {
     bankName: string;
     line1?: string;
-  }
+  };
 }
 
 export interface ICircleCreateBankAccountResponse {
- data: {
-   id: string;
-   description: string;
-   trackingRef: string;
-   fingerprint: string;
-   billingDetails: IBillingDetailsBase & {
-     name: string;
-   };
+  data: {
+    id: string;
+    description: string;
+    trackingRef: string;
+    fingerprint: string;
+    billingDetails: IBillingDetailsBase & {
+      name: string;
+    };
 
-   bankAddress: IBillingDetailsBase & {
-     bankName: string;
-     line1?: string;
-   }
- }
+    bankAddress: IBillingDetailsBase & {
+      bankName: string;
+      line1?: string;
+    };
+  };
 }
 
 export interface ICircleGetBankAccountResponse {
@@ -54,7 +54,6 @@ export interface ICircleGetBankAccountResponse {
     bankAddress: IBillingDetailsBase & {
       bankName: string;
       line1?: string;
-    }
-  }
+    };
+  };
 }
-

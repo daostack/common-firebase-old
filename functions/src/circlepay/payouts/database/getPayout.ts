@@ -1,7 +1,7 @@
-import { ArgumentError, NotFoundError } from '../../../util/errors';
+import {ArgumentError, NotFoundError} from '../../../util/errors';
 
-import { IPayoutEntity } from '../types';
-import { PayoutsCollection } from './index';
+import {IPayoutEntity} from '../types';
+import {PayoutsCollection} from './index';
 
 /**
  * Gets payout by id
@@ -20,9 +20,7 @@ export const getPayout = async (payoutId: string): Promise<IPayoutEntity> => {
     throw new ArgumentError('payoutId', payoutId);
   }
 
-  const payout = (await PayoutsCollection
-    .doc(payoutId)
-    .get()).data();
+  const payout = (await PayoutsCollection.doc(payoutId).get()).data();
 
   if (!payout) {
     throw new NotFoundError(payoutId, 'payout');

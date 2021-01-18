@@ -1,10 +1,13 @@
-export const getFundingRequestAcceptedTemplate = (country: string, amount: number): string => {
+export const getFundingRequestAcceptedTemplate = (
+  country: string,
+  amount: number,
+): string => {
   if (amount) {
     return !country
       ? 'userFundingRequestAcceptedUnknown'
-      : (country === 'IL'
-        ? 'userFundingRequestAcceptedIsraeli'
-        : 'userFundingRequestAcceptedForeign');
+      : country === 'IL'
+      ? 'userFundingRequestAcceptedIsraeli'
+      : 'userFundingRequestAcceptedForeign';
   }
   return 'userFundingRequestAcceptedZeroAmount';
 };

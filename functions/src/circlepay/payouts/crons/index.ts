@@ -1,1 +1,1 @@
-export { payoutStatusCron } from './payoutStatusCron';
+export {payoutStatusCron} from './payoutStatusCron';

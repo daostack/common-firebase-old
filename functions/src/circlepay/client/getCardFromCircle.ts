@@ -1,15 +1,20 @@
 import axios from 'axios';
 
-import { externalRequestExecutor } from '../../util';
-import { circlePayApi } from '../../settings';
-import { ErrorCodes } from '../../constants';
+import {externalRequestExecutor} from '../../util';
+import {circlePayApi} from '../../settings';
+import {ErrorCodes} from '../../constants';
 
-import { getCircleHeaders } from '../index';
+import {getCircleHeaders} from '../index';
 
 // ---- Helper types
 
 export type CircleCardNetwork = 'VISA' | 'MASTERCARD';
-export type CircleCvvCheck = 'pending' | 'pass' | 'fail' | 'unavailable' | 'not_requested';
+export type CircleCvvCheck =
+  | 'pending'
+  | 'pass'
+  | 'fail'
+  | 'unavailable'
+  | 'not_requested';
 
 // ---- Helper interfaces
 
@@ -68,13 +73,23 @@ export interface IGetCircleCardResponse {
  * @param circleCardId - The ID of the card as is in circle (the ID they gave us
  *                       on card creation)
  */
-export const getCardFromCircle = async (circleCardId: string): Promise<IGetCircleCardResponse> => {
+export const getCardFromCircle = async (
+  circleCardId: string,
+): Promise<IGetCircleCardResponse> => {
   const headers = await getCircleHeaders();
 
-  return externalRequestExecutor<IGetCircleCardResponse>(async () => {
-    return (await axios.get<IGetCircleCardResponse>(`${circlePayApi}/cards/${circleCardId}`, headers)).data;
-  }, {
-    errorCode: ErrorCodes.CirclePayError,
-    message: 'Failed getting card details from circle'
-  });
+  return externalRequestExecutor<IGetCircleCardResponse>(
+    async () => {
+      return (
+        await axios.get<IGetCircleCardResponse>(
+          `${circlePayApi}/cards/${circleCardId}`,
+          headers,
+        )
+      ).data;
+    },
+    {
+      errorCode: ErrorCodes.CirclePayError,
+      message: 'Failed getting card details from circle',
+    },
+  );
 };

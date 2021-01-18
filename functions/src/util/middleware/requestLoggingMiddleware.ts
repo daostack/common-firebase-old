@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express';
+import {RequestHandler} from 'express';
 
 export const requestLoggingMiddleware: RequestHandler = (req, res, next) => {
   logger.debug('New request received', {
@@ -6,20 +6,18 @@ export const requestLoggingMiddleware: RequestHandler = (req, res, next) => {
     path: req.originalUrl,
 
     data: {
-
       body: req.body,
       query: req.query,
-      params: req.params
-    }
+      params: req.params,
+    },
   });
 
   res.on('finish', () => {
     logger.debug('Request served', {
       statusCode: res.statusCode,
-      requestId: req.requestId
+      requestId: req.requestId,
     });
   });
-
 
   next();
 };

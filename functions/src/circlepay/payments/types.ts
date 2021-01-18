@@ -1,4 +1,4 @@
-import { IBaseEntity, Nullable } from '../../util/types';
+import {IBaseEntity, Nullable} from '../../util/types';
 
 export type PaymentType = 'one-time' | 'subscription';
 export type PaymentStatus = 'pending' | 'confirmed' | 'paid' | 'failed';
@@ -6,17 +6,17 @@ export type PaymentSource = 'card';
 export type PaymentCurrency = 'USD';
 
 export type PaymentFailureResponseCodes =
-  'payment_failed' |
-  'card_not_honored' |
-  'payment_not_supported_by_issuer' |
-  'payment_not_funded' |
-  'card_invalid' |
-  'card_limit_violated' |
-  'payment_denied' |
-  'payment_fraud_detected' |
-  'credit_card_not_allowed' |
-  'payment_stopped_by_issuer' |
-  'card_account_ineligible';
+  | 'payment_failed'
+  | 'card_not_honored'
+  | 'payment_not_supported_by_issuer'
+  | 'payment_not_funded'
+  | 'card_invalid'
+  | 'card_limit_violated'
+  | 'payment_denied'
+  | 'payment_fraud_detected'
+  | 'credit_card_not_allowed'
+  | 'payment_stopped_by_issuer'
+  | 'card_account_ineligible';
 
 interface IPaymentEntityBase extends IBaseEntity {
   /**
@@ -137,5 +137,9 @@ export interface IPaidPayment extends IPaymentEntityBase {
   status: 'paid';
 }
 
-
-export type IPaymentEntity = IPaymentEntityBase | IPendingPayment | IConfirmedPayment | IPaidPayment | IFailedPayment;
+export type IPaymentEntity =
+  | IPaymentEntityBase
+  | IPendingPayment
+  | IConfirmedPayment
+  | IPaidPayment
+  | IFailedPayment;

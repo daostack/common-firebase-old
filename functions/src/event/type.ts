@@ -1,9 +1,9 @@
-import { IBaseEntity } from '../util/types';
-import { EVENT_TYPES } from './event';
+import {IBaseEntity} from '../util/types';
+import {EVENT_TYPES} from './event';
 
 export interface IEventEntity extends IBaseEntity {
   userId?: string;
   objectId?: string;
 
-  type: EVENT_TYPES
+  type: EVENT_TYPES;
 }

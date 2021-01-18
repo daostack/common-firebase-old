@@ -7,40 +7,51 @@ import {
   authenticate,
   errorHandling,
   routeBasedMiddleware,
-  requestLoggingMiddleware
+  requestLoggingMiddleware,
 } from './middleware';
 
 export const commonRouter = express.Router;
 
 interface ICommonAppOptions {
-  unauthenticatedRoutes: string[]
+  unauthenticatedRoutes: string[];
 }
 
-export const commonApp = (router: express.Router, options?: ICommonAppOptions): express.Application => {
+export const commonApp = (
+  router: express.Router,
+  options?: ICommonAppOptions,
+): express.Application => {
   const app = express();
 
   app.use(sessions);
 
   app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({
-    extended: true
-  }));
+  app.use(
+    bodyParser.urlencoded({
+      extended: true,
+    }),
+  );
 
   app.use(express.json());
 
-  app.use(express.urlencoded({
-    extended: true
-  }));
+  app.use(
+    express.urlencoded({
+      extended: true,
+    }),
+  );
 
   app.use(requestLoggingMiddleware);
 
-  app.use(cors({
-    origin: true
-  }));
+  app.use(
+    cors({
+      origin: true,
+    }),
+  );
 
-  app.use(routeBasedMiddleware(authenticate, {
-    exclude: options?.unauthenticatedRoutes || []
-  }));
+  app.use(
+    routeBasedMiddleware(authenticate, {
+      exclude: options?.unauthenticatedRoutes || [],
+    }),
+  );
 
   app.use(router);
 
@@ -50,7 +61,7 @@ export const commonApp = (router: express.Router, options?: ICommonAppOptions): 
       message: 'OK',
       healthy: true,
       uptime: process.uptime(),
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     try {

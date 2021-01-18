@@ -1,14 +1,18 @@
 import admin from 'firebase-admin';
 import Timestamp = admin.firestore.Timestamp;
-import { v4 } from 'uuid';
+import {v4} from 'uuid';
 
-import { BaseEntityType, SharedOmit } from '../../util/types';
+import {BaseEntityType, SharedOmit} from '../../util/types';
 
-import { IProposalEntity } from '../proposalTypes';
-import { ProposalsCollection } from './index';
+import {IProposalEntity} from '../proposalTypes';
+import {ProposalsCollection} from './index';
 
-
-type OmittedProperties = 'votes' | 'state' | 'paymentState' | 'votesFor' | 'votesAgainst';
+type OmittedProperties =
+  | 'votes'
+  | 'state'
+  | 'paymentState'
+  | 'votesFor'
+  | 'votesAgainst';
 
 /**
  * Prepares the passed proposal for saving and saves it. Please note that
@@ -16,7 +20,9 @@ type OmittedProperties = 'votes' | 'state' | 'paymentState' | 'votesFor' | 'vote
  *
  * @param proposal - the proposal to be saved
  */
-export const addProposal = async (proposal: SharedOmit<IProposalEntity, BaseEntityType | OmittedProperties>): Promise<IProposalEntity> => {
+export const addProposal = async (
+  proposal: SharedOmit<IProposalEntity, BaseEntityType | OmittedProperties>,
+): Promise<IProposalEntity> => {
   const proposalDoc: IProposalEntity = {
     id: v4(),
 
@@ -32,16 +38,14 @@ export const addProposal = async (proposal: SharedOmit<IProposalEntity, BaseEnti
       paymentState: 'notRelevant',
     }),
 
-    ...(proposal as IProposalEntity)
+    ...(proposal as IProposalEntity),
   };
 
-  if(process.env.NODE_ENV === 'test') {
+  if (process.env.NODE_ENV === 'test') {
     proposalDoc['testCreated'] = true;
   }
 
-  await ProposalsCollection
-    .doc(proposalDoc.id)
-    .set(proposalDoc);
+  await ProposalsCollection.doc(proposalDoc.id).set(proposalDoc);
 
   return proposalDoc;
 };

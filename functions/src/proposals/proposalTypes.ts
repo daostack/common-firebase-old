@@ -1,11 +1,20 @@
-import { IBaseEntity } from '../util/types';
-import { ContributionType } from '../common/types';
-import { VoteOutcome } from './voteTypes';
+import {IBaseEntity} from '../util/types';
+import {ContributionType} from '../common/types';
+import {VoteOutcome} from './voteTypes';
 
-export type FundingRequestState = 'countdown' | 'passed' | 'failed' | 'passedInsufficientBalance';
+export type FundingRequestState =
+  | 'countdown'
+  | 'passed'
+  | 'failed'
+  | 'passedInsufficientBalance';
 export type RequestToJoinState = 'countdown' | 'passed' | 'failed';
 
-export type ProposalPaymentState = 'notAttempted' | 'pending' | 'failed' | 'confirmed' | 'notRelevant';
+export type ProposalPaymentState =
+  | 'notAttempted'
+  | 'pending'
+  | 'failed'
+  | 'confirmed'
+  | 'notRelevant';
 
 /**
  * The base proposal fields, that will be available
@@ -139,23 +148,24 @@ export interface IFundingRequestProposal extends IBaseProposalEntity {
   /**
    * Object with some description of the proposal
    */
-  description: IProposalDescription | {
-    /**
-     * The proposal in short
-     */
-    title: string;
+  description:
+    | IProposalDescription
+    | {
+        /**
+         * The proposal in short
+         */
+        title: string;
 
-    /**
-     * Collection of images supporting the request
-     */
-    images: IProposalImage[];
+        /**
+         * Collection of images supporting the request
+         */
+        images: IProposalImage[];
 
-    /**
-     * Collection of files supporting the request
-     */
-    files: IProposalFile[];
-  };
-
+        /**
+         * Collection of files supporting the request
+         */
+        files: IProposalFile[];
+      };
 
   fundingRequest: {
     /**
@@ -218,7 +228,6 @@ export interface IJoinRequestProposal extends IBaseProposalEntity {
     payments: string[];
   };
 }
-
 
 export type ProposalType = 'join' | 'fundingRequest';
 

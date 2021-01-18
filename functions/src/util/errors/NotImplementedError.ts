@@ -1,4 +1,4 @@
-import { CommonError } from './CommonError';
+import {CommonError} from './CommonError';
 
 /**
  * The error that is thrown when a requested method

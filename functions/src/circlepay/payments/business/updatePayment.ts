@@ -1,8 +1,8 @@
-import { IPaymentEntity } from '../types';
-import { ICirclePayment } from '../../types';
-import { failureHelper, feesHelper } from '../helpers';
-import { paymentDb } from '../database';
-import { CommonError } from '../../../util/errors';
+import {IPaymentEntity} from '../types';
+import {ICirclePayment} from '../../types';
+import {failureHelper, feesHelper} from '../helpers';
+import {paymentDb} from '../database';
+import {CommonError} from '../../../util/errors';
 
 /**
  * Handles update from circle and saves it to the database
@@ -10,7 +10,10 @@ import { CommonError } from '../../../util/errors';
  * @param payment - the current version of the payment from our FireStore
  * @param circlePayment - the current version of the payment as is from Circle
  */
-export const updatePayment = async (payment: IPaymentEntity, circlePayment: ICirclePayment): Promise<IPaymentEntity> => {
+export const updatePayment = async (
+  payment: IPaymentEntity,
+  circlePayment: ICirclePayment,
+): Promise<IPaymentEntity> => {
   let updatedPayment: IPaymentEntity = payment;
 
   switch (circlePayment.data.status) {
@@ -19,7 +22,7 @@ export const updatePayment = async (payment: IPaymentEntity, circlePayment: ICir
         ...payment,
 
         status: circlePayment.data.status,
-        failure: failureHelper.processFailedPayment(circlePayment)
+        failure: failureHelper.processFailedPayment(circlePayment),
       };
 
       break;
@@ -29,16 +32,19 @@ export const updatePayment = async (payment: IPaymentEntity, circlePayment: ICir
         ...payment,
 
         status: circlePayment.data.status,
-        fees: feesHelper.processCircleFee(circlePayment)
+        fees: feesHelper.processCircleFee(circlePayment),
       };
 
       break;
     default:
-      logger.warn('Unknown payment state occurred. Not knowing how to handle the payment update', {
-        payment,
-        circlePayment: circlePayment.data,
-        unknownStatus: circlePayment.data.status
-      });
+      logger.warn(
+        'Unknown payment state occurred. Not knowing how to handle the payment update',
+        {
+          payment,
+          circlePayment: circlePayment.data,
+          unknownStatus: circlePayment.data.status,
+        },
+      );
 
       break;
   }
@@ -58,9 +64,12 @@ export const updatePayment = async (payment: IPaymentEntity, circlePayment: ICir
 
         break;
       default:
-        throw new CommonError(`The payment status has updated, but is not known.`, {
-          payment: updatedPayment
-        });
+        throw new CommonError(
+          `The payment status has updated, but is not known.`,
+          {
+            payment: updatedPayment,
+          },
+        );
     }
 
     // @todo If this is subscription payment handle subscription update

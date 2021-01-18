@@ -15,33 +15,33 @@ const template = `
 
 const emailStubs = {
   commonName: {
-    required: true
+    required: true,
   },
   membershipRequestId: {
-    required: true
+    required: true,
   },
   userId: {
-    required: true
+    required: true,
   },
   userEmail: {
-    required: true
+    required: true,
   },
   userFullName: {
-    required: true
+    required: true,
   },
   paymentAmount: {
-    required: true
+    required: true,
   },
   submittedOn: {
-    required: true
+    required: true,
   },
   failureReason: {
-    required: true
-  }
+    required: true,
+  },
 };
 
 export const adminPreauthorizationFailed = {
   subject: 'Payment pre-authorization failed',
   emailStubs,
-  template
+  template,
 };

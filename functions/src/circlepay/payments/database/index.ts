@@ -1,22 +1,27 @@
-import { db } from '../../../util';
-import { Collections } from '../../../constants';
+import {db} from '../../../util';
+import {Collections} from '../../../constants';
 
-import { IPaymentEntity } from '../types';
-import { addPayment } from './addPayment';
-import { updatePaymentInDatabase } from './updatePayment';
-import { getPayments } from './getPayments';
-import { getPayment } from './getPayment';
-import { deletePayment } from './deletePayment';
+import {IPaymentEntity} from '../types';
+import {addPayment} from './addPayment';
+import {updatePaymentInDatabase} from './updatePayment';
+import {getPayments} from './getPayments';
+import {getPayment} from './getPayment';
+import {deletePayment} from './deletePayment';
 
-export const PaymentsCollection = db.collection(Collections.Payments)
+export const PaymentsCollection = db
+  .collection(Collections.Payments)
   .withConverter<IPaymentEntity>({
-    fromFirestore(snapshot: FirebaseFirestore.QueryDocumentSnapshot): IPaymentEntity {
+    fromFirestore(
+      snapshot: FirebaseFirestore.QueryDocumentSnapshot,
+    ): IPaymentEntity {
       return snapshot.data() as IPaymentEntity;
     },
 
-    toFirestore(object: IPaymentEntity | Partial<IPaymentEntity>): FirebaseFirestore.DocumentData {
+    toFirestore(
+      object: IPaymentEntity | Partial<IPaymentEntity>,
+    ): FirebaseFirestore.DocumentData {
       return object;
-    }
+    },
   });
 
 export const paymentDb = {
@@ -48,5 +53,5 @@ export const paymentDb = {
    * Delete payment from the payments collection and
    * created deleted entity for it
    */
-  delete: deletePayment
+  delete: deletePayment,
 };

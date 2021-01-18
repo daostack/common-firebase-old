@@ -1,14 +1,14 @@
-import { ArgumentError, CommonError } from '../../util/errors';
-import { createEvent } from '../../util/db/eventDbService';
-import { EVENT_TYPES } from '../../event/event';
+import {ArgumentError, CommonError} from '../../util/errors';
+import {createEvent} from '../../util/db/eventDbService';
+import {EVENT_TYPES} from '../../event/event';
 
-import { updateProposal } from '../database/updateProposal';
-import { IProposalEntity } from '../proposalTypes';
+import {updateProposal} from '../database/updateProposal';
+import {IProposalEntity} from '../proposalTypes';
 
-import { countVotes } from './countVotes';
-import { hasAbsoluteMajority } from './hasAbsoluteMajority';
-import { isExpired } from './isExpired';
-import { commonDb } from '../../common/database';
+import {countVotes} from './countVotes';
+import {hasAbsoluteMajority} from './hasAbsoluteMajority';
+import {isExpired} from './isExpired';
+import {commonDb} from '../../common/database';
 
 /**
  * Finalizes (counts votes, changes status and more) the passed proposal
@@ -19,15 +19,17 @@ import { commonDb } from '../../common/database';
  *
  * @returns - The finalized proposal
  */
-export const finalizeProposal = async (proposal: IProposalEntity): Promise<IProposalEntity> => {
+export const finalizeProposal = async (
+  proposal: IProposalEntity,
+): Promise<IProposalEntity> => {
   if (!proposal) {
     throw new ArgumentError('proposal', proposal);
   }
 
   // If the proposal does not have a majority and is not expired we should not finalize it
-  if (!await isExpired(proposal) && !(await hasAbsoluteMajority(proposal))) {
+  if (!(await isExpired(proposal)) && !(await hasAbsoluteMajority(proposal))) {
     throw new CommonError('Trying to finalize non expired proposal', {
-      proposal
+      proposal,
     });
   }
 
@@ -35,8 +37,7 @@ export const finalizeProposal = async (proposal: IProposalEntity): Promise<IProp
 
   // If the votes for are more than the votes against give it pass (
   proposal.state =
-    votes.votesFor > votes.votesAgainst &&
-    votes.votesFor > 0
+    votes.votesFor > votes.votesAgainst && votes.votesFor > 0
       ? 'passed'
       : 'failed';
 
@@ -47,7 +48,7 @@ export const finalizeProposal = async (proposal: IProposalEntity): Promise<IProp
     if (common.balance < proposal.fundingRequest.amount) {
       logger.info('Common lacks the funds required to fund passed proposal', {
         common,
-        proposal
+        proposal,
       });
 
       // Change the state of the proposal
@@ -57,13 +58,13 @@ export const finalizeProposal = async (proposal: IProposalEntity): Promise<IProp
       await createEvent({
         objectId: proposal.id,
         userId: proposal.proposerId,
-        type: EVENT_TYPES.FUNDING_REQUEST_ACCEPTED_INSUFFICIENT_FUNDS
+        type: EVENT_TYPES.FUNDING_REQUEST_ACCEPTED_INSUFFICIENT_FUNDS,
       });
     }
   }
 
   logger.info(`Proposal finalized with ${proposal.state}`, {
-    proposal
+    proposal,
   });
 
   await updateProposal(proposal);
@@ -72,17 +73,19 @@ export const finalizeProposal = async (proposal: IProposalEntity): Promise<IProp
     await createEvent({
       objectId: proposal.id,
       userId: proposal.proposerId,
-      type: proposal.type === 'join'
-        ? EVENT_TYPES.REQUEST_TO_JOIN_ACCEPTED
-        : EVENT_TYPES.FUNDING_REQUEST_ACCEPTED
+      type:
+        proposal.type === 'join'
+          ? EVENT_TYPES.REQUEST_TO_JOIN_ACCEPTED
+          : EVENT_TYPES.FUNDING_REQUEST_ACCEPTED,
     });
   } else if (proposal.state === 'failed') {
     await createEvent({
       objectId: proposal.id,
       userId: proposal.proposerId,
-      type: proposal.type === 'join'
-        ? EVENT_TYPES.REQUEST_TO_JOIN_REJECTED
-        : EVENT_TYPES.FUNDING_REQUEST_REJECTED
+      type:
+        proposal.type === 'join'
+          ? EVENT_TYPES.REQUEST_TO_JOIN_REJECTED
+          : EVENT_TYPES.FUNDING_REQUEST_REJECTED,
     });
   }
 

@@ -1,5 +1,5 @@
-import { IBankAccountEntity } from '../types';
-import { BankAccountCollection } from './index';
+import {IBankAccountEntity} from '../types';
+import {BankAccountCollection} from './index';
 
 interface IGetBankAccountOptions {
   /**
@@ -14,13 +14,20 @@ interface IGetBankAccountOptions {
  *
  * @param options - The options for filtering the bankAccounts
  */
-export const getBankAccounts = async (options: IGetBankAccountOptions): Promise<IBankAccountEntity[]> => {
+export const getBankAccounts = async (
+  options: IGetBankAccountOptions,
+): Promise<IBankAccountEntity[]> => {
   let bankAccountsQuery: any = BankAccountCollection;
 
   if (options.fingerprint) {
-    bankAccountsQuery = bankAccountsQuery.where('circleFingerprint', '==', options.fingerprint);
+    bankAccountsQuery = bankAccountsQuery.where(
+      'circleFingerprint',
+      '==',
+      options.fingerprint,
+    );
   }
 
-  return (await bankAccountsQuery.get()).docs
-    .map(bankAccount => bankAccount.data());
+  return (await bankAccountsQuery.get()).docs.map((bankAccount) =>
+    bankAccount.data(),
+  );
 };

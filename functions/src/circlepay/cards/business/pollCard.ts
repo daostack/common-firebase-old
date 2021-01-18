@@ -1,11 +1,11 @@
-import { poll } from '../../../util';
-import { IPollAction, IPollValidator } from '../../../util/poll';
+import {poll} from '../../../util';
+import {IPollAction, IPollValidator} from '../../../util/poll';
 
-import { ArgumentError, CvvVerificationError } from '../../../util/errors';
+import {ArgumentError, CvvVerificationError} from '../../../util/errors';
 
-import { circleClient, ICircleCard } from '../../client';
-import { ICardEntity } from '../types';
-import { cardDb } from '../database';
+import {circleClient, ICircleCard} from '../../client';
+import {ICardEntity} from '../types';
+import {cardDb} from '../database';
 
 interface IPollCardOptions {
   interval: number;
@@ -20,7 +20,7 @@ const defaultCardOptions: IPollCardOptions = {
   maxRetries: 32,
 
   throwOnCvvFail: true,
-  deleteCardOnCvvFail: false
+  deleteCardOnCvvFail: false,
 };
 
 /**
@@ -29,14 +29,17 @@ const defaultCardOptions: IPollCardOptions = {
  * @param card - The entity of the card we want to poll
  * @param pollCardOptions - *Optional* Options for the card polling
  */
-export const pollCard = async (card: ICardEntity, pollCardOptions?: Partial<IPollCardOptions>): Promise<ICardEntity> => {
+export const pollCard = async (
+  card: ICardEntity,
+  pollCardOptions?: Partial<IPollCardOptions>,
+): Promise<ICardEntity> => {
   if (!card) {
     throw new ArgumentError('card', card);
   }
 
   const options = {
     ...defaultCardOptions,
-    ...pollCardOptions
+    ...pollCardOptions,
   };
 
   const pollAction: IPollAction<ICircleCard> = async () => {
@@ -44,11 +47,17 @@ export const pollCard = async (card: ICardEntity, pollCardOptions?: Partial<IPol
   };
 
   const pollValidator: IPollValidator<ICircleCard> = (card) => {
-    return card.verification.avs !== 'pending' &&
-      card.verification.cvv !== 'pending';
+    return (
+      card.verification.avs !== 'pending' && card.verification.cvv !== 'pending'
+    );
   };
 
-  const circleCardObj = await poll<ICircleCard>(pollAction, pollValidator, options.interval, options.maxRetries);
+  const circleCardObj = await poll<ICircleCard>(
+    pollAction,
+    pollValidator,
+    options.interval,
+    options.maxRetries,
+  );
 
   // Update the CVV verification check of the entity if it has changed
   if (circleCardObj.verification.cvv !== card.verification.cvv) {
@@ -56,14 +65,14 @@ export const pollCard = async (card: ICardEntity, pollCardOptions?: Partial<IPol
       ...card,
       verification: {
         ...card.verification,
-        cvv: circleCardObj.verification.cvv as any
-      }
+        cvv: circleCardObj.verification.cvv as any,
+      },
     });
 
     if (circleCardObj.verification.cvv === 'fail') {
       logger.notice('CVV verification failed for card', {
         card,
-        circleCard: circleCardObj
+        circleCard: circleCardObj,
       });
 
       if (options.deleteCardOnCvvFail) {

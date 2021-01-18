@@ -20,24 +20,24 @@ Collaborative Social Action.
 
 const emailStubs = {
   userName: {
-    required: true
+    required: true,
   },
   proposal: {
-    required: true
+    required: true,
   },
   fundingAmount: {
-    required: true
+    required: true,
   },
   commonName: {
-    required: true
+    required: true,
   },
   supportChatLink: {
-    required: true
-  }
+    required: true,
+  },
 };
 
 export const userFundingRequestAcceptedUnknown = {
   subject: 'Proposal approved - Missing information',
   emailStubs,
-  template
+  template,
 };

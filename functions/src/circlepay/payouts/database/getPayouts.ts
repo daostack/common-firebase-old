@@ -1,5 +1,5 @@
-import { PayoutsCollection } from './index';
-import { IPayoutEntity, PayoutStatus } from '../types';
+import {PayoutsCollection} from './index';
+import {IPayoutEntity, PayoutStatus} from '../types';
 
 interface IGetPayoutsOptions {
   proposalId?: string;
@@ -11,7 +11,9 @@ interface IGetPayoutsOptions {
  *
  * @param options - The options for which to retrieve payouts
  */
-export const getPayouts = async (options: IGetPayoutsOptions): Promise<IPayoutEntity[]> => {
+export const getPayouts = async (
+  options: IGetPayoutsOptions,
+): Promise<IPayoutEntity[]> => {
   let payoutsQuery: any = PayoutsCollection;
 
   if (options.proposalId) {
@@ -26,6 +28,5 @@ export const getPayouts = async (options: IGetPayoutsOptions): Promise<IPayoutEn
     }
   }
 
-  return (await payoutsQuery.get())
-    .docs.map(x => x.data());
+  return (await payoutsQuery.get()).docs.map((x) => x.data());
 };

@@ -1,8 +1,8 @@
 import admin from 'firebase-admin';
 
 import Timestamp = admin.firestore.Timestamp;
-import { IEventEntity } from '../../event/type';
-import { EventContext } from 'firebase-functions/lib/cloud-functions';
+import {IEventEntity} from '../../event/type';
+import {EventContext} from 'firebase-functions/lib/cloud-functions';
 
 export type valueOf<T> = T[keyof T];
 export type Nullable<T> = T | null | undefined;
@@ -34,7 +34,6 @@ export interface IPaymentRefund {
   status: CirclePaymentStatus;
 }
 
-
 export interface ICircleNotification {
   clientId: string;
   notificationType: 'payments' | string;
@@ -53,7 +52,7 @@ export interface ICircleNotification {
     updateDate: Date;
 
     refunds: IPaymentRefund[];
-  }
+  };
 }
 
 export type BaseEntityType = 'id' | 'createdAt' | 'updatedAt';
@@ -87,4 +86,7 @@ export interface IBaseEntity {
  * @param eventObj - The object containing the event details
  * @param context - Context about the currently executing trigger
  */
-export type IEventTrigger = (eventObj: IEventEntity, context: EventContext) => void | Promise<void>
+export type IEventTrigger = (
+  eventObj: IEventEntity,
+  context: EventContext,
+) => void | Promise<void>;

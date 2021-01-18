@@ -1,7 +1,7 @@
-import { ArgumentError, NotFoundError } from '../../../util/errors';
+import {ArgumentError, NotFoundError} from '../../../util/errors';
 
-import { BankAccountCollection } from './index';
-import { IBankAccountEntity } from '../types';
+import {BankAccountCollection} from './index';
+import {IBankAccountEntity} from '../types';
 
 /**
  * Gets bankAccount by id
@@ -14,17 +14,20 @@ import { IBankAccountEntity } from '../types';
  *
  * @returns - The found bankAccount
  */
-export const getBankAccount = async (bankAccountId: string, throwErr = true): Promise<IBankAccountEntity> => {
-  if(!bankAccountId) {
+export const getBankAccount = async (
+  bankAccountId: string,
+  throwErr = true,
+): Promise<IBankAccountEntity> => {
+  if (!bankAccountId) {
     throw new ArgumentError('bankAccountId', bankAccountId);
   }
 
-  const bankAccount = (await BankAccountCollection
-    .doc(bankAccountId)
-    .get()).data();
+  const bankAccount = (
+    await BankAccountCollection.doc(bankAccountId).get()
+  ).data();
 
-  if(!bankAccount && throwErr) {
+  if (!bankAccount && throwErr) {
     throw new NotFoundError(bankAccountId, 'bankAccount');
   }
   return bankAccount;
-}
+};

@@ -23,4 +23,3 @@
 //   return (await subscriptionsQuery.get()).docs
 //     .map(bankAccount => bankAccount.data());
 // };
-
