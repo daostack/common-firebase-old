@@ -6,20 +6,22 @@ import { CommonError } from '../../../util/errors';
 import { commonDb } from '../../../common/database';
 import { proposalDb } from '../../../proposals/database';
 import { addCommonMemberByProposalId } from '../../../common/business/addCommonMember';
+import { subscriptionDb } from '../../../subscriptions/database';
+import { handleFinalizedSubscriptionPayment } from './handlers/subscriptions/handleFinalizedSubscriptionPayment';
 
 /**
  * Handles update from circle and saves it to the database
  *
- * @param payment - the current version of the payment from our FireStore
+ * @param oldPayment - the current version of the payment from our FireStore
  * @param circlePayment - the current version of the payment as is from Circle
  */
-export const updatePayment = async (payment: IPaymentEntity, circlePayment: ICirclePayment): Promise<IPaymentEntity> => {
-  let updatedPayment: IPaymentEntity = payment;
+export const updatePayment = async (oldPayment: IPaymentEntity, circlePayment: ICirclePayment): Promise<IPaymentEntity> => {
+  let updatedPayment: IPaymentEntity = oldPayment;
 
   switch (circlePayment.data.status) {
     case 'failed':
       updatedPayment = {
-        ...payment,
+        ...oldPayment,
 
         status: circlePayment.data.status,
         failure: failureHelper.processFailedPayment(circlePayment)
@@ -29,7 +31,7 @@ export const updatePayment = async (payment: IPaymentEntity, circlePayment: ICir
     case 'confirmed':
     case 'paid':
       updatedPayment = {
-        ...payment,
+        ...oldPayment,
 
         status: circlePayment.data.status,
         fees: feesHelper.processCircleFee(circlePayment)
@@ -38,7 +40,7 @@ export const updatePayment = async (payment: IPaymentEntity, circlePayment: ICir
       break;
     default:
       logger.warn('Unknown payment state occurred. Not knowing how to handle the payment update', {
-        payment,
+        payment: oldPayment,
         circlePayment: circlePayment.data,
         unknownStatus: circlePayment.data.status
       });
@@ -49,13 +51,13 @@ export const updatePayment = async (payment: IPaymentEntity, circlePayment: ICir
   updatedPayment = await paymentDb.update(updatedPayment);
 
   // If the status has change broadcast an event
-  if (payment.status !== updatedPayment.status) {
+  if (oldPayment.status !== updatedPayment.status) {
     logger.debug('Payment status update occurred on payment', {
-      status: `${payment.status} -> ${updatedPayment.status}`,
-      paymentType: payment.type,
-      paymentId: payment.id
+      status: `${oldPayment.status} -> ${updatedPayment.status}`,
+      paymentType: oldPayment.type,
+      paymentId: oldPayment.id
     }, {
-      oldPayment: payment,
+      oldPayment: oldPayment,
       updatedPayment: updatedPayment
     });
 
@@ -76,28 +78,30 @@ export const updatePayment = async (payment: IPaymentEntity, circlePayment: ICir
     }
 
     // @todo If this is subscription payment handle subscription update
-    if (payment.type === 'subscription') {
-      logger.warn('Not Implemented Waring: Payment status change for subscription payment');
+    if (oldPayment.type === 'subscription') {
+      const subscription = await subscriptionDb.get(updatedPayment.subscriptionId);
+
+      logger.info('Handling payment status change for subscription payment');
 
       // Handle this only if the previous status was explicitly pending
       // and the new one is successful
-      // if (payment.status === 'pending' && isSuccessful(payment)) {
-      //
-      // }
+      if (oldPayment.status === 'pending') {
+        await handleFinalizedSubscriptionPayment(subscription, updatedPayment);
+      }
     }
 
     // @todo If this is proposal payment handle the proposal update
-    if (payment.type === 'one-time') {
+    if (oldPayment.type === 'one-time') {
       logger.warn('Not Implemented Waring: Payment status change for subscription payment');
 
       // Handle this only if the previous status was explicitly pending
       // and the new one is successful
-      if (payment.status === 'pending' && isSuccessful(payment)) {
+      if (oldPayment.status === 'pending' && isSuccessful(updatedPayment)) {
         logger.notice('Updating data for hanging payment', {
-          paymentId: payment.id
+          paymentId: oldPayment.id
         });
 
-        const proposal = await proposalDb.getJoinRequest(payment.proposalId);
+        const proposal = await proposalDb.getJoinRequest(oldPayment.proposalId);
 
         // Update common funding info
         const common = await commonDb.get(proposal.commonId);

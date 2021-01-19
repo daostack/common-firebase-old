@@ -1,4 +1,3 @@
-
 import { commonDb } from '../database';
 import { ICommonEntity } from '../types';
 import { createEvent } from '../../util/db/eventDbService';
@@ -7,7 +6,7 @@ import { EVENT_TYPES } from '../../event/event';
 export const updateCommon = async (common: ICommonEntity) : Promise<ICommonEntity> => {
   // should we validate here like in createCommon?
   // check if user is owner of common
-  const updatedCommon = await commonDb.update(common);
+  const updatedCommon = (await commonDb.update(common)) as ICommonEntity;
 
   // but we need to save more data:
   // we have

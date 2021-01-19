@@ -5,11 +5,9 @@ import { IEventEntity } from '../../event/type';
 import { EVENT_TYPES } from '../../event/event';
 import { fundProposal } from '../business/fundProposal';
 import { createSubscription } from '../../subscriptions/business';
-import { commonDb } from '../../common/database';
 import { proposalDb } from '../database';
 import { createEvent } from '../../util/db/eventDbService';
 import { createProposalPayment } from '../../circlepay/payments/business/createProposalPayment';
-import { addCommonMemberByProposalId } from '../../common/business/addCommonMember';
 
 
 export const onProposalApproved = functions.firestore
@@ -46,17 +44,6 @@ export const onProposalApproved = functions.firestore
             sessionId: context.eventId,
             ipAddress: '127.0.0.1' // @todo Get ip, but what IP?
           }, { throwOnFailure: true });
-
-          // Update common funding info
-          const common = await commonDb.get(proposal.commonId);
-
-          common.raised += proposal.join.funding;
-          common.balance += proposal.join.funding;
-
-          await commonDb.update(common);
-
-          // Add the user as member
-          await addCommonMemberByProposalId(proposal.id);
         }
       }
     }
