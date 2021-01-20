@@ -114,30 +114,18 @@ export interface ICommonMetadata {
 
 export interface ICommonUpdate {
   /**
-   * The new common entity 
+   * The common with the changes
    */
-  newCommon: ICommonEntity, /*{
-    balance: number,
-    createdAt: Timestamp,
-    fundingGoalDeadline: number,
-    id: string,
-    image: string,
-    links: ICommonLink[],
-    rules: ICommonRule[],
-    members: ICommonMember[],
-    metadata: ICommonMetadata,
-    name: string,
-    raised: number,
-    register: CommonRegister,
-    updatedAt: Timestamp,
-    commonId: string,
-    changedBy: string,
-  },*/
+  changes: ICommonEntity, // should be commonEntityChangeable
 
+  /**
+   * The id of the common that needs to be changed
+   */
+  commonId: string,
   /**
    * The userId of the user who is responsible for the change
    */
-  changedBy: string
+  userId: string
 }
 
 export type ContributionType = 'one-time' | 'monthly';
