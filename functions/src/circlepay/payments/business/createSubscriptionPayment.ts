@@ -73,7 +73,6 @@ export const createSubscriptionPayment = async (payload: yup.InferType<typeof cr
     subscription
   });
 
-
   // Process the payment if it is finalize. If it is not something went wrong
   if (isFinalized(payment)) {
     await handleFinalizedSubscriptionPayment(subscription, payment);

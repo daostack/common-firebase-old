@@ -6,6 +6,7 @@ import { CommonError } from '../../../../../util/errors';
 import { createEvent } from '../../../../../util/db/eventDbService';
 import { EVENT_TYPES } from '../../../../../event/event';
 import { updateCommonBalance } from '../../../../../common/business/updateCommonBalance';
+import { proposalDb } from '../../../../../proposals/database';
 
 export const handleSuccessfulJoinPayment = async (proposal: IJoinRequestProposal, payment: IPaymentEntity): Promise<void> => {
   if (!isSuccessful(payment)) {
@@ -29,4 +30,10 @@ export const handleSuccessfulJoinPayment = async (proposal: IJoinRequestProposal
 
   // Update common balance info
   await updateCommonBalance(proposal.commonId, proposal.join.funding);
+
+  // Update the status of the proposal
+  await proposalDb.update({
+    id: proposal.id,
+    paymentState: 'confirmed'
+  });
 };

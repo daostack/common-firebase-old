@@ -1,5 +1,5 @@
 import { IJoinRequestProposal } from '../../../../../proposals/proposalTypes';
-import { isFailed, isFinalized, isSuccessful } from '../../../helpers';
+import { isFailed, isPending, isSuccessful } from '../../../helpers';
 import { CommonError } from '../../../../../util/errors';
 import { IPaymentEntity } from '../../../types';
 
@@ -7,12 +7,13 @@ import { handleSuccessfulJoinPayment } from './handleSuccessfulJoinPayment';
 import { handleUnsuccessfulJoinPayment } from './handleFailedJoinPayment';
 
 export const handleFinalizedJoinPayment = async (proposal: IJoinRequestProposal, payment: IPaymentEntity): Promise<void> => {
-  if (!isFinalized(payment)) {
+  if (isPending(payment)) {
     logger.error('Not finalized payment passed to `handleFinalizedJoinPayment()`', {
       payment
     });
-  }
 
+    return;
+  }
 
   // Handle successful payment
   if (isSuccessful(payment)) {

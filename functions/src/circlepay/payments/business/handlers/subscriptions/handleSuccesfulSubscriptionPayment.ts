@@ -10,6 +10,8 @@ import { subscriptionDb } from '../../../../../subscriptions/database';
 import { proposalDb } from '../../../../../proposals/database';
 import { IPaymentEntity } from '../../../types';
 import { isSuccessful } from '../../../helpers';
+import { createEvent } from '../../../../../util/db/eventDbService';
+import { EVENT_TYPES } from '../../../../../event/event';
 import Timestamp = admin.firestore.Timestamp;
 
 
@@ -42,6 +44,12 @@ export const handleSuccessfulSubscriptionPayment = async (subscription: ISubscri
       payment
     });
   }
+
+  await createEvent({
+    type: EVENT_TYPES.SUBSCRIPTION_PAYMENT_CONFIRMED,
+    objectId: payment.id,
+    userId: payment.userId
+  });
 
   // The user may have canceled the subscription between the payment failure
   // so change this only if it explicitly set that the payment is failed

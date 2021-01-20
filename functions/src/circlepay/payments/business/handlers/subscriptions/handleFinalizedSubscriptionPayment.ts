@@ -3,7 +3,7 @@ import { createEvent } from '../../../../../util/db/eventDbService';
 import { EVENT_TYPES } from '../../../../../event/event';
 
 import { IPaymentEntity } from '../../../types';
-import { isFinalized, isSuccessful } from '../../../helpers';
+import { isFinalized, isPending, isSuccessful } from '../../../helpers';
 
 import { handleSuccessfulSubscriptionPayment } from './handleSuccesfulSubscriptionPayment';
 import { handleFailedSubscriptionPayment } from './handleFailedSubscriptionPayment';
@@ -15,7 +15,7 @@ import { handleFailedSubscriptionPayment } from './handleFailedSubscriptionPayme
  * @param payment - The payment itself
  */
 export const handleFinalizedSubscriptionPayment = async (subscription: ISubscriptionEntity, payment: IPaymentEntity): Promise<void> => {
-  if (!isFinalized(payment)) {
+  if (isPending(payment)) {
     logger.error('Non finalized payment passed to `handleFinalizedSubscriptionPayment()`', {
       payment
     });
@@ -24,12 +24,6 @@ export const handleFinalizedSubscriptionPayment = async (subscription: ISubscrip
   }
 
   if (isSuccessful(payment)) {
-    await createEvent({
-      type: EVENT_TYPES.SUBSCRIPTION_PAYMENT_CONFIRMED,
-      objectId: payment.id,
-      userId: payment.userId
-    });
-
     await handleSuccessfulSubscriptionPayment(subscription, payment);
   } else if (isFinalized(payment)) {
     await createEvent({
