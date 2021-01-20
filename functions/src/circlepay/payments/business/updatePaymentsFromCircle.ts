@@ -3,7 +3,8 @@ import { updatePaymentFromCircle } from './updatePaymentFromCircle';
 import { paymentDb } from '../database';
 
 const defaultGetPaymentOptions: IGetPaymentsOptions = {
-  status: 'pending'
+  status: 'pending',
+  olderThan: new Date((new Date().getTime()) - 60 * 60 * 1000) // 1 hour before now
 };
 
 /**

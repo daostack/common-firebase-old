@@ -1,5 +1,8 @@
+import admin from 'firebase-admin';
+
 import { IPaymentEntity, PaymentStatus } from '../types';
 import { PaymentsCollection } from './index';
+import Query = admin.firestore.Query;
 
 export interface IGetPaymentsOptions {
   /**
@@ -18,6 +21,12 @@ export interface IGetPaymentsOptions {
    */
   status?: PaymentStatus | PaymentStatus[];
 
+  /**
+   * Get payment that were created before
+   * the passed date
+   */
+  olderThan?: Date;
+
   createdFromObject?: {
     id?: string;
   }
@@ -29,7 +38,7 @@ export interface IGetPaymentsOptions {
  * @param options - The options for filtering the payments
  */
 export const getPayments = async (options: IGetPaymentsOptions): Promise<IPaymentEntity[]> => {
-  let paymentsQuery: any = PaymentsCollection;
+  let paymentsQuery: Query<IPaymentEntity> = PaymentsCollection;
 
   if (options.id) {
     paymentsQuery = paymentsQuery.where('id', '==', options.id);
@@ -53,6 +62,12 @@ export const getPayments = async (options: IGetPaymentsOptions): Promise<IPaymen
     if (createdFromObject.id) {
       paymentsQuery = paymentsQuery.where('createdFromObject.id', '==', createdFromObject.id);
     }
+  }
+
+  if (options.olderThan) {
+    paymentsQuery = paymentsQuery
+      .orderBy('createdAt')
+      .where('createdAt', '<', options.olderThan);
   }
 
   return (await paymentsQuery.get()).docs

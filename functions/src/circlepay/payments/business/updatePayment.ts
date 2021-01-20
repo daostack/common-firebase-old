@@ -83,9 +83,6 @@ export const updatePayment = async (oldPayment: IPaymentEntity, circlePayment: I
 
       // Handle this only if the previous status was explicitly pending
       if (oldPayment.status === 'pending') {
-        // If we are here the payment is for sure not pending because we need
-        // status change to get to here
-        await handleFinalizedSubscriptionPayment(subscription, updatedPayment);
 
         // Do some grunt work if this is the first subscription payment
         if (!subscription.charges) {
@@ -114,6 +111,10 @@ export const updatePayment = async (oldPayment: IPaymentEntity, circlePayment: I
             await subscriptionDb.delete(subscription.id);
           }
         }
+
+        // status change to get to here
+        // If we are here the payment is for sure not pending because we need
+        await handleFinalizedSubscriptionPayment(subscription, updatedPayment);
       }
     }
 
