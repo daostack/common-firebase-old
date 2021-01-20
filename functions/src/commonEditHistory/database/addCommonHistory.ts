@@ -13,7 +13,7 @@ import { ICommonEditHistory } from '../types';
  * @param commonUpdate     - info of the common that needs to be updated includeing
  *                           the new common to save and the user responsible for the changes
  */
-export const addCommonHistory = async (commonUpdate: ICommonUpdate): Promise<ICommonEditHistory> => {
+export const addCommonHistory = async (commonUpdate/*: ICommonUpdate*/): Promise<ICommonEditHistory> => {
 
   const {newCommon, changedBy} = commonUpdate;
   const originalCommon = await commonDb.get(newCommon.id)

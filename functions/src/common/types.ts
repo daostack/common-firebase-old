@@ -116,7 +116,23 @@ export interface ICommonUpdate {
   /**
    * The new common entity 
    */
-  newCommon: ICommonEntity,
+  newCommon: ICommonEntity, /*{
+    balance: number,
+    createdAt: Timestamp,
+    fundingGoalDeadline: number,
+    id: string,
+    image: string,
+    links: ICommonLink[],
+    rules: ICommonRule[],
+    members: ICommonMember[],
+    metadata: ICommonMetadata,
+    name: string,
+    raised: number,
+    register: CommonRegister,
+    updatedAt: Timestamp,
+    commonId: string,
+    changedBy: string,
+  },*/
 
   /**
    * The userId of the user who is responsible for the change
