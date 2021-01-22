@@ -112,13 +112,13 @@ describe('Card creation process', () => {
 
       const response = await circleApp
         .post('/create-card')
-        .send(invalidCreateCardRequest_MissingKeyId)
+        .send()
         .set({
           Authorization: getTestAuthenticationToken(cardOwnerId)
         });
 
       expect(response.status).toBe(422);
-      expect(response.body).toBe('fsd')
+      expect(response.body.data.detailedErrors).toMatchSnapshot();
     })
   });
 
