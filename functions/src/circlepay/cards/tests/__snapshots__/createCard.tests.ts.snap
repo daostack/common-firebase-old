@@ -9,6 +9,16 @@ Array [
 ]
 `;
 
+exports[`Card creation process Card creation validation should fail if the card expiry date is in the past  1`] = `
+Array [
+  Object {
+    "field": "expYear",
+    "message": "expYear must be greater than or equal to 2021",
+    "value": 2020,
+  },
+]
+`;
+
 exports[`Card creation process Card creation validation should fail if the encryption key ID was not provided 1`] = `
 Array [
   Object {
