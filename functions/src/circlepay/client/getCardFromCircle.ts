@@ -51,6 +51,7 @@ export interface ICircleCard {
   network: CircleCardNetwork;
 
   fingerprint: string;
+  errorCode?: string;
 
   createDate: Date;
   updateDate: Date;

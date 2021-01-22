@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Card creation process Card creation validation should fail if the card expirary  1`] = `
+Array [
+  Object {
+    "field": "keyId",
+    "message": "keyId is a required field",
+  },
+]
+`;
+
+exports[`Card creation process Card creation validation should fail if the encryption key ID was not provided 1`] = `
+Array [
+  Object {
+    "field": "keyId",
+    "message": "keyId is a required field",
+  },
+]
+`;

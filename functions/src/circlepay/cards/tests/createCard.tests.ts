@@ -12,8 +12,17 @@ import { circleApp, getTestAuthenticationToken } from '../../../util/tests/helpe
 import { ICircleCreateCardResponse } from '../../types';
 import { IGetCircleCardResponse } from '../../client/getCardFromCircle';
 
-import { createCardSuccessfulRequest, getCardSuccessfulCvvCheck } from './data/testCardCirlceResponses';
-import { validCreateCardRequest } from './data/testCardRequests';
+import {
+  createCardSuccessfulRequest,
+  getCardFailedCvvCheck,
+  getCardSuccessfulChecks
+} from './data/testCardCirlceResponses';
+import {
+  invalidCreateCardRequest_MissingKeyId,
+  invalidCreateCardRequest_PassedDate,
+  validCreateCardRequest
+} from './data/testCardRequests';
+import { ErrorCodes } from '../../../constants';
 
 const circleMatcher = /.{1,}circle\.com\/.*/;
 
@@ -45,7 +54,7 @@ describe('Card creation process', () => {
   });
 
   describe('Card creation validation', () => {
-    it('should have working mock ', async () => {
+    it('should create the card with all the data valid ', async () => {
       const cardOwnerId = v4();
       const mock = new MockAdapter(axios);
 
@@ -53,7 +62,7 @@ describe('Card creation process', () => {
         .reply<ICircleCreateCardResponse>(200, createCardSuccessfulRequest);
 
       mock.onGet(new RegExp(circleMatcher.source + (/\/cards/).source))
-        .reply<IGetCircleCardResponse>(200, getCardSuccessfulCvvCheck);
+        .reply<IGetCircleCardResponse>(200, getCardSuccessfulChecks);
 
       const response = await circleApp
         .post('/create-card')
@@ -63,8 +72,98 @@ describe('Card creation process', () => {
         });
 
       expect(response.status).toBe(200);
+      expect(response.body.ownerId).toEqual(cardOwnerId);
 
-      console.log(response.body);
+      mock.restore();
+    });
+
+    it('should fail if the encryption key ID was not provided', async () => {
+      const cardOwnerId = v4();
+
+      const response = await circleApp
+        .post('/create-card')
+        .send(invalidCreateCardRequest_MissingKeyId)
+        .set({
+          Authorization: getTestAuthenticationToken(cardOwnerId)
+        });
+
+      expect(response.status).toBe(422);
+      expect(response.body.data.errorCode).toBe(ErrorCodes.ValidationError);
+      expect(response.body.data.detailedErrors).toMatchSnapshot();
+    });
+
+    it('should fail if the card expiry date is in the past ', async () => {
+      const cardOwnerId = v4();
+
+      const response = await circleApp
+        .post('/create-card')
+        .send(invalidCreateCardRequest_PassedDate)
+        .set({
+          Authorization: getTestAuthenticationToken(cardOwnerId)
+        });
+
+      expect(response.status).toBe(422);
+      expect(response.body.data.errorCode).toBe(ErrorCodes.ValidationError);
+      expect(response.body.data.detailedErrors).toMatchSnapshot();
+    });
+
+    it('should fail if no body is provided whatsoever', async () => {
+      const cardOwnerId = v4();
+
+      const response = await circleApp
+        .post('/create-card')
+        .send(invalidCreateCardRequest_MissingKeyId)
+        .set({
+          Authorization: getTestAuthenticationToken(cardOwnerId)
+        });
+
+      expect(response.status).toBe(422);
+      expect(response.body).toBe('fsd')
+    })
+  });
+
+  describe('General card creation safeguard', () => {
+    it('should fail if the user does not exist', async () => {
+      const cardOwnerId = '404';
+      const mock = new MockAdapter(axios);
+
+      mock.onPost(new RegExp(circleMatcher.source + (/\/cards/).source))
+        .reply<ICircleCreateCardResponse>(200, createCardSuccessfulRequest);
+
+      const response = await circleApp
+        .post('/create-card')
+        .send(validCreateCardRequest)
+        .set({
+          Authorization: getTestAuthenticationToken(cardOwnerId)
+        });
+
+      expect(response.status).toEqual(404);
+      expect(response.body.error.includes('Cannot find 404 with identifier user.userId'));
+
+      mock.restore();
+    });
+
+    it('should fail if the CVV is incorrect', async () => {
+      const cardOwnerId = v4();
+      const mock = new MockAdapter(axios);
+
+      mock.onPost(new RegExp(circleMatcher.source + (/\/cards/).source))
+        .reply<ICircleCreateCardResponse>(200, createCardSuccessfulRequest);
+
+      mock.onGet(new RegExp(circleMatcher.source + (/\/cards/).source))
+        .reply<IGetCircleCardResponse>(200, getCardFailedCvvCheck);
+
+      const response = await circleApp
+        .post('/create-card')
+        .send(validCreateCardRequest)
+        .set({
+          Authorization: getTestAuthenticationToken(cardOwnerId)
+        });
+
+      expect(response.status).toBe(500);
+      expect(response.body.data.errorCode).toBe(ErrorCodes.CvvVerificationFail);
+
+      mock.restore();
     });
   });
 });
