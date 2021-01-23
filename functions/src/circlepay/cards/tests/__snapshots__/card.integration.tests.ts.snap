@@ -41,15 +41,6 @@ Array [
 ]
 `;
 
-exports[`Card creation process Card creation validation should fail if the card expirary  1`] = `
-Array [
-  Object {
-    "field": "keyId",
-    "message": "keyId is a required field",
-  },
-]
-`;
-
 exports[`Card creation process Card creation validation should fail if the card expiry date is in the past  1`] = `
 Array [
   Object {

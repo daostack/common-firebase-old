@@ -1,7 +1,8 @@
 import { IUserEntity } from '../../../../users/types';
 import { NotFoundError } from '../../../errors';
-import admin from 'firebase-admin';
-import Timestamp = admin.firestore.Timestamp;
+import firebase from 'firebase';
+import Timestamp = firebase.firestore.Timestamp;
+
 
 jest.mock('../../../../users/database/getUser', () => ({
   getUser: jest.fn()

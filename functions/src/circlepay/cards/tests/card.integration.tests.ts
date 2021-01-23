@@ -5,7 +5,7 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
 // Mockers
-import '../../../util/tests/helpers/mockers/getUserMocker';
+import '../../../util/tests/helpers/mockers/getUser.mocker';
 
 import { circleApp, getTestAuthenticationToken } from '../../../util/tests/helpers';
 
@@ -17,14 +17,16 @@ import {
   getCardFailedCvvCheck,
   getCardSuccessfulChecks
 } from './data/testCardCirlceResponses';
+
 import {
   invalidCreateCardRequest_MissingKeyId,
   invalidCreateCardRequest_PassedDate,
   validCreateCardRequest
 } from './data/testCardRequests';
+
 import { ErrorCodes } from '../../../constants';
 
-const circleMatcher = /.{1,}circle\.com\/.*/;
+const circleMatcher = /.+circle\.com\/.*/;
 
 const test = firebaseFunctionsTests({
   projectId: 'common-tests'

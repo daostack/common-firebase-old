@@ -9,6 +9,7 @@ import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 export const databaseURL = env.firebase.databaseURL;
 export const circlePayApi = env.circlepay.apiUrl;
 
+// let dbFn: any
 let getSecretFn: (secretName: string) => Promise<string>;
 
 if(process.env.NODE_ENV === 'test') {
@@ -18,7 +19,7 @@ if(process.env.NODE_ENV === 'test') {
 
   admin.initializeApp({
     projectId: 'test',
-    credential: admin.credential.applicationDefault()
+    credential: admin.credential?.applicationDefault()
   });
 } else {
   admin.initializeApp({
