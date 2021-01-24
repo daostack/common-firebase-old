@@ -45,7 +45,6 @@ export const addPermission = async (permissionPayload: IPermissionPayload/*: Add
     // for when a common is being created
     return await setPermission(common, role, userId);
   } else {
-    // not tested yet because we don't have the functionality of setting permission from the frontend
     const requestByUser = await userDb.get(requestByUserId);
     const roles = requestByUser.roles;
     let canGrantPermission = false;
