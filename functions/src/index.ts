@@ -13,6 +13,7 @@ import { subscriptionsApp } from './subscriptions';
 import { payoutTriggers } from './circlepay/payouts/triggers';
 import { backofficeApp, circleBalanceCrons } from './backoffice';
 import { metadataApp } from './metadata';
+import { permissionApp } from './permissions';
 
 // --- Express apps
 export const commons = commonsApp;
@@ -21,6 +22,7 @@ export const circlepay = circlePayApp;
 export const proposals = proposalsApp;
 export const subscriptions = subscriptionsApp;
 export const backoffice = backofficeApp;
+export const permissions = permissionApp;
 
 // --- Triggers and Subscriptions
 exports.eventSub = event;

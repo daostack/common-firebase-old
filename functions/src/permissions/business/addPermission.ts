@@ -1,8 +1,27 @@
+//import * as yup from 'yup';
+
 import { ICommonEntity } from '../../common/types';
 import { userDb } from '../../users/database';
-import { Role } from '../types';
+import { Role, IPermissionPayload } from '../types';
 import { IUserEntity } from '../../users/types';
 import { CommonError } from '../../util/errors';
+
+//TODO add this validation scheme whem ICommonUpdatable type is introduced
+// otherwise there's a mismatch between the validation fields and what ICommonEntity requires
+/*const addPermissionDataValidationScheme = yup.object({
+  common: yup.object({
+    id: yup.string().required(),
+    metadata: yup.object({
+      founderId: yup.string().required(),
+    }).required(),
+  }).required(),
+  userId: yup.string().required(),
+  role: yup.string().required(),
+  requestByUserId: yup.string().optional(),
+});
+
+type AddPermissionPayload = yup.InferType<typeof addPermissionDataValidationScheme>
+*/
 
 /**
  * Updating permission of a user to make changes in a common
@@ -19,7 +38,8 @@ import { CommonError } from '../../util/errors';
  *                           * for common creation, it will be null, the userId will get the founder role
  *                           * for other operations, it will be id of the user who sent the http request
  */
-export const addPermission = async (common: ICommonEntity, userId: string, role: Role, requestByUserId = null) : Promise<IUserEntity> => {
+export const addPermission = async (permissionPayload: IPermissionPayload/*: AddPermissionPayload*/) : Promise<IUserEntity> => {
+  const {common, role, userId, requestByUserId = null} = permissionPayload; // add validation
   if (!requestByUserId) 
   {
     // for when a common is being created
