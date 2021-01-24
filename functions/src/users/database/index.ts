@@ -5,6 +5,7 @@ import { IUserEntity } from '../types';
 
 import { getUserByEmail } from './getUserByEmail';
 import { getUser } from './getUser';
+import { updateUser } from './updateUser';
 
 export const UserCollection = db.collection(Collections.Users)
   .withConverter<IUserEntity>({
@@ -18,5 +19,6 @@ export const UserCollection = db.collection(Collections.Users)
 
 export const userDb = {
   get: getUser,
-  getByEmail: getUserByEmail
+  getByEmail: getUserByEmail,
+  update: updateUser
 };

@@ -103,8 +103,7 @@ export const createCommon = async (
     register: 'na',
   });
 
-  addPermission(common, userId);
-  //set founder
+  await addPermission(common, userId, 'founder');
 
   // Broadcast the common created event
   await createEvent({
