@@ -12,6 +12,10 @@ import { getCardFailedCvvCheck, getCardPendingChecks, getCardSuccessfulChecks } 
 import { pollCard } from '../business/pollCard';
 import { pendingCardEntity } from './data/testCardEntities';
 
+
+// Add the logger to the tests globals
+import '../../../util/logger';
+
 // ----- Local Mocks
 
 jest.mock('firebase-admin', () => ({
@@ -92,6 +96,7 @@ describe('Card unit tests', () => {
 
       // Cleanup
       mock.restore();
+      mockSpy.mockClear();
     });
 
     it('should finish on card verification failure', async () => {
@@ -118,12 +123,39 @@ describe('Card unit tests', () => {
 
       // Assert
       expect(pollCardResult).toMatchSnapshot();
-      expect(pollCardResult.verification.cvv).toBe('pass');
+      expect(pollCardResult.verification.cvv).toBe('fail');
 
       expect(mockSpy).toHaveBeenCalledTimes(3);
 
       // Cleanup
       mock.restore();
+      mockSpy.mockClear();
+    });
+
+    it('should throw on card verification failure if that is requests', async () => {
+      // Arrange
+      const mock = new MockAdapter(axios);
+      const mockSpy = jest.spyOn(axios, 'get');
+
+      mock
+        // On the first and second call return pending
+        .onGet(circeCardEndpointMatcher)
+        .replyOnce<IGetCircleCardResponse>(200, getCardPendingChecks)
+
+        // On the second and all sequential calls return check success
+        .onGet(circeCardEndpointMatcher)
+        .reply<IGetCircleCardResponse>(200, getCardFailedCvvCheck);
+
+      // Act & Assert
+      await expect(pollCard(pendingCardEntity, { throwOnCvvFail: true }))
+        .rejects
+        .toThrowError('CVV verification failed for card');
+
+      expect(mockSpy).toHaveBeenCalledTimes(2);
+
+      // Cleanup
+      mock.restore();
+      mockSpy.mockClear();
     });
   });
 });
