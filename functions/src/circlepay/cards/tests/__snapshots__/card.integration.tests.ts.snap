@@ -4,6 +4,10 @@ exports[`Card creation process Card creation validation should fail if no body i
 Array [
   Object {
     "field": "billingDetails.name",
+    "message": "You must provide your fist and last name",
+  },
+  Object {
+    "field": "billingDetails.name",
     "message": "billingDetails.name is a required field",
   },
   Object {

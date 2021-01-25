@@ -121,7 +121,7 @@ describe('Card creation process', () => {
 
       expect(response.status).toBe(422);
       expect(response.body.data.detailedErrors).toMatchSnapshot();
-    })
+    });
   });
 
   describe('General card creation safeguard', () => {
