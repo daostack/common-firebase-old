@@ -2,7 +2,7 @@ import { IBaseEntity } from '../util/types';
 import { IPermission } from '../permissions/types';
 
 export interface IUserEntity extends IBaseEntity {
-   uid: string;s
+   uid: string;
 
    email: string;
    photoURL: string;
