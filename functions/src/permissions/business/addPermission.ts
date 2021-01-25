@@ -40,8 +40,7 @@ type AddPermissionPayload = yup.InferType<typeof addPermissionDataValidationSche
  */
 export const addPermission = async (permissionPayload: IPermissionPayload/*: AddPermissionPayload*/) : Promise<IUserEntity> => {
   const {common, role, userId, requestByUserId = null} = permissionPayload; // add validation
-  if (!requestByUserId) 
-  {
+  if (!requestByUserId) {
     // for when a common is being created
     return await setPermission(common, role, userId);
   } else {
