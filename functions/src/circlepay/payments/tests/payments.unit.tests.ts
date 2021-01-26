@@ -83,7 +83,7 @@ describe('Payment Unit Tests', () => {
       });
 
       // Assert
-      expect(pollResult.fees).toMatchSnapshot()
+      expect(pollResult.fees).toMatchSnapshot();
       expect(mockSpy).toHaveBeenCalledTimes(11);
 
       // Cleanup
@@ -115,7 +115,7 @@ describe('Payment Unit Tests', () => {
       });
 
       // Assert
-      expect(pollResult).toMatchSnapshot();
+      expect(pollResult.status).not.toBe('pending');
       expect(mockSpy).toHaveBeenCalledTimes(11);
 
       // Cleanup

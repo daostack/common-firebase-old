@@ -21,7 +21,7 @@ import '../../../util/logger';
 jest.mock('firebase-admin', () => ({
   initializeApp: jest.fn(),
   firestore: () => ({
-    collection: jest.fn(path => ({
+    collection: jest.fn(() => ({
       withConverter: jest.fn()
         .mockImplementation(() => jest.fn())
       //
@@ -125,7 +125,8 @@ describe('Card unit tests', () => {
       });
 
       // Assert
-      expect(pollCardResult).toMatchSnapshot();
+      expect(pollCardResult).toBeTruthy();
+      expect(pollCardResult.ownerId).toBeTruthy();
       expect(pollCardResult.verification.cvv).toBe('fail');
 
       expect(mockSpy).toHaveBeenCalledTimes(3);
