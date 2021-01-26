@@ -7,42 +7,6 @@ Object {
 }
 `;
 
-exports[`Payment Unit Tests Payment polling should poll until failed status is reached 1`] = `
-Object {
-  "amount": Object {
-    "amount": 36900,
-    "currency": "USD",
-  },
-  "circlePaymentId": "b3025713-7988-45e5-8af8-cca8d624ce28",
-  "createdAt": Object {
-    "nanoseconds": 0,
-    "seconds": 1608168243,
-  },
-  "failure": Object {
-    "errorCode": "payment_failed",
-    "errorDescription": "Payment failed due to unspecified error",
-  },
-  "fees": Object {
-    "amount": 1598,
-    "currency": "USD",
-  },
-  "id": "0ef989c3-d096-42c1-b525-66a3719e413a",
-  "proposalId": "706da88a-a417-464d-8d36-3d68fb2b954c",
-  "source": Object {
-    "id": "62e367b3-6e16-44d8-9407-d5f9486924f4",
-    "type": "card",
-  },
-  "status": "failed",
-  "subscriptionId": "811dd5ed-1481-43bc-bc79-cacf6598916f",
-  "type": "subscription",
-  "updatedAt": Object {
-    "nanoseconds": 0,
-    "seconds": 1608176083,
-  },
-  "userId": "2Ti3LkP23KUJVp2AZY3wVHYWRxm2",
-}
-`;
-
 exports[`Payment Unit Tests Payment polling should poll until successful status is reached 1`] = `
 Object {
   "amount": 1598,
