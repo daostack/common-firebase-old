@@ -19,7 +19,7 @@ router.post('/add-permission', async (req, res, next) => {
       req,
       res,
       next,
-      successMessage: 'Join request successfully created!'
+      successMessage: 'Permission added successfully!'
     });
 });
 

@@ -1,27 +1,24 @@
-//import * as yup from 'yup';
+import * as yup from 'yup';
 
-import { ICommonEntity } from '../../common/types';
+import {validate} from '../../util/validate';
+
 import { userDb } from '../../users/database';
-import { Role, IPermissionPayload } from '../types';
+import { Role } from '../types';
 import { IUserEntity } from '../../users/types';
 import { CommonError } from '../../util/errors';
 
-//TODO add this validation scheme whem ICommonUpdatable type is introduced
-// otherwise there's a mismatch between the validation fields and what ICommonEntity requires
-/*const addPermissionDataValidationScheme = yup.object({
-  common: yup.object({
-    id: yup.string().required(),
-    metadata: yup.object({
-      founderId: yup.string().required(),
-    }).required(),
-  }).required(),
+//type ruleSchems = yup.InferType<typeof Role>
+
+const addPermissionDataValidationScheme = yup.object({
+  commonId: yup.string().required(),
   userId: yup.string().required(),
-  role: yup.string().required(),
-  requestByUserId: yup.string().optional(),
+  role: yup.string()
+    .oneOf(['founder', 'moderator', 'other']),
+  requestByUserId: yup.string().required(),
 });
 
 type AddPermissionPayload = yup.InferType<typeof addPermissionDataValidationScheme>
-*/
+
 
 /**
  * Updating permission of a user to make changes in a common
@@ -30,41 +27,45 @@ type AddPermissionPayload = yup.InferType<typeof addPermissionDataValidationSche
  * we check that requestByUserId has sufficient permission to grant permission (getting this requestByUserId from the http request)
  * and if that user has permission (right now, meaning being founder) then userId will get the permission
  * 
- * @return {Promise<IUserEntity>}                 [description]
- * @param  common - The common that we need to grand permission for
+ * @return               [description]
+ * @param  commonId - The commonId of the common that we need to grand permission for
  * @param  userId - The id of the user who needs the permission
  * @param  role - The role we want to grand the user with userId
  * @param  requestByUserId - the userId of the user requestiong to grand permission to userId
  *                           * for common creation, it will be null, the userId will get the founder role
  *                           * for other operations, it will be id of the user who sent the http request
  */
-export const addPermission = async (permissionPayload: IPermissionPayload/*: AddPermissionPayload*/) : Promise<IUserEntity> => {
-  const {common, role, userId, requestByUserId = null} = permissionPayload; // add validation
-  if (!requestByUserId) {
+export const addPermission = async (permissionPayload: AddPermissionPayload) : Promise<IUserEntity> => {
+  await validate<AddPermissionPayload>(
+    permissionPayload,
+    addPermissionDataValidationScheme
+  )
+  const {commonId, role, userId, requestByUserId} = permissionPayload;
+  if (requestByUserId === userId) {
     // for when a common is being created
-    return await setPermission(common, role, userId);
+    return await setPermission(commonId, role as Role, userId);
   } else {
     const requestByUser = await userDb.get(requestByUserId);
-    const roles = requestByUser.roles;
+    const roles = requestByUser.roles || [];
     let canGrantPermission = false;
     // right now, if requestByUser is a founder, he can grant permission to another user
     roles.forEach((roleObj) => {
-      if (roleObj.role === 'founder' && roleObj.data.commonId === common.id) {
+      if (roleObj.role === 'founder' && roleObj.data.commonId === commonId) {
         canGrantPermission = true;
       }
     });
     if (canGrantPermission) {
-      return await setPermission(common, role, userId);
+      return await setPermission(commonId, role as Role, userId);
     }
   }
   return null;
 }
 
-const setPermission = async (common: ICommonEntity, role: Role, userId: string) => {
+const setPermission = async (commonId: string, role: Role, userId: string) => {
   try {
     const userDoc = await userDb.get(userId);
     const userRoles = userDoc?.roles || [];
-    userRoles.push({role, data: {commonId: common.id}})
+    userRoles.push({role, data: {commonId}})
     userDoc.roles = userRoles;
     await userDb.update(userId, userDoc);
     return userDoc;

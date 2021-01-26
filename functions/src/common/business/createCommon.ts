@@ -10,7 +10,6 @@ import {commonDb} from '../database';
 import {ICommonEntity, ICommonLink, ICommonRule} from '../types';
 import {createEvent} from '../../util/db/eventDbService';
 import {EVENT_TYPES} from '../../event/event';
-import {addPermission} from '../../permissions/business';
 
 // The validation schema for creating commons (and creating typings by inferring them)
 const createCommonDataValidationScheme = yup.object({
@@ -102,10 +101,6 @@ export const createCommon = async (
 
     register: 'na',
   });
-
-  // this failes the tests because test user cannot be found
-  // @talkToAlexI
-  // await addPermission({common, userId, role: 'founder'});
 
   // Broadcast the common created event
   await createEvent({

@@ -1,11 +1,9 @@
-import { ICommonEntity } from '../common/types';
-
 
 export interface IPermissionPayload {
 	/**
 	 * The common that we grant permission to
 	 */
-	common: ICommonEntity;// should be the new common updateable type
+	commonId: string;
 	
 	/**
 	 * The role we want to grant the user with userId
