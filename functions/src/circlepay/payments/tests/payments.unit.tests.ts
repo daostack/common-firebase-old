@@ -18,11 +18,19 @@ import '../../../util/tests/helpers/mockers/payments/addPayment.mocker';
 import '../../../util/tests/helpers/mockers/firebase.mocker';
 import '../../../util/tests/helpers/mockers/getUser.mocker';
 import '../../../util/tests/helpers/mockers/cards/getCard.mocker';
+import '../../../util/tests/helpers/mockers/proposals/getJoinRequest.mocker';
+import '../../../util/tests/helpers/mockers/proposals/updateProposal.mocker';
 
 import { pendingPaymentEntity, successfulPaymentEntity } from './data/testPaymentEntities';
 import { pollPayment } from '../business/pollPayment';
 import { createPayment } from '../business/createPayment';
-import { createPaymentInvalidPayload, createPaymentValidPayload } from './data/testPaymentPayloads';
+import {
+  createPaymentInvalidPayload,
+  createPaymentValidPayload,
+  createProposalPaymentInvalidPayload,
+  createProposalPaymentValidPayload
+} from './data/testPaymentPayloads';
+import { createProposalPayment } from '../business/createProposalPayment';
 
 const circleMatcher = /.+circle\.com\/.*/;
 const circePaymentEndpointMatcher = new RegExp(circleMatcher.source + (/\/payments/).source);
@@ -226,11 +234,66 @@ describe('Payment Unit Tests', () => {
       mockSpyPost.mockClear();
     });
   });
-  //
-  // describe('One-time payments', () => {
-  //
-  // });
-  //
+
+  describe('One-time payments', () => {
+    it('should fail with invalid payload', async () => {
+      // Act and assert
+      await expect(createProposalPayment(createProposalPaymentInvalidPayload))
+        .rejects
+        .toThrowError('Validation failed');
+    });
+
+    it('should fail if the proposal is not found', async () => {
+      // Act and assert
+      await expect(createProposalPayment({
+        ...createProposalPaymentValidPayload,
+        proposalId: '00000000-0000-0000-0000-000000000000'
+      }))
+        .rejects
+        .toThrowError('Cannot find proposal with identifier 00000000-0000-0000-0000-000000000000');
+    });
+
+    it('should fail if the proposal is for subscription based common', async () => {
+      // Act and assert
+      await expect(createProposalPayment({
+        ...createProposalPaymentValidPayload,
+        proposalId: '00000000-0000-0000-0000-000000000001'
+      }))
+        .rejects
+        .toThrowError(
+          'Cannot create proposal payment for proposals that are not of funding type `one-time`. ' +
+          'For charging subscription proposals you must use `createSubscriptionPayment`!'
+        );
+    });
+
+    it('should create the payment given the correct payload', async () => {
+      // Arrange
+      const mock = new MockAdapter(axios);
+      const mockSpyPost = jest.spyOn(axios, 'post');
+
+      mock
+        .onPost(circePaymentEndpointMatcher)
+        .reply<ICircleCreatePaymentResponse>(200, createPaymentValidResponse);
+
+      mock
+        .onGet(circePaymentEndpointMatcher)
+        .reply<ICirclePayment>(200, getPaymentSuccessfulResponce);
+
+      // Act
+      const payment = await createProposalPayment(createProposalPaymentValidPayload);
+
+
+      // Assert
+      expect(payment.proposalId).toBe(createProposalPaymentValidPayload.proposalId);
+      expect(payment.fees).toMatchSnapshot();
+      expect(payment.status).toMatch(/paid|confirmed|failed/);
+
+      // Cleanup
+      mock.restore();
+      mockSpyPost.mockClear();
+    });
+  });
+
   // describe('Subscription payments', () => {
   //
   // });
