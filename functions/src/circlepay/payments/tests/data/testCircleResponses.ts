@@ -1,4 +1,4 @@
-import { ICirclePayment } from '../../../types';
+import { ICircleCreatePaymentResponse, ICirclePayment } from '../../../types';
 
 export const getPaymentPendingResponce: ICirclePayment = {
   data: {
@@ -57,6 +57,24 @@ export const getPaymentFailedResponse: ICirclePayment = {
     createDate: '2020-12-16T07:50:32.328Z',
     updateDate: '2020-12-16T07:50:32.918Z',
     metadata: { email: 'yanivitzhaki0@gmail.com' }
+  }
+};
+
+export const createPaymentValidResponse: ICircleCreatePaymentResponse = {
+  data: {
+    fees: undefined,
+    id: '62d74450-9b61-4d5a-8890-4fb22eb09fd8',
+    type: 'payment',
+    merchantId: 'fd8417cb-34c0-4a56-9d52-d4245c02cd38',
+    merchantWalletId: '1000032538',
+    source: { id: '699ae390-fb25-43f4-9e66-e8581499f8c9', type: 'card' },
+    description: 'Merchant Payment',
+    amount: { amount: '120.00', currency: 'USD' },
+    status: 'pending',
+    refunds: [],
+    createDate: '2021-01-26T06:51:33.702Z',
+    updateDate: '2021-01-26T06:51:33.702Z',
+    metadata: { email: 'alexander2001ivanov@gmail.com' }
   }
 };
 

@@ -1,5 +1,37 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Payment Unit Tests General payments should successfully create payment given valid data 1`] = `
+Object {
+  "amount": Object {
+    "amount": 10000,
+    "currency": "USD",
+  },
+  "circlePaymentId": "62d74450-9b61-4d5a-8890-4fb22eb09fd8",
+  "createdAt": Object {
+    "nanoseconds": 0,
+    "seconds": 1608168243,
+  },
+  "fees": Object {
+    "amount": 0,
+    "currency": "USD",
+  },
+  "id": "ae6b689c-5dcb-41ed-84a7-51e6ce7faa76",
+  "proposalId": "ae6b689c-5dcb-41ed-84a7-51e6ce7faa76",
+  "source": Object {
+    "id": "ae6b689c-5dcb-41ed-84a7-51e6ce7faa76",
+    "type": "card",
+  },
+  "status": "pending",
+  "subscriptionId": undefined,
+  "type": "one-time",
+  "updatedAt": Object {
+    "nanoseconds": 0,
+    "seconds": 1608176083,
+  },
+  "userId": "ae6b689c-5dcb-41ed-84a7-51e6ce7faa76",
+}
+`;
+
 exports[`Payment Unit Tests Payment polling should poll until failed status is reached 1`] = `
 Object {
   "amount": Object {

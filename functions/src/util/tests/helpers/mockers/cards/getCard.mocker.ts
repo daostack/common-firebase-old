@@ -17,7 +17,9 @@ jest.mock('../../../../../circlepay/cards/database/getCard', () => ({
         metadata: undefined,
         ownerId: cardId,
         verification: {
-          cvv: 'pass'
+          cvv: cardId === '00000000-0000-0000-0000-000000000000'
+            ? 'fail'
+            : 'pass'
         },
         updatedAt: Timestamp.now(),
         createdAt: Timestamp.now()

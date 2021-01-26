@@ -1,19 +1,28 @@
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
+import { v4 } from 'uuid';
 import {
+  createPaymentValidResponse,
   getPaymentFailedResponse,
   getPaymentPendingResponce,
   getPaymentSuccessfulResponce
 } from './data/testCircleResponses';
-import { ICirclePayment } from '../../types';
-import '../../../util/tests/helpers/mockers/payments/updatePayment.mocker';
-import '../../../util/tests/helpers/mockers/firebase.mocker';
+import { ICircleCreatePaymentResponse, ICirclePayment } from '../../types';
 
 // Add the logger to the tests globals
 import '../../../util/logger';
 
+// Mockers
+import '../../../util/tests/helpers/mockers/payments/updatePayment.mocker';
+import '../../../util/tests/helpers/mockers/payments/addPayment.mocker';
+import '../../../util/tests/helpers/mockers/firebase.mocker';
+import '../../../util/tests/helpers/mockers/getUser.mocker';
+import '../../../util/tests/helpers/mockers/cards/getCard.mocker';
+
 import { pendingPaymentEntity, successfulPaymentEntity } from './data/testPaymentEntities';
 import { pollPayment } from '../business/pollPayment';
+import { createPayment } from '../business/createPayment';
+import { createPaymentInvalidPayload, createPaymentValidPayload } from './data/testPaymentPayloads';
 
 const circleMatcher = /.+circle\.com\/.*/;
 const circePaymentEndpointMatcher = new RegExp(circleMatcher.source + (/\/payments/).source);
@@ -34,6 +43,10 @@ jest.mock('firebase-admin', () => ({
     })),
     settings: jest.fn()
   })
+}));
+
+jest.mock('../../../util/db/eventDbService', () => ({
+  createEvent: jest.fn()
 }));
 
 describe('Payment Unit Tests', () => {
@@ -147,9 +160,72 @@ describe('Payment Unit Tests', () => {
     });
   });
 
-  // describe('General payments', () => {
-  //
-  // });
+  describe('General payments', () => {
+    it('should not create payment whit invalid data', async () => {
+      // Act & Assert
+      await expect(createPayment(createPaymentInvalidPayload as any))
+        .rejects
+        .toThrowError('Validation failed');
+    });
+
+    it('should not create payment for user, that is not owner of the payment method', async () => {
+      // Arrange
+      const testData = {
+        ...createPaymentValidPayload,
+
+        // The card owner is with the same ID as the card itself
+        // during the mocking, so giving the user and card different
+        // random IDs should result it owner ID mismatch
+        userId: v4(),
+        cardId: v4()
+      };
+
+      // Act & Assert
+      await expect(createPayment(testData as any))
+        .rejects
+        .toThrowError('Cannot charge card, that you do not own');
+    });
+
+    it('should not create the payment if the payment method is not verified', async () => {
+      // Arrange
+      const testData = {
+        ...createPaymentValidPayload,
+
+        // If the card ID is default GUID the mocker will return
+        // card with failed CVV check
+        userId: '00000000-0000-0000-0000-000000000000',
+        cardId: '00000000-0000-0000-0000-000000000000'
+      };
+
+      // Act & Assert
+      await expect(createPayment(testData as any))
+        .rejects
+        .toThrowError('CVV verification failed for card with ID 00000000-0000-0000-0000-000000000000');
+    });
+
+    it('should successfully create payment given valid data', async () => {
+      // Arrange
+      const mock = new MockAdapter(axios);
+      const mockSpyPost = jest.spyOn(axios, 'post');
+
+      mock
+        .onPost(circePaymentEndpointMatcher)
+        .reply<ICircleCreatePaymentResponse>(200, createPaymentValidResponse);
+
+      // Act
+      const createdPayment = await createPayment(createPaymentValidPayload as any);
+
+      // Assert
+      expect(createdPayment).toBeTruthy();
+      expect(createdPayment.amount.amount).toEqual(createPaymentValidPayload.amount);
+
+      expect(createdPayment).toMatchSnapshot();
+
+      // Cleanup
+      mock.restore();
+      mockSpyPost.mockClear();
+    });
+  });
   //
   // describe('One-time payments', () => {
   //
