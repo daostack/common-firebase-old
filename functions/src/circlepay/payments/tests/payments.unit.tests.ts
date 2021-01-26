@@ -83,11 +83,7 @@ describe('Payment Unit Tests', () => {
       });
 
       // Assert
-      // Remove the timestamps
-      delete pollResult.createdAt;
-      delete pollResult.updatedAt;
-
-      expect(pollResult).toMatchSnapshot();
+      expect(pollResult.fees).toMatchSnapshot()
       expect(mockSpy).toHaveBeenCalledTimes(11);
 
       // Cleanup
@@ -230,8 +226,6 @@ describe('Payment Unit Tests', () => {
       // Assert
       expect(createdPayment).toBeTruthy();
       expect(createdPayment.amount.amount).toEqual(createPaymentValidPayload.amount);
-
-      expect(createdPayment).toMatchSnapshot();
 
       // Cleanup
       mock.restore();
