@@ -82,10 +82,6 @@ Object {
     "currency": "USD",
   },
   "circlePaymentId": "b3025713-7988-45e5-8af8-cca8d624ce28",
-  "createdAt": Object {
-    "nanoseconds": 0,
-    "seconds": 1608168243,
-  },
   "fees": Object {
     "amount": 1598,
     "currency": "USD",
@@ -99,10 +95,6 @@ Object {
   "status": "paid",
   "subscriptionId": "811dd5ed-1481-43bc-bc79-cacf6598916f",
   "type": "subscription",
-  "updatedAt": Object {
-    "nanoseconds": 0,
-    "seconds": 1608176083,
-  },
   "userId": "2Ti3LkP23KUJVp2AZY3wVHYWRxm2",
 }
 `;

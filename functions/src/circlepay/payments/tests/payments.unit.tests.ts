@@ -83,6 +83,10 @@ describe('Payment Unit Tests', () => {
       });
 
       // Assert
+      // Remove the timestamps
+      delete pollResult.createdAt;
+      delete pollResult.updatedAt;
+
       expect(pollResult).toMatchSnapshot();
       expect(mockSpy).toHaveBeenCalledTimes(11);
 
@@ -281,7 +285,6 @@ describe('Payment Unit Tests', () => {
 
       // Act
       const payment = await createProposalPayment(createProposalPaymentValidPayload);
-
 
       // Assert
       expect(payment.proposalId).toBe(createProposalPaymentValidPayload.proposalId);

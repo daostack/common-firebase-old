@@ -89,6 +89,9 @@ describe('Card unit tests', () => {
       const pollCardResult = await pollCard(pendingCardEntity);
 
       // Assert
+      delete pollCardResult.updatedAt;
+      delete pollCardResult.createdAt;
+
       expect(pollCardResult).toMatchSnapshot();
       expect(pollCardResult.verification.cvv).toBe('pass');
 
