@@ -15,7 +15,7 @@ let getSecretFn: (secretName: string) => Promise<string>;
 if(process.env.NODE_ENV === 'test') {
   process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
 
-  getSecretFn = (secretName) => Promise.resolve(secretName);
+  getSecretFn = (secretName: string): Promise<string> => Promise.resolve(secretName);
 
   admin.initializeApp({
     projectId: 'test',
