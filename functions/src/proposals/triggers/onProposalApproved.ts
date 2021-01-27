@@ -5,7 +5,6 @@ import {IEventEntity} from '../../event/type';
 import {EVENT_TYPES} from '../../event/event';
 import {fundProposal} from '../business/fundProposal';
 import {createSubscription} from '../../subscriptions/business';
-import {commonDb} from '../../common/database';
 import {proposalDb} from '../database';
 import {createEvent} from '../../util/db/eventDbService';
 import {createProposalPayment} from '../../circlepay/payments/business/createProposalPayment';
