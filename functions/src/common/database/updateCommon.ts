@@ -1,7 +1,7 @@
 import { firestore } from 'firebase-admin';
 
 import { ICommonEntity } from '../types';
-import { commonCollection } from './index';
+import { CommonsCollection } from './index';
 
 export type IUpdatableCommonEntity = Partial<ICommonEntity> & {
   id: string;
@@ -19,7 +19,7 @@ export const updateCommon = async (common: IUpdatableCommonEntity): Promise<IUpd
     updatedAt: firestore.Timestamp.now()
   };
 
-  await commonCollection
+  await CommonsCollection
     .doc(commonEntity.id)
     .update(commonEntity);
 
