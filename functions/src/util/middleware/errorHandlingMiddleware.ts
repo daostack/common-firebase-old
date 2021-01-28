@@ -3,9 +3,9 @@ import * as os from 'os';
 
 import { env } from '../../constants';
 import { createErrorResponse } from '../createErrorResponse';
+
 import { CommonError } from '../errors';
 import { ICommonError } from '../errors/CommonError';
-
 import { slackClient } from '../slack';
 
 export const errorHandling = async (err: Error, req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
