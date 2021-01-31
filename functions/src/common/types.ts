@@ -1,5 +1,4 @@
 import { IBaseEntity } from '../util/types';
-import { IUpdatableCommonEntity } from './database/updateCommon';
 import admin from 'firebase-admin';
 import Timestamp = admin.firestore.Timestamp;
 

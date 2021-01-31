@@ -27,7 +27,6 @@ const updateCommonDataValidationScheme = yup.object({
      rules: yup.array(commonRuleValidationSchema).optional(),
 
      metadata: yup.object({
-       founderId: yup.string().required(),
        byline: yup.string().optional(),
        description: yup.string().optional(),
      }),
