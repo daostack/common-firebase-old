@@ -1,3 +1,7 @@
+# The repo has been migrated to the monorepo project. Please create the PRs there!
+
+[Monorepo address](https://github.com/daostack/common-monorepo)
+
 # The backend code, powering Common
 
 This repository contains code for the firebase backend of the project.
