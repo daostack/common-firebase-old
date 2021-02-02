@@ -1,9 +1,9 @@
 import { IBaseEntity } from '../util/types';
-import { ICommonEntity } from '../common/types';
+import { IUpdatableCommonEntity } from '../common/database/updateCommon';
 
 export interface ICommonEditHistory extends IBaseEntity {
 	commonId: string;
 	changedBy: string;
-	originalDocument: ICommonEntity;
-	newDocument: ICommonEntity;
+	originalDocument: IUpdatableCommonEntity;
+	newDocument: IUpdatableCommonEntity;
 }

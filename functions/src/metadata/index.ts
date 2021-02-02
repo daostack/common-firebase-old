@@ -14,12 +14,20 @@ metadataRouter.get('/app', (req, res) => {
     });
 });
 
+metadataRouter.get('/headers', async (req, res) => {
+  res.send({
+    headers: JSON.stringify(req.headers),
+    rawHeaders: JSON.stringify(req.rawHeaders)
+  });
+});
+
 export const metadataApp = functions
   .runWith({
     timeoutSeconds: 540
   })
   .https.onRequest(commonApp(metadataRouter, {
     unauthenticatedRoutes: [
-      '/app'
+      '/app',
+      '/headers'
     ]
   }));
